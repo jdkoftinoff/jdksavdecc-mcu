@@ -1,5 +1,5 @@
 #include "JDKSAvdeccWorld.h"
-#include "JDKSAvdeccStorage.h"
+#include "JDKSAvdeccEEPromStorage.h"
 
 #ifdef __avr__
 #include "EEProm.h"

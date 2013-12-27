@@ -16,7 +16,7 @@ public:
     bool Poll();
     bool PollEthernet();
 
-    void SendRawPacket(uint16_t len);
+    void SendRawPacket();
     void SendADP();
     void SendControl(uint16_t descriptor_index, uint16_t control_value );
     void ReceiveLEDControl(uint16_t descriptor_index);

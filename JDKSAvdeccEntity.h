@@ -1,7 +1,7 @@
 #pragma once
 
 #include "JDKSAvdeccWorld.h"
-#include "JDKSAvdeccNet.h"
+#include "JDKSAvdeccNetIO.h"
 
 namespace JDKSAvdecc {
 
@@ -20,7 +20,6 @@ public:
     };
 
     struct Storage {
-        uint32_t magic_number;
         jdksavdecc_eui64 entity_model_id;
         jdksavdecc_eui48 mac_address;
         jdksavdecc_string entity_name;
@@ -36,10 +35,11 @@ public:
     virtual bool Poll();
     virtual bool PollEthernet();
 
-    virtual void SendRawPacket(uint16_t len);
+    virtual void SendRawPacket();
     virtual void SendADP();
-    virtual void SendControl(uint16_t descriptor_index, uint16_t control_value );
-    virtual void ReceiveLEDControl(uint16_t descriptor_index);
+    virtual void SendControlToTarget(uint16_t local_descriptor_index, uint16_t control_value );
+    virtual void ReceiveControlFromTarget();
+    virtual void SendRequestForControlToTarget(uint16_t local_descriptor_index);
 
     virtual void AcquireEntity();
     virtual void ControllerAvailableResponse();
