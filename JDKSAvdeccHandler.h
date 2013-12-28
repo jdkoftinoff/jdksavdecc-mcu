@@ -53,7 +53,9 @@ public:
                ( buf[0] == my_mac.value[0] &&
                 buf[1] == my_mac.value[1] &&
                 buf[2] == my_mac.value[2] &&
-                buf[3] == my_mac.value[3] ) )
+                buf[3] == my_mac.value[3] &&
+                buf[4] == my_mac.value[4] &&
+                buf[5] == my_mac.value[5] ) )
             {
                 // Ok, this PDU is worth spending time on. Send it on to all known Handlers.
 
