@@ -16,7 +16,7 @@ public:
     virtual uint16_t ReceiveRawNet(uint8_t *data,
                                    uint16_t max_len );
 
-    virtual bool SendRawNet(jdksavdecc_eui48 *dest_mac,
+    virtual bool SendRawNet(jdksavdecc_eui48 const *dest_mac,
                             uint8_t const *data,
                             uint16_t len );
 

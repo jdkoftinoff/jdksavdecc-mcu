@@ -9,10 +9,11 @@ namespace JDKSAvdecc {
 /// Base clase for sending or receiving raw ethernet frames
 class NetIO {
 public:
-    virtual ~NetIO() {}
+    NetIO();
+    virtual ~NetIO();
 
     /// Do any post-constructor initialization
-    virtual void Initialize();
+    virtual void Initialize() = 0;
 
     virtual jdksavdecc_eui48 const &GetMacAddress() const = 0;
 
