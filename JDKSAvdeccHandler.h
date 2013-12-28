@@ -36,7 +36,9 @@ public:
     }
 
 
-    virtual void PollNet( uint32_t time_in_millis ) {
+    // Poll the NetIO object for an incoming frame. If it is multicast, or m
+    virtual bool PollNet( uint32_t time_in_millis ) {
+        bool r=false;
         uint8_t buf[640];
         uint16_t len;
         // Try receive data
@@ -59,9 +61,10 @@ public:
             {
                 // Ok, this PDU is worth spending time on. Send it on to all known Handlers.
 
-                ReceivedPDU( time_in_millis, buf, len );
+                r=ReceivedPDU( time_in_millis, buf, len );
             }
         }
+        return r;
     }
 
     /// Send Tick() messages to all encapsulated Handlers
