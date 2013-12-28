@@ -16,7 +16,7 @@ public:
     virtual void Initialize() = 0;
 
     /// Get the MAC address of the ethernet port
-    virtual jdksavdecc_eui48 const &GetMacAddress() const = 0;
+    virtual jdksavdecc_eui48 const &GetMACAddress() const = 0;
 
     /// Poll incoming data for raw ethernet frame
     /// Returns length of entire frame received, or 0 if none.

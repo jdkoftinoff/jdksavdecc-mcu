@@ -15,7 +15,7 @@ public:
     virtual ~WizNetIO();
     virtual void Initialize();
 
-    virtual jdksavdecc_eui48 const &GetMacAddress() const {
+    virtual jdksavdecc_eui48 const &GetMACAddress() const {
         return m_mac_address;
     }
 
