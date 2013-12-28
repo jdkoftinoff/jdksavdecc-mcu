@@ -4,11 +4,10 @@
 #include "JDKSAvdeccWizNetIO.h"
 
 #ifdef __AVR__
-#include "w5100.h"
-#include "socket.h"
+#include "utility/w5100.h"
+#include "utility/socket.h"
 
 namespace JDKSAvdecc {
-
 
 WizNetIO::WizNetIO() {
 }
@@ -34,34 +33,35 @@ uint16_t WizNetIO::ReceiveRawNet(uint8_t *data,
         ptr+=2;
         data_len = head[0];
         data_len = (data_len<<8) + head[1] - 2;
-
-        W5100.read_data(0,(uint8_t*) ptr,buf,data_len);
+        if( data_len<=max_len ) {
+            W5100.read_data(0,(uint8_t*) ptr,data,data_len);
+        }
         ptr += data_len;
         W5100.writeSnRX_RD(0, ptr);
         W5100.execCmdSn(0, Sock_RECV);
     }
-    return data_len;
+    return data_len <= max_len ? data_len : 0;
 }
 
 bool WizNetIO::SendRawNet(jdksavdecc_eui48 const *dest_mac,
                           uint8_t const *data,
                           uint16_t len ) {
 
-    W5100.writeSnDHAR(0, dest_mac->values );
+    W5100.writeSnDHAR(0, (uint8_t*)dest_mac->value );
 
-    W5100.send_data_processing(s, (uint8_t *)buf, ret);
-    W5100.execCmdSn(s, Sock_SEND_MAC);
+    W5100.send_data_processing(0, (uint8_t *)data, len);
+    W5100.execCmdSn(0, Sock_SEND_MAC);
 
-    while ( (W5100.readSnIR(s) & SnIR::SEND_OK) != SnIR::SEND_OK )
+    while ( (W5100.readSnIR(0) & SnIR::SEND_OK) != SnIR::SEND_OK )
     {
-        if (W5100.readSnIR(s) & SnIR::TIMEOUT)
+        if (W5100.readSnIR(0) & SnIR::TIMEOUT)
         {
-            W5100.writeSnIR(s, (SnIR::SEND_OK | SnIR::TIMEOUT));
+            W5100.writeSnIR(0, (SnIR::SEND_OK | SnIR::TIMEOUT));
             return 0;
         }
     }
 
-    W5100.writeSnIR(s, SnIR::SEND_OK);
+    W5100.writeSnIR(0, SnIR::SEND_OK);
 }
 
 
