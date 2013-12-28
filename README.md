@@ -13,5 +13,5 @@ To get started:
 
 Then open the Arduino IDE, go to the "Sketch" menu, "Import Library..." menu item, "Add Library..." item.  Then select the JDKSAvdeccArduino directory that you had just cloned from github.
 
-Once you imported the library, you can open the KnobsAndDials example by going to the "File" Menu, "Examples" menu item, then Select "JDKSAvdeccArduino" option.
+Once you imported the library, you can open the KnobsAndButtons example by going to the "File" Menu, "Examples" menu item, then Select "JDKSAvdeccArduino" option.
 
