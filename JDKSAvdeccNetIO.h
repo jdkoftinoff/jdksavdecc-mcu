@@ -15,6 +15,7 @@ public:
     /// Do any post-constructor initialization
     virtual void Initialize() = 0;
 
+    /// Get the MAC address of the ethernet port
     virtual jdksavdecc_eui48 const &GetMacAddress() const = 0;
 
     /// Poll incoming data for raw ethernet frame
@@ -24,8 +25,7 @@ public:
                                    uint16_t max_len ) = 0;
 
     /// Send raw etherent frame.
-    virtual bool SendRawNet(jdksavdecc_eui48 const *dest_mac,
-                            uint8_t const *data,
+    virtual bool SendRawNet(uint8_t const *data,
                             uint16_t len ) = 0;
 
 };

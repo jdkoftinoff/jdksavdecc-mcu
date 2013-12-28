@@ -9,17 +9,18 @@
 
 namespace JDKSAvdecc {
 
-WizNetIO::WizNetIO() {
-}
-
 WizNetIO::~WizNetIO() {
     close(0);
 }
 
 
 void WizNetIO::Initialize() {
+    W5100.init();
+    W5100.setMACAddress(m_mac_address.value);
+    //W5100.setIPAddress(IPAddress(0,0,0,0).raw_address());
     socket(0,SnMR::MACRAW,0x22f0,0);
 }
+
 
 uint16_t WizNetIO::ReceiveRawNet(uint8_t *data,
                                    uint16_t max_len ) {
@@ -43,11 +44,10 @@ uint16_t WizNetIO::ReceiveRawNet(uint8_t *data,
     return data_len <= max_len ? data_len : 0;
 }
 
-bool WizNetIO::SendRawNet(jdksavdecc_eui48 const *dest_mac,
-                          uint8_t const *data,
+bool WizNetIO::SendRawNet(uint8_t const *data,
                           uint16_t len ) {
 
-    W5100.writeSnDHAR(0, (uint8_t*)dest_mac->value );
+    W5100.writeSnDHAR(0, (uint8_t*)data );
 
     W5100.send_data_processing(0, (uint8_t *)data, len);
     W5100.execCmdSn(0, Sock_SEND_MAC);
