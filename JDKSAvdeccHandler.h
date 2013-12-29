@@ -16,6 +16,36 @@ public:
 
     /// Notification of received raw PDU. Return true if PDU is handled
     virtual bool ReceivedPDU( uint32_t time_in_millis, uint8_t *buf, uint16_t len );
+
+
+    /// Helper function to parse AECP AEM message
+    bool ParseAEM(jdksavdecc_aecpdu_aem *aem,
+                  uint8_t const *buf,
+                  uint16_t pos,
+                  uint16_t len);
+
+    /// Test to see if AECPDU AEM message is a command for the specified target entity
+    bool IsAEMForTarget(jdksavdecc_aecpdu_aem const &aem,
+                        jdksavdecc_eui64 const &expected_target_entity_id);
+
+    /// Test to see if AECPDU AEM message is a response for the specified controller entity
+    bool IsAEMForController(jdksavdecc_aecpdu_aem const &aem,
+                           jdksavdecc_eui64 const &expected_controller_entity_id);
+
+
+    /// Helper function to parse AECP AA message
+    bool ParseAA(jdksavdecc_aecp_aa *aa,
+                 uint8_t const *buf,
+                 uint16_t pos,
+                 uint16_t len);
+
+    /// Test to see if AECPDU AA message is a command for the specified target entity
+    bool IsAAForTarget(jdksavdecc_aecp_aa const &aa,
+                        jdksavdecc_eui64 const &expected_target_entity_id);
+
+    /// Test to see if AECPDU AA message is a response for the specified controller entity
+    bool IsAAForController(jdksavdecc_aecp_aa const &aa,
+                            jdksavdecc_eui64 const &expected_controller_entity_id);
 };
 
 
