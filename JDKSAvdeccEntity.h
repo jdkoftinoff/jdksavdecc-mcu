@@ -5,6 +5,7 @@
 
 namespace JDKSAvdecc {
 
+#if 0 // TODO
 class Entity {
 public:
     struct ControlInfo {
@@ -63,5 +64,7 @@ protected:
     uint8_t m_raw_packet[640];
     uint16_t m_raw_packet_len;
 };
+#endif
+
 
 }
