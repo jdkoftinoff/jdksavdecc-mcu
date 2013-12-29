@@ -11,3 +11,7 @@
 #include <iomanip>
 #endif
 
+extern "C" {
+void avr_debug_log(const char *str, uint16_t v );
+}
+

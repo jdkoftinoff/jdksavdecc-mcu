@@ -184,13 +184,14 @@ void setup() {
   Display.gfx_RectangleFilled(0,PANEL_Y-10,239,319,DARKBLUE);
   
 }
-
 extern "C" {
   void avr_debug_log(const char *str, uint16_t v ) {
+#if 1
     Display.txt_MoveCursor(17,2);
     char s[128];
-    sprintf( s, "%s %d", str, v );
+    sprintf( s, "%s %04x", str, v );
     Display.putstr(s);
+#endif
   }
 }
 

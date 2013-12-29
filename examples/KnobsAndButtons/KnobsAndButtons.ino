@@ -188,6 +188,9 @@ void setup() {
   pinMode(6,INPUT_PULLUP);
   pinMode(A4,OUTPUT);
   pinMode(A5,OUTPUT);
+
+  // Initialize the serial port for debug logs  
+  Serial.begin(9600);
   
   // Initialize the W5100 chip 
   rawnet.Initialize();
@@ -206,6 +209,13 @@ void setup() {
   all_handlers.Add( &button5 );
 }
 
+extern "C" {
+void avr_debug_log(const char *str, uint16_t v ) {
+  Serial.print(str);
+  Serial.print(" " );
+  Serial.println(v);
+}
+}
 
 void loop() {
   // Get the current time in milliseconds
