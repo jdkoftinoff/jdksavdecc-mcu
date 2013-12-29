@@ -8,7 +8,7 @@ include_directories( "jdksavdecc-c/include" )
 
 file(GLOB_RECURSE JDKSAVDECC_ARDUINO_INCLUDES "*.h" "jdksavdecc-c/include/*.h" )
 
-file(GLOB_RECURSE JDKSAVDECC_ARDUINO_SRC "*.cpp" "jdksavdecc-c/src/*.c" )
+file(GLOB_RECURSE JDKSAVDECC_ARDUINO_SRC "*.cpp" "*.c" )
 
 add_library (JDKSAvdeccArduino ${JDKSAVDECC_ARDUINO_SRC} ${JDKSAVDECC_ARDUINO_INCLUDES})
 
