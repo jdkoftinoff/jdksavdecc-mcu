@@ -12,10 +12,10 @@ using namespace JDKSAvdecc;
 jdksavdecc_eui48 my_mac = { { 0x90, 0xe0, 0xf0, 0x00, 0x00, 0x01 } };
 
 /// This AVDECC Entity is based on the example MAC address, convered to an EUI-64 by inserting 0xff, 0xfe in the middle
-jdksavdecc_eui64 my_entity_id = { {0x90, 0xe0, 0xf0, 0xff, 0xfe, 0x00, 0x01 } };
+jdksavdecc_eui64 my_entity_id = { {0x90, 0xe0, 0xf0, 0xff, 0xfe, 0x00, 0x00, 0x01 } };
 
 /// This AVDECC Entity Model ID is for example usages
-jdksavdecc_eui64 my_entity_model_id = { {0x90, 0xe0, 0xf0, 0xff, 0xfe, 0x00, 0x02 } };
+jdksavdecc_eui64 my_entity_model_id = { {0x90, 0xe0, 0xf0, 0xff, 0xfe, 0x00, 0x00, 0x02 } };
 
 /// the W5100 chip Raw Ethernet handler object
 WizNetIO rawnet(my_mac);
@@ -156,9 +156,9 @@ public:
     if( time_in_millis > m_last_update_time + m_update_rate_in_millis ) {
       m_last_update_time = time_in_millis;
       
-      knob1.SetValueDoublet( analogRead(0) << 6 ); // Scale 10 bit analog reading into 0-0xffc0
-      knob2.SetValueDoublet( analogRead(1) << 6 );
-      knob3.SetValueDoublet( analogRead(2) << 6 );
+      knob1.SetValueDoublet( analogRead(0)); // A/D values range from 0 to 0x3ff
+      knob2.SetValueDoublet( analogRead(1));
+      knob3.SetValueDoublet( analogRead(2));
       
       button1.SetValueOctet( digitalRead(2) ? 0x00 : 0xff ); // DLI reads true when not pressed, reverse logic
       button2.SetValueOctet( digitalRead(3) ? 0x00 : 0xff );
