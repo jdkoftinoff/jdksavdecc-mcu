@@ -27,14 +27,19 @@ private:
     NetIO &m_net;
     Handler *m_item[MaxItems];
     uint16_t m_num_items;
+    uint32_t m_rx_count;
+    uint32_t m_handled_count;
 public:
-    HandlerGroup(NetIO &net) : m_net(net), m_num_items(0) {}
+    HandlerGroup(NetIO &net) : m_net(net), m_num_items(0), m_rx_count(0), m_handled_count(0) {}
 
     /// Add a handler to the list
     void Add( Handler *v ) {
         m_item[m_num_items++] = v;
     }
 
+
+    uint32_t GetRxCount() const { return m_rx_count; }
+    uint32_t GetHandledCount() const { return m_handled_count; }
 
     // Poll the NetIO object for an incoming frame. If it is multicast, or m
     virtual bool PollNet( uint32_t time_in_millis ) {
@@ -44,24 +49,32 @@ public:
         // Try receive data
         len = m_net.ReceiveRawNet(buf,sizeof(buf));
 
-        jdksavdecc_eui48 const &my_mac = m_net.GetMACAddress();
+        // Make sure we read DA,SA,Ethertype
+        if( len>14 ) {
+            // Make sure it is AVTP/AVDECC ethertype
 
-        // Make sure it is AVTP/AVDECC ethertype
-        if( (buf[12] == ((JDKSAVDECC_AVTP_ETHERTYPE>>8)&0xff))
-           && (buf[13] == ((JDKSAVDECC_AVTP_ETHERTYPE>>0)&0xff))) {
+            if( (buf[12] == ((JDKSAVDECC_AVTP_ETHERTYPE>>8)&0xff))
+               && (buf[13] == ((JDKSAVDECC_AVTP_ETHERTYPE>>0)&0xff))) {
 
-            // Make sure it is either multicast or is for me
-            if( (buf[0]&0x1) ||
-               ( buf[0] == my_mac.value[0] &&
-                buf[1] == my_mac.value[1] &&
-                buf[2] == my_mac.value[2] &&
-                buf[3] == my_mac.value[3] &&
-                buf[4] == my_mac.value[4] &&
-                buf[5] == my_mac.value[5] ) )
-            {
-                // Ok, this PDU is worth spending time on. Send it on to all known Handlers.
+                jdksavdecc_eui48 const &my_mac = m_net.GetMACAddress();
+                
+                // Make sure it is either multicast or is for me
+                if( (buf[0]&0x1) ||
+                   ( buf[0] == my_mac.value[0] &&
+                    buf[1] == my_mac.value[1] &&
+                    buf[2] == my_mac.value[2] &&
+                    buf[3] == my_mac.value[3] &&
+                    buf[4] == my_mac.value[4] &&
+                    buf[5] == my_mac.value[5] ) )
+                {
+                    // Ok, this PDU is worth spending time on. Send it on to all known Handlers.
 
-                r=ReceivedPDU( time_in_millis, buf, len );
+                    m_rx_count++;
+                    r=ReceivedPDU( time_in_millis, buf, len );
+                    if( r ) {
+                        m_handled_count++;
+                    }
+                }
             }
         }
         return r;
