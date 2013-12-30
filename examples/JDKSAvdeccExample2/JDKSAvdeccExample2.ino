@@ -8,6 +8,7 @@
 #include "JDKSAvdeccFrame.h"
 #include "JDKSAvdeccADPManager.h"
 #include "JDKSAvdeccControlReceiver.h"
+#include "JDKSAvdeccHandlerGroup.h"
 
 Picaso_Serial_4DLib Display(&Serial);
 
@@ -121,7 +122,7 @@ VisualLight light5(1,PANEL_X+WIDGET_H_SPACING*1,SLIDER_H+PANEL_Y+20+WIDGET_H_SPA
 ControlReceiver<16> control_receiver(rawnet,my_entity_id);
 
 /// Create a HandlerGroup which can manage up to 16 handlers
-HandlerGroup<16> all_handlers(rawnet);
+HandlerGroup<16> all_handlers;
 
 void display_callback(int ErrCode, unsigned char Errorbyte)
 {

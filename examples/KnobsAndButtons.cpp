@@ -5,6 +5,9 @@
 #include "JDKSAvdeccFrame.h"
 #include "JDKSAvdeccADPManager.h"
 #include "JDKSAvdeccControlSender.h"
+#include "JDKSAvdeccHandlerGroup.h"
+#include "JDKSAvdeccEntity.h"
+
 
 using namespace JDKSAvdecc;
 
@@ -30,6 +33,8 @@ ADPManager adp_manager(
                        20
                        );
 
+Entity my_entity(adp_manager);
+
 /// All of the controls are targetting an example AVDECC Entity ID: 90-e0-f0-ff-fe-00-00-02
 jdksavdecc_eui64 target_entity_id = { { 0x90, 0xe0, 0xf0, 0xff, 0xfe, 0x00, 0x00, 0x02 } };
 
@@ -41,7 +46,6 @@ uint16_t sequence_id = 0;
 
 /// The mapping of Knob 1 to control descriptor 0x0000. 2 byte payload, refresh time of 1000 ms
 ControlSender knob1(
-                    rawnet,
                     my_entity_id,
                     target_entity_id,
                     target_mac_address,
@@ -53,7 +57,6 @@ ControlSender knob1(
 
 /// The mapping of Knob 2 to control descriptor 0x0001. 2 byte payload, refresh time of 1000 ms
 ControlSender knob2(
-                    rawnet,
                     my_entity_id,
                     target_entity_id,
                     target_mac_address,
@@ -65,7 +68,6 @@ ControlSender knob2(
 
 /// The mapping of Knob 2 to control descriptor 0x0002. 2 byte payload, refresh time of 1000 ms
 ControlSender knob3(
-                    rawnet,
                     my_entity_id,
                     target_entity_id,
                     target_mac_address,
@@ -77,7 +79,6 @@ ControlSender knob3(
 
 /// The mapping of Button 1 to control descriptor 0x0003. 2 byte payload, refresh time of 1000 ms
 ControlSender button1(
-                      rawnet,
                       my_entity_id,
                       target_entity_id,
                       target_mac_address,
@@ -89,7 +90,6 @@ ControlSender button1(
 
 /// The mapping of Button 2 to control descriptor 0x0004. 2 byte payload, refresh time of 1000 ms
 ControlSender button2(
-                      rawnet,
                       my_entity_id,
                       target_entity_id,
                       target_mac_address,
@@ -101,7 +101,6 @@ ControlSender button2(
 
 /// The mapping of Button 3 to control descriptor 0x0005. 2 byte payload, refresh time of 1000 ms
 ControlSender button3(
-                      rawnet,
                       my_entity_id,
                       target_entity_id,
                       target_mac_address,
@@ -113,7 +112,6 @@ ControlSender button3(
 
 /// The mapping of Button 3 to control descriptor 0x0006. 2 byte payload, refresh time of 1000 ms
 ControlSender button4(
-                      rawnet,
                       my_entity_id,
                       target_entity_id,
                       target_mac_address,
@@ -125,7 +123,6 @@ ControlSender button4(
 
 /// The mapping of Button 3 to control descriptor 0x0007. 2 byte payload, refresh time of 1000 ms
 ControlSender button5(
-                      rawnet,
                       my_entity_id,
                       target_entity_id,
                       target_mac_address,
@@ -163,8 +160,8 @@ public:
             button1.SetValueOctet( digitalRead(2) ? 0x00 : 0xff ); // DLI reads true when not pressed, reverse logic
             button2.SetValueOctet( digitalRead(3) ? 0x00 : 0xff );
             button3.SetValueOctet( digitalRead(4) ? 0x00 : 0xff );
-            button4.SetValueOctet( digitalRead(5) ? 0x00 : 0xff );  
-            button5.SetValueOctet( digitalRead(6) ? 0x00 : 0xff );  
+            button4.SetValueOctet( digitalRead(5) ? 0x00 : 0xff );
+            button5.SetValueOctet( digitalRead(6) ? 0x00 : 0xff );
             
             digitalWrite( A5, !digitalRead(2) );
             digitalWrite( A4, !digitalRead(3) );      
@@ -176,7 +173,7 @@ public:
 ValueMapper value_mapper(50);
 
 /// Create a HandlerGroup which can manage up to 16 handlers
-HandlerGroup<16> all_handlers(rawnet);
+HandlerGroup<16> all_handlers;
 
 void setup() {
     // Set up the I/O pins for 3 knobs, 5 buttons, and 2 LED's
@@ -207,12 +204,13 @@ void setup() {
     all_handlers.Add( &button3 );  
     all_handlers.Add( &button4 );
     all_handlers.Add( &button5 );
+    all_handlers.Add( &my_entity );
 }
 
 extern "C" {
     void avr_debug_log(const char *str, uint16_t v ) {
         Serial.print(str);
-        Serial.print(" " );
+        Serial.print(" ");
         Serial.println(v);
     }
 }
