@@ -4,6 +4,7 @@
 #include "JDKSAvdeccNetIO.h"
 #include "JDKSAvdeccFrame.h"
 #include "JDKSAvdeccHandler.h"
+#include "JDKSAvdeccHelpers.h"
 
 namespace JDKSAvdecc {
 
@@ -11,8 +12,7 @@ class ControlSender : public Handler {
 public:
 
     /// Construct the SetControlSender object
-    ControlSender(NetIO &net,
-               jdksavdecc_eui64 const &entity_id,
+    ControlSender(jdksavdecc_eui64 const &entity_id,
                jdksavdecc_eui64 const &target_entity_id,
                jdksavdecc_eui48 const &target_mac_address,
                uint16_t &sequence_id,
@@ -47,7 +47,6 @@ public:
 
 
 protected:
-    NetIO &m_net;
     jdksavdecc_eui64 m_entity_id;
     jdksavdecc_eui64 m_target_entity_id;
     jdksavdecc_eui48 m_target_mac_address;

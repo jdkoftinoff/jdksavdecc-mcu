@@ -26,8 +26,23 @@ public:
 
     /// Send raw etherent frame.
     virtual bool SendRawNet(uint8_t const *data,
-                            uint16_t len ) = 0;
+                            uint16_t len,
+                            uint8_t const *data1=0,
+                            uint16_t len1=0,
+                            uint8_t const *data2=0,
+                            uint16_t len2=0 ) = 0;
+
+    /// Reply to the sender of the frame (Same as SendRawNet put swaps SA/DA
+    virtual bool SendReplyRawNet(uint8_t const *data,
+                                 uint16_t len,
+                                 uint8_t const *data1=0,
+                                 uint16_t len1=0,
+                                 uint8_t const *data2=0,
+                                 uint16_t len2=0 ) = 0;
+
 
 };
+
+extern NetIO *net;
 
 }

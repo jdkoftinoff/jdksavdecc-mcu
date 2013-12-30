@@ -4,16 +4,19 @@
 
 namespace JDKSAvdecc {
 
-template <size_t MaxLen>
-class Frame {
-private:
-    uint8_t m_buf[MaxLen];
+
+class FrameBase {
+protected:
+    uint8_t *m_buf;
     uint16_t m_pos;
 public:
-    Frame(
+    FrameBase(
+          uint8_t *buf,
           jdksavdecc_eui48 const &dest_mac,
           jdksavdecc_eui48 const &src_mac,
-          uint16_t ethertype ) : m_pos(0) {
+          uint16_t ethertype )
+        : m_buf(buf)
+        , m_pos(0) {
         PutEUI48( dest_mac );
         PutEUI48( src_mac );
         PutDoublet( ethertype );
@@ -72,6 +75,18 @@ public:
 
     uint8_t const *GetBuf() const { return m_buf; }
     uint16_t GetLength() const { return m_pos; }
+};
+
+template <size_t MaxSize>
+class Frame : public FrameBase {
+protected:
+    uint8_t m_buf_storage[MaxSize];
+public:
+    Frame( jdksavdecc_eui48 const &dest_mac,
+           jdksavdecc_eui48 const &src_mac,
+           uint16_t ethertype )
+        : FrameBase(m_buf_storage,dest_mac,src_mac,ethertype) {}
+
 };
 
 }

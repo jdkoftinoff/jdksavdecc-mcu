@@ -5,6 +5,7 @@
 #include "JDKSAvdeccFrame.h"
 #include "JDKSAvdeccHandler.h"
 #include "JDKSAvdeccControlValueHolder.h"
+#include "JDKSAvdeccHelpers.h"
 
 namespace JDKSAvdecc {
 

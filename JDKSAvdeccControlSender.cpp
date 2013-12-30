@@ -3,7 +3,7 @@
 
 namespace JDKSAvdecc {
 
-ControlSender::ControlSender(NetIO &net,
+ControlSender::ControlSender(
                  jdksavdecc_eui64 const &entity_id,
                  jdksavdecc_eui64 const &target_entity_id,
                  jdksavdecc_eui48 const &target_mac_address,
@@ -12,8 +12,7 @@ ControlSender::ControlSender(NetIO &net,
                  uint16_t value_length,
                  uint32_t update_rate_in_millis
                  )
-: m_net( net )
-, m_entity_id( entity_id )
+: m_entity_id( entity_id )
 , m_target_entity_id( target_entity_id )
 , m_target_mac_address( target_mac_address )
 , m_sequence_id( sequence_id )
@@ -67,7 +66,7 @@ void ControlSender::Tick( uint32_t time_in_millis ) {
 }
 
 void ControlSender::SendSetControl() {
-    Frame<128> pdu(m_target_mac_address,m_net.GetMACAddress(),JDKSAVDECC_AVTP_ETHERTYPE);  // DA, SA, EtherType, ADPDU = 82 bytes
+    Frame<128> pdu(m_target_mac_address,net->GetMACAddress(),JDKSAVDECC_AVTP_ETHERTYPE);  // DA, SA, EtherType, ADPDU
 
     // AECPDU common control header
     pdu.PutOctet( 0x80 + JDKSAVDECC_SUBTYPE_AECP); // cd=1, subtype=0x7b (AECP)
@@ -84,7 +83,7 @@ void ControlSender::SendSetControl() {
     pdu.PutDoublet( m_target_descriptor_index );
     pdu.PutBuf( m_value, m_value_length );
 
-    m_net.SendRawNet( pdu.GetBuf(), pdu.GetLength() );
+    net->SendRawNet( pdu.GetBuf(), pdu.GetLength() );
     m_sequence_id++;
 }
 

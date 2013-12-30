@@ -4,10 +4,15 @@
 #include "JDKSAvdeccNetIO.h"
 
 namespace JDKSAvdecc {
-    NetIO::NetIO() {
-    }
-    NetIO::~NetIO() {
-    }
+
+NetIO *net;
+
+NetIO::NetIO() {
+    net=this;
+}
+NetIO::~NetIO() {
+}
+
 }
 
 
