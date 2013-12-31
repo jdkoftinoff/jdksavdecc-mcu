@@ -8,6 +8,7 @@
 #include "JDKSAvdeccHandlerGroup.h"
 #include "JDKSAvdeccEntity.h"
 
+#define REFRESH_TIME (100)
 
 using namespace JDKSAvdecc;
 
@@ -18,7 +19,7 @@ jdksavdecc_eui48 my_mac = { { 0x90, 0xe0, 0xf0, 0x00, 0x00, 0x01 } };
 jdksavdecc_eui64 my_entity_id = { {0x90, 0xe0, 0xf0, 0xff, 0xfe, 0x00, 0x00, 0x01 } };
 
 /// This AVDECC Entity Model ID is for example usages
-jdksavdecc_eui64 my_entity_model_id = { {0x90, 0xe0, 0xf0, 0xff, 0xfe, 0x00, 0x00, 0x02 } };
+jdksavdecc_eui64 my_entity_model_id = { {0x90, 0xe0, 0xf0, 0xff, 0xfe, 0x00, 0x00, 0x01 } };
 
 /// the W5100 chip Raw Ethernet handler object
 WizNetIO rawnet(my_mac);
@@ -52,7 +53,7 @@ ControlSender knob1(
                     sequence_id,
                     0x0000,
                     2,
-                    1000
+                    REFRESH_TIME
                     );
 
 /// The mapping of Knob 2 to control descriptor 0x0001. 2 byte payload, refresh time of 1000 ms
@@ -63,7 +64,7 @@ ControlSender knob2(
                     sequence_id,
                     0x0001,
                     2,
-                    1000
+                    REFRESH_TIME
                     );
 
 /// The mapping of Knob 2 to control descriptor 0x0002. 2 byte payload, refresh time of 1000 ms
@@ -74,7 +75,7 @@ ControlSender knob3(
                     sequence_id,
                     0x0002,
                     2,
-                    1000
+                    REFRESH_TIME
                     );
 
 /// The mapping of Button 1 to control descriptor 0x0003. 2 byte payload, refresh time of 1000 ms
@@ -85,7 +86,7 @@ ControlSender button1(
                       sequence_id,
                       0x0003,
                       1,
-                      1000
+                      REFRESH_TIME
                       );
 
 /// The mapping of Button 2 to control descriptor 0x0004. 2 byte payload, refresh time of 1000 ms
@@ -96,7 +97,7 @@ ControlSender button2(
                       sequence_id,
                       0x0004,
                       1,
-                      1000
+                      REFRESH_TIME
                       );
 
 /// The mapping of Button 3 to control descriptor 0x0005. 2 byte payload, refresh time of 1000 ms
@@ -107,7 +108,7 @@ ControlSender button3(
                       sequence_id,
                       0x0005,
                       1,
-                      1000
+                      REFRESH_TIME
                       );
 
 /// The mapping of Button 3 to control descriptor 0x0006. 2 byte payload, refresh time of 1000 ms
@@ -118,7 +119,7 @@ ControlSender button4(
                       sequence_id,
                       0x0006,
                       1,
-                      1000
+                      REFRESH_TIME
                       );
 
 /// The mapping of Button 3 to control descriptor 0x0007. 2 byte payload, refresh time of 1000 ms
@@ -129,7 +130,7 @@ ControlSender button5(
                       sequence_id,
                       0x0007,
                       1,
-                      1000
+                      REFRESH_TIME
                       );
 
 
