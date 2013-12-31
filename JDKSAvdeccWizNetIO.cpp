@@ -74,27 +74,69 @@ bool WizNetIO::SendRawNet(uint8_t const *data,
                           uint8_t const *data2,
                           uint16_t len2 ) {
 
-    W5100.writeSnDHAR(0, (uint8_t*)&data[JDKSAVDECC_FRAME_HEADER_DA_OFFSET] );
+    uint8_t try_count=0;
+    bool done=false;
+    // Try up to 3 times to send
+    while( !done && try_count<3 ) {
+        ++try_count;
+        uint8_t wait_count=0;
 
-    W5100.send_data_processing(0, (uint8_t *)data, len);
-    if( data1!=0 && len1>0) {
-        W5100.send_data_processing(0, (uint8_t *)data1, len1);
-    }
-    if( data2!=0 && len2>0 ) {
-        W5100.send_data_processing(0, (uint8_t *)data2, len2);
-    }
-    W5100.execCmdSn(0, Sock_SEND_MAC);
+        // Tell W5100 the destination hardware address
+        W5100.writeSnDHAR(0, (uint8_t*)&data[JDKSAVDECC_FRAME_HEADER_DA_OFFSET] );
 
-    while ( (W5100.readSnIR(0) & SnIR::SEND_OK) != SnIR::SEND_OK )
-    {
-        if (W5100.readSnIR(0) & SnIR::TIMEOUT)
-        {
-            W5100.writeSnIR(0, (SnIR::SEND_OK | SnIR::TIMEOUT));
-            return 0;
+        // Send the data chunk
+        W5100.send_data_processing(0, (uint8_t *)data, len);
+
+        // If there is a data1 chunk then send it
+        if( data1!=0 && len1>0) {
+            W5100.send_data_processing(0, (uint8_t *)data1, len1);
         }
-    }
 
-    W5100.writeSnIR(0, SnIR::SEND_OK);
+        // If there is a data2 chunk then send it
+        if( data2!=0 && len2>0 ) {
+            W5100.send_data_processing(0, (uint8_t *)data2, len2);
+        }
+
+        // Tell W5100 to send the raw ethernet frame now
+        W5100.execCmdSn(0, Sock_SEND_MAC);
+
+        // assume we have success
+        done=true;
+
+        // Check for an OK signal from the chip
+        while ( (W5100.readSnIR(0) & SnIR::SEND_OK) != SnIR::SEND_OK )
+        {
+            // Was it a timeout message?
+            if (W5100.readSnIR(0) & SnIR::TIMEOUT)
+            {
+                // Yes, acknowledge the timeout and maybe try again
+                W5100.writeSnIR(0, (SnIR::SEND_OK | SnIR::TIMEOUT));
+                done=false;
+                break;
+            }
+            // Did we wait too long?
+            if( wait_count++>8 ) {
+                // Yes, try again
+                done=false;
+                break;
+            }
+        }
+
+        W5100.writeSnIR(0, SnIR::SEND_OK);
+    }
+#if JDKSAVDECCWINNETIO_DEBUG
+    // Count the sent packets
+    if( done ) {
+        m_sent_packet_count++;
+        if( (m_sent_packet_count&0xff)==0) {
+            avr_debug_log("sent:",m_sent_packet_count);
+        }
+    } else {
+        m_unsent_packet_count++;
+        avr_debug_log("unsent:",m_sent_packet_count);
+    }
+#endif
+    return done;
 }
 
 bool WizNetIO::SendReplyRawNet(uint8_t const *data,
