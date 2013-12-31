@@ -28,176 +28,198 @@ bool Entity::ReceivedPDU( uint32_t time_in_millis, uint8_t *buf, uint16_t len ) 
         // Try see if it is an AEM message
         jdksavdecc_aecpdu_aem aem;
         if( ParseAEM(&aem,buf,pos,len)) {
-            // figure out if it is unsolicited from the high bit of command_type
-            uint16_t actual_command_type = aem.command_type&0x7fff;
-            bool unsolicited=(aem.command_type>>15)&1;
-
-            // Yes, Is it a command for me as a target?
             if( IsAEMForTarget(aem,m_adp_manager.GetEntityID())) {
-                uint8_t response_status = JDKSAVDECC_AECP_STATUS_NOT_IMPLEMENTED;
-                bool command_is_set_something=false;
-                switch(actual_command_type) {
-                case JDKSAVDECC_AEM_COMMAND_ACQUIRE_ENTITY:
-                    response_status=ReceiveAcquireEntityCommand(buf,pos,len);
-                    break;
-                case JDKSAVDECC_AEM_COMMAND_LOCK_ENTITY:
-                    response_status=ReceiveLockEntityCommand(buf,pos,len);
-                    break;
-                case JDKSAVDECC_AEM_COMMAND_CONTROLLER_AVAILABLE:
-                    response_status=ReceiveControllerAvailableCommand(buf,pos,len);
-                    break;
-                case JDKSAVDECC_AEM_COMMAND_ENTITY_AVAILABLE:
-                    response_status=ReceiveEntityAvailableCommand(buf,pos,len);
-                    break;
-                case JDKSAVDECC_AEM_COMMAND_READ_DESCRIPTOR:
-                    response_status=ReceiveReadDescriptorCommand(buf,pos,len);
-                    break;
-                case JDKSAVDECC_AEM_COMMAND_SET_CONFIGURATION:
-                    response_status=ReceiveSetConfigurationCommand(buf,pos,len);
-                    command_is_set_something=true;
-                    break;
-                case JDKSAVDECC_AEM_COMMAND_GET_CONFIGURATION:
-                    response_status=ReceiveGetConfigurationCommand(buf,pos,len);
-                    break;
-                case JDKSAVDECC_AEM_COMMAND_SET_NAME:
-                    response_status=ReceiveSetNameCommand(buf,pos,len);
-                    command_is_set_something=true;
-                    break;
-                case JDKSAVDECC_AEM_COMMAND_GET_NAME:
-                    response_status=ReceiveGetNameCommand(buf,pos,len);
-                    break;
-                case JDKSAVDECC_AEM_COMMAND_SET_CONTROL:
-                    response_status=ReceiveSetControlCommand(buf,pos,len);
-                    command_is_set_something=true;
-                    break;
-                case JDKSAVDECC_AEM_COMMAND_GET_CONTROL:
-                    response_status=ReceiveGetControlCommand(buf,pos,len);
-                    break;
-                case JDKSAVDECC_AEM_COMMAND_REGISTER_UNSOLICITED_NOTIFICATION:
-                    response_status=ReceiveRegisterUnsolicitedNotificationCommand(buf,pos,len);
-                    break;
-                case JDKSAVDECC_AEM_COMMAND_DEREGISTER_UNSOLICITED_NOTIFICATION:
-                    response_status=ReceiveDeRegisterUnsolicitedNotificationCommand(buf,pos,len);
-                    break;
-                }
-                // TODO: send response, and if it set something with success, send unsolicited responses everywhere
-                r=true; // We consumed the message either way
-            } else {
-                if( IsAEMForController(aem,m_adp_manager.GetEntityID()) ) {
-                    // only bother with the response if it is either unsolicited,
-                    // or is solicited and matches the last request we did send
-                    bool interesting = unsolicited;
-
-                    if( !unsolicited ) {
-                        // First, is it from the entity we sent the command to?
-                        if( jdksavdecc_eui64_compare(
-                                    &m_last_sent_command_target_entity_id, &aem.aecpdu_header.header.target_entity_id )==0 ) {
-                            // yes, does the command type match?
-                            if( actual_command_type == m_last_sent_command_type ) {
-                                // yes, does the sequence ID match?
-                                if( aem.sequence_id == m_outgoing_sequence_id ) {
-                                    // Yes, then we are interested in this message
-                                    interesting = true;
-                                    // forget about the sent state by clearing the last send command target entity id
-                                    jdksavdecc_eui64_init(&m_last_sent_command_target_entity_id);
-                                }
-                            }
-                        }
-                    }
-
-                    // If this message is interesting to us then dispatch it
-                    if( interesting ) {
-                        switch(actual_command_type) {
-                        case JDKSAVDECC_AEM_COMMAND_ACQUIRE_ENTITY:
-                            r=ReceiveAcquireEntityResponse(buf,pos,len);
-                            break;
-                        case JDKSAVDECC_AEM_COMMAND_LOCK_ENTITY:
-                            r=ReceiveLockEntityResponse(buf,pos,len);
-                            break;
-                        case JDKSAVDECC_AEM_COMMAND_CONTROLLER_AVAILABLE:
-                            r=ReceiveControllerAvailableResponse(buf,pos,len);
-                            break;
-                        case JDKSAVDECC_AEM_COMMAND_ENTITY_AVAILABLE:
-                            r=ReceiveEntityAvailableResponse(buf,pos,len);
-                            break;
-                        case JDKSAVDECC_AEM_COMMAND_READ_DESCRIPTOR:
-                            r=ReceiveReadDescriptorResponse(buf,pos,len);
-                            break;
-                        case JDKSAVDECC_AEM_COMMAND_SET_CONFIGURATION:
-                            r=ReceiveSetConfigurationResponse(buf,pos,len);
-                            break;
-                        case JDKSAVDECC_AEM_COMMAND_GET_CONFIGURATION:
-                            r=ReceiveGetConfigurationResponse(buf,pos,len);
-                            break;
-                        case JDKSAVDECC_AEM_COMMAND_SET_NAME:
-                            r=ReceiveSetNameResponse(buf,pos,len);
-                            break;
-                        case JDKSAVDECC_AEM_COMMAND_GET_NAME:
-                            r=ReceiveGetNameResponse(buf,pos,len);
-                            break;
-                        case JDKSAVDECC_AEM_COMMAND_SET_CONTROL:
-                            r=ReceiveSetControlResponse(buf,pos,len);
-                            break;
-                        case JDKSAVDECC_AEM_COMMAND_GET_CONTROL:
-                            r=ReceiveGetControlResponse(buf,pos,len);
-                            break;
-                        case JDKSAVDECC_AEM_COMMAND_REGISTER_UNSOLICITED_NOTIFICATION:
-                            r=ReceiveRegisterUnsolicitedNotificationResponse(buf,pos,len);
-                            break;
-                        case JDKSAVDECC_AEM_COMMAND_DEREGISTER_UNSOLICITED_NOTIFICATION:
-                            r=ReceiveDeRegisterUnsolicitedNotificationResponse(buf,pos,len);
-                            break;
-                        }
-                    }
-                }
+                uint8_t response_code=ReceivedAEMCommand(aem,buf,pos,len);
+                r=true;
+                // TODO: fill in response code in PDU and send reply
+            } else if( IsAEMForController(aem,m_adp_manager.GetEntityID()) ) {
+                r=ReceivedAEMResponse(aem,buf,pos,len);
             }
         }
     }
-    {
+
+
+    if( !r ) {
         // Try see if it is an Address Access message
         jdksavdecc_aecp_aa aa;
         if( ParseAA(&aa,buf,pos,len)) {
             // Yes, is it a command to read/write data?
             if( IsAAForTarget(aa,m_adp_manager.GetEntityID())) {
-                // Yes go through the TLV's and dispatch the read/writes and respond
-                uint8_t *p = &buf[pos+JDKSAVDECC_AECPDU_AA_LEN];
-                uint8_t aa_status=JDKSAVDECC_AECP_AA_STATUS_NOT_IMPLEMENTED;
-                r=true; // We consume the message
-                for( uint16_t i=0; i<aa.tlv_count; ++i ) {
-                    // See 9.2.1.3.3
-                    uint8_t tlv_mode = (p[JDKSAVDECC_AECPDU_AA_TLV_OFFSET_MODE_LENGTH]>>4)&0xf;
-                    uint16_t tlv_length = (((uint16_t)(p[JDKSAVDECC_AECPDU_AA_TLV_OFFSET_MODE_LENGTH]&0xf))<<4)
-                            + p[JDKSAVDECC_AECPDU_AA_TLV_OFFSET_MODE_LENGTH+1];
-                    // require top 32 bits of address to be zero
-                    if( p[JDKSAVDECC_AECPDU_AA_TLV_OFFSET_ADDRESS_UPPER]==0
-                            && p[JDKSAVDECC_AECPDU_AA_TLV_OFFSET_ADDRESS_UPPER+1]==0
-                            && p[JDKSAVDECC_AECPDU_AA_TLV_OFFSET_ADDRESS_UPPER+2]==0
-                            && p[JDKSAVDECC_AECPDU_AA_TLV_OFFSET_ADDRESS_UPPER+3]==0) {
-                        uint32_t tlv_address = jdksavdecc_uint32_get( buf, JDKSAVDECC_AECPDU_AA_TLV_OFFSET_ADDRESS_LOWER );
-
-                        switch( tlv_mode ) {
-                        case JDKSAVDECC_AECP_AA_MODE_READ:
-                            aa_status=ReceiveAARead(tlv_address,tlv_length,p+JDKSAVDECC_AECPDU_AA_TLV_LEN);
-                            break;
-                        case JDKSAVDECC_AECP_AA_MODE_WRITE:
-                            aa_status=ReceiveAAWrite(tlv_address,tlv_length,p+JDKSAVDECC_AECPDU_AA_TLV_LEN);
-                            break;
-                        case JDKSAVDECC_AECP_AA_MODE_EXECUTE:
-                            aa_status=ReceiveAAExecute(tlv_address,tlv_length,p+JDKSAVDECC_AECPDU_AA_TLV_LEN);
-                            break;
-                        }
-                    }
-                    p=p+JDKSAVDECC_AECPDU_AA_TLV_LEN+tlv_length;
-                    if( aa_status!=JDKSAVDECC_AECP_AA_STATUS_SUCCESS ) {
-                        break;
-                    }
-                }
-                // TODO: Send response
+                uint8_t response_code=ReceivedAACommand(aa,buf,pos,len);
+                r=true;
+                // TODO: fill in response code in PDU and send reply
             }
         }
     }
 
     return r;
+}
+
+uint8_t Entity::ReceivedAEMCommand(  jdksavdecc_aecpdu_aem const &aem, uint8_t *buf, uint16_t pos, uint16_t len ) {
+    uint16_t actual_command_type = aem.command_type&0x7fff;
+    uint8_t response_status = JDKSAVDECC_AECP_STATUS_NOT_IMPLEMENTED;
+    bool command_is_set_something=false;
+
+    switch(actual_command_type) {
+    case JDKSAVDECC_AEM_COMMAND_ACQUIRE_ENTITY:
+        response_status=ReceiveAcquireEntityCommand(buf,pos,len);
+        break;
+    case JDKSAVDECC_AEM_COMMAND_LOCK_ENTITY:
+        response_status=ReceiveLockEntityCommand(buf,pos,len);
+        break;
+    case JDKSAVDECC_AEM_COMMAND_CONTROLLER_AVAILABLE:
+        response_status=ReceiveControllerAvailableCommand(buf,pos,len);
+        break;
+    case JDKSAVDECC_AEM_COMMAND_ENTITY_AVAILABLE:
+        response_status=ReceiveEntityAvailableCommand(buf,pos,len);
+        break;
+    case JDKSAVDECC_AEM_COMMAND_READ_DESCRIPTOR:
+        response_status=ReceiveReadDescriptorCommand(buf,pos,len);
+        break;
+    case JDKSAVDECC_AEM_COMMAND_SET_CONFIGURATION:
+        response_status=ReceiveSetConfigurationCommand(buf,pos,len);
+        command_is_set_something=true;
+        break;
+    case JDKSAVDECC_AEM_COMMAND_GET_CONFIGURATION:
+        response_status=ReceiveGetConfigurationCommand(buf,pos,len);
+        break;
+    case JDKSAVDECC_AEM_COMMAND_SET_NAME:
+        response_status=ReceiveSetNameCommand(buf,pos,len);
+        command_is_set_something=true;
+        break;
+    case JDKSAVDECC_AEM_COMMAND_GET_NAME:
+        response_status=ReceiveGetNameCommand(buf,pos,len);
+        break;
+    case JDKSAVDECC_AEM_COMMAND_SET_CONTROL:
+        response_status=ReceiveSetControlCommand(buf,pos,len);
+        command_is_set_something=true;
+        break;
+    case JDKSAVDECC_AEM_COMMAND_GET_CONTROL:
+        response_status=ReceiveGetControlCommand(buf,pos,len);
+        break;
+    case JDKSAVDECC_AEM_COMMAND_REGISTER_UNSOLICITED_NOTIFICATION:
+        response_status=ReceiveRegisterUnsolicitedNotificationCommand(buf,pos,len);
+        break;
+    case JDKSAVDECC_AEM_COMMAND_DEREGISTER_UNSOLICITED_NOTIFICATION:
+        response_status=ReceiveDeRegisterUnsolicitedNotificationCommand(buf,pos,len);
+        break;
+    }
+    return response_status;
+}
+
+bool Entity::ReceivedAEMResponse(  jdksavdecc_aecpdu_aem const &aem, uint8_t *buf, uint16_t pos, uint16_t len ) {
+    bool r=false;
+    // figure out if it is unsolicited from the high bit of command_type
+    uint16_t actual_command_type = aem.command_type&0x7fff;
+    bool unsolicited=(aem.command_type>>15)&1;
+
+    // only bother with the response if it is either unsolicited,
+    // or is solicited and matches the last request we did send
+    bool interesting = unsolicited;
+
+    if( !unsolicited ) {
+        // First, is it from the entity we sent the command to?
+        if( jdksavdecc_eui64_compare(
+                    &m_last_sent_command_target_entity_id, &aem.aecpdu_header.header.target_entity_id )==0 ) {
+            // yes, does the command type match?
+            if( actual_command_type == m_last_sent_command_type ) {
+                // yes, does the sequence ID match?
+                if( aem.sequence_id == m_outgoing_sequence_id ) {
+                    // Yes, then we are interested in this message
+                    interesting = true;
+                    // forget about the sent state by clearing the last send command target entity id
+                    jdksavdecc_eui64_init(&m_last_sent_command_target_entity_id);
+                }
+            }
+        }
+    }
+
+    // If this message is interesting to us then dispatch it
+    if( interesting ) {
+        switch(actual_command_type) {
+        case JDKSAVDECC_AEM_COMMAND_ACQUIRE_ENTITY:
+            r=ReceiveAcquireEntityResponse(buf,pos,len);
+            break;
+        case JDKSAVDECC_AEM_COMMAND_LOCK_ENTITY:
+            r=ReceiveLockEntityResponse(buf,pos,len);
+            break;
+        case JDKSAVDECC_AEM_COMMAND_CONTROLLER_AVAILABLE:
+            r=ReceiveControllerAvailableResponse(buf,pos,len);
+            break;
+        case JDKSAVDECC_AEM_COMMAND_ENTITY_AVAILABLE:
+            r=ReceiveEntityAvailableResponse(buf,pos,len);
+            break;
+        case JDKSAVDECC_AEM_COMMAND_READ_DESCRIPTOR:
+            r=ReceiveReadDescriptorResponse(buf,pos,len);
+            break;
+        case JDKSAVDECC_AEM_COMMAND_SET_CONFIGURATION:
+            r=ReceiveSetConfigurationResponse(buf,pos,len);
+            break;
+        case JDKSAVDECC_AEM_COMMAND_GET_CONFIGURATION:
+            r=ReceiveGetConfigurationResponse(buf,pos,len);
+            break;
+        case JDKSAVDECC_AEM_COMMAND_SET_NAME:
+            r=ReceiveSetNameResponse(buf,pos,len);
+            break;
+        case JDKSAVDECC_AEM_COMMAND_GET_NAME:
+            r=ReceiveGetNameResponse(buf,pos,len);
+            break;
+        case JDKSAVDECC_AEM_COMMAND_SET_CONTROL:
+            r=ReceiveSetControlResponse(buf,pos,len);
+            break;
+        case JDKSAVDECC_AEM_COMMAND_GET_CONTROL:
+            r=ReceiveGetControlResponse(buf,pos,len);
+            break;
+        case JDKSAVDECC_AEM_COMMAND_REGISTER_UNSOLICITED_NOTIFICATION:
+            r=ReceiveRegisterUnsolicitedNotificationResponse(buf,pos,len);
+            break;
+        case JDKSAVDECC_AEM_COMMAND_DEREGISTER_UNSOLICITED_NOTIFICATION:
+            r=ReceiveDeRegisterUnsolicitedNotificationResponse(buf,pos,len);
+            break;
+        }
+    }
+
+    return r;
+}
+
+uint8_t Entity::ReceivedAACommand(  jdksavdecc_aecp_aa const &aa, uint8_t *buf, uint16_t pos, uint16_t len ) {
+    // Yes go through the TLV's and dispatch the read/writes and respond
+    uint8_t *p = &buf[pos+JDKSAVDECC_AECPDU_AA_LEN];
+    uint8_t aa_status=JDKSAVDECC_AECP_AA_STATUS_NOT_IMPLEMENTED;
+    for( uint16_t i=0; i<aa.tlv_count; ++i ) {
+        // See 9.2.1.3.3
+        uint8_t tlv_mode = (p[JDKSAVDECC_AECPDU_AA_TLV_OFFSET_MODE_LENGTH]>>4)&0xf;
+        uint16_t tlv_length = (((uint16_t)(p[JDKSAVDECC_AECPDU_AA_TLV_OFFSET_MODE_LENGTH]&0xf))<<4)
+                + p[JDKSAVDECC_AECPDU_AA_TLV_OFFSET_MODE_LENGTH+1];
+        // require top 32 bits of address to be zero
+        if( p[JDKSAVDECC_AECPDU_AA_TLV_OFFSET_ADDRESS_UPPER]==0
+                && p[JDKSAVDECC_AECPDU_AA_TLV_OFFSET_ADDRESS_UPPER+1]==0
+                && p[JDKSAVDECC_AECPDU_AA_TLV_OFFSET_ADDRESS_UPPER+2]==0
+                && p[JDKSAVDECC_AECPDU_AA_TLV_OFFSET_ADDRESS_UPPER+3]==0) {
+            uint32_t tlv_address = jdksavdecc_uint32_get( buf, JDKSAVDECC_AECPDU_AA_TLV_OFFSET_ADDRESS_LOWER );
+
+            switch( tlv_mode ) {
+            case JDKSAVDECC_AECP_AA_MODE_READ:
+                aa_status=ReceiveAARead(tlv_address,tlv_length,p+JDKSAVDECC_AECPDU_AA_TLV_LEN);
+                break;
+            case JDKSAVDECC_AECP_AA_MODE_WRITE:
+                aa_status=ReceiveAAWrite(tlv_address,tlv_length,p+JDKSAVDECC_AECPDU_AA_TLV_LEN);
+                break;
+            case JDKSAVDECC_AECP_AA_MODE_EXECUTE:
+                aa_status=ReceiveAAExecute(tlv_address,tlv_length,p+JDKSAVDECC_AECPDU_AA_TLV_LEN);
+                break;
+            }
+        }
+        p=p+JDKSAVDECC_AECPDU_AA_TLV_LEN+tlv_length;
+        if( aa_status!=JDKSAVDECC_AECP_AA_STATUS_SUCCESS ) {
+            break;
+        }
+    }
+    return aa_status;
+}
+
+bool Entity::ReceivedAAResponse(  jdksavdecc_aecp_aa const &aa, uint8_t *buf, uint16_t pos, uint16_t len ) {
+    return false;
 }
 
 void Entity::SendResponses( bool internally_generated,

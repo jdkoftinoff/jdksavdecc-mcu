@@ -22,6 +22,11 @@ public:
     // Handle received AECPDU's
     virtual bool ReceivedPDU( uint32_t time_in_millis, uint8_t *buf, uint16_t len );
 
+    uint8_t ReceivedAEMCommand( jdksavdecc_aecpdu_aem const &aem, uint8_t *buf, uint16_t pos, uint16_t len );
+    bool ReceivedAEMResponse( jdksavdecc_aecpdu_aem const &aem, uint8_t *buf, uint16_t pos, uint16_t len );
+    uint8_t ReceivedAACommand( jdksavdecc_aecp_aa const &aa, uint8_t *buf, uint16_t pos, uint16_t len );
+    virtual bool ReceivedAAResponse( jdksavdecc_aecp_aa const &aa, uint8_t *buf, uint16_t pos, uint16_t len );
+
     // Send a direct response to the target entity id, and unsolicited
     // responses to all other subscribed controllers
     void SendResponses( bool internally_generated,
