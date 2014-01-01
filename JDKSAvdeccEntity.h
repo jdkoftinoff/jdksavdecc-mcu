@@ -9,7 +9,9 @@
 
 namespace JDKSAvdecc {
 
+#ifndef JDKSAVDECC_ENTITY_MAX_REGISTERED_CONTROLLERS
 #define JDKSAVDECC_ENTITY_MAX_REGISTERED_CONTROLLERS (4)
+#endif
 
 
 class Entity : public Handler {
