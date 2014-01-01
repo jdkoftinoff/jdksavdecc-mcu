@@ -7,9 +7,19 @@ namespace JDKSAvdecc {
 
 Entity::Entity( ADPManager &adp_manager )
     : m_adp_manager( adp_manager )
+    , m_cur_time(0)
+    , m_outgoing_sequence_id(0)
     , m_last_sent_command_time(0)
     , m_last_sent_command_type(JDKSAVDECC_AEM_COMMAND_EXPANSION) {
-    memset(&m_last_sent_command_target_entity_id.value,0,sizeof(m_last_sent_command_target_entity_id.value) );
+    // clear info on sent command state
+    jdksavdecc_eui64_init(&m_last_sent_command_target_entity_id);
+    // clear info on acquired state
+    jdksavdecc_eui64_init(&m_acquired_by_controller_entity_id);
+    jdksavdecc_eui64_init(&m_acquire_in_progress_by_controller_entity_id);
+    for( uint8_t i=0; i<JDKSAVDECC_ENTITY_MAX_REGISTERED_CONTROLLERS; ++i ) {
+        jdksavdecc_eui64_init(&m_registered_controllers_entity_id[i]);
+        jdksavdecc_eui48_init(&m_registered_controllers_mac_address[i]);
+    }
 }
 
 void Entity::Tick( uint32_t time_in_millis ) {
