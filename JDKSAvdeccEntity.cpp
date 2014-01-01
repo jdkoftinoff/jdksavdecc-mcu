@@ -6,12 +6,27 @@
 namespace JDKSAvdecc {
 
 Entity::Entity( ADPManager &adp_manager )
-    : m_adp_manager( adp_manager ) {
-
+    : m_adp_manager( adp_manager )
+    , m_last_sent_command_time(0)
+    , m_last_sent_command_type(JDKSAVDECC_AEM_COMMAND_EXPANSION) {
+    memset(&m_last_sent_command_target_entity_id.value,0,sizeof(m_last_sent_command_target_entity_id.value) );
 }
 
 void Entity::Tick( uint32_t time_in_millis ) {
     m_cur_time = time_in_millis;
+    uint16_t cmd = m_last_sent_command_type;
+    if( cmd != JDKSAVDECC_AEM_COMMAND_EXPANSION &&
+            WasTimeOutHit( time_in_millis, m_last_sent_command_time, JDKSAVDECC_AEM_TIMEOUT_IN_MS ) ) {
+        m_last_sent_command_type=JDKSAVDECC_AEM_COMMAND_EXPANSION; // clear knowledge of sent command
+        CommandTimedOut(m_last_sent_command_target_entity_id,cmd,m_outgoing_sequence_id);
+    }
+}
+
+void Entity::CommandTimedOut( jdksavdecc_eui64 const &target_entity_id,
+                              uint16_t command_type,
+                              uint16_t sequence_id) {
+//    avr_debug_log("TimeOut:", sequence_id );
+    memset( &m_last_sent_command_target_entity_id,0,sizeof(m_last_sent_command_target_entity_id));
 }
 
 bool Entity::ReceivedPDU( uint32_t time_in_millis, uint8_t *buf, uint16_t len ) {
@@ -31,9 +46,6 @@ bool Entity::ReceivedPDU( uint32_t time_in_millis, uint8_t *buf, uint16_t len ) 
             if( IsAEMForTarget(aem,m_adp_manager.GetEntityID())) {
                 uint8_t response_code=ReceivedAEMCommand(aem,buf,pos,len);
                 r=true;
-                // TODO: fill in response code in PDU and send reply
-            } else if( IsAEMForController(aem,m_adp_manager.GetEntityID()) ) {
-                r=ReceivedAEMResponse(aem,buf,pos,len);
             }
         }
     }
@@ -104,83 +116,20 @@ uint8_t Entity::ReceivedAEMCommand(  jdksavdecc_aecpdu_aem const &aem, uint8_t *
         response_status=ReceiveDeRegisterUnsolicitedNotificationCommand(buf,pos,len);
         break;
     }
+
+    // Send the response to either just the requesting controller or it and all registered controllers
+    buf[JDKSAVDECC_FRAME_HEADER_LEN + 2 ] = (buf[JDKSAVDECC_FRAME_HEADER_LEN + 2 ]&0x7) + (response_status<<3);
+
+    SendResponses(
+                false,
+                command_is_set_something && response_status==JDKSAVDECC_AECP_STATUS_SUCCESS,
+                buf,
+                len);
+
     return response_status;
 }
 
-bool Entity::ReceivedAEMResponse(  jdksavdecc_aecpdu_aem const &aem, uint8_t *buf, uint16_t pos, uint16_t len ) {
-    bool r=false;
-    // figure out if it is unsolicited from the high bit of command_type
-    uint16_t actual_command_type = aem.command_type&0x7fff;
-    bool unsolicited=(aem.command_type>>15)&1;
 
-    // only bother with the response if it is either unsolicited,
-    // or is solicited and matches the last request we did send
-    bool interesting = unsolicited;
-
-    if( !unsolicited ) {
-        // First, is it from the entity we sent the command to?
-        if( jdksavdecc_eui64_compare(
-                    &m_last_sent_command_target_entity_id, &aem.aecpdu_header.header.target_entity_id )==0 ) {
-            // yes, does the command type match?
-            if( actual_command_type == m_last_sent_command_type ) {
-                // yes, does the sequence ID match?
-                if( aem.sequence_id == m_outgoing_sequence_id ) {
-                    // Yes, then we are interested in this message
-                    interesting = true;
-                    // forget about the sent state by clearing the last send command target entity id
-                    jdksavdecc_eui64_init(&m_last_sent_command_target_entity_id);
-                }
-            }
-        }
-    }
-
-    // If this message is interesting to us then dispatch it
-    if( interesting ) {
-        switch(actual_command_type) {
-        case JDKSAVDECC_AEM_COMMAND_ACQUIRE_ENTITY:
-            r=ReceiveAcquireEntityResponse(buf,pos,len);
-            break;
-        case JDKSAVDECC_AEM_COMMAND_LOCK_ENTITY:
-            r=ReceiveLockEntityResponse(buf,pos,len);
-            break;
-        case JDKSAVDECC_AEM_COMMAND_CONTROLLER_AVAILABLE:
-            r=ReceiveControllerAvailableResponse(buf,pos,len);
-            break;
-        case JDKSAVDECC_AEM_COMMAND_ENTITY_AVAILABLE:
-            r=ReceiveEntityAvailableResponse(buf,pos,len);
-            break;
-        case JDKSAVDECC_AEM_COMMAND_READ_DESCRIPTOR:
-            r=ReceiveReadDescriptorResponse(buf,pos,len);
-            break;
-        case JDKSAVDECC_AEM_COMMAND_SET_CONFIGURATION:
-            r=ReceiveSetConfigurationResponse(buf,pos,len);
-            break;
-        case JDKSAVDECC_AEM_COMMAND_GET_CONFIGURATION:
-            r=ReceiveGetConfigurationResponse(buf,pos,len);
-            break;
-        case JDKSAVDECC_AEM_COMMAND_SET_NAME:
-            r=ReceiveSetNameResponse(buf,pos,len);
-            break;
-        case JDKSAVDECC_AEM_COMMAND_GET_NAME:
-            r=ReceiveGetNameResponse(buf,pos,len);
-            break;
-        case JDKSAVDECC_AEM_COMMAND_SET_CONTROL:
-            r=ReceiveSetControlResponse(buf,pos,len);
-            break;
-        case JDKSAVDECC_AEM_COMMAND_GET_CONTROL:
-            r=ReceiveGetControlResponse(buf,pos,len);
-            break;
-        case JDKSAVDECC_AEM_COMMAND_REGISTER_UNSOLICITED_NOTIFICATION:
-            r=ReceiveRegisterUnsolicitedNotificationResponse(buf,pos,len);
-            break;
-        case JDKSAVDECC_AEM_COMMAND_DEREGISTER_UNSOLICITED_NOTIFICATION:
-            r=ReceiveDeRegisterUnsolicitedNotificationResponse(buf,pos,len);
-            break;
-        }
-    }
-
-    return r;
-}
 
 uint8_t Entity::ReceivedAACommand(  jdksavdecc_aecp_aa const &aa, uint8_t *buf, uint16_t pos, uint16_t len ) {
     // Yes go through the TLV's and dispatch the read/writes and respond
@@ -215,16 +164,23 @@ uint8_t Entity::ReceivedAACommand(  jdksavdecc_aecp_aa const &aa, uint8_t *buf, 
             break;
         }
     }
+    // Send the response to either just the requesting controller or it and all registered controllers
+    buf[JDKSAVDECC_FRAME_HEADER_LEN + 2 ] = (buf[JDKSAVDECC_FRAME_HEADER_LEN + 2 ]&0x7) + (aa_status<<3);
+
+    // Only send responses to the requesting controller
+    SendResponses(false,false,buf,pos);
+
     return aa_status;
 }
 
-bool Entity::ReceivedAAResponse(  jdksavdecc_aecp_aa const &aa, uint8_t *buf, uint16_t pos, uint16_t len ) {
-    return false;
-}
-
 void Entity::SendResponses( bool internally_generated,
+                            bool send_to_registered_controllers,
                             uint8_t *buf,
-                            uint16_t len ) {
+                            uint16_t len,
+                            uint8_t const *additional_data1,
+                            uint16_t additional_data_length1,
+                            uint8_t const *additional_data2,
+                            uint16_t additional_data_length2 ) {
 
     // buf already contains the requestor's mac address and controller. Capture the controller entity id
     jdksavdecc_eui64 original_controller_id;
@@ -241,24 +197,26 @@ void Entity::SendResponses( bool internally_generated,
         jdksavdecc_eui48_set(net->GetMACAddress(),buf,6);
     }
 
-    // Mark the message as an unsolicited response
-    jdksavdecc_aecpdu_aem_set_command_type(
-                jdksavdecc_aecpdu_aem_get_command_type(buf,14) | 0x8000,
-                buf, 14 );
+    if( send_to_registered_controllers ) {
+        // Mark the message as an unsolicited response
+        jdksavdecc_aecpdu_aem_set_command_type(
+                    jdksavdecc_aecpdu_aem_get_command_type(buf,14) | 0x8000,
+                    buf, 14 );
 
-    // Now go through all subscribed entities
-    for( uint8_t i=0; i<JDKSAVDECC_ENTITY_MAX_REGISTERED_CONTROLLERS; ++i ) {
-        // We only care about controllers with entity_id != 0
+        // Now go through all subscribed entities
+        for( uint8_t i=0; i<JDKSAVDECC_ENTITY_MAX_REGISTERED_CONTROLLERS; ++i ) {
+            // We only care about controllers with entity_id != 0
 
-        if( !jdksavdecc_eui64_is_zero( m_registered_controllers_entity_id[i] ) ) {
-            // and don't send the original requesting controller a double response
-            if( jdksavdecc_eui64_compare( &original_controller_id, &m_registered_controllers_entity_id[i] )!=0 ) {
-                // Set the controller_entity_id in the frame
-                jdksavdecc_eui64_set(m_registered_controllers_entity_id[i],buf,14+JDKSAVDECC_AECPDU_COMMON_OFFSET_CONTROLLER_ENTITY_ID);
-                // Set the destination mac address
-                jdksavdecc_eui48_set(m_registered_controllers_mac_address[i],buf,0);
-                // Send the frame to that controller
-                net->SendRawNet(buf,len);
+            if( !jdksavdecc_eui64_is_zero( m_registered_controllers_entity_id[i] ) ) {
+                // and don't send the original requesting controller a double response
+                if( jdksavdecc_eui64_compare( &original_controller_id, &m_registered_controllers_entity_id[i] )!=0 ) {
+                    // Set the controller_entity_id in the frame
+                    jdksavdecc_eui64_set(m_registered_controllers_entity_id[i],buf,14+JDKSAVDECC_AECPDU_COMMON_OFFSET_CONTROLLER_ENTITY_ID);
+                    // Set the destination mac address
+                    jdksavdecc_eui48_set(m_registered_controllers_mac_address[i],buf,0);
+                    // Send the frame to that controller
+                    net->SendRawNet(buf,len);
+                }
             }
         }
     }
@@ -267,6 +225,7 @@ void Entity::SendResponses( bool internally_generated,
 void Entity::SendCommand( jdksavdecc_eui64 const &target_entity_id,
                           jdksavdecc_eui48 const &target_mac_address,
                           uint16_t aem_command_type,
+                          bool track_for_ack,
                           uint8_t const *additional_data1,
                           uint16_t additional_data_length1,
                           uint8_t const *additional_data2,
@@ -301,36 +260,67 @@ void Entity::SendCommand( jdksavdecc_eui64 const &target_entity_id,
                      additional_data1, additional_data_length1,
                      additional_data2, additional_data_length2);
 
-    // Keep track of when we sent this message and who we sent it to so we can
-    // manage time outs
-    m_last_sent_command_time = m_cur_time;
-    m_last_sent_command_type = aem_command_type;
-    m_last_sent_command_target_entity_id = target_entity_id;
+    if( track_for_ack ) {
+        // Keep track of when we sent this message and who we sent it to so we can
+        // manage time outs
+        m_last_sent_command_time = m_cur_time;
+        m_last_sent_command_type = aem_command_type;
+        m_last_sent_command_target_entity_id = target_entity_id;
+    }
+}
+
+void Entity::SendUnsolicitedResponses(
+                          uint16_t aem_command_type,
+                          uint8_t const *additional_data1,
+                          uint16_t additional_data_length1,
+                          uint8_t const *additional_data2,
+                          uint16_t additional_data_length2 ) {
+
+    // Make a temp pdu buffer just long enough to contain:
+    // ethernet frame DA,SA,Ethertype, AVTP Common Control Header, AVDECC AEM Common Format.
+    Frame<JDKSAVDECC_FRAME_HEADER_LEN + JDKSAVDECC_AECPDU_AEM_LEN>
+            pdu(net->GetMACAddress(),net->GetMACAddress(),JDKSAVDECC_AVTP_ETHERTYPE);
+
+    // control_data_length field is N + value_length
+    uint16_t control_data_length = JDKSAVDECC_AECPDU_AEM_LEN -
+            JDKSAVDECC_COMMON_CONTROL_HEADER_LEN + additional_data_length1 + additional_data_length2;
+
+    // AECPDU common control header
+    pdu.PutOctet( 0x80 + JDKSAVDECC_SUBTYPE_AECP); // cd=1, subtype=0x7b (AECP)
+    pdu.PutOctet( 0x00 + JDKSAVDECC_AECP_MESSAGE_TYPE_AEM_COMMAND );  // sv=0, version=0, message_type = AEM_COMMAND
+    pdu.PutOctet( ((JDKSAVDECC_AEM_STATUS_SUCCESS) << 3) + ((control_data_length>>8)&0x7) ); // Send success code. top 3 bits of control_data_length
+    pdu.PutOctet( control_data_length & 0xff ); // lower 8 bits of control_data_length
+
+    pdu.PutEUI64( m_adp_manager.GetEntityID() ); // entity_id of the device we are setting (placeholder)
+    pdu.PutEUI64( m_adp_manager.GetEntityID() ); // controller_id
+
+    // increment outoging sequence id before sending it, so when we receive a response we know what sequence id to expect
+    // there are no inflight messages here
+    ++m_outgoing_sequence_id;
+    pdu.PutDoublet( m_outgoing_sequence_id );
+    pdu.PutDoublet( aem_command_type );
+
+    SendResponses(true,true,
+                  (uint8_t*)pdu.GetBuf(),pdu.GetLength(),
+                  additional_data1, additional_data_length1,
+                  additional_data2, additional_data_length2);
+
 }
 
 uint8_t Entity::ReceiveAcquireEntityCommand( uint8_t *buf, uint16_t pos, uint16_t len ) {
     return JDKSAVDECC_AECP_STATUS_NOT_IMPLEMENTED;
 }
 
-bool Entity::ReceiveAcquireEntityResponse( uint8_t *buf, uint16_t pos, uint16_t len ) {
-    return false;
-}
 
 uint8_t Entity::ReceiveLockEntityCommand( uint8_t *buf, uint16_t pos, uint16_t len ) {
     return JDKSAVDECC_AECP_STATUS_NOT_IMPLEMENTED;
 }
 
-bool Entity::ReceiveLockEntityResponse( uint8_t *buf, uint16_t pos, uint16_t len ) {
-    return false;
-}
 
 uint8_t Entity::ReceiveEntityAvailableCommand( uint8_t *buf, uint16_t pos, uint16_t len ) {
     return JDKSAVDECC_AECP_STATUS_NOT_IMPLEMENTED;
 }
 
-bool Entity::ReceiveEntityAvailableResponse( uint8_t *buf, uint16_t pos, uint16_t len ) {
-    return false;
-}
 
 uint8_t Entity::ReceiveControllerAvailableCommand( uint8_t *buf, uint16_t pos, uint16_t len ) {
     return JDKSAVDECC_AECP_STATUS_NOT_IMPLEMENTED;
@@ -344,40 +334,23 @@ uint8_t Entity::ReceiveReadDescriptorCommand( uint8_t *buf, uint16_t pos, uint16
     return JDKSAVDECC_AECP_STATUS_NOT_IMPLEMENTED;
 }
 
-bool Entity::ReceiveReadDescriptorResponse( uint8_t *buf, uint16_t pos, uint16_t len ) {
-    return false;
-}
 
 uint8_t Entity::ReceiveSetConfigurationCommand( uint8_t *buf, uint16_t pos, uint16_t len ) {
     return JDKSAVDECC_AECP_STATUS_NOT_IMPLEMENTED;
 }
 
-bool Entity::ReceiveSetConfigurationResponse( uint8_t *buf, uint16_t pos, uint16_t len ) {
-    return false;
-}
 
 uint8_t Entity::ReceiveGetConfigurationCommand( uint8_t *buf, uint16_t pos, uint16_t len ) {
     return JDKSAVDECC_AECP_STATUS_NOT_IMPLEMENTED;
-}
-
-bool Entity::ReceiveGetConfigurationResponse( uint8_t *buf, uint16_t pos, uint16_t len ) {
-    return false;
 }
 
 uint8_t Entity::ReceiveSetNameCommand( uint8_t *buf, uint16_t pos, uint16_t len ) {
     return JDKSAVDECC_AECP_STATUS_NOT_IMPLEMENTED;
 }
 
-bool Entity::ReceiveSetNameResponse( uint8_t *buf, uint16_t pos, uint16_t len ) {
-    return false;
-}
 
 uint8_t Entity::ReceiveGetNameCommand( uint8_t *buf, uint16_t pos, uint16_t len ) {
     return JDKSAVDECC_AECP_STATUS_NOT_IMPLEMENTED;
-}
-
-bool Entity::ReceiveGetNameResponse( uint8_t *buf, uint16_t pos, uint16_t len ) {
-    return false;
 }
 
 
@@ -385,24 +358,8 @@ uint8_t Entity::ReceiveSetControlCommand( uint8_t *buf, uint16_t pos, uint16_t l
     return JDKSAVDECC_AECP_STATUS_NOT_IMPLEMENTED;
 }
 
-bool Entity::ReceiveSetControlResponse( uint8_t *buf, uint16_t pos, uint16_t len ) {
-    return false;
-}
 
 uint8_t Entity::ReceiveGetControlCommand( uint8_t *buf, uint16_t pos, uint16_t len ) {
-    return JDKSAVDECC_AECP_STATUS_NOT_IMPLEMENTED;
-}
-
-bool Entity::ReceiveGetControlResponse( uint8_t *buf, uint16_t pos, uint16_t len ) {
-    return false;
-}
-
-uint8_t Entity::ReceiveControlValue(
-        jdksavdecc_eui64 const &target_entity_id,
-        uint16_t target_descriptor_index,
-        uint8_t const *control_value,
-        uint16_t control_value_len
-        ) {
     return JDKSAVDECC_AECP_STATUS_NOT_IMPLEMENTED;
 }
 
@@ -411,16 +368,8 @@ uint8_t Entity::ReceiveRegisterUnsolicitedNotificationCommand(  uint8_t *buf, ui
     return JDKSAVDECC_AECP_STATUS_NOT_IMPLEMENTED;
 }
 
-bool Entity::ReceiveRegisterUnsolicitedNotificationResponse(  uint8_t *buf, uint16_t pos, uint16_t len ) {
-    return false;
-}
-
 uint8_t Entity::ReceiveDeRegisterUnsolicitedNotificationCommand( uint8_t *buf, uint16_t pos, uint16_t len ) {
     return JDKSAVDECC_AECP_STATUS_NOT_IMPLEMENTED;
-}
-
-bool Entity::ReceiveDeRegisterUnsolicitedNotificationResponse(  uint8_t *buf, uint16_t pos, uint16_t len ) {
-    return false;
 }
 
 
