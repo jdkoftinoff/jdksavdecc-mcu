@@ -4,6 +4,11 @@
 
 namespace JDKSAvdecc {
 
+inline bool WasTimeOutHit( uint32_t cur_time, uint32_t last_time_done, uint32_t timeout ) {
+    uint32_t difftime = cur_time - last_time_done;
+    return difftime > timeout;
+}
+
 /// Helper function to parse AECP AEM message
 bool ParseAEM(jdksavdecc_aecpdu_aem *aem,
               uint8_t const *buf,
