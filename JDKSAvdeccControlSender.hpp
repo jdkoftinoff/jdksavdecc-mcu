@@ -31,11 +31,11 @@
 */
 
 
-#include "JDKSAvdeccWorld.h"
-#include "JDKSAvdeccNetIO.h"
-#include "JDKSAvdeccFrame.h"
-#include "JDKSAvdeccHandler.h"
-#include "JDKSAvdeccHelpers.h"
+#include "JDKSAvdeccWorld.hpp"
+#include "JDKSAvdeccNetIO.hpp"
+#include "JDKSAvdeccFrame.hpp"
+#include "JDKSAvdeccHandler.hpp"
+#include "JDKSAvdeccHelpers.hpp"
 
 namespace JDKSAvdecc {
 

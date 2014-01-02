@@ -31,57 +31,50 @@
 */
 
 
-#include "JDKSAvdeccWorld.h"
-#include "JDKSAvdeccNetIO.h"
-#include "JDKSAvdeccHandler.h"
+#include "JDKSAvdeccWorld.hpp"
+#include "JDKSAvdeccNetIO.hpp"
+#include "JDKSAvdeccFrame.hpp"
+
+#include "JDKSAvdeccHandler.hpp"
 
 namespace JDKSAvdecc {
 
-
-/// The HandlerGroupBase class maintains a list of Handler pointers
-/// Dispatches Tick() and ReceivedPDU() calls to all Handlers
-/// It does not contain the storage of the handlers
-/// No bounds checking is done
-class HandlerGroupBase : public Handler {
-protected:
-    uint16_t m_num_items;
-    Handler **m_item;
-    uint32_t m_rx_count;
-    uint32_t m_handled_count;
+class ADPManager : public Handler {
 public:
-    HandlerGroupBase(Handler **item_storage);
 
-    /// Add a handler to the list
-    void Add( Handler *v ) {
-        m_item[m_num_items++] = v;
-    }
+    /// Construct the ADPManager object
+    ADPManager(NetIO &net,
+               jdksavdecc_eui64 const &entity_id,
+               jdksavdecc_eui64 const &entity_model_id,
+               uint32_t entity_capabilities,
+               uint32_t controller_capabilities,
+               uint16_t valid_time_in_seconds );
 
-    uint32_t GetRxCount() const { return m_rx_count; }
-    uint32_t GetHandledCount() const { return m_handled_count; }
-
-    // Poll the NetIO object for an incoming frame. If it is multicast, or m
-    virtual bool PollNet( uint32_t time_in_millis );
-
-    /// Send Tick() messages to all encapsulated Handlers
-    /// and poll incoming network for PDU's and dispatch them
+    /// Send the ENTITY_AVAILABLE message if it is time to
     virtual void Tick( uint32_t time_in_millis );
 
-    /// Send ReceivedPDU message to each handler until one returns true.
+    /// Handle any incoming ADPDU. Return true if handled
     virtual bool ReceivedPDU( uint32_t time_in_millis, uint8_t *buf, uint16_t len );
-};
 
+    /// Formulate the ADPDU and send it
+    void SendADP();
 
-/// HandlerGroup is a HandlerGroupBase and contains
-/// the storage of the contained Handler pointers.
-/// The HandlerGroup is templatelized by the MaxItem count.
-template <uint16_t MaxItems>
-class HandlerGroup : public HandlerGroupBase {
-private:
-    Handler *m_item_storage[MaxItems];
-public:
-    HandlerGroup()
-        : HandlerGroupBase(m_item_storage) {}
+    jdksavdecc_eui64 const &GetEntityID() const { return m_entity_id; }
+    jdksavdecc_eui64 const &GetEntityModelID() const { return m_entity_model_id; }
+    uint32_t GetEntityCapabilities() const { return m_entity_capabilities; }
+    uint32_t GetControllerCapabilities() const { return m_controller_capabilities; }
+    uint16_t GetValidTimeInSeconds() const { return m_valid_time_in_seconds; }
+    uint32_t GetAvailableIndex() const { return m_available_index; }
+
+protected:
+    NetIO &m_net;
+    jdksavdecc_eui64 m_entity_id;
+    jdksavdecc_eui64 m_entity_model_id;
+    uint32_t m_entity_capabilities;
+    uint32_t m_controller_capabilities;
+    uint16_t m_valid_time_in_seconds;
+    uint32_t m_available_index;
+    uint32_t m_next_send_time_millis;
 };
 
 }
-

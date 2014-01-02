@@ -29,8 +29,8 @@
   POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "JDKSAvdeccWorld.h"
-#include "JDKSAvdeccEEPromStorage.h"
+#include "JDKSAvdeccWorld.hpp"
+#include "JDKSAvdeccEEPromStorage.hpp"
 
 #ifdef __avr__
 #include "EEProm.h"

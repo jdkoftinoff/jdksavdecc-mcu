@@ -30,9 +30,9 @@
 */
 
 
-#include "JDKSAvdeccWorld.h"
+#include "JDKSAvdeccWorld.hpp"
 
-#include "JDKSAvdeccWizNetIO.h"
+#include "JDKSAvdeccWizNetIO.hpp"
 
 extern "C" {
 void avr_debug_log(const char *str, uint16_t v );

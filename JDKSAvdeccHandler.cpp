@@ -29,8 +29,8 @@
   POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "JDKSAvdeccWorld.h"
-#include "JDKSAvdeccHandler.h"
+#include "JDKSAvdeccWorld.hpp"
+#include "JDKSAvdeccHandler.hpp"
 
 namespace JDKSAvdecc {
 

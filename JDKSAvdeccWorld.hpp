@@ -30,25 +30,28 @@
   POSSIBILITY OF SUCH DAMAGE.
 */
 
+#include "jdksavdecc-c/include/jdksavdecc.h"
+#include "jdksavdecc-c/include/jdksavdecc_print.h"
+#include "jdksavdecc-c/include/jdksavdecc_pdu_print.h"
 
-#include "JDKSAvdeccWorld.h"
-#include "JDKSAvdeccNetIO.h"
+#ifdef __ARDUINO__
 
-namespace JDKSAvdecc {
+#else
+#include <iostream>
+#include <iomanip>
+#endif
 
-/// Abstract base class for classes that need to be notified
-/// of time traversal and received PDU's
-class Handler {
-public:
-    virtual ~Handler();
-
-    /// Notification of time passage
-    virtual void Tick( uint32_t time_in_millis );
-
-    /// Notification of received raw PDU. Return true if PDU is handled
-    virtual bool ReceivedPDU( uint32_t time_in_millis, uint8_t *buf, uint16_t len );
-
-};
-
+extern "C" {
+void avr_debug_log(const char *str, uint16_t v );
 }
+
+#define JDKSAVDECC_FRAME_HEADER_DA_OFFSET (0)
+#define JDKSAVDECC_FRAME_HEADER_SA_OFFSET (6)
+#define JDKSAVDECC_FRAME_HEADER_ETHERTYPE_OFFSET (12)
+#define JDKSAVDECC_FRAME_HEADER_LEN (14)
+#define JDKSAVDECC_FRAME_MAX_SIZE \
+    (JDKSAVDECC_FRAME_HEADER_LEN + \
+    JDKSAVDECC_COMMON_CONTROL_HEADER_LEN + \
+    JDKSAVDECC_AECP_MAX_CONTROL_DATA_LENGTH)
+
 

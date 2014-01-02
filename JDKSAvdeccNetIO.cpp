@@ -30,9 +30,9 @@
 */
 
 
-#include "JDKSAvdeccWorld.h"
+#include "JDKSAvdeccWorld.hpp"
 
-#include "JDKSAvdeccNetIO.h"
+#include "JDKSAvdeccNetIO.hpp"
 
 namespace JDKSAvdecc {
 

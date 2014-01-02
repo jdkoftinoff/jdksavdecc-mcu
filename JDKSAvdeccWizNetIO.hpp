@@ -31,50 +31,56 @@
 */
 
 
-#include "JDKSAvdeccWorld.h"
-#include "JDKSAvdeccNetIO.h"
-#include "JDKSAvdeccFrame.h"
+#include "JDKSAvdeccWorld.hpp"
 
-#include "JDKSAvdeccHandler.h"
+#include "JDKSAvdeccNetIO.hpp"
+
+#define JDKSAVDECCWINNETIO_DEBUG 0
 
 namespace JDKSAvdecc {
 
-class ADPManager : public Handler {
+#ifdef __AVR__
+class WizNetIO : public NetIO {
 public:
+    WizNetIO( jdksavdecc_eui48 const &mac_address )
+    : m_mac_address(mac_address)
+#if JDKSAVDECCWINNETIO_DEBUG
+    , m_sent_packet_count(0)
+    , m_unsent_packet_count(0)
+#endif
+    {}
 
-    /// Construct the ADPManager object
-    ADPManager(NetIO &net,
-               jdksavdecc_eui64 const &entity_id,
-               jdksavdecc_eui64 const &entity_model_id,
-               uint32_t entity_capabilities,
-               uint32_t controller_capabilities,
-               uint16_t valid_time_in_seconds );
+    virtual ~WizNetIO();
+    virtual void Initialize();
 
-    /// Send the ENTITY_AVAILABLE message if it is time to
-    virtual void Tick( uint32_t time_in_millis );
+    virtual jdksavdecc_eui48 const &GetMACAddress() const {
+        return m_mac_address;
+    }
 
-    /// Handle any incoming ADPDU. Return true if handled
-    virtual bool ReceivedPDU( uint32_t time_in_millis, uint8_t *buf, uint16_t len );
+    virtual uint16_t ReceiveRawNet(uint8_t *data,
+                                   uint16_t max_len );
 
-    /// Formulate the ADPDU and send it
-    void SendADP();
+    virtual bool SendRawNet(uint8_t const *data,
+                            uint16_t len,
+                            uint8_t const *data1,
+                            uint16_t len1,
+                            uint8_t const *data2,
+                            uint16_t len2 );
 
-    jdksavdecc_eui64 const &GetEntityID() const { return m_entity_id; }
-    jdksavdecc_eui64 const &GetEntityModelID() const { return m_entity_model_id; }
-    uint32_t GetEntityCapabilities() const { return m_entity_capabilities; }
-    uint32_t GetControllerCapabilities() const { return m_controller_capabilities; }
-    uint16_t GetValidTimeInSeconds() const { return m_valid_time_in_seconds; }
-    uint32_t GetAvailableIndex() const { return m_available_index; }
-
-protected:
-    NetIO &m_net;
-    jdksavdecc_eui64 m_entity_id;
-    jdksavdecc_eui64 m_entity_model_id;
-    uint32_t m_entity_capabilities;
-    uint32_t m_controller_capabilities;
-    uint16_t m_valid_time_in_seconds;
-    uint32_t m_available_index;
-    uint32_t m_next_send_time_millis;
+    virtual bool SendReplyRawNet(uint8_t const *data,
+                                 uint16_t len,
+                                 uint8_t const *data1,
+                                 uint16_t len1,
+                                 uint8_t const *data2,
+                                 uint16_t len2 );
+#if JDKSAVDECCWINNETIO_DEBUG
+    uint16_t m_sent_packet_count;
+    uint16_t m_unsent_packet_count;
+#endif
+private:
+    jdksavdecc_eui48 m_mac_address;
 };
+
+#endif
 
 }

@@ -31,39 +31,24 @@
 */
 
 
-#include "JDKSAvdeccWorld.h"
-#include "JDKSAvdeccNetIO.h"
-#include "JDKSAvdeccFrame.h"
-#include "JDKSAvdeccHandler.h"
+#include "JDKSAvdeccWorld.hpp"
+#include "JDKSAvdeccNetIO.hpp"
 
 namespace JDKSAvdecc {
 
-class ControlValueHolder : public Handler {
+/// Abstract base class for classes that need to be notified
+/// of time traversal and received PDU's
+class Handler {
 public:
-    ControlValueHolder( uint8_t value_length );
+    virtual ~Handler();
 
-    bool IsDirty() const { return m_dirty; }
-    void ClearDirty() { m_dirty=false; }
+    /// Notification of time passage
+    virtual void Tick( uint32_t time_in_millis );
 
-    uint8_t GetValueLength() const { return m_value_length; }
+    /// Notification of received raw PDU. Return true if PDU is handled
+    virtual bool ReceivedPDU( uint32_t time_in_millis, uint8_t *buf, uint16_t len );
 
-    uint8_t GetValueOctet() const;
-    uint16_t GetValueDoublet() const;
-    uint32_t GetValueQuadlet() const;
-
-    uint32_t GetValue() const;
-
-    void SetValueOctet( uint8_t v );
-    void SetValueDoublet( uint16_t v );
-    void SetValueQuadlet( uint32_t v );
-
-    void SetValue( uint32_t v );
-    void SetValue( uint8_t const *v );
-
-protected:
-    uint8_t m_value[4];
-    bool m_dirty;
-    uint8_t m_value_length;
 };
 
 }
+

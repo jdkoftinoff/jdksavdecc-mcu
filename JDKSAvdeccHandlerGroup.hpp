@@ -31,56 +31,57 @@
 */
 
 
-#include "JDKSAvdeccWorld.h"
-
-#include "JDKSAvdeccNetIO.h"
-
-#define JDKSAVDECCWINNETIO_DEBUG 0
+#include "JDKSAvdeccWorld.hpp"
+#include "JDKSAvdeccNetIO.hpp"
+#include "JDKSAvdeccHandler.hpp"
 
 namespace JDKSAvdecc {
 
-#ifdef __AVR__
-class WizNetIO : public NetIO {
+
+/// The HandlerGroupBase class maintains a list of Handler pointers
+/// Dispatches Tick() and ReceivedPDU() calls to all Handlers
+/// It does not contain the storage of the handlers
+/// No bounds checking is done
+class HandlerGroupBase : public Handler {
+protected:
+    uint16_t m_num_items;
+    Handler **m_item;
+    uint32_t m_rx_count;
+    uint32_t m_handled_count;
 public:
-    WizNetIO( jdksavdecc_eui48 const &mac_address )
-    : m_mac_address(mac_address)
-#if JDKSAVDECCWINNETIO_DEBUG
-    , m_sent_packet_count(0)
-    , m_unsent_packet_count(0)
-#endif
-    {}
+    HandlerGroupBase(Handler **item_storage);
 
-    virtual ~WizNetIO();
-    virtual void Initialize();
-
-    virtual jdksavdecc_eui48 const &GetMACAddress() const {
-        return m_mac_address;
+    /// Add a handler to the list
+    void Add( Handler *v ) {
+        m_item[m_num_items++] = v;
     }
 
-    virtual uint16_t ReceiveRawNet(uint8_t *data,
-                                   uint16_t max_len );
+    uint32_t GetRxCount() const { return m_rx_count; }
+    uint32_t GetHandledCount() const { return m_handled_count; }
 
-    virtual bool SendRawNet(uint8_t const *data,
-                            uint16_t len,
-                            uint8_t const *data1,
-                            uint16_t len1,
-                            uint8_t const *data2,
-                            uint16_t len2 );
+    // Poll the NetIO object for an incoming frame. If it is multicast, or m
+    virtual bool PollNet( uint32_t time_in_millis );
 
-    virtual bool SendReplyRawNet(uint8_t const *data,
-                                 uint16_t len,
-                                 uint8_t const *data1,
-                                 uint16_t len1,
-                                 uint8_t const *data2,
-                                 uint16_t len2 );
-#if JDKSAVDECCWINNETIO_DEBUG
-    uint16_t m_sent_packet_count;
-    uint16_t m_unsent_packet_count;
-#endif
-private:
-    jdksavdecc_eui48 m_mac_address;
+    /// Send Tick() messages to all encapsulated Handlers
+    /// and poll incoming network for PDU's and dispatch them
+    virtual void Tick( uint32_t time_in_millis );
+
+    /// Send ReceivedPDU message to each handler until one returns true.
+    virtual bool ReceivedPDU( uint32_t time_in_millis, uint8_t *buf, uint16_t len );
 };
 
-#endif
+
+/// HandlerGroup is a HandlerGroupBase and contains
+/// the storage of the contained Handler pointers.
+/// The HandlerGroup is templatelized by the MaxItem count.
+template <uint16_t MaxItems>
+class HandlerGroup : public HandlerGroupBase {
+private:
+    Handler *m_item_storage[MaxItems];
+public:
+    HandlerGroup()
+        : HandlerGroupBase(m_item_storage) {}
+};
 
 }
+

@@ -29,8 +29,8 @@
   POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "JDKSAvdeccWorld.h"
-#include "JDKSAvdeccControlValueHolder.h"
+#include "JDKSAvdeccWorld.hpp"
+#include "JDKSAvdeccControlValueHolder.hpp"
 
 namespace JDKSAvdecc {
 
