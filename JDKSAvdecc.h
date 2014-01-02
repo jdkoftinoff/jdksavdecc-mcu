@@ -43,5 +43,4 @@
 #include "JDKSAvdeccHelpers.hpp"
 #include "JDKSAvdeccNetIO.hpp"
 #include "JDKSAvdeccWizNetIO.hpp"
-#include "JDKSAvdeccWorld.hpp"
 
