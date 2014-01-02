@@ -166,9 +166,9 @@ inline bool ParseAA(
             jdksavdecc_aecp_aa *aa,
             FrameBase const &pdu ) {
     bool r=false;
-    // Validate subtype is AECP
+    // Validate subtype is AA
     if( jdksavdecc_uint8_get(pdu.GetBuf(),pdu.GetPos())==(0x80+JDKSAVDECC_SUBTYPE_AECP) ) {
-        // Yes, read the aem header
+        // Yes, read the aa header
 
         if( jdksavdecc_aecp_aa_read(aa,pdu.GetBuf(),pdu.GetPos(),pdu.GetLen())>0 ) {
             // make sure it is version 0 and an AA_COMMAND or AA_RESPONSE
