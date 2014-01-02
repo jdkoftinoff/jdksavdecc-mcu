@@ -6,7 +6,7 @@ set(LIBS ${LIBS} ${CHECK_LIBRARIES} JDKSAvdeccArduino)
 
 include_directories( "jdksavdecc-c/include" )
 
-file(GLOB JDKSAVDECC_ARDUINO_INCLUDES "*.hpp" "jdksavdecc-c/include/*.h" )
+file(GLOB JDKSAVDECC_ARDUINO_INCLUDES "*.h" "*.hpp" "jdksavdecc-c/include/*.h" )
 
 file(GLOB JDKSAVDECC_ARDUINO_SRC "*.cpp" "*.c" )
 
