@@ -38,23 +38,19 @@ namespace JDKSAvdecc {
 
 bool ControllerEntity::ReceivedPDU( uint32_t time_in_millis, uint8_t *buf, uint16_t len ) {
     bool r=false;
-    m_cur_time = time_in_millis;
 
     // we already know the message is AVTP ethertype and is either directly
     // targetting my MAC address or is a multicast message
-
-    // DA (6), SA (6), Ethertype (2) brings us to subtype byte at 14
-    ssize_t pos=JDKSAVDECC_FRAME_HEADER_LEN;
-
+    FrameBase pdu(time_in_millis,buf,len);
     {
         // Try see if it is an AEM message
         jdksavdecc_aecpdu_aem aem;
-        if( ParseAEM(&aem,buf,pos,len)) {
+        if( ParseAEM(&aem,pdu)) {
             if( IsAEMForTarget(aem,m_adp_manager.GetEntityID())) {
-                uint8_t response_code=ReceivedAEMCommand(aem,buf,pos,len);
+                ReceivedAEMCommand(aem,pdu);
                 r=true;
             } else if( IsAEMForController(aem,m_adp_manager.GetEntityID()) ) {
-                r=ReceivedAEMResponse(aem,buf,pos,len);
+                r=ReceivedAEMResponse(aem,pdu);
             }
         }
     }
@@ -63,10 +59,10 @@ bool ControllerEntity::ReceivedPDU( uint32_t time_in_millis, uint8_t *buf, uint1
     if( !r ) {
         // Try see if it is an Address Access message
         jdksavdecc_aecp_aa aa;
-        if( ParseAA(&aa,buf,pos,len)) {
+        if( ParseAA(&aa,pdu)) {
             // Yes, is it a command to read/write data?
             if( IsAAForTarget(aa,m_adp_manager.GetEntityID())) {
-                uint8_t response_code=ReceivedAACommand(aa,buf,pos,len);
+                ReceivedAACommand(aa,pdu);
                 r=true;
                 // TODO: fill in response code in PDU and send reply
             }
@@ -77,7 +73,9 @@ bool ControllerEntity::ReceivedPDU( uint32_t time_in_millis, uint8_t *buf, uint1
 }
 
 
-bool ControllerEntity::ReceivedAEMResponse(  jdksavdecc_aecpdu_aem const &aem, uint8_t *buf, uint16_t pos, uint16_t len ) {
+bool ControllerEntity::ReceivedAEMResponse(
+            jdksavdecc_aecpdu_aem const &aem,
+            FrameBase &pdu ) {
     bool r=false;
     // figure out if it is unsolicited from the high bit of command_type
     uint16_t actual_command_type = aem.command_type&0x7fff;
@@ -108,43 +106,43 @@ bool ControllerEntity::ReceivedAEMResponse(  jdksavdecc_aecpdu_aem const &aem, u
     if( interesting ) {
         switch(actual_command_type) {
         case JDKSAVDECC_AEM_COMMAND_ACQUIRE_ENTITY:
-            r=ReceiveAcquireEntityResponse(aem,buf,pos,len);
+            r=ReceiveAcquireEntityResponse(aem,pdu);
             break;
         case JDKSAVDECC_AEM_COMMAND_LOCK_ENTITY:
-            r=ReceiveLockEntityResponse(aem,buf,pos,len);
+            r=ReceiveLockEntityResponse(aem,pdu);
             break;
         case JDKSAVDECC_AEM_COMMAND_CONTROLLER_AVAILABLE:
-            r=ReceiveControllerAvailableResponse(aem,buf,pos,len);
+            r=ReceiveControllerAvailableResponse(aem,pdu);
             break;
         case JDKSAVDECC_AEM_COMMAND_ENTITY_AVAILABLE:
-            r=ReceiveEntityAvailableResponse(aem,buf,pos,len);
+            r=ReceiveEntityAvailableResponse(aem,pdu);
             break;
         case JDKSAVDECC_AEM_COMMAND_READ_DESCRIPTOR:
-            r=ReceiveReadDescriptorResponse(aem,buf,pos,len);
+            r=ReceiveReadDescriptorResponse(aem,pdu);
             break;
         case JDKSAVDECC_AEM_COMMAND_SET_CONFIGURATION:
-            r=ReceiveSetConfigurationResponse(aem,buf,pos,len);
+            r=ReceiveSetConfigurationResponse(aem,pdu);
             break;
         case JDKSAVDECC_AEM_COMMAND_GET_CONFIGURATION:
-            r=ReceiveGetConfigurationResponse(aem,buf,pos,len);
+            r=ReceiveGetConfigurationResponse(aem,pdu);
             break;
         case JDKSAVDECC_AEM_COMMAND_SET_NAME:
-            r=ReceiveSetNameResponse(aem,buf,pos,len);
+            r=ReceiveSetNameResponse(aem,pdu);
             break;
         case JDKSAVDECC_AEM_COMMAND_GET_NAME:
-            r=ReceiveGetNameResponse(aem,buf,pos,len);
+            r=ReceiveGetNameResponse(aem,pdu);
             break;
         case JDKSAVDECC_AEM_COMMAND_SET_CONTROL:
-            r=ReceiveSetControlResponse(aem,buf,pos,len);
+            r=ReceiveSetControlResponse(aem,pdu);
             break;
         case JDKSAVDECC_AEM_COMMAND_GET_CONTROL:
-            r=ReceiveGetControlResponse(aem,buf,pos,len);
+            r=ReceiveGetControlResponse(aem,pdu);
             break;
         case JDKSAVDECC_AEM_COMMAND_REGISTER_UNSOLICITED_NOTIFICATION:
-            r=ReceiveRegisterUnsolicitedNotificationResponse(aem,buf,pos,len);
+            r=ReceiveRegisterUnsolicitedNotificationResponse(aem,pdu);
             break;
         case JDKSAVDECC_AEM_COMMAND_DEREGISTER_UNSOLICITED_NOTIFICATION:
-            r=ReceiveDeRegisterUnsolicitedNotificationResponse(aem,buf,pos,len);
+            r=ReceiveDeRegisterUnsolicitedNotificationResponse(aem,pdu);
             break;
         }
     }
@@ -152,89 +150,71 @@ bool ControllerEntity::ReceivedAEMResponse(  jdksavdecc_aecpdu_aem const &aem, u
     return r;
 }
 
-bool ControllerEntity::ReceivedAAResponse( jdksavdecc_aecp_aa const &aa, uint8_t *buf, uint16_t pos, uint16_t len ) {
+bool ControllerEntity::ReceivedAAResponse(
+        jdksavdecc_aecp_aa const &aa,
+        FrameBase &pdu ) {
     return false;
 }
 
 bool ControllerEntity::ReceiveAcquireEntityResponse(
         jdksavdecc_aecpdu_aem const &aem,
-        uint8_t *buf,
-        uint16_t pos,
-        uint16_t len ) {
+        FrameBase &pdu ) {
     return false;
 }
 
 bool ControllerEntity::ReceiveLockEntityResponse(
         jdksavdecc_aecpdu_aem const &aem,
-        uint8_t *buf,
-        uint16_t pos,
-        uint16_t len ) {
+        FrameBase &pdu ) {
     return false;
 }
 
 bool ControllerEntity::ReceiveEntityAvailableResponse(
         jdksavdecc_aecpdu_aem const &aem,
-        uint8_t *buf,
-        uint16_t pos,
-        uint16_t len ) {
+        FrameBase &pdu ) {
     return false;
 }
 
 bool ControllerEntity::ReceiveReadDescriptorResponse(
         jdksavdecc_aecpdu_aem const &aem,
-        uint8_t *buf,
-        uint16_t pos,
-        uint16_t len ) {
+        FrameBase &pdu ) {
     return false;
 }
 
 bool ControllerEntity::ReceiveSetConfigurationResponse(
         jdksavdecc_aecpdu_aem const &aem,
-        uint8_t *buf,
-        uint16_t pos,
-        uint16_t len ) {
+        FrameBase &pdu ) {
     return false;
 }
 
 bool ControllerEntity::ReceiveGetConfigurationResponse(
         jdksavdecc_aecpdu_aem const &aem,
-        uint8_t *buf,
-        uint16_t pos,
-        uint16_t len ) {
+        FrameBase &pdu ) {
     return false;
 }
 
 
 bool ControllerEntity::ReceiveSetNameResponse(
         jdksavdecc_aecpdu_aem const &aem,
-        uint8_t *buf,
-        uint16_t pos,
-        uint16_t len ) {
+        FrameBase &pdu ) {
     return false;
 }
 
 bool ControllerEntity::ReceiveGetNameResponse(
         jdksavdecc_aecpdu_aem const &aem,
-        uint8_t *buf,
-        uint16_t pos,
-        uint16_t len ) {
+        FrameBase &pdu ) {
     return false;
 }
 
 
 bool ControllerEntity::ReceiveSetControlResponse(
         jdksavdecc_aecpdu_aem const &aem,
-        uint8_t *buf,
-        uint16_t pos,
-        uint16_t len ) {
+        FrameBase &pdu ) {
     return false;
 }
 
 bool ControllerEntity::ReceiveGetControlResponse(
         jdksavdecc_aecpdu_aem const &aem,
-        uint8_t *buf,
-        uint16_t pos,
-        uint16_t len ) {
+        FrameBase &pdu ) {
     return false;
 }
 
@@ -250,17 +230,13 @@ uint8_t ControllerEntity::ReceiveControlValue(
 
 bool ControllerEntity::ReceiveRegisterUnsolicitedNotificationResponse(
         jdksavdecc_aecpdu_aem const &aem,
-        uint8_t *buf,
-        uint16_t pos,
-        uint16_t len ) {
+        FrameBase &pdu ) {
     return false;
 }
 
 bool ControllerEntity::ReceiveDeRegisterUnsolicitedNotificationResponse(
         jdksavdecc_aecpdu_aem const &aem,
-        uint8_t *buf,
-        uint16_t pos,
-        uint16_t len ) {
+        FrameBase &pdu ) {
     return false;
 }
 

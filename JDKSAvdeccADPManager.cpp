@@ -60,7 +60,7 @@ void ADPManager::Tick( uint32_t time_in_millis ) {
 void ADPManager::SendADP() {
     jdksavdecc_eui48 adp_multicast_addr = JDKSAVDECC_MULTICAST_ADP_ACMP;
 
-    Frame<82> adp(adp_multicast_addr,m_net.GetMACAddress(),JDKSAVDECC_AVTP_ETHERTYPE);  // DA, SA, EtherType, ADPDU = 82 bytes
+    Frame<82> adp(0,adp_multicast_addr,m_net.GetMACAddress(),JDKSAVDECC_AVTP_ETHERTYPE);  // DA, SA, EtherType, ADPDU = 82 bytes
 
     // avtpdu common control header
     adp.PutOctet( 0x80 + JDKSAVDECC_SUBTYPE_ADP); // cd=1, subtype=0x7a (ADP)
@@ -88,7 +88,7 @@ void ADPManager::SendADP() {
     // 20 octets total, all 0
     adp.PutZeros( 20 );
 
-    m_net.SendRawNet( adp.GetBuf(), adp.GetLength() );
+    m_net.SendRawNet( adp.GetBuf(), adp.GetPos() );
     m_available_index++;
 }
 

@@ -44,7 +44,7 @@ HandlerGroupBase::HandlerGroupBase(Handler **item_storage)
 // Poll the NetIO object for an incoming frame. If it is multicast, or m
 bool HandlerGroupBase::PollNet( uint32_t time_in_millis ) {
     bool r=false;
-    uint8_t buf[JDKSAVDECC_FRAME_MAX_SIZE];
+    uint8_t buf[JDKSAVDECC_AECP_FRAME_MAX_SIZE];
     uint16_t len;
     // Try receive data
     len = net->ReceiveRawNet(buf,sizeof(buf));

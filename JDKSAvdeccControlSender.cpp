@@ -97,7 +97,7 @@ void ControlSender::Tick( uint32_t time_in_millis ) {
 }
 
 void ControlSender::SendSetControl() {
-    Frame<128> pdu(m_target_mac_address,net->GetMACAddress(),JDKSAVDECC_AVTP_ETHERTYPE);  // DA, SA, EtherType, ADPDU
+    Frame<128> pdu(0,m_target_mac_address,net->GetMACAddress(),JDKSAVDECC_AVTP_ETHERTYPE);  // DA, SA, EtherType, ADPDU
 
     // AECPDU common control header
     pdu.PutOctet( 0x80 + JDKSAVDECC_SUBTYPE_AECP); // cd=1, subtype=0x7b (AECP)
@@ -114,7 +114,7 @@ void ControlSender::SendSetControl() {
     pdu.PutDoublet( m_target_descriptor_index );
     pdu.PutBuf( m_value, m_value_length );
 
-    net->SendRawNet( pdu.GetBuf(), pdu.GetLength() );
+    net->SendRawNet( pdu.GetBuf(), pdu.GetPos() );
     m_sequence_id++;
 }
 

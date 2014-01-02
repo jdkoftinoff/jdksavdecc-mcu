@@ -1,4 +1,3 @@
-#pragma once
 /*
   Copyright (c) 2014, J.D. Koftinoff Software, Ltd.
   All rights reserved.
@@ -29,7 +28,7 @@
   ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
   POSSIBILITY OF SUCH DAMAGE.
 */
-
+#pragma once
 
 #include "JDKSAvdeccWorld.hpp"
 #include "JDKSAvdeccNetIO.hpp"
@@ -53,15 +52,11 @@ public:
 
     virtual bool ReceivedAAResponse(
             jdksavdecc_aecp_aa const &aa,
-            uint8_t *buf,
-            uint16_t pos,
-            uint16_t len );
+            FrameBase &pdu );
 
     bool ReceivedAEMResponse(
             jdksavdecc_aecpdu_aem const &aem,
-            uint8_t *buf,
-            uint16_t pos,
-            uint16_t len );
+            FrameBase &pdu );
 
 
     // Formulate and send a ACQUIRE_ENTITY command to a target entity
@@ -79,9 +74,7 @@ public:
 
     virtual bool ReceiveAcquireEntityResponse(
             jdksavdecc_aecpdu_aem const &aem,
-            uint8_t *buf,
-            uint16_t pos,
-            uint16_t len );
+            FrameBase &pdu );
 
     // Formulate and send a LOCK_ENTITY command to a target entity
     void SendLockEntity(
@@ -99,9 +92,7 @@ public:
 
     virtual bool ReceiveLockEntityResponse(
             jdksavdecc_aecpdu_aem const &aem,
-            uint8_t *buf,
-            uint16_t pos,
-            uint16_t len );
+            FrameBase &pdu );
 
     // Formulate and send an ENTITY_AVAILABLE command to a target entity
     void SendEntityAvailable(
@@ -112,9 +103,7 @@ public:
 
     virtual bool ReceiveEntityAvailableResponse(
             jdksavdecc_aecpdu_aem const &aem,
-            uint8_t *buf,
-            uint16_t pos,
-            uint16_t len );
+            FrameBase &pdu );
 
     // Formulate and send a READ_DESCRIPTOR command to a target entity
     void SendReadDescriptor(
@@ -135,7 +124,7 @@ public:
 
     virtual bool ReceiveReadDescriptorResponse(
             jdksavdecc_aecpdu_aem const &aem,
-            uint8_t *buf, uint16_t pos, uint16_t len );
+            FrameBase &pdu );
 
     // Formulate and send a SET_CONFIGURATION command to a target entity
     void SendSetConfiguration(
@@ -154,9 +143,7 @@ public:
 
     virtual bool ReceiveSetConfigurationResponse(
             jdksavdecc_aecpdu_aem const &aem,
-            uint8_t *buf,
-            uint16_t pos,
-            uint16_t len );
+            FrameBase &pdu );
 
 
     // Formulate and send a GET_CONFIGURATION command to a target entity
@@ -170,9 +157,7 @@ public:
 
     virtual bool ReceiveGetConfigurationResponse(
             jdksavdecc_aecpdu_aem const &aem,
-            uint8_t *buf,
-            uint16_t pos,
-            uint16_t len );
+            FrameBase &pdu );
 
 
     // Formulate and send a SET_NAME command to a target entity
@@ -199,9 +184,7 @@ public:
 
     virtual bool ReceiveSetNameResponse(
             jdksavdecc_aecpdu_aem const &aem,
-            uint8_t *buf,
-            uint16_t pos,
-            uint16_t len );
+            FrameBase &pdu );
 
 
     // Formulate and send a GET_NAME command to a target entity
@@ -224,9 +207,7 @@ public:
 
     virtual bool ReceiveGetNameResponse(
             jdksavdecc_aecpdu_aem const &aem,
-            uint8_t *buf,
-            uint16_t pos,
-            uint16_t len );
+            FrameBase &pdu );
 
     // Formulate and send a SET_CONTROL command to a target entity
     void SendSetControl(
@@ -249,9 +230,7 @@ public:
 
     virtual bool ReceiveSetControlResponse(
             jdksavdecc_aecpdu_aem const &aem,
-            uint8_t *buf,
-            uint16_t pos,
-            uint16_t len );
+            FrameBase &pdu );
 
 
     // Formulate and send an REGISTER_UNSOLICITED_NOTIFICATION command to a target entity
@@ -263,9 +242,7 @@ public:
 
     virtual bool ReceiveRegisterUnsolicitedNotificationResponse(
             jdksavdecc_aecpdu_aem const &aem,
-            uint8_t *buf,
-            uint16_t pos,
-            uint16_t len );
+            FrameBase &pdu );
 
     // Formulate and send a DEREGISTER_UNSOLICITED_NOTIFICATION command to a target entity
     void SendDeRegisterUnsolicitedNotification(
@@ -276,9 +253,7 @@ public:
 
     virtual bool ReceiveDeRegisterUnsolicitedNotificationResponse(
             jdksavdecc_aecpdu_aem const &aem,
-            uint8_t *buf,
-            uint16_t pos,
-            uint16_t len );
+            FrameBase &pdu );
 
     // Notification that a new control value was received from the target entity,
     // either because of a solicited or unsolicited SET_CONTROL response or
@@ -306,9 +281,7 @@ public:
     }
     virtual bool ReceiveGetControlResponse(
             jdksavdecc_aecpdu_aem const &aem,
-            uint8_t *buf,
-            uint16_t pos,
-            uint16_t len );
+            FrameBase &pdu );
 
 protected:
 

@@ -1,4 +1,3 @@
-#pragma once
 /*
   Copyright (c) 2014, J.D. Koftinoff Software, Ltd.
   All rights reserved.
@@ -29,6 +28,7 @@
   ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
   POSSIBILITY OF SUCH DAMAGE.
 */
+#pragma once
 
 #include "jdksavdecc-c/include/jdksavdecc.h"
 #include "jdksavdecc-c/include/jdksavdecc_print.h"
@@ -37,21 +37,35 @@
 #ifdef __ARDUINO__
 
 #else
+#include <sys/time.h>
 #include <iostream>
 #include <iomanip>
 #endif
 
+#if defined(__ARDUINO__)
+typedef uint32_t jdksavdecc_timestamp_in_milliseconds;
+
+inline jdksavdecc_timestamp_in_milliseconds GetTimeInMs() {
+    return millis();
+}
+#elif defined(__APPLE__) || defined(__linux__)
+typedef uint64_t jdksavdecc_timestamp_in_milliseconds;
+inline jdksavdecc_timestamp_in_milliseconds GetTimeInMs() {
+    timeval tv;
+
+    gettimeofday(&tv,0);
+    return uint64_t(tv.tv_usec/1000 + tv.tv_sec*1000);
+}
+#elif defined(WIN32)
+typedef uint64_t jdksavdecc_timestamp_in_milliseconds;
+inline jdksavdecc_timestamp_in_milliseconds GetTimeInMs() {
+    return uint64_t(GetTickCount());
+}
+#endif
+
+
 extern "C" {
 void avr_debug_log(const char *str, uint16_t v );
 }
-
-#define JDKSAVDECC_FRAME_HEADER_DA_OFFSET (0)
-#define JDKSAVDECC_FRAME_HEADER_SA_OFFSET (6)
-#define JDKSAVDECC_FRAME_HEADER_ETHERTYPE_OFFSET (12)
-#define JDKSAVDECC_FRAME_HEADER_LEN (14)
-#define JDKSAVDECC_FRAME_MAX_SIZE \
-    (JDKSAVDECC_FRAME_HEADER_LEN + \
-    JDKSAVDECC_COMMON_CONTROL_HEADER_LEN + \
-    JDKSAVDECC_AECP_MAX_CONTROL_DATA_LENGTH)
 
 
