@@ -1,14 +1,8 @@
-#include "JDKSAvdeccWorld.h"
+#include "JDKSAvdecc.h"
 #include "Ethernet.h"
 #include "SPI.h"
-#include "JDKSAvdeccWizNetIO.h"
-#include "JDKSAvdeccFrame.h"
-#include "JDKSAvdeccADPManager.h"
-#include "JDKSAvdeccControlSender.h"
-#include "JDKSAvdeccHandlerGroup.h"
-#include "JDKSAvdeccEntity.h"
 
-#define REFRESH_TIME (100)
+#define REFRESH_TIME (50)
 
 using namespace JDKSAvdecc;
 
@@ -34,7 +28,7 @@ ADPManager adp_manager(
   20
   );
 
-Entity my_entity(adp_manager);
+ControllerEntity my_entity(adp_manager);
 
 /// All of the controls are targetting an example AVDECC Entity ID: 90-e0-f0-ff-fe-00-00-02
 jdksavdecc_eui64 target_entity_id = { { 0x90, 0xe0, 0xf0, 0xff, 0xfe, 0x00, 0x00, 0x02 } };
@@ -205,7 +199,7 @@ void setup() {
   all_handlers.Add( &button3 );  
   all_handlers.Add( &button4 );
   all_handlers.Add( &button5 );
-  all_handlers.Add( &my_entity );
+//  all_handlers.Add( &my_entity );
 }
 
 extern "C" {

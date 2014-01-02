@@ -1,14 +1,9 @@
-
+#include "JDKSAvdecc.h"
 #include "Picaso_Serial_4DLib.h"
 #include "Picaso_Const4D.h"
-#include "JDKSAvdeccWorld.h"
+#include "JDKSAvdeccWorld.hpp"
 #include "Ethernet.h"
 #include "SPI.h"
-#include "JDKSAvdeccWizNetIO.h"
-#include "JDKSAvdeccFrame.h"
-#include "JDKSAvdeccADPManager.h"
-#include "JDKSAvdeccControlReceiver.h"
-#include "JDKSAvdeccHandlerGroup.h"
 
 Picaso_Serial_4DLib Display(&Serial);
 
