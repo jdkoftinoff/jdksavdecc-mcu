@@ -1,3 +1,34 @@
+/*
+  Copyright (c) 2014, J.D. Koftinoff Software, Ltd.
+  All rights reserved.
+
+  Redistribution and use in source and binary forms, with or without
+  modification, are permitted provided that the following conditions are met:
+
+   1. Redistributions of source code must retain the above copyright notice,
+      this list of conditions and the following disclaimer.
+
+   2. Redistributions in binary form must reproduce the above copyright
+      notice, this list of conditions and the following disclaimer in the
+      documentation and/or other materials provided with the distribution.
+
+   3. Neither the name of J.D. Koftinoff Software, Ltd. nor the names of its
+      contributors may be used to endorse or promote products derived from
+      this software without specific prior written permission.
+
+  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+  AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+  IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+  ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+  LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+  CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+  SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+  INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+  CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+  POSSIBILITY OF SUCH DAMAGE.
+*/
+
 
 #include "JDKSAvdeccWorld.h"
 
@@ -77,43 +108,43 @@ bool ControllerEntity::ReceivedAEMResponse(  jdksavdecc_aecpdu_aem const &aem, u
     if( interesting ) {
         switch(actual_command_type) {
         case JDKSAVDECC_AEM_COMMAND_ACQUIRE_ENTITY:
-            r=ReceiveAcquireEntityResponse(buf,pos,len);
+            r=ReceiveAcquireEntityResponse(aem,buf,pos,len);
             break;
         case JDKSAVDECC_AEM_COMMAND_LOCK_ENTITY:
-            r=ReceiveLockEntityResponse(buf,pos,len);
+            r=ReceiveLockEntityResponse(aem,buf,pos,len);
             break;
         case JDKSAVDECC_AEM_COMMAND_CONTROLLER_AVAILABLE:
-            r=ReceiveControllerAvailableResponse(buf,pos,len);
+            r=ReceiveControllerAvailableResponse(aem,buf,pos,len);
             break;
         case JDKSAVDECC_AEM_COMMAND_ENTITY_AVAILABLE:
-            r=ReceiveEntityAvailableResponse(buf,pos,len);
+            r=ReceiveEntityAvailableResponse(aem,buf,pos,len);
             break;
         case JDKSAVDECC_AEM_COMMAND_READ_DESCRIPTOR:
-            r=ReceiveReadDescriptorResponse(buf,pos,len);
+            r=ReceiveReadDescriptorResponse(aem,buf,pos,len);
             break;
         case JDKSAVDECC_AEM_COMMAND_SET_CONFIGURATION:
-            r=ReceiveSetConfigurationResponse(buf,pos,len);
+            r=ReceiveSetConfigurationResponse(aem,buf,pos,len);
             break;
         case JDKSAVDECC_AEM_COMMAND_GET_CONFIGURATION:
-            r=ReceiveGetConfigurationResponse(buf,pos,len);
+            r=ReceiveGetConfigurationResponse(aem,buf,pos,len);
             break;
         case JDKSAVDECC_AEM_COMMAND_SET_NAME:
-            r=ReceiveSetNameResponse(buf,pos,len);
+            r=ReceiveSetNameResponse(aem,buf,pos,len);
             break;
         case JDKSAVDECC_AEM_COMMAND_GET_NAME:
-            r=ReceiveGetNameResponse(buf,pos,len);
+            r=ReceiveGetNameResponse(aem,buf,pos,len);
             break;
         case JDKSAVDECC_AEM_COMMAND_SET_CONTROL:
-            r=ReceiveSetControlResponse(buf,pos,len);
+            r=ReceiveSetControlResponse(aem,buf,pos,len);
             break;
         case JDKSAVDECC_AEM_COMMAND_GET_CONTROL:
-            r=ReceiveGetControlResponse(buf,pos,len);
+            r=ReceiveGetControlResponse(aem,buf,pos,len);
             break;
         case JDKSAVDECC_AEM_COMMAND_REGISTER_UNSOLICITED_NOTIFICATION:
-            r=ReceiveRegisterUnsolicitedNotificationResponse(buf,pos,len);
+            r=ReceiveRegisterUnsolicitedNotificationResponse(aem,buf,pos,len);
             break;
         case JDKSAVDECC_AEM_COMMAND_DEREGISTER_UNSOLICITED_NOTIFICATION:
-            r=ReceiveDeRegisterUnsolicitedNotificationResponse(buf,pos,len);
+            r=ReceiveDeRegisterUnsolicitedNotificationResponse(aem,buf,pos,len);
             break;
         }
     }
@@ -121,49 +152,89 @@ bool ControllerEntity::ReceivedAEMResponse(  jdksavdecc_aecpdu_aem const &aem, u
     return r;
 }
 
-bool ControllerEntity::ReceivedAAResponse(  jdksavdecc_aecp_aa const &aa, uint8_t *buf, uint16_t pos, uint16_t len ) {
+bool ControllerEntity::ReceivedAAResponse( jdksavdecc_aecp_aa const &aa, uint8_t *buf, uint16_t pos, uint16_t len ) {
     return false;
 }
 
-bool ControllerEntity::ReceiveAcquireEntityResponse( uint8_t *buf, uint16_t pos, uint16_t len ) {
+bool ControllerEntity::ReceiveAcquireEntityResponse(
+        jdksavdecc_aecpdu_aem const &aem,
+        uint8_t *buf,
+        uint16_t pos,
+        uint16_t len ) {
     return false;
 }
 
-bool ControllerEntity::ReceiveLockEntityResponse( uint8_t *buf, uint16_t pos, uint16_t len ) {
+bool ControllerEntity::ReceiveLockEntityResponse(
+        jdksavdecc_aecpdu_aem const &aem,
+        uint8_t *buf,
+        uint16_t pos,
+        uint16_t len ) {
     return false;
 }
 
-bool ControllerEntity::ReceiveEntityAvailableResponse( uint8_t *buf, uint16_t pos, uint16_t len ) {
+bool ControllerEntity::ReceiveEntityAvailableResponse(
+        jdksavdecc_aecpdu_aem const &aem,
+        uint8_t *buf,
+        uint16_t pos,
+        uint16_t len ) {
     return false;
 }
 
-bool ControllerEntity::ReceiveReadDescriptorResponse( uint8_t *buf, uint16_t pos, uint16_t len ) {
+bool ControllerEntity::ReceiveReadDescriptorResponse(
+        jdksavdecc_aecpdu_aem const &aem,
+        uint8_t *buf,
+        uint16_t pos,
+        uint16_t len ) {
     return false;
 }
 
-bool ControllerEntity::ReceiveSetConfigurationResponse( uint8_t *buf, uint16_t pos, uint16_t len ) {
+bool ControllerEntity::ReceiveSetConfigurationResponse(
+        jdksavdecc_aecpdu_aem const &aem,
+        uint8_t *buf,
+        uint16_t pos,
+        uint16_t len ) {
     return false;
 }
 
-bool ControllerEntity::ReceiveGetConfigurationResponse( uint8_t *buf, uint16_t pos, uint16_t len ) {
+bool ControllerEntity::ReceiveGetConfigurationResponse(
+        jdksavdecc_aecpdu_aem const &aem,
+        uint8_t *buf,
+        uint16_t pos,
+        uint16_t len ) {
     return false;
 }
 
 
-bool ControllerEntity::ReceiveSetNameResponse( uint8_t *buf, uint16_t pos, uint16_t len ) {
+bool ControllerEntity::ReceiveSetNameResponse(
+        jdksavdecc_aecpdu_aem const &aem,
+        uint8_t *buf,
+        uint16_t pos,
+        uint16_t len ) {
     return false;
 }
 
-bool ControllerEntity::ReceiveGetNameResponse( uint8_t *buf, uint16_t pos, uint16_t len ) {
+bool ControllerEntity::ReceiveGetNameResponse(
+        jdksavdecc_aecpdu_aem const &aem,
+        uint8_t *buf,
+        uint16_t pos,
+        uint16_t len ) {
     return false;
 }
 
 
-bool ControllerEntity::ReceiveSetControlResponse( uint8_t *buf, uint16_t pos, uint16_t len ) {
+bool ControllerEntity::ReceiveSetControlResponse(
+        jdksavdecc_aecpdu_aem const &aem,
+        uint8_t *buf,
+        uint16_t pos,
+        uint16_t len ) {
     return false;
 }
 
-bool ControllerEntity::ReceiveGetControlResponse( uint8_t *buf, uint16_t pos, uint16_t len ) {
+bool ControllerEntity::ReceiveGetControlResponse(
+        jdksavdecc_aecpdu_aem const &aem,
+        uint8_t *buf,
+        uint16_t pos,
+        uint16_t len ) {
     return false;
 }
 
@@ -177,11 +248,19 @@ uint8_t ControllerEntity::ReceiveControlValue(
 }
 
 
-bool ControllerEntity::ReceiveRegisterUnsolicitedNotificationResponse(  uint8_t *buf, uint16_t pos, uint16_t len ) {
+bool ControllerEntity::ReceiveRegisterUnsolicitedNotificationResponse(
+        jdksavdecc_aecpdu_aem const &aem,
+        uint8_t *buf,
+        uint16_t pos,
+        uint16_t len ) {
     return false;
 }
 
-bool ControllerEntity::ReceiveDeRegisterUnsolicitedNotificationResponse(  uint8_t *buf, uint16_t pos, uint16_t len ) {
+bool ControllerEntity::ReceiveDeRegisterUnsolicitedNotificationResponse(
+        jdksavdecc_aecpdu_aem const &aem,
+        uint8_t *buf,
+        uint16_t pos,
+        uint16_t len ) {
     return false;
 }
 
