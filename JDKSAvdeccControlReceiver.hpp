@@ -57,14 +57,12 @@ public:
         m_values[ m_num_descriptors++ ] = v;
     }
 
-    virtual bool ReceivedGetControlCommand( uint32_t time_in_millis,
-                                           jdksavdecc_aecpdu_aem const &aem,
-                                           uint8_t *buf,
-                                           uint16_t pos,
-                                           uint16_t len ) {
+    virtual bool ReceivedGetControlCommand(
+            jdksavdecc_aecpdu_aem const &aem,
+            FrameBase &pdu ) {
         bool r=false;
         // yes, get the descriptor index
-        uint16_t descriptor_index = jdksavdecc_aem_command_set_control_get_descriptor_index(buf,pos);
+        uint16_t descriptor_index = jdksavdecc_aem_command_set_control_get_descriptor_index(pdu.GetBuf(),pdu.GetPos());
         // is it a descriptor index that we care about?
         if( (descriptor_index>=m_descriptor_index_offset)
            && (descriptor_index < (m_descriptor_index_offset+m_num_descriptors)) ) {
@@ -80,32 +78,29 @@ public:
         return r;
     }
 
-    virtual bool ReceivedSetControlCommand( uint32_t time_in_millis,
-                                            jdksavdecc_aecpdu_aem const &aem,
-                                            uint8_t *buf,
-                                            uint16_t pos,
-                                            uint16_t len ) {
+    virtual bool ReceivedSetControlCommand(
+            jdksavdecc_aecpdu_aem const &aem,
+            FrameBase &pdu ) {
         bool r=false;
         // yes, get the descriptor index
-        uint16_t descriptor_index = jdksavdecc_aem_command_set_control_get_descriptor_index(buf,pos);
+        uint16_t descriptor_index = jdksavdecc_aem_command_set_control_get_descriptor_index(pdu.GetBuf(),pdu.GetPos());
         // is it a descriptor index that we care about?
         if( (descriptor_index>=m_descriptor_index_offset)
            && (descriptor_index < (m_descriptor_index_offset+m_num_descriptors)) ) {
             // yes, it is in range, extract the data value
 
             m_values[descriptor_index-m_descriptor_index_offset]->SetValue(
-                                                                           &buf[pos+JDKSAVDECC_AEM_COMMAND_SET_CONTROL_COMMAND_OFFSET_VALUES] );
+                                                                           pdu.GetBuf() + pdu.GetPos() +JDKSAVDECC_AEM_COMMAND_SET_CONTROL_COMMAND_OFFSET_VALUES
+                                                                           );
 
             r=true;
         }
         return r;
     }
 
-    virtual bool ReceivedReadDescriptorCommand( uint32_t time_in_millis,
-                                        jdksavdecc_aecpdu_aem const &aem,
-                                        uint8_t *buf,
-                                        uint16_t pos,
-                                        uint16_t len ) {
+    virtual bool ReceivedReadDescriptorCommand(
+            jdksavdecc_aecpdu_aem const &aem,
+            FrameBase &pdu ) {
         bool r=false;
         return r;
 
@@ -117,12 +112,11 @@ public:
         // we already know the message is AVTP ethertype and is either directly
         // targetting my MAC address or is a multicast message
 
-        // DA (6), SA (6), Ethertype (2) brings us to subtype byte at 14
-        ssize_t pos=14;
+        FrameBase pdu(time_in_millis,buf,len);
 
         // Try see if it is an AEM message
         jdksavdecc_aecpdu_aem aem;
-        if( ParseAEM(&aem,buf,pos,len)) {
+        if( ParseAEM(&aem,pdu)) {
             // Yes, Is it a command for me?
             if( IsAEMForTarget(aem,m_entity_id)) {
                 // Yes. Is the sequence_id ok?
@@ -132,13 +126,13 @@ public:
                     m_last_sequence_id = aem.sequence_id;
                     if( aem.command_type == JDKSAVDECC_AEM_COMMAND_GET_CONTROL ) {
                         // Handle GET_CONTROL commands
-                        r=ReceivedGetControlCommand( time_in_millis, aem, buf, pos, len );
+                        r=ReceivedGetControlCommand( aem, pdu );
                     } else if( aem.command_type == JDKSAVDECC_AEM_COMMAND_SET_CONTROL ) {
                         // Handle SET_CONTROL commands
-                        r=ReceivedSetControlCommand( time_in_millis, aem, buf, pos, len );
+                        r=ReceivedSetControlCommand( aem, pdu );
                     } else if( aem.command_type == JDKSAVDECC_AEM_COMMAND_READ_DESCRIPTOR ) {
                         // Handle READ_DESCRIPTOR commands
-                        r=ReceivedReadDescriptorCommand( time_in_millis, aem, buf, pos, len );
+                        r=ReceivedReadDescriptorCommand( aem, pdu );
                     }
                 }
             }
