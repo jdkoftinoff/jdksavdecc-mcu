@@ -34,21 +34,17 @@
 #include "jdksavdecc-c/include/jdksavdecc_print.h"
 #include "jdksavdecc-c/include/jdksavdecc_pdu_print.h"
 
-#ifdef __ARDUINO__
-
-#else
-#include <sys/time.h>
-#include <iostream>
-#include <iomanip>
-#endif
-
-#if defined(__ARDUINO__)
+#if defined(__AVR__)
+#include "SPI.h"
 typedef uint32_t jdksavdecc_timestamp_in_milliseconds;
 
 inline jdksavdecc_timestamp_in_milliseconds GetTimeInMs() {
     return millis();
 }
 #elif defined(__APPLE__) || defined(__linux__)
+#include <sys/time.h>
+#include <iostream>
+#include <iomanip>
 typedef uint64_t jdksavdecc_timestamp_in_milliseconds;
 inline jdksavdecc_timestamp_in_milliseconds GetTimeInMs() {
     timeval tv;
@@ -57,6 +53,8 @@ inline jdksavdecc_timestamp_in_milliseconds GetTimeInMs() {
     return uint64_t(tv.tv_usec/1000 + tv.tv_sec*1000);
 }
 #elif defined(WIN32)
+#include <iostream>
+#include <iomanip>
 typedef uint64_t jdksavdecc_timestamp_in_milliseconds;
 inline jdksavdecc_timestamp_in_milliseconds GetTimeInMs() {
     return uint64_t(GetTickCount());
