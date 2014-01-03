@@ -38,6 +38,7 @@ namespace JDKSAvdecc {
 
 bool ControllerEntity::ReceivedPDU( uint32_t time_in_millis, uint8_t *buf, uint16_t len ) {
     bool r=false;
+    bool done=false;
 
     // we already know the message is AVTP ethertype and is either directly
     // targetting my MAC address or is a multicast message
@@ -52,11 +53,12 @@ bool ControllerEntity::ReceivedPDU( uint32_t time_in_millis, uint8_t *buf, uint1
             } else if( IsAEMForController(aem,m_adp_manager.GetEntityID()) ) {
                 r=ReceivedAEMResponse(aem,pdu);
             }
+            done=true;
         }
     }
 
 
-    if( !r ) {
+    if( !done ) {
         // Try see if it is an Address Access message
         jdksavdecc_aecp_aa aa;
         if( ParseAA(&aa,pdu)) {
