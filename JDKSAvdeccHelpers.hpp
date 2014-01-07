@@ -138,7 +138,7 @@ inline bool IsAEMForController(
     if(aem.aecpdu_header.header.message_type==JDKSAVDECC_AECP_MESSAGE_TYPE_AEM_RESPONSE) {
         // Yes
         // Is it for me?
-        if( jdksavdecc_eui64_compare( &expected_controller_entity_id, &aem.controller_entity_id )==0 ) {
+        if( jdksavdecc_eui64_compare( &expected_controller_entity_id, &aem.aecpdu_header.controller_entity_id )==0 ) {
             r=true;
         }
     }

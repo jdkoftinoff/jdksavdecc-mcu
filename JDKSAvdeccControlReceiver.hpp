@@ -120,10 +120,10 @@ public:
             // Yes, Is it a command for me?
             if( IsAEMForTarget(aem,m_entity_id)) {
                 // Yes. Is the sequence_id ok?
-                if( aem.sequence_id != m_last_sequence_id )
+                if( aem.aecpdu_header.sequence_id != m_last_sequence_id )
                 {
                     // Yes, it is different.
-                    m_last_sequence_id = aem.sequence_id;
+                    m_last_sequence_id = aem.aecpdu_header.sequence_id;
                     if( aem.command_type == JDKSAVDECC_AEM_COMMAND_GET_CONTROL ) {
                         // Handle GET_CONTROL commands
                         r=ReceivedGetControlCommand( aem, pdu );
