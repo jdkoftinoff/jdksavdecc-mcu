@@ -2,18 +2,26 @@
 #include "Ethernet.h"
 #include "SPI.h"
 
-#define REFRESH_TIME (50)
+#define REFRESH_TIME (1000)
 
 using namespace JDKSAvdecc;
 
-/// This MAC address is within the IEEE Std 1722-2011 assigned range, OUI 90-E0-F0 and is only for example usages.
-jdksavdecc_eui48 my_mac = { { 0x90, 0xe0, 0xf0, 0x00, 0x00, 0x01 } };
+/// This MAC address is based on the J.D. Koftinoff Software, Ltd. assigned MAC-S (OUI36): 70:b3:d5:ed:c
+/// JDKS reserves the MAC range from 70:b3:d5:ed:cf:f0 to 70:b3:d5:ed:cf:f7 inclusive for experimental devices only
 
-/// This AVDECC Entity is based on the example MAC address, convered to an EUI-64 by inserting 0xff, 0xfe in the middle
-jdksavdecc_eui64 my_entity_id = { {0x90, 0xe0, 0xf0, 0xff, 0xfe, 0x00, 0x00, 0x01 } };
+jdksavdecc_eui48 my_mac = { { 0x70, 0xb3, 0xd5, 0xed, 0xcf, 0xf0 } };
 
-/// This AVDECC Entity Model ID is for example usages
-jdksavdecc_eui64 my_entity_model_id = { {0x90, 0xe0, 0xf0, 0xff, 0xfe, 0x00, 0x00, 0x01 } };
+/// This AVDECC Entity is based on the mac address (insert ff ff)
+jdksavdecc_eui64 my_entity_id = { {0x70, 0xb3, 0xd5, 0xff, 0xff, 0xed, 0xcf, 0xf0 } };
+
+/// This AVDECC Entity Model ID is based on the J.D. Koftinoff Software, Ltd. assigned MAC-S (OUI36): 70:b3:d5:ed:c
+jdksavdecc_eui64 my_entity_model_id = { {0x70, 0xb3, 0xd5, 0xed, 0xc0, 0x00, 0x00, 0x00 } };
+
+/// All of the controls are targetting the entity of the second JDKS Experimental MAC address
+jdksavdecc_eui64 target_entity_id = { {0x70, 0xb3, 0xd5, 0xff, 0xff, 0xed, 0xcf, 0xf1 } };
+
+/// All of the controls are targetting the second JDKS experimental MAC address 70:b3:d5:ed:cf:f1
+jdksavdecc_eui48 target_mac_address = { { 0x70, 0xb3, 0xd5, 0xed, 0xcf, 0xf1 } };
 
 /// the W5100 chip Raw Ethernet handler object
 WizNetIO rawnet(my_mac);
@@ -28,13 +36,7 @@ ADPManager adp_manager(
   20
   );
 
-ControllerEntity my_entity(adp_manager);
-
-/// All of the controls are targetting an example AVDECC Entity ID: 90-e0-f0-ff-fe-00-00-02
-jdksavdecc_eui64 target_entity_id = { { 0x90, 0xe0, 0xf0, 0xff, 0xfe, 0x00, 0x00, 0x02 } };
-
-/// All of the controls are targetting an example MAC address: 90-e0-f0-00-00-02
-jdksavdecc_eui48 target_mac_address = { { 0x90, 0xe0, 0xf0, 0x00, 0x00, 0x02 } };
+//ControllerEntity my_entity(adp_manager);
 
 /// The shared sequence ID for transmitted messages
 uint16_t sequence_id = 0;
@@ -204,18 +206,52 @@ void setup() {
 
 extern "C" {
 void avr_debug_log(const char *str, uint16_t v ) {
+  char txt[64];
+  char pdu[256];
+  static uint16_t logging_sequence_id=0;
+  uint16_t r;
+  sprintf( txt, "%s %u", str, (unsigned)v );
+  r=jdksavdecc_jdks_log_control_generate(
+        &my_entity_id,
+        8, // Control index 8
+        JDKSAVDECC_DESCRIPTOR_ENTITY,
+        0x0000,
+        &sequence_id,
+        &logging_sequence_id,
+        JDKSAVDECC_JDKS_LOG_INFO,
+        0,
+        txt,
+        pdu,
+        14,
+        sizeof(pdu));
+  if( r>0 )
+  {
+      memcpy(pdu+JDKSAVDECC_FRAME_HEADER_SA_OFFSET,my_mac.value,6);    
+      net->SendRawNet((uint8_t*)pdu,r);
+  }
+  else {
+    Serial.println(" error ");    
+  }
+  
+#if 0  
   Serial.print(str);
   Serial.print(" ");
   Serial.println(v);
+#endif
 }
 }
 
 void loop() {
+  static uint32_t last_second=0;
   // Get the current time in milliseconds
   uint32_t cur_time = millis();
   
   // Tell all the handlers to do their periodic jobs
   all_handlers.Tick(cur_time);
+  if( cur_time/1000 != last_second ) {
+    last_second = cur_time/1000;
+    avr_debug_log("Time from KnobsAndButtons is:",last_second);
+  }
 }
 
 

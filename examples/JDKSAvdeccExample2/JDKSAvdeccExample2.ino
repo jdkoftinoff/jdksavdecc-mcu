@@ -9,14 +9,16 @@ Picaso_Serial_4DLib Display(&Serial);
 
 using namespace JDKSAvdecc;
 
-/// This MAC address is within the IEEE Std 1722-2011 assigned range, OUI 90-E0-F0 and is only for example usages.
-jdksavdecc_eui48 my_mac = { { 0x90, 0xe0, 0xf0, 0x00, 0x00, 0x02 } };
+/// This MAC address is based on the J.D. Koftinoff Software, Ltd. assigned MAC-S (OUI36): 70:b3:d5:ed:c
+/// JDKS reserves the MAC range from 70:b3:d5:ed:cf:f0 to 70:b3:d5:ed:cf:f7 inclusive for experimental devices only
 
-/// This AVDECC Entity is based on the example MAC address, convered to an EUI-64 by inserting 0xff, 0xfe in the middle
-jdksavdecc_eui64 my_entity_id = { {0x90, 0xe0, 0xf0, 0xff, 0xfe, 0x00, 0x00, 0x02 } };
+jdksavdecc_eui48 my_mac = { { 0x70, 0xb3, 0xd5, 0xed, 0xcf, 0xf1 } };
 
-/// This AVDECC Entity Model ID is for example usages
-jdksavdecc_eui64 my_entity_model_id = { {0x90, 0xe0, 0xf0, 0xff, 0xfe, 0x00, 0x00, 0x02 } };
+/// This AVDECC Entity is based on the mac address (insert ff ff)
+jdksavdecc_eui64 my_entity_id = { {0x70, 0xb3, 0xd5, 0xff, 0xff, 0xed, 0xcf, 0xf1 } };
+
+/// This AVDECC Entity Model ID is based on the J.D. Koftinoff Software, Ltd. assigned MAC-S (OUI36): 70:b3:d5:ed:c
+jdksavdecc_eui64 my_entity_model_id = { {0x70, 0xb3, 0xd5, 0xed, 0xc0, 0x00, 0x00, 0x01 } };
 
 /// the W5100 chip Raw Ethernet handler object
 WizNetIO rawnet(my_mac);
@@ -31,6 +33,7 @@ ADPManager adp_manager(
   20
   );
 
+//ControllerEntity my_entity(adp_manager);
 
 /// A VisualHandler is an object which is a Handler, can hold a control value,
 /// And contains GUI position, width, and height properties.  It 
@@ -123,10 +126,11 @@ void display_callback(int ErrCode, unsigned char Errorbyte)
 {
   // Toggle the LED connected to digital pin 9 if the communication to the display fails
   {
+    avr_debug_log("Unable to communicate with LCD - Rebooting",0);
     digitalWrite(9, HIGH);   // turn the LED on (HIGH is the voltage level)
-    delay(100);               // wait for a second
+    delay(400);               // wait
     digitalWrite(9, LOW);    // turn the LED off by making the voltage LOW
-    delay(100);               // wait for a second
+    delay(400);               // wait
   }
   asm volatile ("  jmp 0");   // restart
 }
@@ -136,6 +140,9 @@ void setup() {
   pinMode(9,OUTPUT);  
   digitalWrite(9, LOW);    // turn the LED off by making the voltage LOW
   
+  // Initialize the W5100 chip 
+  rawnet.Initialize();
+  
   // Set serial baud rate for the display to 19200
   Display.TimeLimit4D = 5000;  
   Display.Callback4D = display_callback;
@@ -143,9 +150,6 @@ void setup() {
   delay(50);
   Serial.flush();
   Display.gfx_Cls();
-  
-  // Initialize the W5100 chip 
-  rawnet.Initialize();
   
   // Tell the control receiver which widgets are mapped to which control descriptors
   control_receiver.AddDescriptor( &slider1 );
@@ -180,15 +184,36 @@ void setup() {
   Display.gfx_RectangleFilled(0,PANEL_Y-10,239,319,DARKBLUE);
   
 }
+
+uint16_t sequence_id = 0;
+
 extern "C" {
-  void avr_debug_log(const char *str, uint16_t v ) {
-#if 1
-    Display.txt_MoveCursor(17,2);
-    char s[128];
-    sprintf( s, "%s %04x", str, v );
-    Display.putstr(s);
-#endif
+void avr_debug_log(const char *str, uint16_t v ) {
+  static uint16_t logging_sequence_id=0;
+  uint16_t r;
+  {
+    char txt[64];
+    char pdu[256];
+    sprintf( txt, "%s %u", str, (unsigned)v );
+    r=jdksavdecc_jdks_log_control_generate(
+          &my_entity_id,
+          8, // Control index 8
+          JDKSAVDECC_DESCRIPTOR_ENTITY,
+          0x0000,
+          &sequence_id,
+          &logging_sequence_id,
+          JDKSAVDECC_JDKS_LOG_INFO,
+          0,
+          txt,
+          pdu,
+          14,
+          sizeof(pdu));
+    if( r>0 ) {
+        memcpy(pdu+JDKSAVDECC_FRAME_HEADER_SA_OFFSET,my_mac.value,6);
+        net->SendRawNet((uint8_t*)pdu,r);
+    }
   }
+}
 }
 
 void loop() {
@@ -197,13 +222,7 @@ void loop() {
   all_handlers.Tick(cur_time);  
   if( cur_time/1000 != last_second ) {
     last_second = cur_time/1000;
-    avr_debug_log("time:",last_second);
-#if 0    
-    Display.txt_MoveCursor(0,0);
-    char s[16];
-    sprintf( s, "%d,%ld,%ld", last_second, all_handlers.GetRxCount(), all_handlers.GetHandledCount() );
-    Display.putstr(s);
-#endif    
+    avr_debug_log(":time:",last_second);
   }
 }
 
