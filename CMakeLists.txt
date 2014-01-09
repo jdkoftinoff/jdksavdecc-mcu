@@ -1,3 +1,6 @@
+# this cmake file is currently only for non-cross compiles for testing
+# and is not used for creating avr binaries
+
 cmake_minimum_required (VERSION 2.8)
 project (JDKSAvdeccArduino)
 enable_testing()
