@@ -198,8 +198,6 @@ void avr_debug_log(const char *str, uint16_t v ) {
     r=jdksavdecc_jdks_log_control_generate(
           &my_entity_id,
           8, // Control index 8
-          JDKSAVDECC_DESCRIPTOR_ENTITY,
-          0x0000,
           &sequence_id,
           &logging_sequence_id,
           JDKSAVDECC_JDKS_LOG_INFO,
