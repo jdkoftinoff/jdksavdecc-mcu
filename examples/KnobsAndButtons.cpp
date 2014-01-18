@@ -208,14 +208,12 @@ extern "C" {
 void avr_debug_log(const char *str, uint16_t v ) {
   char txt[64];
   char pdu[256];
-  static uint16_t logging_sequence_id=0;
   uint16_t r;
   sprintf( txt, "%s %u", str, (unsigned)v );
   r=jdksavdecc_jdks_log_control_generate(
         &my_entity_id,
         8, // Control index 8
         &sequence_id,
-        &logging_sequence_id,
         JDKSAVDECC_JDKS_LOG_INFO,
         0,
         txt,

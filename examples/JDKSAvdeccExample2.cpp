@@ -189,7 +189,6 @@ uint16_t sequence_id = 0;
 
 extern "C" {
 void avr_debug_log(const char *str, uint16_t v ) {
-  static uint16_t logging_sequence_id=0;
   uint16_t r;
   {
     char txt[64];
@@ -199,7 +198,6 @@ void avr_debug_log(const char *str, uint16_t v ) {
           &my_entity_id,
           8, // Control index 8
           &sequence_id,
-          &logging_sequence_id,
           JDKSAVDECC_JDKS_LOG_INFO,
           0,
           txt,
