@@ -36,7 +36,6 @@
 
 #if defined(__AVR__)
 #include "SPI.h"
-typedef uint32_t jdksavdecc_timestamp_in_milliseconds;
 
 inline jdksavdecc_timestamp_in_milliseconds GetTimeInMs() {
     return millis();
