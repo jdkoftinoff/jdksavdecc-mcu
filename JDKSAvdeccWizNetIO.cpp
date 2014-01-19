@@ -42,6 +42,18 @@ void avr_debug_log(const char *str, uint16_t v );
 #include "utility/w5100.h"
 #include "utility/socket.h"
 
+// The newer ARDUINO library has one change in the w5100 library, this typedef is here to
+// maintain compatibility
+#if defined(ARDUINO)
+# if ARDUINO >= 150
+typedef uint16_t w5100addr_t;
+# elif ARDUINO <150
+typedef uint8_t *w5100addr_t;
+#endif
+#else
+typedef uint16_t w5100addr_t;
+#endif
+
 namespace JDKSAvdecc {
 
 WizNetIO::~WizNetIO() {
@@ -66,12 +78,12 @@ uint16_t WizNetIO::ReceiveRawNet(uint8_t *data,
 
     if( (W5100.readSnIR(0)&SnIR::RECV) !=0 ) {
         ptr = W5100.readSnRX_RD(0);
-        W5100.read_data(0,(uint8_t*)ptr,head,2);
+        W5100.read_data(0,(w5100addr_t)ptr,head,2);
         ptr+=2;
         data_len = head[0];
         data_len = (data_len<<8) + head[1] - 2;
         // read the frame header to make sure we care
-        W5100.read_data(0,(uint8_t*)ptr,data,JDKSAVDECC_FRAME_HEADER_LEN);
+        W5100.read_data(0,(w5100addr_t)ptr,data,JDKSAVDECC_FRAME_HEADER_LEN);
         ptr += JDKSAVDECC_FRAME_HEADER_LEN;
         // we care if it is ethertype 0x22f0
         if( (data[JDKSAVDECC_FRAME_HEADER_ETHERTYPE_OFFSET+0]==0x22) &&
@@ -82,7 +94,7 @@ uint16_t WizNetIO::ReceiveRawNet(uint8_t *data,
                     memcmp(&data[JDKSAVDECC_FRAME_HEADER_DA_OFFSET],jdksavdecc_multicast_adp_acmp.value,6)==0) {
                 // ok, then read the rest of the data
                 if( data_len<=max_len ) {
-                    W5100.read_data(0,(uint8_t*) ptr,data+JDKSAVDECC_FRAME_HEADER_LEN,data_len-JDKSAVDECC_FRAME_HEADER_LEN);
+                    W5100.read_data(0,(w5100addr_t)ptr,data+JDKSAVDECC_FRAME_HEADER_LEN,data_len-JDKSAVDECC_FRAME_HEADER_LEN);
                     r=data_len;
                 } else {
                     //            avr_debug_log("pkt len", data_len );
