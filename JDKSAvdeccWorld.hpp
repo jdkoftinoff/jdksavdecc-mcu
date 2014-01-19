@@ -44,25 +44,25 @@ inline jdksavdecc_timestamp_in_milliseconds GetTimeInMs() {
 #include <sys/time.h>
 #include <iostream>
 #include <iomanip>
-typedef uint64_t jdksavdecc_timestamp_in_milliseconds;
 inline jdksavdecc_timestamp_in_milliseconds GetTimeInMs() {
     timeval tv;
 
     gettimeofday(&tv,0);
-    return uint64_t(tv.tv_usec/1000 + tv.tv_sec*1000);
+    return jdksavdecc_timestamp_in_milliseconds(tv.tv_usec/1000) +
+        jdksavdecc_timestamp_in_milliseconds(tv.tv_sec*1000);
 }
 #elif defined(WIN32)
 #include <iostream>
 #include <iomanip>
-typedef uint64_t jdksavdecc_timestamp_in_milliseconds;
 inline jdksavdecc_timestamp_in_milliseconds GetTimeInMs() {
-    return uint64_t(GetTickCount());
+    return jdksavdecc_timestamp_in_milliseconds(GetTickCount());
 }
 #endif
 
 
+#if defined(__AVR__)
 extern "C" {
 void avr_debug_log(const char *str, uint16_t v );
 }
-
+#endif
 
