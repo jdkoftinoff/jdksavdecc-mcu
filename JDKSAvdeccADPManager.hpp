@@ -50,10 +50,10 @@ public:
                uint16_t valid_time_in_seconds );
 
     /// Send the ENTITY_AVAILABLE message if it is time to
-    virtual void Tick( uint32_t time_in_millis );
+    virtual void Tick( jdksavdecc_timestamp_in_milliseconds time_in_millis );
 
     /// Handle any incoming ADPDU. Return true if handled
-    virtual bool ReceivedPDU( uint32_t time_in_millis, uint8_t *buf, uint16_t len );
+    virtual bool ReceivedPDU( jdksavdecc_timestamp_in_milliseconds time_in_millis, uint8_t *buf, uint16_t len );
 
     /// Formulate the ADPDU and send it
     void SendADP();
@@ -73,7 +73,7 @@ protected:
     uint32_t m_controller_capabilities;
     uint16_t m_valid_time_in_seconds;
     uint32_t m_available_index;
-    uint32_t m_next_send_time_millis;
+    jdksavdecc_timestamp_in_milliseconds m_last_send_time_in_millis;
 };
 
 }

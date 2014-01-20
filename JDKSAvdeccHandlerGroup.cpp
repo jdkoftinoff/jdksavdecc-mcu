@@ -42,7 +42,7 @@ HandlerGroupBase::HandlerGroupBase(Handler **item_storage)
 
 
 // Poll the NetIO object for an incoming frame. If it is multicast, or m
-bool HandlerGroupBase::PollNet( uint32_t time_in_millis ) {
+bool HandlerGroupBase::PollNet( jdksavdecc_timestamp_in_milliseconds time_in_millis ) {
     bool r=false;
     uint8_t buf[JDKSAVDECC_AECP_FRAME_MAX_SIZE];
     uint16_t len;
@@ -64,7 +64,7 @@ bool HandlerGroupBase::PollNet( uint32_t time_in_millis ) {
 
 /// Send Tick() messages to all encapsulated Handlers
 /// and poll incoming network for PDU's and dispatch them
-void HandlerGroupBase::Tick( uint32_t time_in_millis ) {
+void HandlerGroupBase::Tick( jdksavdecc_timestamp_in_milliseconds time_in_millis ) {
     PollNet( time_in_millis );
     for( uint16_t i=0; i<m_num_items; ++i ) {
         m_item[i]->Tick(time_in_millis);
@@ -72,7 +72,7 @@ void HandlerGroupBase::Tick( uint32_t time_in_millis ) {
 }
 
 /// Send ReceivedPDU message to each handler until one returns true.
-bool HandlerGroupBase::ReceivedPDU( uint32_t time_in_millis, uint8_t *buf, uint16_t len ) {
+bool HandlerGroupBase::ReceivedPDU( jdksavdecc_timestamp_in_milliseconds time_in_millis, uint8_t *buf, uint16_t len ) {
     bool r=false;
     for( uint16_t i=0; i<m_num_items; ++i ) {
         if( m_item[i]->ReceivedPDU(time_in_millis,buf,len) ) {

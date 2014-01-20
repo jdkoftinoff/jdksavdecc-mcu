@@ -49,7 +49,7 @@ public:
     Entity( ADPManager &adp_manager );
 
     /// Run periodic state machines
-    virtual void Tick( uint32_t time_in_millis );
+    virtual void Tick( jdksavdecc_timestamp_in_milliseconds time_in_millis );
 
     /// Notification that a command to a target entity timed out
     virtual void CommandTimedOut(
@@ -59,7 +59,7 @@ public:
 
     /// Handle received AECPDU's
     virtual bool ReceivedPDU(
-            uint32_t time_in_millis,
+            jdksavdecc_timestamp_in_milliseconds time_in_millis,
             uint8_t *buf,
             uint16_t len );
 

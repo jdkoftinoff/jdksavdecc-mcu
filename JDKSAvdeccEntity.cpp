@@ -56,7 +56,7 @@ Entity::Entity( ADPManager &adp_manager )
     }
 }
 
-void Entity::Tick( uint32_t time_in_millis ) {
+void Entity::Tick( jdksavdecc_timestamp_in_milliseconds time_in_millis ) {
     uint16_t cmd = m_last_sent_command_type;
 
     // If we are locked, then time out the lock
@@ -94,7 +94,7 @@ void Entity::CommandTimedOut(
 }
 
 bool Entity::ReceivedPDU(
-        uint32_t time_in_millis,
+        jdksavdecc_timestamp_in_milliseconds time_in_millis,
         uint8_t *buf,
         uint16_t len ) {
     bool r=false;
@@ -102,7 +102,7 @@ bool Entity::ReceivedPDU(
     // we already know the message is AVTP ethertype and is either directly
     // targetting my MAC address or is a multicast message
 
-    {	
+    {
         // Try see if it is an AEM message
         jdksavdecc_aecpdu_aem aem;
         if( ParseAEM(&aem,pdu)) {
