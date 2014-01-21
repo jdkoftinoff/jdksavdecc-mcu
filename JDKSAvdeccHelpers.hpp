@@ -217,14 +217,17 @@ inline void SetAAReply( uint8_t status_code,
                   uint8_t *buf,
                   uint16_t pos,
                   uint16_t len ) {
-    // offset 1: sv=0, version=0, control_data = ADDRESS_ACCESS_RESPONSE
-    buf[pos+1] = JDKSAVDECC_AECP_MESSAGE_TYPE_ADDRESS_ACCESS_RESPONSE;
-    // new control data length is new_length minus frame beginning position pos and the common control header.
-    // See IEEE 1722-2011 Clause 5.3.3
-    uint16_t control_data_length=new_length-pos-JDKSAVDECC_COMMON_CONTROL_HEADER_LEN;
-    // offset 2: status = status code, top 3 bits of new control_data_length
-    buf[pos+2] = (status_code<<3) + ((control_data_length>>8)&0x7);
-    // offset 3: bottom 8 bits of new control_data_length
+   if( len>pos+2 ) {
+      // offset 1: sv=0, version=0, control_data = ADDRESS_ACCESS_RESPONSE
+      buf[pos+1] = JDKSAVDECC_AECP_MESSAGE_TYPE_ADDRESS_ACCESS_RESPONSE;
+      // new control data length is new_length minus frame beginning position pos and the common control header.
+      // See IEEE 1722-2011 Clause 5.3.3
+      uint16_t control_data_length=new_length-pos-JDKSAVDECC_COMMON_CONTROL_HEADER_LEN;
+      // offset 2: status = status code, top 3 bits of new control_data_length
+      buf[pos+2] = (status_code<<3) + ((control_data_length>>8)&0x7);
+      // offset 3: bottom 8 bits of new control_data_length
+      buf[pos+3] = (control_data_length&0xff);
+   }
 }
 
 }
