@@ -63,6 +63,7 @@ public:
         bool r=false;
         // yes, get the descriptor index
         uint16_t descriptor_index = jdksavdecc_aem_command_set_control_get_descriptor_index(pdu.GetBuf(),pdu.GetPos());
+        (void)aem;
         // is it a descriptor index that we care about?
         if( (descriptor_index>=m_descriptor_index_offset)
            && (descriptor_index < (m_descriptor_index_offset+m_num_descriptors)) ) {
@@ -84,6 +85,7 @@ public:
         bool r=false;
         // yes, get the descriptor index
         uint16_t descriptor_index = jdksavdecc_aem_command_set_control_get_descriptor_index(pdu.GetBuf(),pdu.GetPos());
+        (void)aem;
         // is it a descriptor index that we care about?
         if( (descriptor_index>=m_descriptor_index_offset)
            && (descriptor_index < (m_descriptor_index_offset+m_num_descriptors)) ) {
@@ -102,8 +104,9 @@ public:
             jdksavdecc_aecpdu_aem const &aem,
             FrameBase &pdu ) {
         bool r=false;
+        (void)aem;
+        (void)pdu;
         return r;
-
     }
 
     /// Handle incoming PDU
