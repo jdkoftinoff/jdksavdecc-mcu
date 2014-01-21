@@ -31,6 +31,7 @@
 #pragma once
 
 #include "jdksavdecc-c/include/jdksavdecc.h"
+#include "jdksavdecc-c/include/jdksavdecc_jdks.h"
 #include "jdksavdecc-c/include/jdksavdecc_print.h"
 #include "jdksavdecc-c/include/jdksavdecc_pdu_print.h"
 
