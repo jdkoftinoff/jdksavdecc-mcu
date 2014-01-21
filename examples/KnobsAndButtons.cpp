@@ -1,3 +1,4 @@
+#include "Arduino.h"
 #include "JDKSAvdecc.h"
 #include "Ethernet.h"
 #include "SPI.h"
@@ -141,12 +142,12 @@ private:
   uint32_t m_last_update_time;
 public:  
 
-  ValueMapper( uint32_t update_rate_in_millis ) 
+  ValueMapper( jdksavdecc_timestamp_in_milliseconds update_rate_in_millis ) 
   : m_update_rate_in_millis(update_rate_in_millis) 
   , m_last_update_time(0) {
   }
   
-  virtual void Tick( uint32_t time_in_millis ) {
+  virtual void Tick( jdksavdecc_timestamp_in_milliseconds time_in_millis ) {
     if( time_in_millis > m_last_update_time + m_update_rate_in_millis ) {
       m_last_update_time = time_in_millis;
       
@@ -218,7 +219,6 @@ void avr_debug_log(const char *str, uint16_t v ) {
         0,
         txt,
         pdu,
-        14,
         sizeof(pdu));
   if( r>0 )
   {
@@ -238,9 +238,9 @@ void avr_debug_log(const char *str, uint16_t v ) {
 }
 
 void loop() {
-  static uint32_t last_second=0;
+  static jdksavdecc_timestamp_in_milliseconds last_second=0;
   // Get the current time in milliseconds
-  uint32_t cur_time = millis();
+  jdksavdecc_timestamp_in_milliseconds cur_time = millis();
   
   // Tell all the handlers to do their periodic jobs
   all_handlers.Tick(cur_time);

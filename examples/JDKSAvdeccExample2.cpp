@@ -1,3 +1,4 @@
+#include "Arduino.h"
 #include "JDKSAvdecc.h"
 #include "Picaso_Serial_4DLib.h"
 #include "Picaso_Const4D.h"
@@ -59,7 +60,7 @@ public:
   {    
   }
 
-  virtual void Tick( uint32_t time_in_millis ) {
+  virtual void Tick( jdksavdecc_timestamp_in_milliseconds time_in_millis ) {
     if( time_in_millis > m_last_update_time_millis + m_max_update_rate_millis ) {
       if( IsDirty() ) {
         Draw();
@@ -202,7 +203,6 @@ void avr_debug_log(const char *str, uint16_t v ) {
           0,
           txt,
           pdu,
-          14,
           sizeof(pdu));
     if( r>0 ) {
         memcpy(pdu+JDKSAVDECC_FRAME_HEADER_SA_OFFSET,my_mac.value,6);
@@ -214,7 +214,7 @@ void avr_debug_log(const char *str, uint16_t v ) {
 
 void loop() {
   static uint16_t last_second = 0xffff;
-  uint32_t cur_time = millis();
+  jdksavdecc_timestamp_in_milliseconds cur_time = millis();
   all_handlers.Tick(cur_time);  
   if( cur_time/1000 != last_second ) {
     last_second = cur_time/1000;
