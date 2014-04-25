@@ -117,6 +117,7 @@ bool Entity::ReceivedPDU(
     if( !r ) {
         // Try see if it is an Address Access message
         jdksavdecc_aecp_aa aa;
+        memset(&aa,0,sizeof(aa));   
         if( ParseAA(&aa,pdu)) {
             // Yes, is it a command to read/write data?
             if( IsAAForTarget(aa,m_adp_manager.GetEntityID())) {
