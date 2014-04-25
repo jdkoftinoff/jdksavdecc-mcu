@@ -103,6 +103,7 @@ inline bool ParseAEM(
     // Validate subtype is AECP
     if( jdksavdecc_uint8_get(rx.GetBuf(),rx.GetPos())==(0x80+JDKSAVDECC_SUBTYPE_AECP) ) {
         // Yes, read the aem header
+        memset(aem,0,sizeof(*aem));
         if( jdksavdecc_aecpdu_aem_read(aem,rx.GetBuf(),rx.GetPos(),rx.GetLen())>0 ) {
             // make sure it is version 0 and an AEM_COMMAND or AEM_RESPONSE
             if( aem->aecpdu_header.header.version==0 &&
