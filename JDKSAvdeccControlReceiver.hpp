@@ -63,6 +63,7 @@ public:
         bool r=false;
         // yes, get the descriptor index
         uint16_t descriptor_index = jdksavdecc_aem_command_set_control_get_descriptor_index(pdu.GetBuf(),pdu.GetPos());
+        (void)aem;
         // is it a descriptor index that we care about?
         if( (descriptor_index>=m_descriptor_index_offset)
            && (descriptor_index < (m_descriptor_index_offset+m_num_descriptors)) ) {
@@ -84,6 +85,7 @@ public:
         bool r=false;
         // yes, get the descriptor index
         uint16_t descriptor_index = jdksavdecc_aem_command_set_control_get_descriptor_index(pdu.GetBuf(),pdu.GetPos());
+        (void)aem;
         // is it a descriptor index that we care about?
         if( (descriptor_index>=m_descriptor_index_offset)
            && (descriptor_index < (m_descriptor_index_offset+m_num_descriptors)) ) {
@@ -102,12 +104,13 @@ public:
             jdksavdecc_aecpdu_aem const &aem,
             FrameBase &pdu ) {
         bool r=false;
+        (void)aem;
+        (void)pdu;
         return r;
-
     }
 
     /// Handle incoming PDU
-    virtual bool ReceivedPDU( uint32_t time_in_millis, uint8_t *buf, uint16_t len ) {
+    virtual bool ReceivedPDU( jdksavdecc_timestamp_in_milliseconds time_in_millis, uint8_t *buf, uint16_t len ) {
         bool r=false;
         // we already know the message is AVTP ethertype and is either directly
         // targetting my MAC address or is a multicast message
@@ -120,10 +123,10 @@ public:
             // Yes, Is it a command for me?
             if( IsAEMForTarget(aem,m_entity_id)) {
                 // Yes. Is the sequence_id ok?
-                if( aem.sequence_id != m_last_sequence_id )
+                if( aem.aecpdu_header.sequence_id != m_last_sequence_id )
                 {
                     // Yes, it is different.
-                    m_last_sequence_id = aem.sequence_id;
+                    m_last_sequence_id = aem.aecpdu_header.sequence_id;
                     if( aem.command_type == JDKSAVDECC_AEM_COMMAND_GET_CONTROL ) {
                         // Handle GET_CONTROL commands
                         r=ReceivedGetControlCommand( aem, pdu );

@@ -59,14 +59,14 @@ public:
     uint32_t GetHandledCount() const { return m_handled_count; }
 
     // Poll the NetIO object for an incoming frame. If it is multicast, or m
-    virtual bool PollNet( uint32_t time_in_millis );
+    virtual bool PollNet( jdksavdecc_timestamp_in_milliseconds time_in_millis );
 
     /// Send Tick() messages to all encapsulated Handlers
     /// and poll incoming network for PDU's and dispatch them
-    virtual void Tick( uint32_t time_in_millis );
+    virtual void Tick( jdksavdecc_timestamp_in_milliseconds time_in_millis );
 
     /// Send ReceivedPDU message to each handler until one returns true.
-    virtual bool ReceivedPDU( uint32_t time_in_millis, uint8_t *buf, uint16_t len );
+    virtual bool ReceivedPDU( jdksavdecc_timestamp_in_milliseconds time_in_millis, uint8_t *buf, uint16_t len );
 };
 
 

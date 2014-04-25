@@ -1,3 +1,4 @@
+
 /*
   Copyright (c) 2014, J.D. Koftinoff Software, Ltd.
   All rights reserved.
@@ -28,42 +29,14 @@
   ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
   POSSIBILITY OF SUCH DAMAGE.
 */
-#pragma once
 
-#include "jdksavdecc-c/include/jdksavdecc.h"
+#include "jdksavdecc-c/include/jdksavdecc_world.h"
 #include "jdksavdecc-c/include/jdksavdecc_jdks.h"
-#include "jdksavdecc-c/include/jdksavdecc_print.h"
-#include "jdksavdecc-c/include/jdksavdecc_pdu_print.h"
 
-#if defined(__AVR__)
-#include "SPI.h"
-
-inline jdksavdecc_timestamp_in_milliseconds GetTimeInMs() {
-    return millis();
-}
-#elif defined(__APPLE__) || defined(__linux__)
-#include <sys/time.h>
-#include <iostream>
-#include <iomanip>
-inline jdksavdecc_timestamp_in_milliseconds GetTimeInMs() {
-    timeval tv;
-
-    gettimeofday(&tv,0);
-    return jdksavdecc_timestamp_in_milliseconds(tv.tv_usec/1000) +
-        jdksavdecc_timestamp_in_milliseconds(tv.tv_sec*1000);
-}
-#elif defined(WIN32)
-#include <iostream>
-#include <iomanip>
-inline jdksavdecc_timestamp_in_milliseconds GetTimeInMs() {
-    return jdksavdecc_timestamp_in_milliseconds(GetTickCount());
-}
-#endif
+struct jdksavdecc_eui48 jdksavdecc_jdks_multicast_log = JDKSAVDECC_JDKS_MULTICAST_LOG;
+struct jdksavdecc_eui64 jdksavdecc_jdks_notifications_controller_entity_id = JDKSAVDECC_JDKS_NOTIFICATIONS_CONTROLLER_ENTITY_ID;
+struct jdksavdecc_eui64 jdksavdecc_jdks_aem_control_log_text = JDKSAVDECC_JDKS_AEM_CONTROL_LOG_TEXT;
+struct jdksavdecc_eui64 jdksavdecc_jdks_aem_control_ipv4_parameters = JDKSAVDECC_JDKS_AEM_CONTROL_IPV4_PARAMETERS;
 
 
-#if defined(__AVR__)
-extern "C" {
-void avr_debug_log(const char *str, uint16_t v );
-}
-#endif
 

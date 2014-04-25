@@ -31,6 +31,7 @@
 
 #include "JDKSAvdeccWorld.hpp"
 #include "JDKSAvdeccADPManager.hpp"
+#include "JDKSAvdeccHelpers.hpp"
 
 namespace JDKSAvdecc {
 
@@ -47,13 +48,13 @@ ADPManager::ADPManager(NetIO &net,
 , m_controller_capabilities( controller_capabilities )
 , m_valid_time_in_seconds( valid_time_in_seconds )
 , m_available_index(0)
-, m_next_send_time_millis(0) {}
+, m_last_send_time_in_millis(0) {}
 
 
-void ADPManager::Tick( uint32_t time_in_millis ) {
-    if( m_next_send_time_millis < time_in_millis ) {
+void ADPManager::Tick( jdksavdecc_timestamp_in_milliseconds time_in_millis ) {
+    if( WasTimeOutHit(time_in_millis,m_last_send_time_in_millis,(m_valid_time_in_seconds*(1000/4)))) {
         SendADP();
-        m_next_send_time_millis = time_in_millis + m_valid_time_in_seconds*(1000/4);
+        m_last_send_time_in_millis = time_in_millis;
     }
 }
 
@@ -92,7 +93,7 @@ void ADPManager::SendADP() {
     m_available_index++;
 }
 
-bool ADPManager::ReceivedPDU( uint32_t time_in_millis, uint8_t *buf, uint16_t len ) {
+bool ADPManager::ReceivedPDU( jdksavdecc_timestamp_in_milliseconds time_in_millis, uint8_t *buf, uint16_t len ) {
 return false;
 }
 

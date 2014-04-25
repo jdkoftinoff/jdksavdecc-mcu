@@ -56,7 +56,7 @@ Entity::Entity( ADPManager &adp_manager )
     }
 }
 
-void Entity::Tick( uint32_t time_in_millis ) {
+void Entity::Tick( jdksavdecc_timestamp_in_milliseconds time_in_millis ) {
     uint16_t cmd = m_last_sent_command_type;
 
     // If we are locked, then time out the lock
@@ -94,7 +94,7 @@ void Entity::CommandTimedOut(
 }
 
 bool Entity::ReceivedPDU(
-        uint32_t time_in_millis,
+        jdksavdecc_timestamp_in_milliseconds time_in_millis,
         uint8_t *buf,
         uint16_t len ) {
     bool r=false;
@@ -102,7 +102,7 @@ bool Entity::ReceivedPDU(
     // we already know the message is AVTP ethertype and is either directly
     // targetting my MAC address or is a multicast message
 
-    {	
+    {
         // Try see if it is an AEM message
         jdksavdecc_aecpdu_aem aem;
         if( ParseAEM(&aem,pdu)) {
@@ -216,7 +216,7 @@ uint8_t Entity::ValidatePermissions( jdksavdecc_aecpdu_aem const &aem ) {
 
     // if we have an owner and it isn't the controller that sent us the request then fail
     if( has_owner ) {
-        if( jdksavdecc_eui64_compare(&m_acquired_by_controller_entity_id,&aem.controller_entity_id)!=0 ) {
+        if( jdksavdecc_eui64_compare(&m_acquired_by_controller_entity_id,&aem.aecpdu_header.controller_entity_id)!=0 ) {
             // not our controller.
             response_status=JDKSAVDECC_AEM_STATUS_ENTITY_ACQUIRED;
         } else {
@@ -227,7 +227,7 @@ uint8_t Entity::ValidatePermissions( jdksavdecc_aecpdu_aem const &aem ) {
         // We don't have an owner, so check to see if we are locked
         if( jdksavdecc_eui64_is_set(m_locked_by_controller_entity_id) ) {
             // Yes, we are locked. Are we locked by the controller that sent us the message?
-            if( jdksavdecc_eui64_compare(&m_locked_by_controller_entity_id,&aem.controller_entity_id)!=0 ) {
+            if( jdksavdecc_eui64_compare(&m_locked_by_controller_entity_id,&aem.aecpdu_header.controller_entity_id)!=0 ) {
                 // not our controller
                 response_status=JDKSAVDECC_AEM_STATUS_ENTITY_LOCKED;
             } else {
@@ -428,7 +428,7 @@ uint8_t Entity::ReceiveAcquireEntityCommand(
     uint8_t status = JDKSAVDECC_AECP_STATUS_NOT_IMPLEMENTED;
 
     bool controller_id_matches_current_owner;
-    controller_id_matches_current_owner = jdksavdecc_eui64_compare(&m_acquired_by_controller_entity_id,&aem.controller_entity_id);
+    controller_id_matches_current_owner = jdksavdecc_eui64_compare(&m_acquired_by_controller_entity_id,&aem.aecpdu_header.controller_entity_id);
 
     bool has_current_owner;
     has_current_owner  = jdksavdecc_eui64_is_set(m_acquired_by_controller_entity_id);

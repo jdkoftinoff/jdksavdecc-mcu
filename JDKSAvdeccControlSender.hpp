@@ -48,13 +48,13 @@ public:
                uint16_t &sequence_id,
                uint16_t target_descriptor_index,
                uint16_t value_length,
-               uint32_t update_rate_in_millis);
+               jdksavdecc_timestamp_in_milliseconds update_rate_in_millis);
 
     /// Send the SET_CONTROL message if it is time to
-    virtual void Tick( uint32_t time_in_millis );
+    virtual void Tick( jdksavdecc_timestamp_in_milliseconds time_in_millis );
 
     /// Handle incoming PDU
-    virtual bool ReceivedPDU( uint32_t time_in_millis, uint8_t *buf, uint16_t len );
+    virtual bool ReceivedPDU( jdksavdecc_timestamp_in_milliseconds time_in_millis, uint8_t *buf, uint16_t len );
 
     /// Set a one byte value. If it actually changed, then force Tick to send ASAP
     void SetValueOctet( uint8_t val );
@@ -84,8 +84,8 @@ protected:
     uint16_t m_target_descriptor_index;
     uint16_t m_value_length;
     uint8_t m_value[4];
-    uint32_t m_update_rate_in_millis;
-    uint32_t m_next_send_time_millis;
+    jdksavdecc_timestamp_in_milliseconds m_update_rate_in_millis;
+    jdksavdecc_timestamp_in_milliseconds m_last_send_time_in_millis;
 };
 
 }

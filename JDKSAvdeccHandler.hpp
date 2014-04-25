@@ -42,10 +42,10 @@ public:
     virtual ~Handler();
 
     /// Notification of time passage
-    virtual void Tick( uint32_t time_in_millis );
+    virtual void Tick( jdksavdecc_timestamp_in_milliseconds time_in_millis );
 
     /// Notification of received raw PDU. Return true if PDU is handled
-    virtual bool ReceivedPDU( uint32_t time_in_millis, uint8_t *buf, uint16_t len );
+    virtual bool ReceivedPDU( jdksavdecc_timestamp_in_milliseconds time_in_millis, uint8_t *buf, uint16_t len );
 
 };
 

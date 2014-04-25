@@ -47,7 +47,7 @@ public:
         : Entity(adp_manager) {}
 
     /// Handle incoming commands and responses
-    virtual bool ReceivedPDU( uint32_t time_in_millis, uint8_t *buf, uint16_t len );
+    virtual bool ReceivedPDU( jdksavdecc_timestamp_in_milliseconds time_in_millis, uint8_t *buf, uint16_t len );
 
 
     virtual bool ReceivedAAResponse(

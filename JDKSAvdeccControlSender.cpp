@@ -41,7 +41,7 @@ ControlSender::ControlSender(
                  uint16_t &sequence_id,
                  uint16_t target_descriptor_index,
                  uint16_t value_length,
-                 uint32_t update_rate_in_millis
+                 jdksavdecc_timestamp_in_milliseconds update_rate_in_millis
                  )
 : m_entity_id( entity_id )
 , m_target_entity_id( target_entity_id )
@@ -50,7 +50,7 @@ ControlSender::ControlSender(
 , m_target_descriptor_index( target_descriptor_index )
 , m_value_length(value_length)
 , m_update_rate_in_millis(update_rate_in_millis)
-, m_next_send_time_millis(0) {
+, m_last_send_time_in_millis(0) {
     m_value[0] = 0;
     m_value[1] = 0;
     m_value[2] = 0;
@@ -59,7 +59,7 @@ ControlSender::ControlSender(
 
 void ControlSender::SetValueOctet( uint8_t val ) {
     if( val!=m_value[0] ) {
-        m_next_send_time_millis = 0;
+        m_last_send_time_in_millis -= m_update_rate_in_millis;
         m_value[0] = val;
     }
 }
@@ -68,7 +68,7 @@ void ControlSender::SetValueOctet( uint8_t val ) {
 void ControlSender::SetValueDoublet( uint16_t val ) {
     if( (((val>>8)&0xff) !=m_value[0])
        || (((val>>0)&0xff)!=m_value[1]) ) {
-        m_next_send_time_millis = 0;
+        m_last_send_time_in_millis -= m_update_rate_in_millis;
         m_value[0] = (val>>8)&0xff;
         m_value[1] = (val>>0)&0xff;
     }
@@ -81,7 +81,7 @@ void ControlSender::SetValueQuadlet( uint32_t val ) {
        || (((val>>8)&0xff) !=m_value[2])
        || (((val>>0)&0xff)!=m_value[3]) ) {
 
-        m_next_send_time_millis = 0;
+        m_last_send_time_in_millis -= m_update_rate_in_millis;
         m_value[0] = (val>>24)&0xff;
         m_value[1] = (val>>16)&0xff;
         m_value[2] = (val>>8)&0xff;
@@ -89,10 +89,10 @@ void ControlSender::SetValueQuadlet( uint32_t val ) {
     }
 }
 
-void ControlSender::Tick( uint32_t time_in_millis ) {
-    if( m_next_send_time_millis < time_in_millis ) {
+void ControlSender::Tick( jdksavdecc_timestamp_in_milliseconds time_in_millis ) {
+    if( WasTimeOutHit(time_in_millis,m_last_send_time_in_millis,m_update_rate_in_millis) ) {
         SendSetControl();
-        m_next_send_time_millis = time_in_millis + m_update_rate_in_millis;
+        m_last_send_time_in_millis = time_in_millis;
     }
 }
 
@@ -118,7 +118,7 @@ void ControlSender::SendSetControl() {
     m_sequence_id++;
 }
 
-bool ControlSender::ReceivedPDU( uint32_t time_in_millis, uint8_t *buf, uint16_t len ) {
+bool ControlSender::ReceivedPDU( jdksavdecc_timestamp_in_milliseconds time_in_millis, uint8_t *buf, uint16_t len ) {
     return false;
 }
 

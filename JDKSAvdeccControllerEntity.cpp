@@ -36,7 +36,7 @@
 
 namespace JDKSAvdecc {
 
-bool ControllerEntity::ReceivedPDU( uint32_t time_in_millis, uint8_t *buf, uint16_t len ) {
+bool ControllerEntity::ReceivedPDU( jdksavdecc_timestamp_in_milliseconds time_in_millis, uint8_t *buf, uint16_t len ) {
     bool r=false;
     bool done=false;
 
@@ -94,7 +94,7 @@ bool ControllerEntity::ReceivedAEMResponse(
             // yes, does the command type match?
             if( actual_command_type == m_last_sent_command_type ) {
                 // yes, does the sequence ID match?
-                if( aem.sequence_id == m_outgoing_sequence_id ) {
+                if( aem.aecpdu_header.sequence_id == m_outgoing_sequence_id ) {
                     // Yes, then we are interested in this message
                     interesting = true;
                     // forget about the sent state by clearing the last send command target entity id
