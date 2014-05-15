@@ -1,5 +1,5 @@
 #include "Arduino.h"
-#include "JDKSAvdecc.h"
+#include "JDKSAvdeccSimple.h"
 #include "Ethernet.h"
 #include "SPI.h"
 

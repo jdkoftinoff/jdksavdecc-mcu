@@ -1,5 +1,5 @@
 #include "Arduino.h"
-#include "JDKSAvdecc.h"
+#include "JDKSAvdeccSimple.h"
 #include "Picaso_Serial_4DLib.h"
 #include "Picaso_Const4D.h"
 #include "JDKSAvdeccWorld.hpp"
@@ -25,10 +25,10 @@ jdksavdecc_eui64 my_entity_model_id = { {0x70, 0xb3, 0xd5, 0xed, 0xc0, 0x00, 0x0
 WizNetIO rawnet(my_mac);
 
 /// The ADP manager is told about the entity id, model_id, entity capabilities, controller capabilities, and valid time in seconds
-ADPManager adp_manager( 
-  rawnet, 
-  my_entity_id, 
-  my_entity_model_id, 
+ADPManager adp_manager(
+  rawnet,
+  my_entity_id,
+  my_entity_model_id,
   JDKSAVDECC_ADP_ENTITY_CAPABILITY_AEM_SUPPORTED,
   JDKSAVDECC_ADP_CONTROLLER_CAPABILITY_IMPLEMENTED,
   20
@@ -37,7 +37,7 @@ ADPManager adp_manager(
 //ControllerEntity my_entity(adp_manager);
 
 /// A VisualHandler is an object which is a Handler, can hold a control value,
-/// And contains GUI position, width, and height properties.  It 
+/// And contains GUI position, width, and height properties.  It
 /// Also keeps track of a maximum update rate; new changes immediately
 /// cause an update unless the last update was too recent.
 class VisualHandler : public ControlValueHolder {
@@ -48,7 +48,7 @@ protected:
   uint16_t m_h;
   uint32_t m_last_update_time_millis;
   uint16_t m_max_update_rate_millis;
-public:  
+public:
   VisualHandler( uint8_t value_length, uint16_t x, uint16_t y, uint16_t w, uint16_t h, uint16_t max_update_rate_millis = 50 )
     : ControlValueHolder( value_length )
     , m_x( x )
@@ -57,7 +57,7 @@ public:
     , m_h( h )
     , m_last_update_time_millis( 0 )
     , m_max_update_rate_millis( max_update_rate_millis )
-  {    
+  {
   }
 
   virtual void Tick( jdksavdecc_timestamp_in_milliseconds time_in_millis ) {
@@ -77,12 +77,12 @@ public:
 class VisualSlider : public VisualHandler {
 protected:
   uint16_t m_scale;
-  
+
 public:
   VisualSlider( uint8_t value_length, uint16_t x, uint16_t y, uint16_t w, uint16_t h, uint16_t scale, uint16_t max_update_rate_millis = 50 )
     : VisualHandler(value_length, x,y,w,h,max_update_rate_millis )
     , m_scale( scale ) {}
-      
+
   virtual void Draw() {
     Display.gfx_Slider( SLIDER_RAISED, m_x, m_y, m_x+m_w, m_y+m_h, GRAY, m_scale, m_scale - GetValueDoublet() );
   }
@@ -91,7 +91,7 @@ public:
 class VisualLight : public VisualHandler {
 public:
   VisualLight( uint8_t value_length, uint16_t x, uint16_t y, uint16_t w, uint16_t max_update_rate_millis = 50 )
-    : VisualHandler(value_length,x,y,w,w,max_update_rate_millis ) {    
+    : VisualHandler(value_length,x,y,w,w,max_update_rate_millis ) {
   }
 
   virtual void Draw() {
@@ -138,20 +138,20 @@ void display_callback(int ErrCode, unsigned char Errorbyte)
 
 void setup() {
   // set pin 9 to be output for LED status
-  pinMode(9,OUTPUT);  
+  pinMode(9,OUTPUT);
   digitalWrite(9, LOW);    // turn the LED off by making the voltage LOW
-  
-  // Initialize the W5100 chip 
+
+  // Initialize the W5100 chip
   rawnet.Initialize();
-  
+
   // Set serial baud rate for the display to 19200
-  Display.TimeLimit4D = 5000;  
+  Display.TimeLimit4D = 5000;
   Display.Callback4D = display_callback;
   Serial.begin(9600);
   delay(50);
   Serial.flush();
   Display.gfx_Cls();
-  
+
   // Tell the control receiver which widgets are mapped to which control descriptors
   control_receiver.AddDescriptor( &slider1 );
   control_receiver.AddDescriptor( &slider2 );
@@ -161,8 +161,8 @@ void setup() {
   control_receiver.AddDescriptor( &light1 );
   control_receiver.AddDescriptor( &light4 );
   control_receiver.AddDescriptor( &light5 );
-  
-  // Put all the handlers into the HandlerGroup  
+
+  // Put all the handlers into the HandlerGroup
   all_handlers.Add( &adp_manager );
   all_handlers.Add( &control_receiver );
   all_handlers.Add( &slider1 );
@@ -178,12 +178,12 @@ void setup() {
   Display.gfx_Cls();
   Display.txt_MoveCursor(0, 0);
   Display.txt_FGcolour( WHITE );
-  
+
   // put the header info nicely on top
-  Display.putstr(" JDKSAvdeccArduino Example #2\n      By Jeff Koftinoff\n   http://avb.statusbar.com");   
+  Display.putstr(" JDKSAvdeccArduino Example #2\n      By Jeff Koftinoff\n   http://avb.statusbar.com");
   // fill the rest of the screen with dark blue
   Display.gfx_RectangleFilled(0,PANEL_Y-10,239,319,DARKBLUE);
-  
+
 }
 
 uint16_t sequence_id = 0;
@@ -215,7 +215,7 @@ void avr_debug_log(const char *str, uint16_t v ) {
 void loop() {
   static uint16_t last_second = 0xffff;
   jdksavdecc_timestamp_in_milliseconds cur_time = millis();
-  all_handlers.Tick(cur_time);  
+  all_handlers.Tick(cur_time);
   if( cur_time/1000 != last_second ) {
     last_second = cur_time/1000;
     avr_debug_log(":time:",last_second);

@@ -1,5 +1,5 @@
 #include "Arduino.h"
-#include "JDKSAvdecc.h"
+#include "JDKSAvdeccSimple.h"
 #include "Ethernet.h"
 #include "SPI.h"
 
@@ -28,10 +28,10 @@ jdksavdecc_eui48 target_mac_address = { { 0x70, 0xb3, 0xd5, 0xed, 0xcf, 0xf1 } }
 WizNetIO rawnet(my_mac);
 
 /// The ADP manager is told about the entity id, model_id, entity capabilities, controller capabilities, and valid time in seconds
-ADPManager adp_manager( 
-  rawnet, 
-  my_entity_id, 
-  my_entity_model_id, 
+ADPManager adp_manager(
+  rawnet,
+  my_entity_id,
+  my_entity_model_id,
   JDKSAVDECC_ADP_ENTITY_CAPABILITY_AEM_SUPPORTED,
   JDKSAVDECC_ADP_CONTROLLER_CAPABILITY_IMPLEMENTED,
   20
@@ -137,32 +137,32 @@ class ValueMapper : public Handler {
 private:
   /// The update rate in milliseconds
   uint32_t m_update_rate_in_millis;
-  
+
   /// The time that the last update happened
   uint32_t m_last_update_time;
-public:  
+public:
 
-  ValueMapper( jdksavdecc_timestamp_in_milliseconds update_rate_in_millis ) 
-  : m_update_rate_in_millis(update_rate_in_millis) 
+  ValueMapper( jdksavdecc_timestamp_in_milliseconds update_rate_in_millis )
+  : m_update_rate_in_millis(update_rate_in_millis)
   , m_last_update_time(0) {
   }
-  
+
   virtual void Tick( jdksavdecc_timestamp_in_milliseconds time_in_millis ) {
     if( time_in_millis > m_last_update_time + m_update_rate_in_millis ) {
       m_last_update_time = time_in_millis;
-      
+
       knob1.SetValueDoublet( analogRead(0)); // A/D values range from 0 to 0x3ff
       knob2.SetValueDoublet( analogRead(1));
       knob3.SetValueDoublet( analogRead(2));
-      
+
       button1.SetValueOctet( digitalRead(2) ? 0x00 : 0xff ); // DLI reads true when not pressed, reverse logic
       button2.SetValueOctet( digitalRead(3) ? 0x00 : 0xff );
       button3.SetValueOctet( digitalRead(4) ? 0x00 : 0xff );
-      button4.SetValueOctet( digitalRead(5) ? 0x00 : 0xff );  
-      button5.SetValueOctet( digitalRead(6) ? 0x00 : 0xff );  
-  
+      button4.SetValueOctet( digitalRead(5) ? 0x00 : 0xff );
+      button5.SetValueOctet( digitalRead(6) ? 0x00 : 0xff );
+
       digitalWrite( A5, !digitalRead(2) );
-      digitalWrite( A4, !digitalRead(3) );      
+      digitalWrite( A4, !digitalRead(3) );
     }
   }
 };
@@ -184,14 +184,14 @@ void setup() {
   pinMode(A4,OUTPUT);
   pinMode(A5,OUTPUT);
 
-  // Initialize the serial port for debug logs  
+  // Initialize the serial port for debug logs
   Serial.begin(9600);
-  
-  // Initialize the W5100 chip 
+
+  // Initialize the W5100 chip
   rawnet.Initialize();
-  
+
   // Put all the handlers into the HandlerGroup
-  
+
   all_handlers.Add( &value_mapper );
   all_handlers.Add( &adp_manager );
   all_handlers.Add( &knob1 );
@@ -199,7 +199,7 @@ void setup() {
   all_handlers.Add( &knob3 );
   all_handlers.Add( &button1 );
   all_handlers.Add( &button2 );
-  all_handlers.Add( &button3 );  
+  all_handlers.Add( &button3 );
   all_handlers.Add( &button4 );
   all_handlers.Add( &button5 );
 //  all_handlers.Add( &my_entity );
@@ -222,14 +222,14 @@ void avr_debug_log(const char *str, uint16_t v ) {
         sizeof(pdu));
   if( r>0 )
   {
-      memcpy(pdu+JDKSAVDECC_FRAME_HEADER_SA_OFFSET,my_mac.value,6);    
+      memcpy(pdu+JDKSAVDECC_FRAME_HEADER_SA_OFFSET,my_mac.value,6);
       net->SendRawNet((uint8_t*)pdu,r);
   }
   else {
-    Serial.println(" error ");    
+    Serial.println(" error ");
   }
-  
-#if 0  
+
+#if 0
   Serial.print(str);
   Serial.print(" ");
   Serial.println(v);
@@ -241,7 +241,7 @@ void loop() {
   static jdksavdecc_timestamp_in_milliseconds last_second=0;
   // Get the current time in milliseconds
   jdksavdecc_timestamp_in_milliseconds cur_time = millis();
-  
+
   // Tell all the handlers to do their periodic jobs
   all_handlers.Tick(cur_time);
   if( cur_time/1000 != last_second ) {
