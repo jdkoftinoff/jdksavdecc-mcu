@@ -29,8 +29,8 @@
   POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "jdksavdecc-c/include/jdksavdecc_world.h"
-#include "jdksavdecc-c/include/jdksavdecc_print.h"
+#include "jdksavb/jdksavdecc-c/include/jdksavdecc_world.h"
+#include "jdksavb/jdksavdecc-c/include/jdksavdecc_print.h"
 
 char jdksavdecc_printer_hexdig[16] = "0123456789ABCDEF";
 

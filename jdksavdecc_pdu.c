@@ -30,8 +30,8 @@
   POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "jdksavdecc-c/include/jdksavdecc_world.h"
-#include "jdksavdecc-c/include/jdksavdecc_pdu.h"
+#include "jdksavb/jdksavdecc-c/include/jdksavdecc_world.h"
+#include "jdksavb/jdksavdecc-c/include/jdksavdecc_pdu.h"
 
 struct jdksavdecc_eui48 jdksavdecc_multicast_maap = JDKSAVDECC_MULTICAST_MAAP;
 

@@ -30,8 +30,8 @@
   POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "jdksavdecc-c/include/jdksavdecc_world.h"
-#include "jdksavdecc-c/include/jdksavdecc_jdks.h"
+#include "jdksavb/jdksavdecc-c/include/jdksavdecc_world.h"
+#include "jdksavb/jdksavdecc-c/include/jdksavdecc_jdks.h"
 
 struct jdksavdecc_eui48 jdksavdecc_jdks_multicast_log = JDKSAVDECC_JDKS_MULTICAST_LOG;
 struct jdksavdecc_eui64 jdksavdecc_jdks_notifications_controller_entity_id = JDKSAVDECC_JDKS_NOTIFICATIONS_CONTROLLER_ENTITY_ID;
