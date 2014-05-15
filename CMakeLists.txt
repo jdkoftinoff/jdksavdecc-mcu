@@ -7,9 +7,9 @@ enable_testing()
 
 set(LIBS ${LIBS} ${CHECK_LIBRARIES} JDKSAvdeccArduino)
 
-include_directories( "jdksavdecc-c/include" )
+include_directories( "jdksavb/jdksavdecc-c/include" "jdksavb/jdksavb/include" )
 
-file(GLOB JDKSAVDECC_ARDUINO_INCLUDES "*.h" "*.hpp" "jdksavdecc-c/include/*.h" )
+file(GLOB JDKSAVDECC_ARDUINO_INCLUDES "*.h" "*.hpp" "jdksavb/jdksavb/include/*.h" "jdksavb/jdksavdecc-c/include/*.h" )
 
 file(GLOB JDKSAVDECC_ARDUINO_SRC "*.cpp" "*.c" )
 
