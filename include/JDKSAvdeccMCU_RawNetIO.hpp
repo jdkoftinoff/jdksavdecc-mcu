@@ -53,12 +53,11 @@ class RawNetIO : public NetIO
 #endif
 
     uint16_t m_ethertype;
-    uint8_t m_my_mac[6];
-    uint8_t m_default_dest_mac[6];
+    jdksavdecc_eui48 m_my_mac;
+    jdksavdecc_eui48 m_default_dest_mac;
     int m_interface_id;
     void *m_pcap;
 
-    void setNonblocking();
 
   public:
     /**
@@ -72,7 +71,9 @@ class RawNetIO : public NetIO
     */
     ~RawNetIO();
 
-    bool joinMulticast( const uint8_t multicast_mac[6] );
+    void setNonblocking();
+
+    bool joinMulticast( const jdksavdecc_eui48 &multicast_mac );
 
 #if defined( _WIN32 )
     SOCKET getFd() const { return m_fd; }
