@@ -30,7 +30,7 @@
   POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifdef __AVR__
+#ifdef JDKSAVDECCMCU_BARE_METAL
 
 #include "JDKSAvdeccMCU_World.hpp"
 
@@ -40,22 +40,12 @@
 #include "Ethernet.h"
 #include "SPI.h"
 
-namespace JDKSAvdeccMCU
-{
-typedef WizNetIO PlatformNetIO;
-}
-
 #else
 
 #include "JDKSAvdeccMCU_World.hpp"
-#include "JDKSAvdeccMCU_RawNetIO.hpp"
-#include "JDKSAvdeccMCU_PcapFileNetIO.hpp"
+#include "JDKSAvdeccMCU_RawSocketBase.hpp"
+#include "JDKSAvdeccMCU_RawSocketPcapFile.hpp"
 #include "JDKSAvdeccMCU.hpp"
-
-namespace JDKSAvdeccMCU
-{
-typedef RawNetIO PlatformNetIO;
-}
 
 #ifdef __cplusplus
 extern "C" {
@@ -226,6 +216,7 @@ class Serial_
 {
   public:
     Serial_( FILE *inf, FILE *outf ) : m_inf( inf ), m_outf( outf ) {}
+    virtual ~Serial_() {}
     void begin( unsigned long ) {}
     void begin( unsigned long, uint8_t ) {}
     void end( void ) {}

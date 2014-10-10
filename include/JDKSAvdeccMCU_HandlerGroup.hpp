@@ -31,7 +31,7 @@
 #pragma once
 
 #include "JDKSAvdeccMCU_World.hpp"
-#include "JDKSAvdeccMCU_NetIO.hpp"
+#include "JDKSAvdeccMCU_RawSocketBase.hpp"
 #include "JDKSAvdeccMCU_Handler.hpp"
 
 namespace JDKSAvdeccMCU
@@ -44,13 +44,14 @@ namespace JDKSAvdeccMCU
 class HandlerGroupBase : public Handler
 {
   protected:
+    RawSocketBase &m_net;
     uint16_t m_num_items;
     Handler **m_item;
     uint32_t m_rx_count;
     uint32_t m_handled_count;
 
   public:
-    HandlerGroupBase( Handler **item_storage );
+    HandlerGroupBase( RawSocketBase &net, Handler **item_storage );
 
     /// Add a handler to the list
     void add( Handler *v ) { m_item[m_num_items++] = v; }
@@ -59,14 +60,14 @@ class HandlerGroupBase : public Handler
     uint32_t getHandledCount() const { return m_handled_count; }
 
     /// Poll the NetIO object for an incoming frame.
-    virtual bool pollNet( jdksavdecc_timestamp_in_milliseconds time_in_millis );
+    virtual bool pollNet();
 
     /// Send Tick() messages to all encapsulated Handlers
     /// and poll incoming network for PDU's and dispatch them
-    virtual void tick( jdksavdecc_timestamp_in_milliseconds time_in_millis );
+    virtual void tick();
 
     /// Send ReceivedPDU message to each handler until one returns true.
-    virtual bool receivedPDU( jdksavdecc_timestamp_in_milliseconds time_in_millis, uint8_t *buf, uint16_t len );
+    virtual bool receivedPDU( FrameBase &frame );
 };
 
 /// HandlerGroup is a HandlerGroupBase and contains
@@ -79,6 +80,6 @@ class HandlerGroup : public HandlerGroupBase
     Handler *m_item_storage[MaxItems];
 
   public:
-    HandlerGroup() : HandlerGroupBase( m_item_storage ) {}
+    HandlerGroup( RawSocketBase &net ) : HandlerGroupBase( net, m_item_storage ) {}
 };
 }

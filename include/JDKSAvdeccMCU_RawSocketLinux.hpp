@@ -31,39 +31,40 @@
 #pragma once
 
 #include "JDKSAvdeccMCU_World.hpp"
-#include "JDKSAvdeccMCU_NetIO.hpp"
-
-#include "JDKSAvdeccMCU_PcapFileReader.hpp"
-#include "JDKSAvdeccMCU_PcapFileWriter.hpp"
-
-#ifdef JDKSAVDECCMCU_ENABLE_PCAPFILE
+#include "JDKSAvdeccMCU_RawSocketBase.hpp"
 
 namespace JDKSAvdeccMCU
 {
-class PcapFileNetIO : public NetIO
+class RawSocketLinux : public RawSocketBase
 {
   public:
-    PcapFileNetIO( jdksavdecc_eui48 mac_address, const char *incoming_file_name, const char *outgoing_file_name );
+    RawSocketLinux();
 
-    virtual ~PcapFileNetIO();
+    virtual ~RawSocketLinux() {}
 
-    virtual void initialize();
+    virtual jdksavdecc_timestamp_in_milliseconds getTimeInMilliseconds();
 
-    virtual jdksavdecc_eui48 const &getMACAddress() const { return m_mac_address; }
+    virtual bool recvFrame( FrameBase *frame );
 
-    virtual uint16_t receiveRawNet( uint8_t *data, uint16_t max_len );
+    virtual bool sendFrame( FrameBase const &frame, uint8_t const *data1, uint16_t len1, uint8_t const *data2, uint16_t len2 );
 
-    virtual bool sendRawNet(
-        uint8_t const *data, uint16_t len, uint8_t const *data1, uint16_t len1, uint8_t const *data2, uint16_t len2 );
+    virtual bool sendReplyFrame( FrameBase &frame, uint8_t const *data1, uint16_t len1, uint8_t const *data2, uint16_t len2 );
 
-    virtual bool sendReplyRawNet(
-        uint8_t const *data, uint16_t len, uint8_t const *data1, uint16_t len1, uint8_t const *data2, uint16_t len2 );
+    /**
+    * Attempt to join an additional multicast mac address group
+    */
+    virtual bool joinMulticast( const jdksavdecc_eui48 &multicast_mac );
 
-  private:
-    jdksavdecc_eui48 m_mac_address;
-    PcapFileReader m_incoming_file;
-    PcapFileWriter m_outgoing_file;
+    /**
+    * Set the socket to non blocking mode
+    */
+    virtual void setNonblocking();
+
+    /**
+    * Get the file descriptor
+    */
+    virtual filedescriptor_t getFd() const;
+
+    virtual jdksavdecc_eui48 const &getMACAddress() const;
 };
 }
-
-#endif

@@ -31,7 +31,7 @@
 #pragma once
 
 #include "JDKSAvdeccMCU_World.hpp"
-#include "JDKSAvdeccMCU_NetIO.hpp"
+#include "JDKSAvdeccMCU_RawSocketBase.hpp"
 #include "JDKSAvdeccMCU_Frame.hpp"
 #include "JDKSAvdeccMCU_Handler.hpp"
 #include "JDKSAvdeccMCU_Helpers.hpp"
@@ -43,7 +43,8 @@ class ControlSender : public Handler
 {
   public:
     /// Construct the SetControlSender object
-    ControlSender( jdksavdecc_eui64 const &entity_id,
+    ControlSender( RawSocketBase &net,
+                   jdksavdecc_eui64 const &entity_id,
                    jdksavdecc_eui64 const &target_entity_id,
                    jdksavdecc_eui48 const &target_mac_address,
                    uint16_t &sequence_id,
@@ -52,10 +53,10 @@ class ControlSender : public Handler
                    jdksavdecc_timestamp_in_milliseconds update_rate_in_millis );
 
     /// Send the SET_CONTROL message if it is time to
-    virtual void tick( jdksavdecc_timestamp_in_milliseconds time_in_millis );
+    virtual void tick();
 
     /// Handle incoming PDU
-    virtual bool receivedPDU( jdksavdecc_timestamp_in_milliseconds time_in_millis, uint8_t *buf, uint16_t len );
+    virtual bool receivedPDU( FrameBase &frame );
 
     /// Set a one byte value. If it actually changed, then force Tick to send ASAP
     void setValueOctet( uint8_t val );
@@ -75,6 +76,7 @@ class ControlSender : public Handler
     uint16_t getSequenceID() const { return m_sequence_id; }
 
   protected:
+    RawSocketBase &m_net;
     jdksavdecc_eui64 m_entity_id;
     jdksavdecc_eui64 m_target_entity_id;
     jdksavdecc_eui48 m_target_mac_address;

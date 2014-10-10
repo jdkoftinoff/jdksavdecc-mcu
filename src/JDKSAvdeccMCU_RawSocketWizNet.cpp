@@ -31,7 +31,7 @@
 
 #include "JDKSAvdeccMCU_World.hpp"
 
-#include "JDKSAvdeccMCU_WizNetIO.hpp"
+#include "JDKSAvdeccMCU_RawSocketWizNet.hpp"
 
 #ifdef __AVR__
 #include "utility/w5100.h"
@@ -52,17 +52,9 @@ typedef uint16_t w5100addr_t;
 namespace JDKSAvdeccMCU
 {
 
-WizNetIO::~WizNetIO() { close( 0 ); }
+RawSocketWizNet::~RawSocketWizNet() { close( 0 ); }
 
-void WizNetIO::Initialize()
-{
-    W5100.init();
-    W5100.setMACAddress( m_mac_address.value );
-    // W5100.setIPAddress(IPAddress(0,0,0,0).raw_address());
-    socket( 0, SnMR::MACRAW, 0x22f0, 0 );
-}
-
-uint16_t WizNetIO::ReceiveRawNet( uint8_t *data, uint16_t max_len )
+bool RawSocketWizNet::recvFrame( FrameBase *frame )
 {
     uint8_t head[2];
     uint16_t data_len = 0;
@@ -77,11 +69,11 @@ uint16_t WizNetIO::ReceiveRawNet( uint8_t *data, uint16_t max_len )
         data_len = head[0];
         data_len = ( data_len << 8 ) + head[1] - 2;
         // read the frame header to make sure we care
-        W5100.read_data( 0, (w5100addr_t)ptr, data, JDKSAVDECC_FRAME_HEADER_LEN );
+        W5100.read_data( 0, (w5100addr_t)ptr, frame->getBuf(), JDKSAVDECC_FRAME_HEADER_LEN );
         ptr += JDKSAVDECC_FRAME_HEADER_LEN;
         // we care if it is ethertype 0x22f0
-        if ( ( data[JDKSAVDECC_FRAME_HEADER_ETHERTYPE_OFFSET + 0] == 0x22 )
-             && ( data[JDKSAVDECC_FRAME_HEADER_ETHERTYPE_OFFSET + 1] == 0xf0 ) )
+        if ( ( data[JDKSAVDECC_FRAME_HEADER_ETHERTYPE_OFFSET + 0] == ( ( m_ethertype >> 8 ) & 0xff ) )
+             && ( data[JDKSAVDECC_FRAME_HEADER_ETHERTYPE_OFFSET + 1] == ( (m_ethertype >> 0)0xff ) ) )
         {
 
             // we care if it is for me or the ADP/ACMP multicast address
@@ -91,9 +83,12 @@ uint16_t WizNetIO::ReceiveRawNet( uint8_t *data, uint16_t max_len )
                 // ok, then read the rest of the data
                 if ( data_len <= max_len )
                 {
-                    W5100.read_data(
-                        0, (w5100addr_t)ptr, data + JDKSAVDECC_FRAME_HEADER_LEN, data_len - JDKSAVDECC_FRAME_HEADER_LEN );
+                    W5100.read_data( 0,
+                                     (w5100addr_t)ptr,
+                                     frame->getBuf() + JDKSAVDECC_FRAME_HEADER_LEN,
+                                     frame->getMaximumLength() - JDKSAVDECC_FRAME_HEADER_LEN );
                     r = data_len;
+                    frame->SetLength( r );
                 }
                 else
                 {
@@ -107,13 +102,93 @@ uint16_t WizNetIO::ReceiveRawNet( uint8_t *data, uint16_t max_len )
         W5100.writeSnIR( 0, SnIR::RECV );
         W5100.execCmdSn( 0, Sock_RECV );
     }
-    return r;
+    return r > JDKSAVDECC_FRAME_HEADER_LEN;
 }
 
-bool WizNetIO::SendRawNet(
+bool RawSocketWizNet::sendFrame(
+    FrameBase const &frame, uint8_t const *data1, uint16_t len1, uint8_t const *data2, uint16_t len2 )
+{
+    uint8_t try_count = 0;
+    bool done = false;
+    // Try up to 3 times to send
+    while ( !done && try_count < 3 )
+    {
+        ++try_count;
+        uint8_t wait_count = 0;
+
+        // Tell W5100 the destination hardware address
+        W5100.writeSnDHAR( 0, &frame.getBuf()[JDKSAVDECC_FRAME_HEADER_DA_OFFSET] );
+
+        // Send the data chunk
+        W5100.send_data_processing( 0, frame.getBuf(), len );
+
+        // If there is a data1 chunk then send it
+        if ( data1 != 0 && len1 > 0 )
+        {
+            W5100.send_data_processing( 0, (uint8_t *)data1, len1 );
+        }
+
+        // If there is a data2 chunk then send it
+        if ( data2 != 0 && len2 > 0 )
+        {
+            W5100.send_data_processing( 0, (uint8_t *)data2, len2 );
+        }
+
+        // Tell W5100 to send the raw ethernet frame now
+        W5100.execCmdSn( 0, Sock_SEND_MAC );
+
+        // assume we have success
+        done = true;
+
+        // Check for an OK signal from the chip
+        while ( ( W5100.readSnIR( 0 ) & SnIR::SEND_OK ) != SnIR::SEND_OK )
+        {
+            // Was it a timeout message?
+            if ( W5100.readSnIR( 0 ) & SnIR::TIMEOUT )
+            {
+                // Yes, acknowledge the timeout and maybe try again
+                W5100.writeSnIR( 0, ( SnIR::SEND_OK | SnIR::TIMEOUT ) );
+                done = false;
+                break;
+            }
+            // Did we wait too long?
+            if ( wait_count++ > 8 )
+            {
+                // Yes, try again
+                done = false;
+                break;
+            }
+        }
+
+        W5100.writeSnIR( 0, SnIR::SEND_OK );
+    }
+    return done;
+}
+
+bool RawSocketWizNet::sendReplyFrame(
+    FrameBase &frame, uint8_t const *data1, uint16_t len1, uint8_t const *data2, uint16_t len2 )
+{
+    uint8_t *p = frame.getBuf();
+    // Set DA to what was SA, set SA to m_mac_address
+    for ( uint8_t i = 0; i < 6; ++i )
+    {
+        p[i + JDKSAVDECC_FRAME_HEADER_DA_OFFSET] = p[i + JDKSAVDECC_FRAME_HEADER_SA_OFFSET];
+        p[i + JDKSAVDECC_FRAME_HEADER_SA_OFFSET] = m_mac_address.value[i];
+    }
+    return sendFrame( frame, data1, len1, data2, len2 );
+}
+
+void RawSocketWizNet::initialize()
+{
+    W5100.init();
+    W5100.setMACAddress( m_mac_address.value );
+    // W5100.setIPAddress(IPAddress(0,0,0,0).raw_address());
+    socket( 0, SnMR::MACRAW, 0x22f0, 0 );
+}
+
+bool RawSocketWizNet::SendRawNet(
     uint8_t const *data, uint16_t len, uint8_t const *data1, uint16_t len1, uint8_t const *data2, uint16_t len2 )
 {
-
     uint8_t try_count = 0;
     bool done = false;
     // Try up to 3 times to send
@@ -187,7 +262,7 @@ bool WizNetIO::SendRawNet(
     return done;
 }
 
-bool WizNetIO::SendReplyRawNet(
+bool RawSocketWizNet::SendReplyRawNet(
     uint8_t const *data, uint16_t len, uint8_t const *data1, uint16_t len1, uint8_t const *data2, uint16_t len2 )
 {
     uint8_t *p = (uint8_t *)data;
@@ -201,6 +276,6 @@ bool WizNetIO::SendReplyRawNet(
 }
 }
 #else
-const char *jdksavdeccmcu_wiznetio_file = __FILE__;
+const char *jdksavdeccmcu_RawSocketWizNet_file = __FILE__;
 
 #endif

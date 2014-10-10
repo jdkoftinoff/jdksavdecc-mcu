@@ -31,43 +31,40 @@
 #pragma once
 
 #include "JDKSAvdeccMCU_World.hpp"
+#include "JDKSAvdeccMCU_RawSocketBase.hpp"
 
 namespace JDKSAvdeccMCU
 {
-
-/// Base clase for sending or receiving raw ethernet frames
-class NetIO
+class RawSocketPcap : public RawSocketBase
 {
   public:
-    NetIO();
-    virtual ~NetIO();
+    RawSocketPcap() {}
 
-    /// Do any post-constructor initialization
-    virtual void initialize() = 0;
+    virtual ~RawSocketPcap() {}
 
-    /// Get the MAC address of the ethernet port
-    virtual jdksavdecc_eui48 const &getMACAddress() const = 0;
+    virtual jdksavdecc_timestamp_in_milliseconds getTimeInMilliseconds();
 
-    /// Poll incoming data for raw ethernet frame
-    /// Returns length of entire frame received, or 0 if none.
-    /// data will contain entire raw ethernet frame
-    virtual uint16_t receiveRawNet( uint8_t *data, uint16_t max_len ) = 0;
+    virtual bool recvFrame( FrameBase *frame );
 
-    /// Send raw etherent frame.
-    virtual bool sendRawNet( uint8_t const *data,
-                             uint16_t len,
-                             uint8_t const *data1 = 0,
-                             uint16_t len1 = 0,
-                             uint8_t const *data2 = 0,
-                             uint16_t len2 = 0 ) = 0;
+    virtual bool sendFrame( FrameBase const &frame, uint8_t const *data1, uint16_t len1, uint8_t const *data2, uint16_t len2 );
 
-    /// Reply to the sender of the frame (Same as SendRawNet put swaps SA/DA
-    virtual bool sendReplyRawNet( uint8_t const *data,
-                                  uint16_t len,
-                                  uint8_t const *data1 = 0,
-                                  uint16_t len1 = 0,
-                                  uint8_t const *data2 = 0,
-                                  uint16_t len2 = 0 ) = 0;
+    virtual bool sendReplyFrame( FrameBase &frame, uint8_t const *data1, uint16_t len1, uint8_t const *data2, uint16_t len2 );
+
+    /**
+    * Attempt to join an additional multicast mac address group
+    */
+    virtual bool joinMulticast( const jdksavdecc_eui48 &multicast_mac );
+
+    /**
+    * Set the socket to non blocking mode
+    */
+    virtual void setNonblocking();
+
+    /**
+    * Get the file descriptor
+    */
+    virtual filedescriptor_t getFd() const;
+
+    virtual jdksavdecc_eui48 const &getMACAddress() const;
 };
-extern NetIO *net;
 }

@@ -31,7 +31,7 @@
 #pragma once
 
 #include "JDKSAvdeccMCU_World.hpp"
-#include "JDKSAvdeccMCU_NetIO.hpp"
+#include "JDKSAvdeccMCU_RawSocketBase.hpp"
 
 namespace JDKSAvdeccMCU
 {
@@ -44,9 +44,9 @@ class Handler
     virtual ~Handler();
 
     /// Notification of time passage
-    virtual void tick( jdksavdecc_timestamp_in_milliseconds time_in_millis );
+    virtual void tick();
 
     /// Notification of received raw PDU. Return true if PDU is handled
-    virtual bool receivedPDU( jdksavdecc_timestamp_in_milliseconds time_in_millis, uint8_t *buf, uint16_t len );
+    virtual bool receivedPDU( FrameBase &frame );
 };
 }

@@ -35,30 +35,30 @@
 namespace JDKSAvdeccMCU
 {
 
-HandlerGroupBase::HandlerGroupBase( Handler **item_storage )
-    : m_num_items( 0 ), m_item( item_storage ), m_rx_count( 0 ), m_handled_count( 0 )
+HandlerGroupBase::HandlerGroupBase( RawSocketBase &net, Handler **item_storage )
+    : m_net( net ), m_num_items( 0 ), m_item( item_storage ), m_rx_count( 0 ), m_handled_count( 0 )
 {
 }
 
 // Poll the NetIO object for an incoming frame. If it is multicast, or m
-bool HandlerGroupBase::pollNet( jdksavdecc_timestamp_in_milliseconds time_in_millis )
+bool HandlerGroupBase::pollNet()
 {
     bool r = false;
-    uint8_t buf[JDKSAVDECC_AECP_FRAME_MAX_SIZE];
-    uint16_t len;
+    Frame<JDKSAVDECC_AECP_FRAME_MAX_SIZE> aecp_frame;
     // Try receive data
-    len = net->receiveRawNet( buf, sizeof( buf ) );
-
-    // Make sure we read DA,SA,Ethertype
-    if ( len > JDKSAVDECC_FRAME_HEADER_LEN )
+    if ( m_net.recvFrame( &aecp_frame ) )
     {
-        // Ok, this PDU is worth spending time on. Send it on to all known Handlers.
-
-        m_rx_count++;
-        r = receivedPDU( time_in_millis, buf, len );
-        if ( r )
+        // Make sure we read DA,SA,Ethertype
+        if ( aecp_frame.getSize() > JDKSAVDECC_FRAME_HEADER_LEN )
         {
-            m_handled_count++;
+            // Ok, this PDU is worth spending time on. Send it on to all known Handlers.
+
+            m_rx_count++;
+            r = receivedPDU( aecp_frame );
+            if ( r )
+            {
+                m_handled_count++;
+            }
         }
     }
     return r;
@@ -66,22 +66,22 @@ bool HandlerGroupBase::pollNet( jdksavdecc_timestamp_in_milliseconds time_in_mil
 
 /// Send Tick() messages to all encapsulated Handlers
 /// and poll incoming network for PDU's and dispatch them
-void HandlerGroupBase::tick( jdksavdecc_timestamp_in_milliseconds time_in_millis )
+void HandlerGroupBase::tick()
 {
-    pollNet( time_in_millis );
+    pollNet();
     for ( uint16_t i = 0; i < m_num_items; ++i )
     {
-        m_item[i]->tick( time_in_millis );
+        m_item[i]->tick();
     }
 }
 
 /// Send ReceivedPDU message to each handler until one returns true.
-bool HandlerGroupBase::receivedPDU( jdksavdecc_timestamp_in_milliseconds time_in_millis, uint8_t *buf, uint16_t len )
+bool HandlerGroupBase::receivedPDU( FrameBase &frame )
 {
     bool r = false;
     for ( uint16_t i = 0; i < m_num_items; ++i )
     {
-        if ( m_item[i]->receivedPDU( time_in_millis, buf, len ) )
+        if ( m_item[i]->receivedPDU( frame ) )
         {
             r = true;
             break;

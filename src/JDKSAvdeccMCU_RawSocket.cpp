@@ -30,9 +30,7 @@
 */
 
 #include "JDKSAvdeccMCU_World.hpp"
-#include "JDKSAvdeccMCU_RawNetIO.hpp"
-
-#ifdef JDKSAVDECCMCU_ENABLE_RAW
+#include "JDKSAvdeccMCU_RawSocket.hpp"
 
 #if defined( __linux__ )
 #include <unistd.h>
@@ -105,9 +103,9 @@
 #endif
 #endif
 
-
 namespace JDKSAvdeccMCU
 {
+
 #if !( defined( _WIN32 ) && ( !defined( ENABLE_PCAP ) || ENABLE_PCAP == 0 ) )
 #if defined( __APPLE__ ) || defined( _WIN32 )
 static pcap_if_t *raw_alldevs = 0;
@@ -124,8 +122,41 @@ static void raw_cleanup()
 
 #endif
 
+void RawSocket::initialize()
+{
+    static bool initted = false;
+    if ( !initted )
+    {
+#if defined( _WIN32 )
 
-RawNetIO::RawNetIO( uint16_t ethertype, const char *interface_name, const uint8_t join_multicast[] )
+        WSADATA wsaData;
+        WORD version;
+        int error;
+        version = MAKEWORD( 2, 2 );
+        error = WSAStartup( version, &wsaData );
+        if ( error != 0 )
+        {
+            throw std : runtime_error( "Error Initializing WS2_32" );
+        }
+        if ( version != wsaData.wVersion )
+        {
+            throw std : runtime_error( "Error Initializing WS2_32" );
+        }
+        initted = true;
+
+#elif defined( __linux__ ) || defined( __APPLE__ )
+
+        struct sigaction act;
+        act.sa_handler = SIG_IGN;
+        sigemptyset( &act.sa_mask );
+        act.sa_flags = 0;
+        sigaction( SIGPIPE, &act, NULL );
+        initted = true;
+#endif
+    }
+}
+
+RawSocket::RawSocket( uint16_t ethertype, const char *interface_name, const jdksavdecc_eui48 *join_multicast )
 {
 #if defined( __linux__ )
     init_sockets();
@@ -133,7 +164,7 @@ RawNetIO::RawNetIO( uint16_t ethertype, const char *interface_name, const uint8_
 
     if ( join_multicast )
     {
-        memcpy( m_default_dest_mac, join_multicast, 6 );
+        memcpy( m_default_dest_mac, join_multicast->value, 6 );
     }
 
     if ( fd >= 0 && interface_name )
@@ -173,7 +204,7 @@ RawNetIO::RawNetIO( uint16_t ethertype, const char *interface_name, const uint8_
     m_ethertype = ethertype;
     if ( join_multicast )
     {
-        memcpy( m_default_dest_mac, join_multicast, 6 );
+        memcpy( m_default_dest_mac.value, join_multicast->value, 6 );
     }
 
     p = pcap_open_live( interface_name, 65536, 1, 1, errbuf );
@@ -231,7 +262,7 @@ RawNetIO::RawNetIO( uint16_t ethertype, const char *interface_name, const uint8_
                                         if ( strstr( d->name, ninfo->AdapterName ) > 0 )
                                         {
                                             if ( ninfo->AddressLength == 6 )
-                                                memcpy( m_my_mac, ninfo->Address, 6 );
+                                                memcpy( m_my_mac.value, ninfo->Address, 6 );
                                             break;
                                         }
                                         ninfo = ninfo->Next;
@@ -260,7 +291,7 @@ RawNetIO::RawNetIO( uint16_t ethertype, const char *interface_name, const uint8_
                                 struct sockaddr_dl *dl = (struct sockaddr_dl *)a->addr;
                                 mac = (uint8_t const *)dl->sdl_data + dl->sdl_nlen;
 
-                                memcpy( m_my_mac, mac, 6 );
+                                memcpy( m_my_mac.value, mac, 6 );
                             }
                         }
 #endif
@@ -275,7 +306,10 @@ RawNetIO::RawNetIO( uint16_t ethertype, const char *interface_name, const uint8_
                 else
                 {
                     /* enable ether protocol filter */
-                    joinMulticast( join_multicast );
+                    if ( join_multicast )
+                    {
+                        joinMulticast( *join_multicast );
+                    }
                     m_fd = pcap_fileno( p );
                     if ( m_fd == -1 )
                     {
@@ -306,7 +340,7 @@ RawNetIO::RawNetIO( uint16_t ethertype, const char *interface_name, const uint8_
 #endif
 }
 
-RawNetIO::~RawNetIO()
+RawSocket::~RawSocket()
 {
 #if defined( __linux__ )
     if ( m_fd >= 0 )
@@ -342,54 +376,89 @@ RawNetIO::~RawNetIO()
 #endif
 }
 
-void RawNetIO::initialize()
+ssize_t RawSocket::send( const jdksavdecc_eui48 *dest_mac, const void *payload, ssize_t payload_len )
 {
-    static bool initted = false;
-    if ( !initted )
+#if defined( __linux__ )
+    ssize_t r = -1;
+    ssize_t sent_len;
+    struct sockaddr_ll socket_address;
+    uint8_t buffer[ETH_FRAME_LEN];
+    unsigned char *etherhead = buffer;
+    unsigned char *data = buffer + 14;
+    struct ethhdr *eh = (struct ethhdr *)etherhead;
+    socket_address.sll_family = PF_PACKET;
+    socket_address.sll_protocol = htons( m_ethertype );
+    socket_address.sll_ifindex = m_interface_id;
+    socket_address.sll_hatype = 1; /*ARPHRD_ETHER; */
+    socket_address.sll_pkttype = PACKET_OTHERHOST;
+    socket_address.sll_halen = ETH_ALEN;
+    memcpy( socket_address.sll_addr, m_my_mac, ETH_ALEN );
+    socket_address.sll_addr[6] = 0x00;
+    socket_address.sll_addr[7] = 0x00;
+
+    if ( dest_mac )
     {
-#if defined( _WIN32 )
+        memcpy( (void *)buffer, (void *)dest_mac, ETH_ALEN );
+    }
+    else
+    {
+        memcpy( (void *)buffer, (void *)m_default_dest_mac, 6 );
+    }
 
-        WSADATA wsaData;
-        WORD version;
-        int error;
-        version = MAKEWORD( 2, 2 );
-        error = WSAStartup( version, &wsaData );
-        if ( error != 0 )
+    memcpy( (void *)( buffer + ETH_ALEN ), (void *)m_my_mac, ETH_ALEN );
+    eh->h_proto = htons( m_ethertype );
+    memcpy( data, payload, payload_len );
+    do
+    {
+        sent_len = sendto( m_fd, buffer, payload_len + 14, 0, (struct sockaddr *)&socket_address, sizeof( socket_address ) );
+    } while ( sent_len < 0 && ( errno == EINTR ) );
+    if ( sent_len >= 0 )
+    {
+        r = sent_len - 14;
+    }
+
+    return r;
+#elif defined( __APPLE__ ) || defined( _WIN32 )
+    int r = 0;
+    pcap_t *pcap = (pcap_t *)m_pcap;
+
+    if ( pcap )
+    {
+        uint8_t buffer[2048];
+        uint8_t *data = buffer + 14;
+        if ( dest_mac )
         {
-            return false;
+            memcpy( (void *)buffer, dest_mac->value, 6 );
         }
-        if ( version != wsaData.wVersion )
+        else
         {
-            return false;
+            memcpy( (void *)buffer, m_default_dest_mac.value, 6 );
         }
-        initted = true;
-        return true;
-
-#elif defined( __linux__ ) || defined( __APPLE__ )
-
-        struct sigaction act;
-        act.sa_handler = SIG_IGN;
-        sigemptyset( &act.sa_mask );
-        act.sa_flags = 0;
-        sigaction( SIGPIPE, &act, NULL );
-        initted = true;
-        return true;
+        memcpy( (void *)( buffer + 6 ), m_my_mac.value, 6 );
+        buffer[12] = ( m_ethertype >> 8 ) & 0xff;
+        buffer[13] = ( m_ethertype & 0xff );
+        memcpy( data, payload, payload_len );
+        r = pcap_sendpacket( pcap, buffer, (int)payload_len + 14 ) == 0;
+    }
+    else
+    {
+        r = false;
+    }
+    return r ? payload_len : -1;
 
 #endif
+}
+
+ssize_t RawSocket::recv( jdksavdecc_timestamp_in_milliseconds *timestamp,
+                         jdksavdecc_eui48 *src_mac,
+                         jdksavdecc_eui48 *dest_mac,
+                         void *payload_buf,
+                         ssize_t payload_buf_max_size )
+{
+    if ( timestamp )
+    {
+        *timestamp = getTimeInMilliseconds();
     }
-}
-
-const jdksavdecc_eui48 &RawNetIO::getMACAddress() const
-{
-
-}
-
-bool RawNetIO::joinMulticast( const uint8_t multicast_mac[6] )
-{
-}
-
-uint16_t RawNetIO::receiveRawNet( uint8_t *data, uint16_t max_len )
-{
 #if defined( __linux__ )
     ssize_t r = -1;
     ssize_t buf_len;
@@ -446,88 +515,96 @@ uint16_t RawNetIO::receiveRawNet( uint8_t *data, uint16_t max_len )
 #endif
 }
 
-bool RawNetIO::sendRawNet(
-    const uint8_t *data, uint16_t len, const uint8_t *data1, uint16_t len1, const uint8_t *data2, uint16_t len2 )
+bool RawSocket::joinMulticast( jdksavdecc_eui48 const &multicast_mac )
 {
 #if defined( __linux__ )
-    ssize_t r = -1;
-    ssize_t sent_len;
-    struct sockaddr_ll socket_address;
-    uint8_t buffer[ETH_FRAME_LEN];
-    unsigned char *etherhead = buffer;
-    unsigned char *data = buffer + 14;
-    struct ethhdr *eh = (struct ethhdr *)etherhead;
-    socket_address.sll_family = PF_PACKET;
-    socket_address.sll_protocol = htons( m_ethertype );
-    socket_address.sll_ifindex = m_interface_id;
-    socket_address.sll_hatype = 1; /*ARPHRD_ETHER; */
-    socket_address.sll_pkttype = PACKET_OTHERHOST;
-    socket_address.sll_halen = ETH_ALEN;
-    memcpy( socket_address.sll_addr, m_my_mac, ETH_ALEN );
-    socket_address.sll_addr[6] = 0x00;
-    socket_address.sll_addr[7] = 0x00;
-
-    if ( dest_mac )
+    bool r = false;
+    struct packet_mreq mreq;
+    struct sockaddr_ll saddr;
+    if ( multicast_mac )
     {
-        memcpy( (void *)buffer, (void *)dest_mac, ETH_ALEN );
-    }
-    else
-    {
-        memcpy( (void *)buffer, (void *)m_default_dest_mac, 6 );
-    }
-
-    memcpy( (void *)( buffer + ETH_ALEN ), (void *)m_my_mac, ETH_ALEN );
-    eh->h_proto = htons( m_ethertype );
-    memcpy( data, payload, payload_len );
-    do
-    {
-        sent_len = sendto( m_fd, buffer, payload_len + 14, 0, (struct sockaddr *)&socket_address, sizeof( socket_address ) );
-    } while ( sent_len < 0 && ( errno == EINTR ) );
-    if ( sent_len >= 0 )
-    {
-        r = sent_len - 14;
-    }
-
-    return r;
-#elif defined( __APPLE__ ) || defined( _WIN32 )
-    int r = 0;
-    pcap_t *pcap = (pcap_t *)m_pcap;
-
-    if ( pcap )
-    {
-        uint8_t buffer[2048];
-        uint8_t *data = buffer + 14;
-        if ( dest_mac )
+        memset( &saddr, 0, sizeof( saddr ) );
+        saddr.sll_family = AF_PACKET;
+        saddr.sll_ifindex = m_interface_id;
+        saddr.sll_pkttype = PACKET_MULTICAST;
+        saddr.sll_protocol = htons( m_ethertype );
+        if ( bind( m_fd, (struct sockaddr *)&saddr, sizeof( saddr ) ) >= 0 )
         {
-            memcpy( (void *)buffer, (void *)dest_mac, 6 );
+            memset( &mreq, 0, sizeof( mreq ) );
+            mreq.mr_ifindex = m_interface_id;
+            mreq.mr_type = PACKET_MR_MULTICAST;
+            mreq.mr_alen = 6;
+            mreq.mr_address[0] = multicast_mac[0];
+            mreq.mr_address[1] = multicast_mac[1];
+            mreq.mr_address[2] = multicast_mac[2];
+            mreq.mr_address[3] = multicast_mac[3];
+            mreq.mr_address[4] = multicast_mac[4];
+            mreq.mr_address[5] = multicast_mac[5];
+            if ( setsockopt( m_fd, SOL_PACKET, PACKET_ADD_MEMBERSHIP, &mreq, sizeof( mreq ) ) >= 0 )
+            {
+                r = true;
+            }
+            else
+            {
+                fprintf( stderr,
+                         "us_rawnet_join_multicast setsockopt[SOL_SOCKET,PACKET_ADD_MEMBERSHIP] error %s",
+                         strerror( errno ) );
+            }
         }
         else
         {
-            memcpy( (void *)buffer, (void *)m_default_dest_mac, 6 );
+            fprintf( stderr, "us_rawnet_join_multicast bind error: %s", strerror( errno ) );
         }
-        memcpy( (void *)( buffer + 6 ), (void *)m_my_mac, 6 );
-        buffer[12] = ( m_ethertype >> 8 ) & 0xff;
-        buffer[13] = ( m_ethertype & 0xff );
-        memcpy( data, payload, payload_len );
-        r = pcap_sendpacket( pcap, buffer, (int)payload_len + 14 ) == 0;
+    }
+    return r;
+#elif defined( __APPLE__ ) || defined( _WIN32 )
+    bool r = 0;
+    struct bpf_program fcode;
+    pcap_t *p = (pcap_t *)m_pcap;
+    char filter[1024];
+    /* TODO: add multicast address to pcap filter here if multicast_mac is not null*/
+    (void)multicast_mac;
+    sprintf( filter, "ether proto 0x%04x", m_ethertype );
+
+    if ( pcap_compile( p, &fcode, filter, 1, 0xffffffff ) < 0 )
+    {
+        pcap_close( p );
+        fprintf( stderr, "Unable to pcap_compile: '%s'\n", filter );
     }
     else
     {
-        r = false;
+        if ( pcap_setfilter( p, &fcode ) < 0 )
+        {
+            pcap_close( p );
+            fprintf( stderr, "Unable to pcap_setfilter\n" );
+        }
+        else
+        {
+            r = true;
+        }
+        pcap_freecode( &fcode );
     }
-    return r ? payload_len : -1;
-
+    return r;
 #endif
 }
 
-bool RawNetIO::sendReplyRawNet(
-    const uint8_t *data, uint16_t len, const uint8_t *data1, uint16_t len1, const uint8_t *data2, uint16_t len2 )
+void RawSocket::setNonblocking()
 {
+#if defined( __linux__ ) || defined( __APPLE__ )
+    int val;
+    int flags;
+    val = fcntl( m_fd, F_GETFL, 0 );
+    flags = O_NONBLOCK;
+    val |= flags;
+    fcntl( m_fd, F_SETFL, val );
+#elif defined( _WIN32 )
+    u_long mode = 1;
+    if ( ioctlsocket( m_fd, FIOBIO, &mode ) != NO_ERROR )
+    {
+        fprintf( stderr, "fcntl F_SETFL O_NONBLOCK failed\n" );
+    }
+#endif
 }
 }
-
-#else
-
-const char *jdksavdeccmcu_rawnetio_file = __FILE__;
 
 #endif

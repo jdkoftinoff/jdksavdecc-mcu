@@ -35,14 +35,16 @@
 namespace JDKSAvdeccMCU
 {
 
-ControlSender::ControlSender( jdksavdecc_eui64 const &entity_id,
+ControlSender::ControlSender( RawSocketBase &net,
+                              jdksavdecc_eui64 const &entity_id,
                               jdksavdecc_eui64 const &target_entity_id,
                               jdksavdecc_eui48 const &target_mac_address,
                               uint16_t &sequence_id,
                               uint16_t target_descriptor_index,
                               uint16_t value_length,
                               jdksavdecc_timestamp_in_milliseconds update_rate_in_millis )
-    : m_entity_id( entity_id )
+    : m_net( net )
+    , m_entity_id( entity_id )
     , m_target_entity_id( target_entity_id )
     , m_target_mac_address( target_mac_address )
     , m_sequence_id( sequence_id )
@@ -92,8 +94,9 @@ void ControlSender::setValueQuadlet( uint32_t val )
     }
 }
 
-void ControlSender::tick( jdksavdecc_timestamp_in_milliseconds time_in_millis )
+void ControlSender::tick()
 {
+    jdksavdecc_timestamp_in_milliseconds time_in_millis = m_net.getTimeInMilliseconds();
     if ( wasTimeOutHit( time_in_millis, m_last_send_time_in_millis, m_update_rate_in_millis ) )
     {
         sendSetControl();
@@ -103,7 +106,7 @@ void ControlSender::tick( jdksavdecc_timestamp_in_milliseconds time_in_millis )
 
 void ControlSender::sendSetControl()
 {
-    Frame<128> pdu( 0, m_target_mac_address, net->getMACAddress(), JDKSAVDECC_AVTP_ETHERTYPE ); // DA, SA, EtherType, ADPDU
+    Frame<128> pdu( 0, m_target_mac_address, m_net.getMACAddress(), JDKSAVDECC_AVTP_ETHERTYPE ); // DA, SA, EtherType, ADPDU
 
     // AECPDU common control header
     pdu.putOctet( 0x80 + JDKSAVDECC_SUBTYPE_AECP );                  // cd=1, subtype=0x7b (AECP)
@@ -121,15 +124,13 @@ void ControlSender::sendSetControl()
     pdu.putDoublet( m_target_descriptor_index );
     pdu.putBuf( m_value, m_value_length );
 
-    net->sendRawNet( pdu.getBuf(), pdu.getPos() );
+    m_net.sendFrame( pdu );
     m_sequence_id++;
 }
 
-bool ControlSender::receivedPDU( jdksavdecc_timestamp_in_milliseconds time_in_millis, uint8_t *buf, uint16_t len )
+bool ControlSender::receivedPDU( FrameBase &frame )
 {
-    (void)time_in_millis;
-    (void)buf;
-    (void)len;
+    (void)frame;
     return false;
 }
 }

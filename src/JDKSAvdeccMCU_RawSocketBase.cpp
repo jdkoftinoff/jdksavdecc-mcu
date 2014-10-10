@@ -28,50 +28,53 @@
   ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
   POSSIBILITY OF SUCH DAMAGE.
 */
-#pragma once
 
 #include "JDKSAvdeccMCU_World.hpp"
-
-#include "JDKSAvdeccMCU_NetIO.hpp"
-
-#define JDKSAVDECCWINNETIO_DEBUG 0
+#include "JDKSAvdeccMCU_RawSocketBase.hpp"
 
 namespace JDKSAvdeccMCU
 {
 
-#ifdef __AVR__
-class WizNetIO : public NetIO
+RawSocketBase *RawSocketBase::net[JDKSAVDECCMCU_MAX_RAWSOCKETS] = {};
+uint16_t RawSocketBase::num_rawsockets = 0;
+uint16_t RawSocketBase::last_recv = 0;
+
+bool RawSocketBase::multiRecvFrame( FrameBase *frame )
 {
-  public:
-    WizNetIO( jdksavdecc_eui48 const &mac_address, const char *interfaceName = 0 )
-        : m_mac_address( mac_address )
-#if JDKSAVDECCWINNETIO_DEBUG
-        , m_sent_packet_count( 0 )
-        , m_unsent_packet_count( 0 )
-#endif
+    bool r = false;
+    if ( net[last_recv]->recvFrame( frame ) )
     {
-        (void)interfaceName;
+        r = true;
     }
+    last_recv = ( last_recv + 1 ) % num_rawsockets;
+    return r;
+}
 
-    virtual ~WizNetIO();
-    virtual void initialize();
+bool RawSocketBase::multiSendFrame(
+    FrameBase const &frame, uint8_t const *data1, uint16_t len1, uint8_t const *data2, uint16_t len2 )
+{
+    for ( uint16_t i = 0; i < num_rawsockets; ++i )
+    {
+        if ( ( frame.getBuf()[JDKSAVDECC_FRAME_HEADER_DA_OFFSET] & 0x01 )
+             || ( memcmp( frame.getBuf() + JDKSAVDECC_FRAME_HEADER_SA_OFFSET, net[i]->getMACAddress().value, 6 ) == 0 ) )
+        {
+            net[i]->sendFrame( frame, data1, len1, data2, len2 );
+        }
+    }
+    return true;
+}
 
-    virtual jdksavdecc_eui48 const &getMACAddress() const { return m_mac_address; }
-
-    virtual uint16_t receiveRawNet( uint8_t *data, uint16_t max_len );
-
-    virtual bool sendRawNet(
-        uint8_t const *data, uint16_t len, uint8_t const *data1, uint16_t len1, uint8_t const *data2, uint16_t len2 );
-
-    virtual bool sendReplyRawNet(
-        uint8_t const *data, uint16_t len, uint8_t const *data1, uint16_t len1, uint8_t const *data2, uint16_t len2 );
-#if JDKSAVDECCWINNETIO_DEBUG
-    uint16_t m_sent_packet_count;
-    uint16_t m_unsent_packet_count;
-#endif
-  private:
-    jdksavdecc_eui48 m_mac_address;
-};
-
-#endif
+bool RawSocketBase::multiSendReplyFrame(
+    FrameBase &frame, uint8_t const *data1, uint16_t len1, uint8_t const *data2, uint16_t len2 )
+{
+    for ( uint16_t i = 0; i < num_rawsockets; ++i )
+    {
+        if ( ( frame.getBuf()[JDKSAVDECC_FRAME_HEADER_SA_OFFSET] & 0x01 )
+             || ( memcmp( frame.getBuf() + JDKSAVDECC_FRAME_HEADER_DA_OFFSET, net[i]->getMACAddress().value, 6 ) == 0 ) )
+        {
+            net[i]->sendReplyFrame( frame, data1, len1, data2, len2 );
+        }
+    }
+    return true;
+}
 }

@@ -31,7 +31,7 @@
 #pragma once
 
 #include "JDKSAvdeccMCU_World.hpp"
-#include "JDKSAvdeccMCU_NetIO.hpp"
+#include "JDKSAvdeccMCU_RawSocketBase.hpp"
 #include "JDKSAvdeccMCU_Handler.hpp"
 #include "JDKSAvdeccMCU_Helpers.hpp"
 #include "JDKSAvdeccMCU_Frame.hpp"
@@ -47,16 +47,16 @@ namespace JDKSAvdeccMCU
 class Entity : public Handler
 {
   public:
-    Entity( ADPManager &adp_manager );
+    Entity( RawSocketBase &net, ADPManager &adp_manager );
 
     /// Run periodic state machines
-    virtual void tick( jdksavdecc_timestamp_in_milliseconds time_in_millis );
+    virtual void tick();
 
     /// Notification that a command to a target entity timed out
     virtual void commandTimedOut( jdksavdecc_eui64 const &target_entity_id, uint16_t command_type, uint16_t sequence_id );
 
     /// Handle received AECPDU's
-    virtual bool receivedPDU( jdksavdecc_timestamp_in_milliseconds time_in_millis, uint8_t *buf, uint16_t len );
+    virtual bool receivedPDU( FrameBase &frame );
 
     /// Check to make sure the command is allowed or disallowed due to acquire or locking
     uint8_t validatePermissions( jdksavdecc_aecpdu_aem const &aem );
@@ -85,8 +85,7 @@ class Entity : public Handler
     /// responses to all other subscribed controllers
     void sendResponses( bool internally_generated,
                         bool send_to_registered_controllers,
-                        uint8_t *buf,
-                        uint16_t len,
+                        FrameBase &pdu,
                         uint8_t const *additional_data1 = 0,
                         uint16_t additional_data_length1 = 0,
                         uint8_t const *additional_data2 = 0,
@@ -217,6 +216,9 @@ class Entity : public Handler
                                       uint8_t const *request );
 
   protected:
+    /// The network port
+    RawSocketBase &m_net;
+
     /// The advertising manager, also contains capabilities, entity_id, and entity_model_id
     ADPManager &m_adp_manager;
 

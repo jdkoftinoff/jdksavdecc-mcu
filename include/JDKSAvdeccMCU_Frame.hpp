@@ -62,7 +62,7 @@ class FrameBase
     {
     }
 
-    uint16_t getLen() const { return m_len; }
+    uint16_t getMaxLength() const { return m_len; }
 
     void putEUI48( jdksavdecc_eui48 const &val )
     {
@@ -126,20 +126,28 @@ class FrameBase
 
     uint8_t const *getBuf() const { return m_buf; }
     uint8_t *getBuf() { return m_buf; }
-    uint16_t getPos() const { return m_pos; }
-    void setPos( uint16_t n = JDKSAVDECC_FRAME_HEADER_LEN ) { m_pos = n; }
+    uint16_t getPosition() const { return m_pos; }
+    uint16_t getSize() const { return m_pos; }
+    void setPosition( uint16_t n = JDKSAVDECC_FRAME_HEADER_LEN ) { m_pos = n; }
+    void setLength( uint16_t n ) { m_pos = n; }
 
     jdksavdecc_eui48 getDA() const { return jdksavdecc_eui48_get( m_buf, JDKSAVDECC_FRAME_HEADER_DA_OFFSET ); }
 
+    void setDA( jdksavdecc_eui48 const &da ) { jdksavdecc_eui48_set( da, m_buf, JDKSAVDECC_FRAME_HEADER_DA_OFFSET ); }
+
     jdksavdecc_eui48 getSA() const { return jdksavdecc_eui48_get( m_buf, JDKSAVDECC_FRAME_HEADER_SA_OFFSET ); }
 
+    void setSA( jdksavdecc_eui48 const &sa ) { jdksavdecc_eui48_set( sa, m_buf, JDKSAVDECC_FRAME_HEADER_SA_OFFSET ); }
+
     uint16_t getEtherType() const { return jdksavdecc_uint16_get( m_buf, JDKSAVDECC_FRAME_HEADER_ETHERTYPE_OFFSET ); }
+
+    void setEtherType( uint16_t et ) { jdksavdecc_uint16_set( et, m_buf, JDKSAVDECC_FRAME_HEADER_ETHERTYPE_OFFSET ); }
 
     uint8_t *getPayload() { return &m_buf[JDKSAVDECC_FRAME_HEADER_LEN]; }
 
     uint8_t const *getPayload() const { return &m_buf[JDKSAVDECC_FRAME_HEADER_LEN]; }
 
-    jdksavdecc_timestamp_in_milliseconds getTimeInMs() const { return m_time_in_ms; }
+    jdksavdecc_timestamp_in_milliseconds getTimeInMilliseconds() const { return m_time_in_ms; }
 };
 
 template <size_t MaxSize>
@@ -149,6 +157,8 @@ class Frame : public FrameBase
     uint8_t m_buf_storage[MaxSize];
 
   public:
+    Frame() : FrameBase( 0, m_buf_storage, 0 ) {}
+
     Frame( jdksavdecc_timestamp_in_milliseconds time_in_ms,
            jdksavdecc_eui48 const &dest_mac,
            jdksavdecc_eui48 const &src_mac,

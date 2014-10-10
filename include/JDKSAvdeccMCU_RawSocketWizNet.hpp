@@ -28,16 +28,59 @@
   ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
   POSSIBILITY OF SUCH DAMAGE.
 */
+#pragma once
 
 #include "JDKSAvdeccMCU_World.hpp"
 
-#include "JDKSAvdeccMCU_NetIO.hpp"
+#include "JDKSAvdeccMCU_RawSocketBase.hpp"
+
+#define JDKSAVDECCWINNETIO_DEBUG 0
 
 namespace JDKSAvdeccMCU
 {
 
-NetIO *net;
+#ifdef __AVR__
+class RawSocketWizNet : public RawSocketBase
+{
+  public:
+    RawSocketWizNet( jdksavdecc_eui48 const &mac_address, uint16_t ethertype )
+        : m_mac_address( mac_address ), m_ethertype( ethertype )
+    {
+    }
 
-NetIO::NetIO() { net = this; }
-NetIO::~NetIO() {}
+    virtual ~RawSocketWizNet();
+
+    virtual jdksavdecc_timestamp_in_milliseconds getTimeInMilliseconds() { return millis(); }
+
+    virtual bool recvFrame( FrameBase *frame );
+
+    virtual bool sendFrame( FrameBase const &frame, uint8_t const *data1, uint16_t len1, uint8_t const *data2, uint16_t len2 );
+
+    virtual bool sendReplyFrame( FrameBase &frame, uint8_t const *data1, uint16_t len1, uint8_t const *data2, uint16_t len2 );
+
+    virtual void initialize();
+
+    /**
+    * Attempt to join an additional multicast mac address group
+    */
+    virtual bool joinMulticast( const jdksavdecc_eui48 &multicast_mac ) { (void)multicast_mac; }
+
+    /**
+    * Set the socket to non blocking mode
+    */
+    virtual void setNonblocking() {}
+
+    /**
+    * Get the file descriptor
+    */
+    virtual filedescriptor_t getFd() const { return 0; }
+
+    virtual jdksavdecc_eui48 const &getMACAddress() const { return m_mac_address; }
+
+  private:
+    jdksavdecc_eui48 m_mac_address;
+    uint16_t m_ethertype;
+};
+
+#endif
 }

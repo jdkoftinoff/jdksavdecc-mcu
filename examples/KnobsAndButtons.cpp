@@ -13,11 +13,11 @@ jdksavdecc_eui48 my_mac = {{0x70, 0xb3, 0xd5, 0xed, 0xcf, 0xf0}};
 /// Ethernet handler object
 
 #if defined( JDKSAVDECCMCU_BARE_METAL )
-PlatformNetIO rawnet( my_mac ); // For embedded systems
+RawSocketWizeNet rawnet( my_mac ); // For embedded systems
 #elif defined( JDKSAVDECCMCU_ENABLE_RAW )
-RawNetIO rawnet( JDKSAVDECC_AVTP_ETHERTYPE, "en0", jdksavdecc_multicast_adp_acmp.value ); // For non-embedded systems
+RawSocket rawnet( JDKSAVDECC_AVTP_ETHERTYPE, "en0", &jdksavdecc_multicast_adp_acmp ); // For non-embedded systems
 #else
-PcapFileNetIO rawnet( my_mac, "input.pcap", "output.pcap" );
+RawSocketPcapFile rawnet( JDKSAVDECC_AVTP_ETHERTYPE, "input.pcap", "output.pcap" );
 #endif
 
 /// This AVDECC Entity is based on the mac address (insert ff ff)
@@ -47,28 +47,28 @@ ADPManager adp_manager( rawnet,
 uint16_t sequence_id = 0;
 
 /// The mapping of Knob 1 to control descriptor 0x0000. 2 byte payload, refresh time of 1000 ms
-ControlSender knob1( my_entity_id, target_entity_id, target_mac_address, sequence_id, 0x0000, 2, REFRESH_TIME );
+ControlSender knob1( rawnet, my_entity_id, target_entity_id, target_mac_address, sequence_id, 0x0000, 2, REFRESH_TIME );
 
 /// The mapping of Knob 2 to control descriptor 0x0001. 2 byte payload, refresh time of 1000 ms
-ControlSender knob2( my_entity_id, target_entity_id, target_mac_address, sequence_id, 0x0001, 2, REFRESH_TIME );
+ControlSender knob2( rawnet, my_entity_id, target_entity_id, target_mac_address, sequence_id, 0x0001, 2, REFRESH_TIME );
 
 /// The mapping of Knob 2 to control descriptor 0x0002. 2 byte payload, refresh time of 1000 ms
-ControlSender knob3( my_entity_id, target_entity_id, target_mac_address, sequence_id, 0x0002, 2, REFRESH_TIME );
+ControlSender knob3( rawnet, my_entity_id, target_entity_id, target_mac_address, sequence_id, 0x0002, 2, REFRESH_TIME );
 
 /// The mapping of Button 1 to control descriptor 0x0003. 2 byte payload, refresh time of 1000 ms
-ControlSender button1( my_entity_id, target_entity_id, target_mac_address, sequence_id, 0x0003, 1, REFRESH_TIME );
+ControlSender button1( rawnet, my_entity_id, target_entity_id, target_mac_address, sequence_id, 0x0003, 1, REFRESH_TIME );
 
 /// The mapping of Button 2 to control descriptor 0x0004. 2 byte payload, refresh time of 1000 ms
-ControlSender button2( my_entity_id, target_entity_id, target_mac_address, sequence_id, 0x0004, 1, REFRESH_TIME );
+ControlSender button2( rawnet, my_entity_id, target_entity_id, target_mac_address, sequence_id, 0x0004, 1, REFRESH_TIME );
 
 /// The mapping of Button 3 to control descriptor 0x0005. 2 byte payload, refresh time of 1000 ms
-ControlSender button3( my_entity_id, target_entity_id, target_mac_address, sequence_id, 0x0005, 1, REFRESH_TIME );
+ControlSender button3( rawnet, my_entity_id, target_entity_id, target_mac_address, sequence_id, 0x0005, 1, REFRESH_TIME );
 
 /// The mapping of Button 3 to control descriptor 0x0006. 2 byte payload, refresh time of 1000 ms
-ControlSender button4( my_entity_id, target_entity_id, target_mac_address, sequence_id, 0x0006, 1, REFRESH_TIME );
+ControlSender button4( rawnet, my_entity_id, target_entity_id, target_mac_address, sequence_id, 0x0006, 1, REFRESH_TIME );
 
 /// The mapping of Button 3 to control descriptor 0x0007. 2 byte payload, refresh time of 1000 ms
-ControlSender button5( my_entity_id, target_entity_id, target_mac_address, sequence_id, 0x0007, 1, REFRESH_TIME );
+ControlSender button5( rawnet, my_entity_id, target_entity_id, target_mac_address, sequence_id, 0x0007, 1, REFRESH_TIME );
 
 /// The ValueMapper scans the A/D's and Digital input pins at the specified rate
 /// and applies the new values to the appropriate knob or button
@@ -87,8 +87,10 @@ class ValueMapper : public Handler
     {
     }
 
-    virtual void tick( jdksavdecc_timestamp_in_milliseconds time_in_millis )
+    virtual void tick()
     {
+        jdksavdecc_timestamp_in_milliseconds time_in_millis = rawnet.getTimeInMilliseconds();
+
         if ( time_in_millis > m_last_update_time + m_update_rate_in_millis )
         {
             m_last_update_time = time_in_millis;
@@ -113,7 +115,7 @@ class ValueMapper : public Handler
 ValueMapper value_mapper( 50 );
 
 /// Create a HandlerGroup which can manage up to 16 handlers
-HandlerGroup<16> all_handlers;
+HandlerGroup<16> all_handlers( rawnet );
 
 void setup()
 {
@@ -130,7 +132,7 @@ void setup()
     // Initialize the serial port for debug logs
     Serial.begin( 9600 );
 
-    // Initialize the W5100 chip
+    // Initialize the ethernet chip
     rawnet.initialize();
 
     // Put all the handlers into the HandlerGroup
@@ -162,10 +164,10 @@ void jdksavdeccmcu_debug_log( const char *str, uint16_t v )
                                               txt,
                                               pdu,
                                               sizeof( pdu ) );
-    if ( r > 0 && net )
+    if ( r > 0 )
     {
         memcpy( pdu + JDKSAVDECC_FRAME_HEADER_SA_OFFSET, my_mac.value, 6 );
-        net->sendRawNet( (uint8_t *)pdu, r );
+        rawnet.sendRaw( (uint8_t *)pdu, r );
     }
     else
     {
@@ -180,7 +182,7 @@ void loop()
     jdksavdecc_timestamp_in_milliseconds cur_time = millis();
 
     // Tell all the handlers to do their periodic jobs
-    all_handlers.tick( cur_time );
+    all_handlers.tick();
     if ( cur_time / 1000 != last_second )
     {
         last_second = cur_time / 1000;

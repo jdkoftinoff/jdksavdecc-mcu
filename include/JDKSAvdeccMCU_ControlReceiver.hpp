@@ -31,7 +31,7 @@
 #pragma once
 
 #include "JDKSAvdeccMCU_World.hpp"
-#include "JDKSAvdeccMCU_NetIO.hpp"
+#include "JDKSAvdeccMCU_RawSocketBase.hpp"
 #include "JDKSAvdeccMCU_Frame.hpp"
 #include "JDKSAvdeccMCU_Handler.hpp"
 #include "JDKSAvdeccMCU_ControlValueHolder.hpp"
@@ -45,7 +45,7 @@ class ControlReceiver : public Handler
 {
   public:
     /// Construct the ControlReceiver object
-    ControlReceiver( NetIO &net, jdksavdecc_eui64 const &entity_id, uint16_t descriptor_index_offset = 0 )
+    ControlReceiver( RawSocketBase &net, jdksavdecc_eui64 const &entity_id, uint16_t descriptor_index_offset = 0 )
         : m_net( net )
         , m_entity_id( entity_id )
         , m_descriptor_index_offset( descriptor_index_offset )
@@ -61,7 +61,7 @@ class ControlReceiver : public Handler
     {
         bool r = false;
         // yes, get the descriptor index
-        uint16_t descriptor_index = jdksavdecc_aem_command_set_control_get_descriptor_index( pdu.getBuf(), pdu.getPos() );
+        uint16_t descriptor_index = jdksavdecc_aem_command_set_control_get_descriptor_index( pdu.getBuf(), pdu.getPosition() );
         (void)aem;
         // is it a descriptor index that we care about?
         if ( ( descriptor_index >= m_descriptor_index_offset )
@@ -84,7 +84,7 @@ class ControlReceiver : public Handler
     {
         bool r = false;
         // yes, get the descriptor index
-        uint16_t descriptor_index = jdksavdecc_aem_command_set_control_get_descriptor_index( pdu.getBuf(), pdu.getPos() );
+        uint16_t descriptor_index = jdksavdecc_aem_command_set_control_get_descriptor_index( pdu.getBuf(), pdu.getPosition() );
         (void)aem;
         // is it a descriptor index that we care about?
         if ( ( descriptor_index >= m_descriptor_index_offset )
@@ -93,7 +93,7 @@ class ControlReceiver : public Handler
             // yes, it is in range, extract the data value
 
             m_values[descriptor_index - m_descriptor_index_offset]->setValue(
-                pdu.getBuf() + pdu.getPos() + JDKSAVDECC_AEM_COMMAND_SET_CONTROL_COMMAND_OFFSET_VALUES );
+                pdu.getBuf() + pdu.getPosition() + JDKSAVDECC_AEM_COMMAND_SET_CONTROL_COMMAND_OFFSET_VALUES );
 
             r = true;
         }
@@ -158,7 +158,7 @@ class ControlReceiver : public Handler
     jdksavdecc_eui64 const &getEntityID() const { return m_entity_id; }
 
   protected:
-    NetIO &m_net;
+    RawSocketBase &m_net;
     jdksavdecc_eui64 const &m_entity_id;
     uint16_t m_descriptor_index_offset;
     uint16_t m_num_descriptors;

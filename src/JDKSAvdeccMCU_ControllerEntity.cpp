@@ -36,30 +36,27 @@
 namespace JDKSAvdeccMCU
 {
 
-bool ControllerEntity::receivedPDU( jdksavdecc_timestamp_in_milliseconds time_in_millis, uint8_t *buf, uint16_t len )
+bool ControllerEntity::receivedPDU( FrameBase &frame )
 {
     bool r = false;
     bool done = false;
 
     // we already know the message is AVTP ethertype and is either directly
     // targetting my MAC address or is a multicast message
-    FrameBase pdu( time_in_millis, buf, len );
+    // Try see if it is an AEM message
+    jdksavdecc_aecpdu_aem aem;
+    if ( parseAEM( &aem, frame ) )
     {
-        // Try see if it is an AEM message
-        jdksavdecc_aecpdu_aem aem;
-        if ( parseAEM( &aem, pdu ) )
+        if ( isAEMForTarget( aem, m_adp_manager.getEntityID() ) )
         {
-            if ( isAEMForTarget( aem, m_adp_manager.getEntityID() ) )
-            {
-                receivedAEMCommand( aem, pdu );
-                r = true;
-            }
-            else if ( isAEMForController( aem, m_adp_manager.getEntityID() ) )
-            {
-                r = receivedAEMResponse( aem, pdu );
-            }
-            done = true;
+            receivedAEMCommand( aem, frame );
+            r = true;
         }
+        else if ( isAEMForController( aem, m_adp_manager.getEntityID() ) )
+        {
+            r = receivedAEMResponse( aem, frame );
+        }
+        done = true;
     }
 
     if ( !done )
@@ -67,12 +64,12 @@ bool ControllerEntity::receivedPDU( jdksavdecc_timestamp_in_milliseconds time_in
         // Try see if it is an Address Access message
         jdksavdecc_aecp_aa aa;
         memset( &aa, 0, sizeof( aa ) );
-        if ( parseAA( &aa, pdu ) )
+        if ( parseAA( &aa, frame ) )
         {
             // Yes, is it a command to read/write data?
             if ( isAAForTarget( aa, m_adp_manager.getEntityID() ) )
             {
-                receivedAACommand( aa, pdu );
+                receivedAACommand( aa, frame );
                 r = true;
                 // TODO: fill in response code in PDU and send reply
             }

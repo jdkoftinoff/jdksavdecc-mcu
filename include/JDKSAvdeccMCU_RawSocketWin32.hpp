@@ -31,68 +31,40 @@
 #pragma once
 
 #include "JDKSAvdeccMCU_World.hpp"
-
-#include "JDKSAvdeccMCU_NetIO.hpp"
-
-#ifdef __AVR__
-#include "JDKSAvdeccMCU_WizNetIO.hpp"
-namespace JDKSAvdeccMCU
-{
-typedef WizNetIO RawNetIO;
-}
-#elif defined( JDKSAVDECCMCU_ENABLE_RAW )
+#include "JDKSAvdeccMCU_RawSocketBase.hpp"
 
 namespace JDKSAvdeccMCU
 {
-class RawNetIO : public NetIO
+class RawSocketWin32 : public RawSocketBase
 {
-#if defined( _WIN32 )
-    SOCKET m_fd;
-#else
-    int m_fd;
-#endif
-
-    uint16_t m_ethertype;
-    jdksavdecc_eui48 m_my_mac;
-    jdksavdecc_eui48 m_default_dest_mac;
-    int m_interface_id;
-    void *m_pcap;
-
-
   public:
-    /**
-    *  Open a raw socket connected to the specified interface name and join the
-    *  specified multicast address
-    */
-    RawNetIO( uint16_t ethertype, const char *interface_name, const uint8_t join_multicast[6] );
+    RawSocketWin32();
+
+    virtual ~RawSocketWin32() {}
+
+    virtual jdksavdecc_timestamp_in_milliseconds getTimeInMilliseconds();
+
+    virtual bool recvFrame( FrameBase *frame );
+
+    virtual bool sendFrame( FrameBase const &frame, uint8_t const *data1, uint16_t len1, uint8_t const *data2, uint16_t len2 );
+
+    virtual bool sendReplyFrame( FrameBase &frame, uint8_t const *data1, uint16_t len1, uint8_t const *data2, uint16_t len2 );
 
     /**
-    * Close a raw socket
+    * Attempt to join an additional multicast mac address group
     */
-    ~RawNetIO();
+    virtual bool joinMulticast( const jdksavdecc_eui48 &multicast_mac );
 
-    void setNonblocking();
+    /**
+    * Set the socket to non blocking mode
+    */
+    virtual void setNonblocking();
 
-    bool joinMulticast( const jdksavdecc_eui48 &multicast_mac );
+    /**
+    * Get the file descriptor
+    */
+    virtual filedescriptor_t getFd() const;
 
-#if defined( _WIN32 )
-    SOCKET getFd() const { return m_fd; }
-#else
-    int getFd() const { return m_fd; }
-#endif
-
-    virtual void initialize();
-
-    virtual const jdksavdecc_eui48 &getMACAddress() const;
-
-    virtual uint16_t receiveRawNet( uint8_t *data, uint16_t max_len );
-
-    virtual bool sendRawNet(
-        uint8_t const *data, uint16_t len, uint8_t const *data1, uint16_t len1, uint8_t const *data2, uint16_t len2 );
-
-    virtual bool sendReplyRawNet(
-        uint8_t const *data, uint16_t len, uint8_t const *data1, uint16_t len1, uint8_t const *data2, uint16_t len2 );
+    virtual jdksavdecc_eui48 const &getMACAddress() const;
 };
 }
-
-#endif

@@ -36,7 +36,7 @@
 namespace JDKSAvdeccMCU
 {
 
-ADPManager::ADPManager( NetIO &net,
+ADPManager::ADPManager( RawSocketBase &net,
                         jdksavdecc_eui64 const &entity_id,
                         jdksavdecc_eui64 const &entity_model_id,
                         uint32_t entity_capabilities,
@@ -53,8 +53,10 @@ ADPManager::ADPManager( NetIO &net,
 {
 }
 
-void ADPManager::tick( jdksavdecc_timestamp_in_milliseconds time_in_millis )
+void ADPManager::tick()
 {
+    jdksavdecc_timestamp_in_milliseconds time_in_millis;
+    time_in_millis = m_net.getTimeInMilliseconds();
     if ( wasTimeOutHit( time_in_millis, m_last_send_time_in_millis, ( m_valid_time_in_seconds * ( 1000 / 4 ) ) ) )
     {
         sendADP();
@@ -97,15 +99,13 @@ void ADPManager::sendADP()
     // 20 octets total, all 0
     adp.putZeros( 20 );
 
-    m_net.sendRawNet( adp.getBuf(), adp.getPos() );
+    m_net.sendFrame( adp );
     m_available_index++;
 }
 
-bool ADPManager::receivedPDU( jdksavdecc_timestamp_in_milliseconds time_in_millis, uint8_t *buf, uint16_t len )
+bool ADPManager::receivedPDU( FrameBase &frame )
 {
-    (void)time_in_millis;
-    (void)buf;
-    (void)len;
+    (void)frame;
     return false;
 }
 }

@@ -52,12 +52,12 @@ using namespace jdksavdecc;
 #if defined( __AVR__ )
 #include "SPI.h"
 
-inline jdksavdecc_timestamp_in_milliseconds getTimeInMs() { return millis(); }
+inline jdksavdecc_timestamp_in_milliseconds getTimeInMilliseconds() { return millis(); }
 #elif defined( __APPLE__ ) || defined( __linux__ )
 #include <sys/time.h>
 #include <iostream>
 #include <iomanip>
-inline jdksavdecc_timestamp_in_milliseconds getTimeInMs()
+inline jdksavdecc_timestamp_in_milliseconds getTimeInMilliseconds()
 {
     timeval tv;
 
@@ -67,7 +67,10 @@ inline jdksavdecc_timestamp_in_milliseconds getTimeInMs()
 #elif defined( WIN32 )
 #include <iostream>
 #include <iomanip>
-inline jdksavdecc_timestamp_in_milliseconds getTimeInMs() { return jdksavdecc_timestamp_in_milliseconds( GetTickCount() ); }
+inline jdksavdecc_timestamp_in_milliseconds getTimeInMilliseconds()
+{
+    return jdksavdecc_timestamp_in_milliseconds( GetTickCount() );
+}
 #endif
 
 void jdksavdeccmcu_debug_log( const char *str, uint16_t v );

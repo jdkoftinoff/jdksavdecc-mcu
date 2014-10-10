@@ -31,7 +31,7 @@
 #pragma once
 
 #include "JDKSAvdeccMCU_World.hpp"
-#include "JDKSAvdeccMCU_NetIO.hpp"
+#include "JDKSAvdeccMCU_RawSocketBase.hpp"
 #include "JDKSAvdeccMCU_Frame.hpp"
 #include "JDKSAvdeccMCU_Handler.hpp"
 

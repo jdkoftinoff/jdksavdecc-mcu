@@ -37,13 +37,11 @@ namespace JDKSAvdeccMCU
 
 Handler::~Handler() {}
 
-void Handler::tick( jdksavdecc_timestamp_in_milliseconds time_in_millis ) { (void)time_in_millis; }
+void Handler::tick() {}
 
-bool Handler::receivedPDU( jdksavdecc_timestamp_in_milliseconds time_in_millis, uint8_t *buf, uint16_t len )
+bool Handler::receivedPDU( FrameBase &frame )
 {
-    (void)time_in_millis;
-    (void)buf;
-    (void)len;
+    (void)frame;
     return false;
 }
 }

@@ -31,7 +31,7 @@
 #pragma once
 
 #include "JDKSAvdeccMCU_World.hpp"
-#include "JDKSAvdeccMCU_NetIO.hpp"
+#include "JDKSAvdeccMCU_RawSocketBase.hpp"
 #include "JDKSAvdeccMCU_Frame.hpp"
 
 #include "JDKSAvdeccMCU_Handler.hpp"
@@ -43,7 +43,7 @@ class ADPManager : public Handler
 {
   public:
     /// Construct the ADPManager object
-    ADPManager( NetIO &net,
+    ADPManager( RawSocketBase &net,
                 jdksavdecc_eui64 const &entity_id,
                 jdksavdecc_eui64 const &entity_model_id,
                 uint32_t entity_capabilities,
@@ -51,10 +51,10 @@ class ADPManager : public Handler
                 uint16_t valid_time_in_seconds );
 
     /// Send the ENTITY_AVAILABLE message if it is time to
-    virtual void tick( jdksavdecc_timestamp_in_milliseconds time_in_millis );
+    virtual void tick();
 
     /// Handle any incoming ADPDU. Return true if handled
-    virtual bool receivedPDU( jdksavdecc_timestamp_in_milliseconds time_in_millis, uint8_t *buf, uint16_t len );
+    virtual bool receivedPDU( FrameBase &frame );
 
     /// Formulate the ADPDU and send it
     void sendADP();
@@ -67,7 +67,7 @@ class ADPManager : public Handler
     uint32_t getAvailableIndex() const { return m_available_index; }
 
   protected:
-    NetIO &m_net;
+    RawSocketBase &m_net;
     jdksavdecc_eui64 m_entity_id;
     jdksavdecc_eui64 m_entity_model_id;
     uint32_t m_entity_capabilities;
