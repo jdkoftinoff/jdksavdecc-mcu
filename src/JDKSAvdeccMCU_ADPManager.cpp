@@ -36,7 +36,7 @@
 namespace JDKSAvdeccMCU
 {
 
-ADPManager::ADPManager( RawSocketBase &net,
+ADPManager::ADPManager( RawSocket &net,
                         jdksavdecc_eui64 const &entity_id,
                         jdksavdecc_eui64 const &entity_model_id,
                         uint32_t entity_capabilities,

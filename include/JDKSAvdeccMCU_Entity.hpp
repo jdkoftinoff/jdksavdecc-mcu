@@ -31,7 +31,7 @@
 #pragma once
 
 #include "JDKSAvdeccMCU_World.hpp"
-#include "JDKSAvdeccMCU_RawSocketBase.hpp"
+#include "JDKSAvdeccMCU_RawSocket.hpp"
 #include "JDKSAvdeccMCU_Handler.hpp"
 #include "JDKSAvdeccMCU_Helpers.hpp"
 #include "JDKSAvdeccMCU_Frame.hpp"
@@ -47,7 +47,7 @@ namespace JDKSAvdeccMCU
 class Entity : public Handler
 {
   public:
-    Entity( RawSocketBase &net, ADPManager &adp_manager );
+    Entity( RawSocket &net, ADPManager &adp_manager );
 
     /// Run periodic state machines
     virtual void tick();
@@ -217,7 +217,7 @@ class Entity : public Handler
 
   protected:
     /// The network port
-    RawSocketBase &m_net;
+    RawSocket &m_net;
 
     /// The advertising manager, also contains capabilities, entity_id, and entity_model_id
     ADPManager &m_adp_manager;

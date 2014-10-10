@@ -35,7 +35,7 @@
 namespace JDKSAvdeccMCU
 {
 
-HandlerGroupBase::HandlerGroupBase( RawSocketBase &net, Handler **item_storage )
+HandlerGroupBase::HandlerGroupBase( RawSocket &net, Handler **item_storage )
     : m_net( net ), m_num_items( 0 ), m_item( item_storage ), m_rx_count( 0 ), m_handled_count( 0 )
 {
 }

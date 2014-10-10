@@ -41,7 +41,7 @@
 #include "JDKSAvdeccMCU_Handler.hpp"
 #include "JDKSAvdeccMCU_HandlerGroup.hpp"
 #include "JDKSAvdeccMCU_Helpers.hpp"
-#include "JDKSAvdeccMCU_RawSocketBase.hpp"
+#include "JDKSAvdeccMCU_RawSocket.hpp"
 #include "JDKSAvdeccMCU_RawSocket.hpp"
 #include "JDKSAvdeccMCU_RawSocketPcapFile.hpp"
 #include "JDKSAvdeccMCU_RawSocketWizNet.hpp"

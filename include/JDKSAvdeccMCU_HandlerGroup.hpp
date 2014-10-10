@@ -31,7 +31,7 @@
 #pragma once
 
 #include "JDKSAvdeccMCU_World.hpp"
-#include "JDKSAvdeccMCU_RawSocketBase.hpp"
+#include "JDKSAvdeccMCU_RawSocket.hpp"
 #include "JDKSAvdeccMCU_Handler.hpp"
 
 namespace JDKSAvdeccMCU
@@ -44,14 +44,14 @@ namespace JDKSAvdeccMCU
 class HandlerGroupBase : public Handler
 {
   protected:
-    RawSocketBase &m_net;
+    RawSocket &m_net;
     uint16_t m_num_items;
     Handler **m_item;
     uint32_t m_rx_count;
     uint32_t m_handled_count;
 
   public:
-    HandlerGroupBase( RawSocketBase &net, Handler **item_storage );
+    HandlerGroupBase( RawSocket &net, Handler **item_storage );
 
     /// Add a handler to the list
     void add( Handler *v ) { m_item[m_num_items++] = v; }
@@ -80,6 +80,6 @@ class HandlerGroup : public HandlerGroupBase
     Handler *m_item_storage[MaxItems];
 
   public:
-    HandlerGroup( RawSocketBase &net ) : HandlerGroupBase( net, m_item_storage ) {}
+    HandlerGroup( RawSocket &net ) : HandlerGroupBase( net, m_item_storage ) {}
 };
 }

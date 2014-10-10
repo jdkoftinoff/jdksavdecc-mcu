@@ -31,14 +31,14 @@
 #pragma once
 
 #include "JDKSAvdeccMCU_World.hpp"
-#include "JDKSAvdeccMCU_RawSocketBase.hpp"
+#include "JDKSAvdeccMCU_RawSocket.hpp"
 
 namespace JDKSAvdeccMCU
 {
-class RawSocketPcap : public RawSocketBase
+class RawSocketPcap : public RawSocket
 {
   public:
-    RawSocketPcap() {}
+    RawSocketPcap( const char *interface_name, uint16_t ethertype, const jdksavdecc_eui48 *multicast_to_join = 0 ) {}
 
     virtual ~RawSocketPcap() {}
 

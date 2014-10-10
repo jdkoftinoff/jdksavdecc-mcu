@@ -31,7 +31,7 @@
 #pragma once
 
 #include "JDKSAvdeccMCU_World.hpp"
-#include "JDKSAvdeccMCU_RawSocketBase.hpp"
+#include "JDKSAvdeccMCU_RawSocket.hpp"
 #include "JDKSAvdeccMCU_Frame.hpp"
 #include "JDKSAvdeccMCU_Handler.hpp"
 #include "JDKSAvdeccMCU_ControlValueHolder.hpp"
@@ -45,7 +45,7 @@ class ControlReceiver : public Handler
 {
   public:
     /// Construct the ControlReceiver object
-    ControlReceiver( RawSocketBase &net, jdksavdecc_eui64 const &entity_id, uint16_t descriptor_index_offset = 0 )
+    ControlReceiver( RawSocket &net, jdksavdecc_eui64 const &entity_id, uint16_t descriptor_index_offset = 0 )
         : m_net( net )
         , m_entity_id( entity_id )
         , m_descriptor_index_offset( descriptor_index_offset )
@@ -158,7 +158,7 @@ class ControlReceiver : public Handler
     jdksavdecc_eui64 const &getEntityID() const { return m_entity_id; }
 
   protected:
-    RawSocketBase &m_net;
+    RawSocket &m_net;
     jdksavdecc_eui64 const &m_entity_id;
     uint16_t m_descriptor_index_offset;
     uint16_t m_num_descriptors;

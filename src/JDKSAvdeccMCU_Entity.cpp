@@ -36,7 +36,7 @@
 namespace JDKSAvdeccMCU
 {
 
-Entity::Entity( RawSocketBase &net, ADPManager &adp_manager )
+Entity::Entity( RawSocket &net, ADPManager &adp_manager )
     : m_net( net )
     , m_adp_manager( adp_manager )
     , m_outgoing_sequence_id( 0 )

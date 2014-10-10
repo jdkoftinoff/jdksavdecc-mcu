@@ -30,7 +30,6 @@
 */
 
 #include "JDKSAvdeccMCU_World.hpp"
-
 #include "JDKSAvdeccMCU_RawSocketWizNet.hpp"
 
 #ifdef __AVR__
@@ -76,9 +75,9 @@ bool RawSocketWizNet::recvFrame( FrameBase *frame )
              && ( data[JDKSAVDECC_FRAME_HEADER_ETHERTYPE_OFFSET + 1] == ( (m_ethertype >> 0)0xff ) ) )
         {
 
-            // we care if it is for me or the ADP/ACMP multicast address
+            // we care if it is for me or the multicast address
             if ( memcmp( &data[JDKSAVDECC_FRAME_HEADER_DA_OFFSET], m_mac_address.value, 6 ) == 0
-                 || memcmp( &data[JDKSAVDECC_FRAME_HEADER_DA_OFFSET], jdksavdecc_multicast_adp_acmp.value, 6 ) == 0 )
+                 || memcmp( &data[JDKSAVDECC_FRAME_HEADER_DA_OFFSET], m_multicast.value, 6 ) == 0 )
             {
                 // ok, then read the rest of the data
                 if ( data_len <= max_len )
@@ -168,6 +167,7 @@ bool RawSocketWizNet::sendFrame(
 bool RawSocketWizNet::sendReplyFrame(
     FrameBase &frame, uint8_t const *data1, uint16_t len1, uint8_t const *data2, uint16_t len2 )
 {
+    bool r = false;
     uint8_t *p = frame.getBuf();
     // Set DA to what was SA, set SA to m_mac_address
     for ( uint8_t i = 0; i < 6; ++i )
@@ -175,7 +175,12 @@ bool RawSocketWizNet::sendReplyFrame(
         p[i + JDKSAVDECC_FRAME_HEADER_DA_OFFSET] = p[i + JDKSAVDECC_FRAME_HEADER_SA_OFFSET];
         p[i + JDKSAVDECC_FRAME_HEADER_SA_OFFSET] = m_mac_address.value[i];
     }
-    return sendFrame( frame, data1, len1, data2, len2 );
+    r = sendFrame( frame, data1, len1, data2, len2 );
+    for ( uint8_t i = 0; i < 6; ++i )
+    {
+        p[i + JDKSAVDECC_FRAME_HEADER_DA_OFFSET] = p[i + JDKSAVDECC_FRAME_HEADER_SA_OFFSET];
+        p[i + JDKSAVDECC_FRAME_HEADER_SA_OFFSET] = m_mac_address.value[i];
+    }
 }
 
 void RawSocketWizNet::initialize()

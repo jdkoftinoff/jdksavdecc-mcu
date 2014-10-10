@@ -31,7 +31,7 @@
 #pragma once
 
 #include "JDKSAvdeccMCU_World.hpp"
-#include "JDKSAvdeccMCU_RawSocketBase.hpp"
+#include "JDKSAvdeccMCU_RawSocket.hpp"
 #include "JDKSAvdeccMCU_Frame.hpp"
 
 #include "JDKSAvdeccMCU_Handler.hpp"
@@ -43,7 +43,7 @@ class ADPManager : public Handler
 {
   public:
     /// Construct the ADPManager object
-    ADPManager( RawSocketBase &net,
+    ADPManager( RawSocket &net,
                 jdksavdecc_eui64 const &entity_id,
                 jdksavdecc_eui64 const &entity_model_id,
                 uint32_t entity_capabilities,
@@ -67,7 +67,7 @@ class ADPManager : public Handler
     uint32_t getAvailableIndex() const { return m_available_index; }
 
   protected:
-    RawSocketBase &m_net;
+    RawSocket &m_net;
     jdksavdecc_eui64 m_entity_id;
     jdksavdecc_eui64 m_entity_model_id;
     uint32_t m_entity_capabilities;

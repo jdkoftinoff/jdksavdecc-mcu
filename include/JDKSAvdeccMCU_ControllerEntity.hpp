@@ -31,7 +31,7 @@
 #pragma once
 
 #include "JDKSAvdeccMCU_World.hpp"
-#include "JDKSAvdeccMCU_RawSocketBase.hpp"
+#include "JDKSAvdeccMCU_RawSocket.hpp"
 #include "JDKSAvdeccMCU_Handler.hpp"
 #include "JDKSAvdeccMCU_Helpers.hpp"
 #include "JDKSAvdeccMCU_Frame.hpp"
@@ -44,7 +44,7 @@ namespace JDKSAvdeccMCU
 class ControllerEntity : public Entity
 {
   public:
-    ControllerEntity( RawSocketBase &net, ADPManager &adp_manager ) : Entity( net, adp_manager ) {}
+    ControllerEntity( RawSocket &net, ADPManager &adp_manager ) : Entity( net, adp_manager ) {}
 
     /// Handle incoming commands and responses
     virtual bool receivedPDU( FrameBase &frame );

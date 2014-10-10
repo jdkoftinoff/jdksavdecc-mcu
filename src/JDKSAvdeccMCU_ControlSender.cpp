@@ -35,7 +35,7 @@
 namespace JDKSAvdeccMCU
 {
 
-ControlSender::ControlSender( RawSocketBase &net,
+ControlSender::ControlSender( RawSocket &net,
                               jdksavdecc_eui64 const &entity_id,
                               jdksavdecc_eui64 const &target_entity_id,
                               jdksavdecc_eui48 const &target_mac_address,

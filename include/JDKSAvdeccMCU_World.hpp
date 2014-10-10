@@ -44,6 +44,18 @@
 #define JDKSAVDECCMCU_ENABLE_PCAPFILE
 #endif
 
+#ifndef JDKSAVDECC_ENABLE_PCAP
+#if defined( __APPLE__ )
+#define JDKSAVDECC_ENABLE_PCAP
+#endif
+#endif
+
+#ifndef JDKSAVDECC_ENABLE_WIN32
+#if defined( _WIN32 )
+#define JDKSAVDECC_ENABLE_WIN32
+#endif
+#endif
+
 namespace JDKSAvdeccMCU
 {
 using namespace jdksavdecc;

@@ -31,11 +31,11 @@
 #pragma once
 
 #include "JDKSAvdeccMCU_World.hpp"
-#include "JDKSAvdeccMCU_RawSocketBase.hpp"
+#include "JDKSAvdeccMCU_RawSocket.hpp"
 
 namespace JDKSAvdeccMCU
 {
-class RawSocketWin32 : public RawSocketBase
+class RawSocketWin32 : public RawSocket
 {
   public:
     RawSocketWin32();

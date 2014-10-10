@@ -27,14 +27,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "JDKSAvdeccMCU_World.hpp"
-#include "JDKSAvdeccMCU_RawSocketBase.hpp"
+#include "JDKSAvdeccMCU_RawSocket.hpp"
 #include "JDKSAvdeccMCU_PcapFileReader.hpp"
 #include "JDKSAvdeccMCU_PcapFileWriter.hpp"
 
 namespace JDKSAvdeccMCU
 {
 
-class RawSocketPcapFile : public RawSocketBase
+class RawSocketPcapFile : public RawSocket
 {
     uint16_t m_ethertype;
     jdksavdecc_eui48 m_my_mac;

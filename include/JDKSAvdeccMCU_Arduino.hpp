@@ -43,7 +43,9 @@
 #else
 
 #include "JDKSAvdeccMCU_World.hpp"
-#include "JDKSAvdeccMCU_RawSocketBase.hpp"
+#include "JDKSAvdeccMCU_RawSocket.hpp"
+#include "JDKSAvdeccMCU_RawSocketWin32.hpp"
+#include "JDKSAvdeccMCU_RawSocketPcap.hpp"
 #include "JDKSAvdeccMCU_RawSocketPcapFile.hpp"
 #include "JDKSAvdeccMCU.hpp"
 

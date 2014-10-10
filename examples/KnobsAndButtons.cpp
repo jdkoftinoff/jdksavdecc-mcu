@@ -1,5 +1,5 @@
 
-#include "JDKSAvdeccMCU_Arduino.hpp"
+#include "JDKSAvdeccMCU_Arduino.h"
 
 #define REFRESH_TIME ( 1000 )
 
@@ -13,11 +13,11 @@ jdksavdecc_eui48 my_mac = {{0x70, 0xb3, 0xd5, 0xed, 0xcf, 0xf0}};
 /// Ethernet handler object
 
 #if defined( JDKSAVDECCMCU_BARE_METAL )
-RawSocketWizeNet rawnet( my_mac ); // For embedded systems
+RawSocketWizeNet rawnet( my_mac, JDKSAVDECC_AVTP_ETHERTYPE, &jdksavdecc_multicast_adp_acmp ); // For embedded systems
 #elif defined( JDKSAVDECCMCU_ENABLE_RAW )
-RawSocket rawnet( JDKSAVDECC_AVTP_ETHERTYPE, "en0", &jdksavdecc_multicast_adp_acmp ); // For non-embedded systems
+RawSocketPcap rawnet( "en0", JDKSAVDECC_AVTP_ETHERTYPE, &jdksavdecc_multicast_adp_acmp ); // For non-embedded systems
 #else
-RawSocketPcapFile rawnet( JDKSAVDECC_AVTP_ETHERTYPE, "input.pcap", "output.pcap" );
+RawSocketPcapFile rawnet( JDKSAVDECC_AVTP_ETHERTYPE, "input.pcap", "output.pcap", &jdksavdecc_multicast_adp_acmp );
 #endif
 
 /// This AVDECC Entity is based on the mac address (insert ff ff)
@@ -153,7 +153,7 @@ void setup()
 void jdksavdeccmcu_debug_log( const char *str, uint16_t v )
 {
     char txt[64];
-    char pdu[256];
+    Frame<256> pdu;
     uint16_t r;
     sprintf( txt, "%s %u", str, (unsigned)v );
     r = jdksavdecc_jdks_log_control_generate( &my_entity_id,
@@ -162,12 +162,13 @@ void jdksavdeccmcu_debug_log( const char *str, uint16_t v )
                                               JDKSAVDECC_JDKS_LOG_INFO,
                                               0,
                                               txt,
-                                              pdu,
-                                              sizeof( pdu ) );
+                                              pdu.getBuf(),
+                                              pdu.getMaxLength() );
     if ( r > 0 )
     {
-        memcpy( pdu + JDKSAVDECC_FRAME_HEADER_SA_OFFSET, my_mac.value, 6 );
-        rawnet.sendRaw( (uint8_t *)pdu, r );
+        pdu.setLength( r );
+        memcpy( pdu.getBuf() + JDKSAVDECC_FRAME_HEADER_SA_OFFSET, my_mac.value, 6 );
+        RawSocket::multiSendFrame( pdu );
     }
     else
     {

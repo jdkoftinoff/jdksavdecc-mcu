@@ -32,7 +32,7 @@
 
 #include "JDKSAvdeccMCU_World.hpp"
 
-#include "JDKSAvdeccMCU_RawSocketBase.hpp"
+#include "JDKSAvdeccMCU_RawSocket.hpp"
 
 #define JDKSAVDECCWINNETIO_DEBUG 0
 
@@ -43,9 +43,17 @@ namespace JDKSAvdeccMCU
 class RawSocketWizNet : public RawSocketBase
 {
   public:
-    RawSocketWizNet( jdksavdecc_eui48 const &mac_address, uint16_t ethertype )
+    RawSocketWizNet( jdksavdecc_eui48 const &mac_address, uint16_t ethertype, const jdksavdecc_eui48 *multicast_to_join = 0 )
         : m_mac_address( mac_address ), m_ethertype( ethertype )
     {
+        if ( multicast_to_join )
+        {
+            m_multicast = *multicast_to_join;
+        }
+        else
+        {
+            jdksavdecc_eui48_init( &m_multicast );
+        }
     }
 
     virtual ~RawSocketWizNet();
@@ -63,7 +71,7 @@ class RawSocketWizNet : public RawSocketBase
     /**
     * Attempt to join an additional multicast mac address group
     */
-    virtual bool joinMulticast( const jdksavdecc_eui48 &multicast_mac ) { (void)multicast_mac; }
+    virtual bool joinMulticast( const jdksavdecc_eui48 &multicast_mac ) { m_multicast = multicast_mac; }
 
     /**
     * Set the socket to non blocking mode
@@ -80,6 +88,7 @@ class RawSocketWizNet : public RawSocketBase
   private:
     jdksavdecc_eui48 m_mac_address;
     uint16_t m_ethertype;
+    const jdksavdecc_eui48 m_multicast;
 };
 
 #endif
