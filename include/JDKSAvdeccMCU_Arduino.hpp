@@ -34,17 +34,15 @@
 #define JDKSAVDECCMCU_BARE_METAL
 #endif
 #include "JDKSAvdeccMCU_World.hpp"
+#include "JDKSAvdeccMCU.hpp"
 
-#if (JDKSAVDECCMCU_BARE_METAL==1) && defined(__AVR__)
+#if defined(__AVR__)
 
 #include "Arduino.h"
-#include "JDKSAvdeccMCU.hpp"
 #include "Ethernet.h"
 #include "SPI.h"
 
 #else
-
-#include "JDKSAvdeccMCU.hpp"
 
 #ifdef __cplusplus
 extern "C" {

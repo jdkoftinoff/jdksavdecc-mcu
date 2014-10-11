@@ -32,8 +32,7 @@
 
 
 #ifndef JDKSAVDECCMCU_BARE_METAL
-#if defined( __AVR__ ) && !defined( __linux__ ) && !defined( __APPLE__ )       \
-    && !defined( _WIN32 )
+#if defined( __AVR__ )
 #define JDKSAVDECCMCU_BARE_METAL 1
 #ifndef JDKSAVDECCMCU_ENABLE_RAWSOCKETWIZNET
 #define JDKSAVDECCMCU_ENABLE_RAWSOCKETWIZNET 1
@@ -92,7 +91,6 @@
 #endif
 
 #include "jdksavdecc.h"
-#include "jdksavdecc_plus.hpp"
 
 namespace JDKSAvdeccMCU
 {
@@ -100,7 +98,7 @@ using namespace jdksavdecc;
 }
 
 #if defined( __AVR__ )
-#include "SPI.h"
+#include <SPI.h>
 
 inline jdksavdecc_timestamp_in_milliseconds getTimeInMilliseconds()
 {
