@@ -30,8 +30,6 @@
 */
 #pragma once
 
-#include "jdksavdecc.h"
-#include "jdksavdecc_plus.hpp"
 
 #ifndef JDKSAVDECCMCU_BARE_METAL
 #if defined( __AVR__ ) && !defined( __linux__ ) && !defined( __APPLE__ )       \
@@ -56,6 +54,12 @@
 #endif
 #ifndef JDKSAVDECCMCU_ENABLE_RAWSOCKETWIN32
 #define JDKSAVDECCMCU_ENABLE_RAWSOCKETWIN32 0
+#endif
+#ifndef JDKSAVDECCMCU_CPP_NO_IOSTREAM
+#define JDKSAVDECCMCU_CPP_NO_IOSTREAM
+#endif
+#ifndef JDKSAVDECC_CPP_NO_STDIO
+#define JDKSAVDECC_CPP_NO_STDIO
 #endif
 #endif
 #else
@@ -86,6 +90,9 @@
 #define JDKSAVDECCMCU_ENABLE_RAWSOCKETWIN32 1
 #endif
 #endif
+
+#include "jdksavdecc.h"
+#include "jdksavdecc_plus.hpp"
 
 namespace JDKSAvdeccMCU
 {

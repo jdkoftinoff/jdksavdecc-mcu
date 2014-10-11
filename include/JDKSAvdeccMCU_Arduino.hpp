@@ -30,23 +30,20 @@
   POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifdef JDKSAVDECCMCU_BARE_METAL
-
+#if defined(__AVR__) && !defined(JDKSAVDECC_MCU_BARE_METAL)
+#define JDKSAVDECCMCU_BARE_METAL
+#endif
 #include "JDKSAvdeccMCU_World.hpp"
+
+#if (JDKSAVDECCMCU_BARE_METAL==1) && defined(__AVR__)
 
 #include "Arduino.h"
 #include "JDKSAvdeccMCU.hpp"
-#include "JDKSAvdeccMCU_WizNetIO.hpp"
 #include "Ethernet.h"
 #include "SPI.h"
 
 #else
 
-#include "JDKSAvdeccMCU_World.hpp"
-#include "JDKSAvdeccMCU_RawSocket.hpp"
-#include "JDKSAvdeccMCU_RawSocketWin32.hpp"
-#include "JDKSAvdeccMCU_RawSocketMacOSX.hpp"
-#include "JDKSAvdeccMCU_RawSocketPcapFile.hpp"
 #include "JDKSAvdeccMCU.hpp"
 
 #ifdef __cplusplus
