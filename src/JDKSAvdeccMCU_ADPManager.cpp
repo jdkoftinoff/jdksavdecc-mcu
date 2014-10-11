@@ -57,7 +57,9 @@ void ADPManager::tick()
 {
     jdksavdecc_timestamp_in_milliseconds time_in_millis;
     time_in_millis = m_net.getTimeInMilliseconds();
-    if ( wasTimeOutHit( time_in_millis, m_last_send_time_in_millis, ( m_valid_time_in_seconds * ( 1000 / 4 ) ) ) )
+    if ( wasTimeOutHit( time_in_millis,
+                        m_last_send_time_in_millis,
+                        ( m_valid_time_in_seconds * ( 1000 / 4 ) ) ) )
     {
         sendADP();
         m_last_send_time_in_millis = time_in_millis;
@@ -69,15 +71,26 @@ void ADPManager::sendADP()
     jdksavdecc_eui48 adp_multicast_addr = JDKSAVDECC_MULTICAST_ADP_ACMP;
 
     Frame<82> adp(
-        0, adp_multicast_addr, m_net.getMACAddress(), JDKSAVDECC_AVTP_ETHERTYPE ); // DA, SA, EtherType, ADPDU = 82 bytes
+        0,
+        adp_multicast_addr,
+        m_net.getMACAddress(),
+        JDKSAVDECC_AVTP_ETHERTYPE ); // DA, SA, EtherType, ADPDU = 82 bytes
 
     // avtpdu common control header
-    adp.putOctet( 0x80 + JDKSAVDECC_SUBTYPE_ADP );                       // cd=1, subtype=0x7a (ADP)
-    adp.putOctet( 0x00 + JDKSAVDECC_ADP_MESSAGE_TYPE_ENTITY_AVAILABLE ); // sv=0, version=0, message_type = ENTITY_AVAILABLE
+    adp.putOctet( 0x80 + JDKSAVDECC_SUBTYPE_ADP ); // cd=1, subtype=0x7a (ADP)
+    adp.putOctet(
+        0x00
+        + JDKSAVDECC_ADP_MESSAGE_TYPE_ENTITY_AVAILABLE ); // sv=0, version=0,
+                                                          // message_type =
+                                                          // ENTITY_AVAILABLE
     adp.putOctet( ( m_valid_time_in_seconds / 2 )
-                  << 3 ); // valid_time is in 2 second steps. top 3 bits of control_data_length is 0
-    adp.putOctet( JDKSAVDECC_ADPDU_LEN
-                  - JDKSAVDECC_COMMON_CONTROL_HEADER_LEN ); // control_data_length field is 56 - See 1722.1 Clause 6.2.1.7
+                  << 3 ); // valid_time is in 2 second steps. top 3 bits of
+                          // control_data_length is 0
+    adp.putOctet(
+        JDKSAVDECC_ADPDU_LEN
+        - JDKSAVDECC_COMMON_CONTROL_HEADER_LEN ); // control_data_length field
+                                                  // is 56 - See 1722.1 Clause
+                                                  // 6.2.1.7
     adp.putEUI64( m_entity_id );
     adp.putEUI64( m_entity_model_id );
     adp.putQuadlet( m_entity_capabilities );

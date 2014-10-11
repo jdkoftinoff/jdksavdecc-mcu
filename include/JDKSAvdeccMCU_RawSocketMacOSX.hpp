@@ -33,38 +33,45 @@
 #include "JDKSAvdeccMCU_World.hpp"
 #include "JDKSAvdeccMCU_RawSocket.hpp"
 
+#if JDKSAVDECCMCU_ENABLE_RAWSOCKETMACOSX
+
 namespace JDKSAvdeccMCU
 {
-class RawSocketPcap : public RawSocket
+class RawSocketMacOSX : public RawSocket
 {
   public:
-    RawSocketPcap( const char *interface_name, uint16_t ethertype, const jdksavdecc_eui48 *multicast_to_join = 0 ) {}
+    RawSocketMacOSX( const char *interface_name,
+                     uint16_t ethertype,
+                     const jdksavdecc_eui48 *multicast_to_join = 0 )
+    {
+    }
 
-    virtual ~RawSocketPcap() {}
+    virtual ~RawSocketMacOSX() {}
 
     virtual jdksavdecc_timestamp_in_milliseconds getTimeInMilliseconds();
 
     virtual bool recvFrame( FrameBase *frame );
 
-    virtual bool sendFrame( FrameBase const &frame, uint8_t const *data1, uint16_t len1, uint8_t const *data2, uint16_t len2 );
+    virtual bool sendFrame( FrameBase const &frame,
+                            uint8_t const *data1,
+                            uint16_t len1,
+                            uint8_t const *data2,
+                            uint16_t len2 );
 
-    virtual bool sendReplyFrame( FrameBase &frame, uint8_t const *data1, uint16_t len1, uint8_t const *data2, uint16_t len2 );
+    virtual bool sendReplyFrame( FrameBase &frame,
+                                 uint8_t const *data1,
+                                 uint16_t len1,
+                                 uint8_t const *data2,
+                                 uint16_t len2 );
 
-    /**
-    * Attempt to join an additional multicast mac address group
-    */
     virtual bool joinMulticast( const jdksavdecc_eui48 &multicast_mac );
 
-    /**
-    * Set the socket to non blocking mode
-    */
     virtual void setNonblocking();
 
-    /**
-    * Get the file descriptor
-    */
     virtual filedescriptor_t getFd() const;
 
     virtual jdksavdecc_eui48 const &getMACAddress() const;
 };
 }
+
+#endif

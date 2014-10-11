@@ -58,21 +58,30 @@ class ControlSender : public Handler
     /// Handle incoming PDU
     virtual bool receivedPDU( FrameBase &frame );
 
-    /// Set a one byte value. If it actually changed, then force Tick to send ASAP
+    /// Set a one byte value. If it actually changed, then force Tick to send
+    /// ASAP
     void setValueOctet( uint8_t val );
 
-    /// Set a doublet value. If it actually changed, then force Tick to send ASAP
+    /// Set a doublet value. If it actually changed, then force Tick to send
+    /// ASAP
     void setValueDoublet( uint16_t val );
 
-    /// Set a quadlet value. If it actually changed, then force Tick to send ASAP
+    /// Set a quadlet value. If it actually changed, then force Tick to send
+    /// ASAP
     void setValueQuadlet( uint32_t val );
 
     /// Formulate the ADPDU and send it
     void sendSetControl();
 
     jdksavdecc_eui64 const &getEntityID() const { return m_entity_id; }
-    jdksavdecc_eui64 const &getTargetEntityID() const { return m_target_entity_id; }
-    jdksavdecc_eui48 const &getTargetMACAddress() const { return m_target_mac_address; }
+    jdksavdecc_eui64 const &getTargetEntityID() const
+    {
+        return m_target_entity_id;
+    }
+    jdksavdecc_eui48 const &getTargetMACAddress() const
+    {
+        return m_target_mac_address;
+    }
     uint16_t getSequenceID() const { return m_sequence_id; }
 
   protected:

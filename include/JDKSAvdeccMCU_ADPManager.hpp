@@ -60,9 +60,15 @@ class ADPManager : public Handler
     void sendADP();
 
     jdksavdecc_eui64 const &getEntityID() const { return m_entity_id; }
-    jdksavdecc_eui64 const &getEntityModelID() const { return m_entity_model_id; }
+    jdksavdecc_eui64 const &getEntityModelID() const
+    {
+        return m_entity_model_id;
+    }
     uint32_t getEntityCapabilities() const { return m_entity_capabilities; }
-    uint32_t getControllerCapabilities() const { return m_controller_capabilities; }
+    uint32_t getControllerCapabilities() const
+    {
+        return m_controller_capabilities;
+    }
     uint16_t getValidTimeInSeconds() const { return m_valid_time_in_seconds; }
     uint32_t getAvailableIndex() const { return m_available_index; }
 

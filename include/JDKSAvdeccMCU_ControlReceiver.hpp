@@ -45,7 +45,9 @@ class ControlReceiver : public Handler
 {
   public:
     /// Construct the ControlReceiver object
-    ControlReceiver( RawSocket &net, jdksavdecc_eui64 const &entity_id, uint16_t descriptor_index_offset = 0 )
+    ControlReceiver( RawSocket &net,
+                     jdksavdecc_eui64 const &entity_id,
+                     uint16_t descriptor_index_offset = 0 )
         : m_net( net )
         , m_entity_id( entity_id )
         , m_descriptor_index_offset( descriptor_index_offset )
@@ -54,18 +56,26 @@ class ControlReceiver : public Handler
     {
     }
 
-    /// Register the ControlValueHolder to relate to the next descriptor_index in line
-    void addDescriptor( ControlValueHolder *v ) { m_values[m_num_descriptors++] = v; }
+    /// Register the ControlValueHolder to relate to the next descriptor_index
+    /// in line
+    void addDescriptor( ControlValueHolder *v )
+    {
+        m_values[m_num_descriptors++] = v;
+    }
 
-    virtual bool receivedGetControlCommand( jdksavdecc_aecpdu_aem const &aem, FrameBase &pdu )
+    virtual bool receivedGetControlCommand( jdksavdecc_aecpdu_aem const &aem,
+                                            FrameBase &pdu )
     {
         bool r = false;
         // yes, get the descriptor index
-        uint16_t descriptor_index = jdksavdecc_aem_command_set_control_get_descriptor_index( pdu.getBuf(), pdu.getPosition() );
+        uint16_t descriptor_index
+            = jdksavdecc_aem_command_set_control_get_descriptor_index(
+                pdu.getBuf(), pdu.getPosition() );
         (void)aem;
         // is it a descriptor index that we care about?
         if ( ( descriptor_index >= m_descriptor_index_offset )
-             && ( descriptor_index < ( m_descriptor_index_offset + m_num_descriptors ) ) )
+             && ( descriptor_index
+                  < ( m_descriptor_index_offset + m_num_descriptors ) ) )
         {
             // yes, it is in range, extract the data value
 
@@ -80,27 +90,34 @@ class ControlReceiver : public Handler
         return r;
     }
 
-    virtual bool receivedSetControlCommand( jdksavdecc_aecpdu_aem const &aem, FrameBase &pdu )
+    virtual bool receivedSetControlCommand( jdksavdecc_aecpdu_aem const &aem,
+                                            FrameBase &pdu )
     {
         bool r = false;
         // yes, get the descriptor index
-        uint16_t descriptor_index = jdksavdecc_aem_command_set_control_get_descriptor_index( pdu.getBuf(), pdu.getPosition() );
+        uint16_t descriptor_index
+            = jdksavdecc_aem_command_set_control_get_descriptor_index(
+                pdu.getBuf(), pdu.getPosition() );
         (void)aem;
         // is it a descriptor index that we care about?
         if ( ( descriptor_index >= m_descriptor_index_offset )
-             && ( descriptor_index < ( m_descriptor_index_offset + m_num_descriptors ) ) )
+             && ( descriptor_index
+                  < ( m_descriptor_index_offset + m_num_descriptors ) ) )
         {
             // yes, it is in range, extract the data value
 
             m_values[descriptor_index - m_descriptor_index_offset]->setValue(
-                pdu.getBuf() + pdu.getPosition() + JDKSAVDECC_AEM_COMMAND_SET_CONTROL_COMMAND_OFFSET_VALUES );
+                pdu.getBuf() + pdu.getPosition()
+                + JDKSAVDECC_AEM_COMMAND_SET_CONTROL_COMMAND_OFFSET_VALUES );
 
             r = true;
         }
         return r;
     }
 
-    virtual bool receivedReadDescriptorCommand( jdksavdecc_aecpdu_aem const &aem, FrameBase &pdu )
+    virtual bool
+        receivedReadDescriptorCommand( jdksavdecc_aecpdu_aem const &aem,
+                                       FrameBase &pdu )
     {
         bool r = false;
         (void)aem;
@@ -109,7 +126,10 @@ class ControlReceiver : public Handler
     }
 
     /// Handle incoming PDU
-    virtual bool receivedPDU( jdksavdecc_timestamp_in_milliseconds time_in_millis, uint8_t *buf, uint16_t len )
+    virtual bool
+        receivedPDU( jdksavdecc_timestamp_in_milliseconds time_in_millis,
+                     uint8_t *buf,
+                     uint16_t len )
     {
         bool r = false;
         // we already know the message is AVTP ethertype and is either directly
@@ -129,17 +149,20 @@ class ControlReceiver : public Handler
                 {
                     // Yes, it is different.
                     m_last_sequence_id = aem.aecpdu_header.sequence_id;
-                    if ( aem.command_type == JDKSAVDECC_AEM_COMMAND_GET_CONTROL )
+                    if ( aem.command_type
+                         == JDKSAVDECC_AEM_COMMAND_GET_CONTROL )
                     {
                         // Handle GET_CONTROL commands
                         r = receivedGetControlCommand( aem, pdu );
                     }
-                    else if ( aem.command_type == JDKSAVDECC_AEM_COMMAND_SET_CONTROL )
+                    else if ( aem.command_type
+                              == JDKSAVDECC_AEM_COMMAND_SET_CONTROL )
                     {
                         // Handle SET_CONTROL commands
                         r = receivedSetControlCommand( aem, pdu );
                     }
-                    else if ( aem.command_type == JDKSAVDECC_AEM_COMMAND_READ_DESCRIPTOR )
+                    else if ( aem.command_type
+                              == JDKSAVDECC_AEM_COMMAND_READ_DESCRIPTOR )
                     {
                         // Handle READ_DESCRIPTOR commands
                         r = receivedReadDescriptorCommand( aem, pdu );
@@ -149,7 +172,8 @@ class ControlReceiver : public Handler
         }
         if ( r )
         {
-            // TODO: change message type to AEM_RESPONSE and send it back to sender
+            // TODO: change message type to AEM_RESPONSE and send it back to
+            // sender
         }
         return r;
     }

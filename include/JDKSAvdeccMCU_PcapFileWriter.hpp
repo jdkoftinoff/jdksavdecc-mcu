@@ -40,7 +40,10 @@ class PcapFileWriter
 
     void WritePacket( PcapFilePacket const &packet );
     void WritePacket( uint64_t time_in_micros, PcapFilePacket const &packet );
-    void WritePacket( uint8_t const da[6], uint8_t const sa[6], uint16_t ethertype, PcapFilePacket const &packet_payload );
+    void WritePacket( uint8_t const da[6],
+                      uint8_t const sa[6],
+                      uint16_t ethertype,
+                      PcapFilePacket const &packet_payload );
     void WritePacket( uint64_t time_in_micros,
                       uint8_t const da[6],
                       uint8_t const sa[6],

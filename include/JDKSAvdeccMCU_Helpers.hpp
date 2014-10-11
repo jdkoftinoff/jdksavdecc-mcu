@@ -45,30 +45,54 @@ inline bool wasTimeOutHit( jdksavdecc_timestamp_in_milliseconds cur_time,
 }
 
 /// Helper function to parse AECP AEM message
-bool parseAEM( jdksavdecc_aecpdu_aem *aem, uint8_t const *buf, uint16_t pos, uint16_t len );
+bool parseAEM( jdksavdecc_aecpdu_aem *aem,
+               uint8_t const *buf,
+               uint16_t pos,
+               uint16_t len );
 
-/// Test to see if AECPDU AEM message is a command for the specified target entity
-bool isAEMForTarget( jdksavdecc_aecpdu_aem const &aem, jdksavdecc_eui64 const &expected_target_entity_id );
+/// Test to see if AECPDU AEM message is a command for the specified target
+/// entity
+bool isAEMForTarget( jdksavdecc_aecpdu_aem const &aem,
+                     jdksavdecc_eui64 const &expected_target_entity_id );
 
-/// Test to see if AECPDU AEM message is a response for the specified controller entity
-bool isAEMForController( jdksavdecc_aecpdu_aem const &aem, jdksavdecc_eui64 const &expected_controller_entity_id );
+/// Test to see if AECPDU AEM message is a response for the specified controller
+/// entity
+bool
+    isAEMForController( jdksavdecc_aecpdu_aem const &aem,
+                        jdksavdecc_eui64 const &expected_controller_entity_id );
 
-/// Twiddle the header bytes to convert this message from AEM_COMMAND to AEM_RESPONSE in place
-/// with the new status code, and the new control_data_length to match the new_length
-void setAEMReply( uint8_t status_code, uint16_t new_length, uint8_t *buf, uint16_t pos, uint16_t len );
+/// Twiddle the header bytes to convert this message from AEM_COMMAND to
+/// AEM_RESPONSE in place
+/// with the new status code, and the new control_data_length to match the
+/// new_length
+void setAEMReply( uint8_t status_code,
+                  uint16_t new_length,
+                  uint8_t *buf,
+                  uint16_t pos,
+                  uint16_t len );
 
 /// Helper function to parse AECP AA message
-bool parseAA( jdksavdecc_aecp_aa *aa, uint8_t const *buf, uint16_t pos, uint16_t len );
+bool parseAA( jdksavdecc_aecp_aa *aa,
+              uint8_t const *buf,
+              uint16_t pos,
+              uint16_t len );
 
-/// Test to see if AECPDU AA message is a command for the specified target entity
-bool isAAForTarget( jdksavdecc_aecp_aa const &aa, jdksavdecc_eui64 const &expected_target_entity_id );
+/// Test to see if AECPDU AA message is a command for the specified target
+/// entity
+bool isAAForTarget( jdksavdecc_aecp_aa const &aa,
+                    jdksavdecc_eui64 const &expected_target_entity_id );
 
-/// Test to see if AECPDU AA message is a response for the specified controller entity
-bool isAAForController( jdksavdecc_aecp_aa const &aa, jdksavdecc_eui64 const &expected_controller_entity_id );
+/// Test to see if AECPDU AA message is a response for the specified controller
+/// entity
+bool isAAForController( jdksavdecc_aecp_aa const &aa,
+                        jdksavdecc_eui64 const &expected_controller_entity_id );
 
-/// Twiddle the header bytes to convert this message from ADDRESS_ACCESS_COMMAND to ADDRESS_ACCESS_RESPONSE in place
-/// with the new status code, and the new control_data_length to match the new_length
-void setAAReply( uint16_t new_length, uint8_t *buf, uint16_t pos, uint16_t len );
+/// Twiddle the header bytes to convert this message from ADDRESS_ACCESS_COMMAND
+/// to ADDRESS_ACCESS_RESPONSE in place
+/// with the new status code, and the new control_data_length to match the
+/// new_length
+void
+    setAAReply( uint16_t new_length, uint8_t *buf, uint16_t pos, uint16_t len );
 
 /// Formulate an AEM SET_CONTROL style message with payload
 void formAEMSetControl( jdksavdecc_eui48 const &dest_mac,
@@ -85,16 +109,20 @@ inline bool parseAEM( jdksavdecc_aecpdu_aem *aem, FrameBase const &rx )
 {
     bool r = false;
     // Validate subtype is AECP
-    if ( jdksavdecc_uint8_get( rx.getBuf(), rx.getPosition() ) == ( 0x80 + JDKSAVDECC_SUBTYPE_AECP ) )
+    if ( jdksavdecc_uint8_get( rx.getBuf(), rx.getPosition() )
+         == ( 0x80 + JDKSAVDECC_SUBTYPE_AECP ) )
     {
         // Yes, read the aem header
         memset( aem, 0, sizeof( *aem ) );
-        if ( jdksavdecc_aecpdu_aem_read( aem, rx.getBuf(), rx.getPosition(), rx.getMaxLength() ) > 0 )
+        if ( jdksavdecc_aecpdu_aem_read(
+                 aem, rx.getBuf(), rx.getPosition(), rx.getMaxLength() ) > 0 )
         {
             // make sure it is version 0 and an AEM_COMMAND or AEM_RESPONSE
             if ( aem->aecpdu_header.header.version == 0
-                 && ( aem->aecpdu_header.header.message_type == JDKSAVDECC_AECP_MESSAGE_TYPE_AEM_COMMAND
-                      || aem->aecpdu_header.header.message_type == JDKSAVDECC_AECP_MESSAGE_TYPE_AEM_RESPONSE ) )
+                 && ( aem->aecpdu_header.header.message_type
+                      == JDKSAVDECC_AECP_MESSAGE_TYPE_AEM_COMMAND
+                      || aem->aecpdu_header.header.message_type
+                         == JDKSAVDECC_AECP_MESSAGE_TYPE_AEM_RESPONSE ) )
             {
                 r = true;
             }
@@ -103,15 +131,19 @@ inline bool parseAEM( jdksavdecc_aecpdu_aem *aem, FrameBase const &rx )
     return r;
 }
 
-inline bool isAEMForTarget( jdksavdecc_aecpdu_aem const &aem, jdksavdecc_eui64 const &expected_target_entity_id )
+inline bool isAEMForTarget( jdksavdecc_aecpdu_aem const &aem,
+                            jdksavdecc_eui64 const &expected_target_entity_id )
 {
     bool r = false;
     // Is it an AEM_COMMAND?
-    if ( aem.aecpdu_header.header.message_type == JDKSAVDECC_AECP_MESSAGE_TYPE_AEM_COMMAND )
+    if ( aem.aecpdu_header.header.message_type
+         == JDKSAVDECC_AECP_MESSAGE_TYPE_AEM_COMMAND )
     {
         // Yes
         // Is it for me?
-        if ( jdksavdecc_eui64_compare( &expected_target_entity_id, &aem.aecpdu_header.header.target_entity_id ) == 0 )
+        if ( jdksavdecc_eui64_compare(
+                 &expected_target_entity_id,
+                 &aem.aecpdu_header.header.target_entity_id ) == 0 )
         {
             r = true;
         }
@@ -119,15 +151,20 @@ inline bool isAEMForTarget( jdksavdecc_aecpdu_aem const &aem, jdksavdecc_eui64 c
     return r;
 }
 
-inline bool isAEMForController( jdksavdecc_aecpdu_aem const &aem, jdksavdecc_eui64 const &expected_controller_entity_id )
+inline bool
+    isAEMForController( jdksavdecc_aecpdu_aem const &aem,
+                        jdksavdecc_eui64 const &expected_controller_entity_id )
 {
     bool r = false;
     // Is it an AEM_RESPONSE?
-    if ( aem.aecpdu_header.header.message_type == JDKSAVDECC_AECP_MESSAGE_TYPE_AEM_RESPONSE )
+    if ( aem.aecpdu_header.header.message_type
+         == JDKSAVDECC_AECP_MESSAGE_TYPE_AEM_RESPONSE )
     {
         // Yes
         // Is it for me?
-        if ( jdksavdecc_eui64_compare( &expected_controller_entity_id, &aem.aecpdu_header.controller_entity_id ) == 0 )
+        if ( jdksavdecc_eui64_compare( &expected_controller_entity_id,
+                                       &aem.aecpdu_header.controller_entity_id )
+             == 0 )
         {
             r = true;
         }
@@ -135,15 +172,20 @@ inline bool isAEMForController( jdksavdecc_aecpdu_aem const &aem, jdksavdecc_eui
     return r;
 }
 
-inline void setAEMReply( uint8_t status_code, uint16_t new_length, FrameBase &pdu )
+inline void
+    setAEMReply( uint8_t status_code, uint16_t new_length, FrameBase &pdu )
 {
     // offset 1: sv=0, version=0, control_data = AEM_RESPONSE
-    pdu.getBuf()[pdu.getPosition() + 1] = JDKSAVDECC_AECP_MESSAGE_TYPE_AEM_RESPONSE;
-    // new control data length is new_length minus frame beginning position pos and the common control header.
+    pdu.getBuf()[pdu.getPosition() + 1]
+        = JDKSAVDECC_AECP_MESSAGE_TYPE_AEM_RESPONSE;
+    // new control data length is new_length minus frame beginning position pos
+    // and the common control header.
     // See IEEE 1722-2011 Clause 5.3.3
-    uint16_t control_data_length = new_length - pdu.getPosition() - JDKSAVDECC_COMMON_CONTROL_HEADER_LEN;
+    uint16_t control_data_length = new_length - pdu.getPosition()
+                                   - JDKSAVDECC_COMMON_CONTROL_HEADER_LEN;
     // offset 2: status = status code, top 3 bits of new control_data_length
-    pdu.getBuf()[pdu.getPosition() + 2] = ( status_code << 3 ) + ( ( control_data_length >> 8 ) & 0x7 );
+    pdu.getBuf()[pdu.getPosition() + 2]
+        = ( status_code << 3 ) + ( ( control_data_length >> 8 ) & 0x7 );
     // offset 3: bottom 8 bits of new control_data_length
     // TODO: new control_data_length
 }
@@ -152,16 +194,20 @@ inline bool parseAA( jdksavdecc_aecp_aa *aa, FrameBase const &pdu )
 {
     bool r = false;
     // Validate subtype is AA
-    if ( jdksavdecc_uint8_get( pdu.getBuf(), pdu.getPosition() ) == ( 0x80 + JDKSAVDECC_SUBTYPE_AECP ) )
+    if ( jdksavdecc_uint8_get( pdu.getBuf(), pdu.getPosition() )
+         == ( 0x80 + JDKSAVDECC_SUBTYPE_AECP ) )
     {
         // Yes, read the aa header
 
-        if ( jdksavdecc_aecp_aa_read( aa, pdu.getBuf(), pdu.getPosition(), pdu.getMaxLength() ) > 0 )
+        if ( jdksavdecc_aecp_aa_read(
+                 aa, pdu.getBuf(), pdu.getPosition(), pdu.getMaxLength() ) > 0 )
         {
             // make sure it is version 0 and an AA_COMMAND or AA_RESPONSE
             if ( aa->aecpdu_header.header.version == 0
-                 && ( aa->aecpdu_header.header.message_type == JDKSAVDECC_AECP_MESSAGE_TYPE_ADDRESS_ACCESS_COMMAND
-                      || aa->aecpdu_header.header.message_type == JDKSAVDECC_AECP_MESSAGE_TYPE_ADDRESS_ACCESS_RESPONSE ) )
+                 && ( aa->aecpdu_header.header.message_type
+                      == JDKSAVDECC_AECP_MESSAGE_TYPE_ADDRESS_ACCESS_COMMAND
+                      || aa->aecpdu_header.header.message_type
+                         == JDKSAVDECC_AECP_MESSAGE_TYPE_ADDRESS_ACCESS_RESPONSE ) )
             {
                 r = true;
             }
@@ -170,16 +216,20 @@ inline bool parseAA( jdksavdecc_aecp_aa *aa, FrameBase const &pdu )
     return r;
 }
 
-inline bool isAAForTarget( jdksavdecc_aecp_aa const &aa, jdksavdecc_eui64 const &expected_target_entity_id )
+inline bool isAAForTarget( jdksavdecc_aecp_aa const &aa,
+                           jdksavdecc_eui64 const &expected_target_entity_id )
 {
     bool r = false;
 
     // Is it an AA_COMMAND?
-    if ( aa.aecpdu_header.header.message_type == JDKSAVDECC_AECP_MESSAGE_TYPE_ADDRESS_ACCESS_COMMAND )
+    if ( aa.aecpdu_header.header.message_type
+         == JDKSAVDECC_AECP_MESSAGE_TYPE_ADDRESS_ACCESS_COMMAND )
     {
         // Yes
         // Is it for me?
-        if ( jdksavdecc_eui64_compare( &expected_target_entity_id, &aa.aecpdu_header.header.target_entity_id ) == 0 )
+        if ( jdksavdecc_eui64_compare(
+                 &expected_target_entity_id,
+                 &aa.aecpdu_header.header.target_entity_id ) == 0 )
         {
             r = true;
         }
@@ -187,16 +237,20 @@ inline bool isAAForTarget( jdksavdecc_aecp_aa const &aa, jdksavdecc_eui64 const 
     return r;
 }
 
-inline bool isAAForController( jdksavdecc_aecp_aa const &aa, jdksavdecc_eui64 const &expected_controller_entity_id )
+inline bool
+    isAAForController( jdksavdecc_aecp_aa const &aa,
+                       jdksavdecc_eui64 const &expected_controller_entity_id )
 {
     bool r = false;
 
     // Is it an AA_RESPONSE?
-    if ( aa.aecpdu_header.header.message_type == JDKSAVDECC_AECP_MESSAGE_TYPE_ADDRESS_ACCESS_RESPONSE )
+    if ( aa.aecpdu_header.header.message_type
+         == JDKSAVDECC_AECP_MESSAGE_TYPE_ADDRESS_ACCESS_RESPONSE )
     {
         // Yes
         // Is it for me?
-        if ( jdksavdecc_eui64_compare( &expected_controller_entity_id, &aa.controller_entity_id ) == 0 )
+        if ( jdksavdecc_eui64_compare( &expected_controller_entity_id,
+                                       &aa.controller_entity_id ) == 0 )
         {
             r = true;
         }
@@ -204,17 +258,24 @@ inline bool isAAForController( jdksavdecc_aecp_aa const &aa, jdksavdecc_eui64 co
     return r;
 }
 
-inline void setAAReply( uint8_t status_code, uint16_t new_length, uint8_t *buf, uint16_t pos, uint16_t len )
+inline void setAAReply( uint8_t status_code,
+                        uint16_t new_length,
+                        uint8_t *buf,
+                        uint16_t pos,
+                        uint16_t len )
 {
     if ( len > pos + 2 )
     {
         // offset 1: sv=0, version=0, control_data = ADDRESS_ACCESS_RESPONSE
         buf[pos + 1] = JDKSAVDECC_AECP_MESSAGE_TYPE_ADDRESS_ACCESS_RESPONSE;
-        // new control data length is new_length minus frame beginning position pos and the common control header.
+        // new control data length is new_length minus frame beginning position
+        // pos and the common control header.
         // See IEEE 1722-2011 Clause 5.3.3
-        uint16_t control_data_length = new_length - pos - JDKSAVDECC_COMMON_CONTROL_HEADER_LEN;
+        uint16_t control_data_length = new_length - pos
+                                       - JDKSAVDECC_COMMON_CONTROL_HEADER_LEN;
         // offset 2: status = status code, top 3 bits of new control_data_length
-        buf[pos + 2] = ( status_code << 3 ) + ( ( control_data_length >> 8 ) & 0x7 );
+        buf[pos + 2] = ( status_code << 3 )
+                       + ( ( control_data_length >> 8 ) & 0x7 );
         // offset 3: bottom 8 bits of new control_data_length
         buf[pos + 3] = ( control_data_length & 0xff );
     }

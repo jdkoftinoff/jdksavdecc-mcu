@@ -32,6 +32,11 @@
 #include "JDKSAvdeccMCU_World.hpp"
 #include "JDKSAvdeccMCU_RawSocketWin32.hpp"
 
+#if JDKSAVDECCMCU_ENABLE_RAWSOCKETWIN32
 namespace JDKSAvdeccMCU
 {
 }
+
+#else
+const char *jdksavdeccmcu_rawsocketwin32_file = __FILE__;
+#endif

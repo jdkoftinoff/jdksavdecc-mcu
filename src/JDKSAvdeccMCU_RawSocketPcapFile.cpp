@@ -32,6 +32,11 @@
 #include "JDKSAvdeccMCU_World.hpp"
 #include "JDKSAvdeccMCU_RawSocketPcapFile.hpp"
 
+#if JDKSAVDECCMCU_ENABLE_RAWSOCKETPCAPFILE
 namespace JDKSAvdeccMCU
 {
 }
+
+#else
+const char *jdksavdeccmcu_rawsocketpcapfile_file = __FILE__;
+#endif

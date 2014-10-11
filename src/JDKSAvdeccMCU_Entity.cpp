@@ -69,7 +69,9 @@ void Entity::tick()
     // If we are locked, then time out the lock
     if ( jdksavdecc_eui64_is_set( m_locked_by_controller_entity_id ) )
     {
-        if ( wasTimeOutHit( time_in_millis, m_locked_time, JDKSAVDECC_AEM_LOCK_TIMEOUT_MS ) )
+        if ( wasTimeOutHit( time_in_millis,
+                            m_locked_time,
+                            JDKSAVDECC_AEM_LOCK_TIMEOUT_MS ) )
         {
             jdksavdecc_eui64_init( &m_locked_by_controller_entity_id );
         }
@@ -77,15 +79,21 @@ void Entity::tick()
 
     // Check to see if we had a command in flight that timed out
     if ( cmd != JDKSAVDECC_AEM_COMMAND_EXPANSION
-         && wasTimeOutHit( time_in_millis, m_last_sent_command_time, JDKSAVDECC_AEM_TIMEOUT_IN_MS ) )
+         && wasTimeOutHit( time_in_millis,
+                           m_last_sent_command_time,
+                           JDKSAVDECC_AEM_TIMEOUT_IN_MS ) )
     {
-        m_last_sent_command_type = JDKSAVDECC_AEM_COMMAND_EXPANSION; // clear knowledge of sent command
+        m_last_sent_command_type
+            = JDKSAVDECC_AEM_COMMAND_EXPANSION; // clear knowledge of sent
+                                                // command
 
         // Was the command a CONTROLLER_AVAILABLE? if so, handle it here
         if ( cmd == JDKSAVDECC_AEM_COMMAND_CONTROLLER_AVAILABLE )
         {
-            // Yes, this means that the old controller goes away and the new one is approved
-            m_acquired_by_controller_entity_id = m_acquire_in_progress_by_controller_entity_id;
+            // Yes, this means that the old controller goes away and the new one
+            // is approved
+            m_acquired_by_controller_entity_id
+                = m_acquire_in_progress_by_controller_entity_id;
             // Also clear any lock that may have been there
             jdksavdecc_eui64_init( &m_locked_by_controller_entity_id );
             // TODO: Formulate and send reply to the new controller
@@ -93,18 +101,24 @@ void Entity::tick()
         else
         {
             // Notify entity info about the timed out command
-            commandTimedOut( m_last_sent_command_target_entity_id, cmd, m_outgoing_sequence_id );
+            commandTimedOut( m_last_sent_command_target_entity_id,
+                             cmd,
+                             m_outgoing_sequence_id );
         }
     }
 }
 
-void Entity::commandTimedOut( jdksavdecc_eui64 const &target_entity_id, uint16_t command_type, uint16_t sequence_id )
+void Entity::commandTimedOut( jdksavdecc_eui64 const &target_entity_id,
+                              uint16_t command_type,
+                              uint16_t sequence_id )
 {
     (void)target_entity_id;
     (void)command_type;
     (void)sequence_id;
     //    avr_debug_log("TimeOut:", sequence_id );
-    memset( &m_last_sent_command_target_entity_id, 0, sizeof( m_last_sent_command_target_entity_id ) );
+    memset( &m_last_sent_command_target_entity_id,
+            0,
+            sizeof( m_last_sent_command_target_entity_id ) );
 }
 
 bool Entity::receivedPDU( FrameBase &frame )
@@ -143,7 +157,8 @@ bool Entity::receivedPDU( FrameBase &frame )
     return r;
 }
 
-uint8_t Entity::receivedAEMCommand( jdksavdecc_aecpdu_aem const &aem, FrameBase &pdu )
+uint8_t Entity::receivedAEMCommand( jdksavdecc_aecpdu_aem const &aem,
+                                    FrameBase &pdu )
 {
     // The low 15 bits of command_type is the command. High bit is the 'u' bit.
     uint16_t actual_command_type = aem.command_type & 0x7fff;
@@ -204,19 +219,26 @@ uint8_t Entity::receivedAEMCommand( jdksavdecc_aecpdu_aem const &aem, FrameBase 
         response_status = receiveGetControlCommand( aem, pdu );
         break;
     case JDKSAVDECC_AEM_COMMAND_REGISTER_UNSOLICITED_NOTIFICATION:
-        response_status = receiveRegisterUnsolicitedNotificationCommand( aem, pdu );
+        response_status
+            = receiveRegisterUnsolicitedNotificationCommand( aem, pdu );
         break;
     case JDKSAVDECC_AEM_COMMAND_DEREGISTER_UNSOLICITED_NOTIFICATION:
-        response_status = receiveDeRegisterUnsolicitedNotificationCommand( aem, pdu );
+        response_status
+            = receiveDeRegisterUnsolicitedNotificationCommand( aem, pdu );
         break;
     }
 
     // fill in the new response status
-    pdu.getBuf()[JDKSAVDECC_FRAME_HEADER_LEN + 2] = ( pdu.getBuf()[JDKSAVDECC_FRAME_HEADER_LEN + 2] & 0x7 )
-                                                    + ( response_status << 3 );
+    pdu.getBuf()[JDKSAVDECC_FRAME_HEADER_LEN + 2]
+        = ( pdu.getBuf()[JDKSAVDECC_FRAME_HEADER_LEN + 2] & 0x7 )
+          + ( response_status << 3 );
 
-    // Send the response to either just the requesting controller or it and all registered controllers
-    sendResponses( false, command_is_set_something && response_status == JDKSAVDECC_AECP_STATUS_SUCCESS, pdu );
+    // Send the response to either just the requesting controller or it and all
+    // registered controllers
+    sendResponses( false,
+                   command_is_set_something
+                   && response_status == JDKSAVDECC_AECP_STATUS_SUCCESS,
+                   pdu );
 
     return response_status;
 }
@@ -229,10 +251,13 @@ uint8_t Entity::validatePermissions( jdksavdecc_aecpdu_aem const &aem )
     bool has_owner;
     has_owner = jdksavdecc_eui64_is_set( m_acquired_by_controller_entity_id );
 
-    // if we have an owner and it isn't the controller that sent us the request then fail
+    // if we have an owner and it isn't the controller that sent us the request
+    // then fail
     if ( has_owner )
     {
-        if ( jdksavdecc_eui64_compare( &m_acquired_by_controller_entity_id, &aem.aecpdu_header.controller_entity_id ) != 0 )
+        if ( jdksavdecc_eui64_compare( &m_acquired_by_controller_entity_id,
+                                       &aem.aecpdu_header.controller_entity_id )
+             != 0 )
         {
             // not our controller.
             response_status = JDKSAVDECC_AEM_STATUS_ENTITY_ACQUIRED;
@@ -248,8 +273,11 @@ uint8_t Entity::validatePermissions( jdksavdecc_aecpdu_aem const &aem )
         // We don't have an owner, so check to see if we are locked
         if ( jdksavdecc_eui64_is_set( m_locked_by_controller_entity_id ) )
         {
-            // Yes, we are locked. Are we locked by the controller that sent us the message?
-            if ( jdksavdecc_eui64_compare( &m_locked_by_controller_entity_id, &aem.aecpdu_header.controller_entity_id ) != 0 )
+            // Yes, we are locked. Are we locked by the controller that sent us
+            // the message?
+            if ( jdksavdecc_eui64_compare(
+                     &m_locked_by_controller_entity_id,
+                     &aem.aecpdu_header.controller_entity_id ) != 0 )
             {
                 // not our controller
                 response_status = JDKSAVDECC_AEM_STATUS_ENTITY_LOCKED;
@@ -264,34 +292,51 @@ uint8_t Entity::validatePermissions( jdksavdecc_aecpdu_aem const &aem )
     return response_status;
 }
 
-uint8_t Entity::receivedAACommand( jdksavdecc_aecp_aa const &aa, FrameBase &pdu )
+uint8_t Entity::receivedAACommand( jdksavdecc_aecp_aa const &aa,
+                                   FrameBase &pdu )
 {
     // Yes go through the TLV's and dispatch the read/writes and respond
-    uint8_t *p = pdu.getBuf() + JDKSAVDECC_FRAME_HEADER_LEN + JDKSAVDECC_AECPDU_AA_LEN;
+    uint8_t *p = pdu.getBuf() + JDKSAVDECC_FRAME_HEADER_LEN
+                 + JDKSAVDECC_AECPDU_AA_LEN;
     uint8_t aa_status = JDKSAVDECC_AECP_AA_STATUS_NOT_IMPLEMENTED;
     for ( uint16_t i = 0; i < aa.tlv_count; ++i )
     {
         // See 9.2.1.3.3
-        uint8_t tlv_mode = ( p[JDKSAVDECC_AECPDU_AA_TLV_OFFSET_MODE_LENGTH] >> 4 ) & 0xf;
-        uint16_t tlv_length = ( ( ( uint16_t )( p[JDKSAVDECC_AECPDU_AA_TLV_OFFSET_MODE_LENGTH] & 0xf ) ) << 4 )
-                              + p[JDKSAVDECC_AECPDU_AA_TLV_OFFSET_MODE_LENGTH + 1];
+        uint8_t tlv_mode
+            = ( p[JDKSAVDECC_AECPDU_AA_TLV_OFFSET_MODE_LENGTH] >> 4 ) & 0xf;
+        uint16_t tlv_length
+            = ( ( ( uint16_t )( p[JDKSAVDECC_AECPDU_AA_TLV_OFFSET_MODE_LENGTH]
+                                & 0xf ) )
+                << 4 ) + p[JDKSAVDECC_AECPDU_AA_TLV_OFFSET_MODE_LENGTH + 1];
         // require top 32 bits of address to be zero
-        if ( p[JDKSAVDECC_AECPDU_AA_TLV_OFFSET_ADDRESS_UPPER] == 0 && p[JDKSAVDECC_AECPDU_AA_TLV_OFFSET_ADDRESS_UPPER + 1] == 0
+        if ( p[JDKSAVDECC_AECPDU_AA_TLV_OFFSET_ADDRESS_UPPER] == 0
+             && p[JDKSAVDECC_AECPDU_AA_TLV_OFFSET_ADDRESS_UPPER + 1] == 0
              && p[JDKSAVDECC_AECPDU_AA_TLV_OFFSET_ADDRESS_UPPER + 2] == 0
              && p[JDKSAVDECC_AECPDU_AA_TLV_OFFSET_ADDRESS_UPPER + 3] == 0 )
         {
-            uint32_t tlv_address = jdksavdecc_uint32_get( p, JDKSAVDECC_AECPDU_AA_TLV_OFFSET_ADDRESS_LOWER );
+            uint32_t tlv_address = jdksavdecc_uint32_get(
+                p, JDKSAVDECC_AECPDU_AA_TLV_OFFSET_ADDRESS_LOWER );
 
             switch ( tlv_mode )
             {
             case JDKSAVDECC_AECP_AA_MODE_READ:
-                aa_status = receiveAARead( aa, tlv_address, tlv_length, p + JDKSAVDECC_AECPDU_AA_TLV_LEN );
+                aa_status = receiveAARead( aa,
+                                           tlv_address,
+                                           tlv_length,
+                                           p + JDKSAVDECC_AECPDU_AA_TLV_LEN );
                 break;
             case JDKSAVDECC_AECP_AA_MODE_WRITE:
-                aa_status = receiveAAWrite( aa, tlv_address, tlv_length, p + JDKSAVDECC_AECPDU_AA_TLV_LEN );
+                aa_status = receiveAAWrite( aa,
+                                            tlv_address,
+                                            tlv_length,
+                                            p + JDKSAVDECC_AECPDU_AA_TLV_LEN );
                 break;
             case JDKSAVDECC_AECP_AA_MODE_EXECUTE:
-                aa_status = receiveAAExecute( aa, tlv_address, tlv_length, p + JDKSAVDECC_AECPDU_AA_TLV_LEN );
+                aa_status
+                    = receiveAAExecute( aa,
+                                        tlv_address,
+                                        tlv_length,
+                                        p + JDKSAVDECC_AECPDU_AA_TLV_LEN );
                 break;
             }
         }
@@ -301,9 +346,11 @@ uint8_t Entity::receivedAACommand( jdksavdecc_aecp_aa const &aa, FrameBase &pdu 
             break;
         }
     }
-    // Send the response to either just the requesting controller or it and all registered controllers
-    pdu.getBuf()[JDKSAVDECC_FRAME_HEADER_LEN + 2] = ( pdu.getBuf()[JDKSAVDECC_FRAME_HEADER_LEN + 2] & 0x7 )
-                                                    + ( aa_status << 3 );
+    // Send the response to either just the requesting controller or it and all
+    // registered controllers
+    pdu.getBuf()[JDKSAVDECC_FRAME_HEADER_LEN + 2]
+        = ( pdu.getBuf()[JDKSAVDECC_FRAME_HEADER_LEN + 2] & 0x7 )
+          + ( aa_status << 3 );
 
     // Only send responses to the requesting controller
     sendResponses( false, false, pdu );
@@ -319,18 +366,26 @@ void Entity::sendResponses( bool internally_generated,
                             uint8_t const *additional_data2,
                             uint16_t additional_data_length2 )
 {
-    // buf already contains the requestor's mac address and controller. Capture the controller entity id
+    // buf already contains the requestor's mac address and controller. Capture
+    // the controller entity id
     jdksavdecc_eui64 original_controller_id;
     jdksavdecc_eui64_init( &original_controller_id );
 
     if ( !internally_generated )
     {
-        // The message is not internally generated, it is a response to a real request
+        // The message is not internally generated, it is a response to a real
+        // request
         // extract the actually requested controller entity id from the frame.
-        jdksavdecc_eui64_get( pdu.getBuf(),
-                              JDKSAVDECC_FRAME_HEADER_LEN + JDKSAVDECC_AECPDU_COMMON_OFFSET_CONTROLLER_ENTITY_ID );
+        jdksavdecc_eui64_get(
+            pdu.getBuf(),
+            JDKSAVDECC_FRAME_HEADER_LEN
+            + JDKSAVDECC_AECPDU_COMMON_OFFSET_CONTROLLER_ENTITY_ID );
         // Send the buf to the original
-        m_net.sendReplyFrame( pdu, additional_data1, additional_data_length1, additional_data2, additional_data_length2 );
+        m_net.sendReplyFrame( pdu,
+                              additional_data1,
+                              additional_data_length1,
+                              additional_data2,
+                              additional_data_length2 );
     }
     else
     {
@@ -341,29 +396,44 @@ void Entity::sendResponses( bool internally_generated,
     {
         // Mark the message as an unsolicited response
         jdksavdecc_aecpdu_aem_set_command_type(
-            jdksavdecc_aecpdu_aem_get_command_type( pdu.getBuf(), JDKSAVDECC_FRAME_HEADER_LEN ) | 0x8000,
+            jdksavdecc_aecpdu_aem_get_command_type(
+                pdu.getBuf(), JDKSAVDECC_FRAME_HEADER_LEN ) | 0x8000,
             pdu.getBuf(),
             JDKSAVDECC_FRAME_HEADER_LEN );
 
         // Now go through all subscribed entities
-        for ( uint8_t i = 0; i < JDKSAVDECC_ENTITY_MAX_REGISTERED_CONTROLLERS; ++i )
+        for ( uint8_t i = 0; i < JDKSAVDECC_ENTITY_MAX_REGISTERED_CONTROLLERS;
+              ++i )
         {
-            // We only care about controllers with entity_id != FF:FF:FF:FF:FF:FF:FF:FF
+            // We only care about controllers with entity_id !=
+            // FF:FF:FF:FF:FF:FF:FF:FF
 
-            if ( jdksavdecc_eui64_is_set( m_registered_controllers_entity_id[i] ) )
+            if ( jdksavdecc_eui64_is_set(
+                     m_registered_controllers_entity_id[i] ) )
             {
-                // and don't send the original requesting controller a double response
-                if ( jdksavdecc_eui64_compare( &original_controller_id, &m_registered_controllers_entity_id[i] ) != 0 )
+                // and don't send the original requesting controller a double
+                // response
+                if ( jdksavdecc_eui64_compare(
+                         &original_controller_id,
+                         &m_registered_controllers_entity_id[i] ) != 0 )
                 {
                     // Set the controller_entity_id in the frame
-                    jdksavdecc_eui64_set( m_registered_controllers_entity_id[i],
-                                          pdu.getBuf(),
-                                          JDKSAVDECC_FRAME_HEADER_LEN + JDKSAVDECC_AECPDU_COMMON_OFFSET_CONTROLLER_ENTITY_ID );
+                    jdksavdecc_eui64_set(
+                        m_registered_controllers_entity_id[i],
+                        pdu.getBuf(),
+                        JDKSAVDECC_FRAME_HEADER_LEN
+                        + JDKSAVDECC_AECPDU_COMMON_OFFSET_CONTROLLER_ENTITY_ID );
                     // Set the destination mac address
-                    jdksavdecc_eui48_set( m_registered_controllers_mac_address[i], pdu.getBuf(), 0 );
+                    jdksavdecc_eui48_set(
+                        m_registered_controllers_mac_address[i],
+                        pdu.getBuf(),
+                        0 );
                     // Send the frame to that controller
-                    m_net.sendFrame(
-                        pdu, additional_data1, additional_data_length1, additional_data2, additional_data_length2 );
+                    m_net.sendFrame( pdu,
+                                     additional_data1,
+                                     additional_data_length1,
+                                     additional_data2,
+                                     additional_data_length2 );
                 }
             }
         }
@@ -381,36 +451,53 @@ void Entity::sendCommand( jdksavdecc_eui64 const &target_entity_id,
 {
 
     // Make a temp pdu buffer just long enough to contain:
-    // ethernet frame DA,SA,Ethertype, AVTP Common Control Header, AVDECC AEM Common Format.
+    // ethernet frame DA,SA,Ethertype, AVTP Common Control Header, AVDECC AEM
+    // Common Format.
     Frame<JDKSAVDECC_FRAME_HEADER_LEN + JDKSAVDECC_AECPDU_AEM_LEN> pdu(
-        0, target_mac_address, m_net.getMACAddress(), JDKSAVDECC_AVTP_ETHERTYPE );
+        0,
+        target_mac_address,
+        m_net.getMACAddress(),
+        JDKSAVDECC_AVTP_ETHERTYPE );
 
     // control_data_length field is N + value_length
-    uint16_t control_data_length = JDKSAVDECC_AECPDU_AEM_LEN - JDKSAVDECC_COMMON_CONTROL_HEADER_LEN + additional_data_length1
-                                   + additional_data_length2;
+    uint16_t control_data_length
+        = JDKSAVDECC_AECPDU_AEM_LEN - JDKSAVDECC_COMMON_CONTROL_HEADER_LEN
+          + additional_data_length1 + additional_data_length2;
 
     // AECPDU common control header
-    pdu.putOctet( 0x80 + JDKSAVDECC_SUBTYPE_AECP );                  // cd=1, subtype=0x7b (AECP)
-    pdu.putOctet( 0x00 + JDKSAVDECC_AECP_MESSAGE_TYPE_AEM_COMMAND ); // sv=0, version=0, message_type = AEM_COMMAND
-    pdu.putOctet( ( ( JDKSAVDECC_AEM_STATUS_SUCCESS ) << 3 )
-                  + ( ( control_data_length >> 8 ) & 0x7 ) ); // Send success code. top 3 bits of control_data_length
-    pdu.putOctet( control_data_length & 0xff );               // lower 8 bits of control_data_length
+    pdu.putOctet( 0x80 + JDKSAVDECC_SUBTYPE_AECP ); // cd=1, subtype=0x7b (AECP)
+    pdu.putOctet(
+        0x00 + JDKSAVDECC_AECP_MESSAGE_TYPE_AEM_COMMAND ); // sv=0, version=0,
+                                                           // message_type =
+                                                           // AEM_COMMAND
+    pdu.putOctet(
+        ( ( JDKSAVDECC_AEM_STATUS_SUCCESS ) << 3 )
+        + ( ( control_data_length >> 8 )
+            & 0x7 ) ); // Send success code. top 3 bits of control_data_length
+    pdu.putOctet( control_data_length
+                  & 0xff ); // lower 8 bits of control_data_length
 
-    pdu.putEUI64( target_entity_id );            // entity_id of the device we are setting
+    pdu.putEUI64( target_entity_id ); // entity_id of the device we are setting
     pdu.putEUI64( m_adp_manager.getEntityID() ); // controller_id
 
-    // increment outoging sequence id before sending it, so when we receive a response we know what sequence id to expect
+    // increment outoging sequence id before sending it, so when we receive a
+    // response we know what sequence id to expect
     // there are no inflight messages here
     ++m_outgoing_sequence_id;
     pdu.putDoublet( m_outgoing_sequence_id );
     pdu.putDoublet( aem_command_type );
 
     // Send the header appended to any additional data
-    m_net.sendFrame( pdu, additional_data1, additional_data_length1, additional_data2, additional_data_length2 );
+    m_net.sendFrame( pdu,
+                     additional_data1,
+                     additional_data_length1,
+                     additional_data2,
+                     additional_data_length2 );
 
     if ( track_for_ack )
     {
-        // Keep track of when we sent this message and who we sent it to so we can
+        // Keep track of when we sent this message and who we sent it to so we
+        // can
         // manage time outs
         m_last_sent_command_time = getTimeInMilliseconds();
         m_last_sent_command_type = aem_command_type;
@@ -426,57 +513,84 @@ void Entity::sendUnsolicitedResponses( uint16_t aem_command_type,
 {
 
     // Make a temp pdu buffer just long enough to contain:
-    // ethernet frame DA,SA,Ethertype, AVTP Common Control Header, AVDECC AEM Common Format.
+    // ethernet frame DA,SA,Ethertype, AVTP Common Control Header, AVDECC AEM
+    // Common Format.
     Frame<JDKSAVDECC_FRAME_HEADER_LEN + JDKSAVDECC_AECPDU_AEM_LEN> pdu(
-        0, m_net.getMACAddress(), m_net.getMACAddress(), JDKSAVDECC_AVTP_ETHERTYPE );
+        0,
+        m_net.getMACAddress(),
+        m_net.getMACAddress(),
+        JDKSAVDECC_AVTP_ETHERTYPE );
 
     // control_data_length field is N + value_length
-    uint16_t control_data_length = JDKSAVDECC_AECPDU_AEM_LEN - JDKSAVDECC_COMMON_CONTROL_HEADER_LEN + additional_data_length1
-                                   + additional_data_length2;
+    uint16_t control_data_length
+        = JDKSAVDECC_AECPDU_AEM_LEN - JDKSAVDECC_COMMON_CONTROL_HEADER_LEN
+          + additional_data_length1 + additional_data_length2;
 
     // AECPDU common control header
-    pdu.putOctet( 0x80 + JDKSAVDECC_SUBTYPE_AECP );                  // cd=1, subtype=0x7b (AECP)
-    pdu.putOctet( 0x00 + JDKSAVDECC_AECP_MESSAGE_TYPE_AEM_COMMAND ); // sv=0, version=0, message_type = AEM_COMMAND
-    pdu.putOctet( ( ( JDKSAVDECC_AEM_STATUS_SUCCESS ) << 3 )
-                  + ( ( control_data_length >> 8 ) & 0x7 ) ); // Send success code. top 3 bits of control_data_length
-    pdu.putOctet( control_data_length & 0xff );               // lower 8 bits of control_data_length
+    pdu.putOctet( 0x80 + JDKSAVDECC_SUBTYPE_AECP ); // cd=1, subtype=0x7b (AECP)
+    pdu.putOctet(
+        0x00 + JDKSAVDECC_AECP_MESSAGE_TYPE_AEM_COMMAND ); // sv=0, version=0,
+                                                           // message_type =
+                                                           // AEM_COMMAND
+    pdu.putOctet(
+        ( ( JDKSAVDECC_AEM_STATUS_SUCCESS ) << 3 )
+        + ( ( control_data_length >> 8 )
+            & 0x7 ) ); // Send success code. top 3 bits of control_data_length
+    pdu.putOctet( control_data_length
+                  & 0xff ); // lower 8 bits of control_data_length
 
-    pdu.putEUI64( m_adp_manager.getEntityID() ); // entity_id of the device we are setting (placeholder)
+    pdu.putEUI64( m_adp_manager.getEntityID() ); // entity_id of the device we
+                                                 // are setting (placeholder)
     pdu.putEUI64( m_adp_manager.getEntityID() ); // controller_id
 
-    // increment outoging sequence id before sending it, so when we receive a response we know what sequence id to expect
+    // increment outoging sequence id before sending it, so when we receive a
+    // response we know what sequence id to expect
     // there are no inflight messages here
     ++m_outgoing_sequence_id;
     pdu.putDoublet( m_outgoing_sequence_id );
     pdu.putDoublet( aem_command_type );
 
-    sendResponses( true, true, pdu, additional_data1, additional_data_length1, additional_data2, additional_data_length2 );
+    sendResponses( true,
+                   true,
+                   pdu,
+                   additional_data1,
+                   additional_data_length1,
+                   additional_data2,
+                   additional_data_length2 );
 }
 
-uint8_t Entity::receiveAcquireEntityCommand( jdksavdecc_aecpdu_aem const &aem, FrameBase &pdu )
+uint8_t Entity::receiveAcquireEntityCommand( jdksavdecc_aecpdu_aem const &aem,
+                                             FrameBase &pdu )
 {
 
     uint8_t status = JDKSAVDECC_AECP_STATUS_NOT_IMPLEMENTED;
 
     bool controller_id_matches_current_owner;
     controller_id_matches_current_owner
-        = jdksavdecc_eui64_compare( &m_acquired_by_controller_entity_id, &aem.aecpdu_header.controller_entity_id );
+        = jdksavdecc_eui64_compare( &m_acquired_by_controller_entity_id,
+                                    &aem.aecpdu_header.controller_entity_id );
 
     bool has_current_owner;
-    has_current_owner = jdksavdecc_eui64_is_set( m_acquired_by_controller_entity_id );
+    has_current_owner
+        = jdksavdecc_eui64_is_set( m_acquired_by_controller_entity_id );
 
     // First, make sure this is entity level:
-    if ( jdksavdecc_aem_command_acquire_entity_get_descriptor_index( pdu.getBuf(), pdu.getPosition() ) == 0
-         && jdksavdecc_aem_command_acquire_entity_get_descriptor_type( pdu.getBuf(), pdu.getPosition() )
+    if ( jdksavdecc_aem_command_acquire_entity_get_descriptor_index(
+             pdu.getBuf(), pdu.getPosition() ) == 0
+         && jdksavdecc_aem_command_acquire_entity_get_descriptor_type(
+                pdu.getBuf(), pdu.getPosition() )
             == JDKSAVDECC_DESCRIPTOR_ENTITY )
     {
 
         // is it a release or an acquire?
-        if ( jdksavdecc_aem_command_acquire_entity_get_aem_acquire_flags( pdu.getBuf(), pdu.getPosition() ) & 0x80000000 )
+        if ( jdksavdecc_aem_command_acquire_entity_get_aem_acquire_flags(
+                 pdu.getBuf(), pdu.getPosition() ) & 0x80000000 )
         {
             // This is a request to release.  A release only works if the
-            // requesting controller is the current owner, or there is no current owner
-            if ( ( has_current_owner && controller_id_matches_current_owner ) || !has_current_owner )
+            // requesting controller is the current owner, or there is no
+            // current owner
+            if ( ( has_current_owner && controller_id_matches_current_owner )
+                 || !has_current_owner )
             {
                 // clear current acquire state
                 jdksavdecc_eui64_init( &m_acquired_by_controller_entity_id );
@@ -490,20 +604,26 @@ uint8_t Entity::receiveAcquireEntityCommand( jdksavdecc_aecpdu_aem const &aem, F
         }
         else
         {
-            // This is a request to acquire. Are we already acquired by the same controller or are we not yet acquired?
-            if ( !has_current_owner || ( has_current_owner && controller_id_matches_current_owner ) )
+            // This is a request to acquire. Are we already acquired by the same
+            // controller or are we not yet acquired?
+            if ( !has_current_owner
+                 || ( has_current_owner
+                      && controller_id_matches_current_owner ) )
             {
                 // Yes, success.
                 status = JDKSAVDECC_AEM_STATUS_SUCCESS;
             }
             else
             {
-                // Okay, someone else owns us. Send a CONTROLLER_AVAILABLE message to the controller that
+                // Okay, someone else owns us. Send a CONTROLLER_AVAILABLE
+                // message to the controller that
                 // currently owns us to make sure he is still around.
-                sendControllerAvailable( m_acquired_by_controller_entity_id, m_acquired_by_controller_mac_address );
+                sendControllerAvailable( m_acquired_by_controller_entity_id,
+                                         m_acquired_by_controller_mac_address );
                 // Keep track of when this happened
                 m_acquire_in_progress_time = getTimeInMilliseconds();
-                // Return IN_PROGRESS, the real response will be coming either when the owning controller responds, or
+                // Return IN_PROGRESS, the real response will be coming either
+                // when the owning controller responds, or
                 // if it times out.
                 status = JDKSAVDECC_AEM_STATUS_IN_PROGRESS;
             }
@@ -519,22 +639,16 @@ uint8_t Entity::receiveAcquireEntityCommand( jdksavdecc_aecpdu_aem const &aem, F
     return status;
 }
 
-uint8_t Entity::receiveLockEntityCommand( jdksavdecc_aecpdu_aem const &aem, FrameBase &pdu )
+uint8_t Entity::receiveLockEntityCommand( jdksavdecc_aecpdu_aem const &aem,
+                                          FrameBase &pdu )
 {
     (void)aem;
     (void)pdu;
     return JDKSAVDECC_AECP_STATUS_NOT_IMPLEMENTED;
 }
 
-uint8_t Entity::receiveEntityAvailableCommand( jdksavdecc_aecpdu_aem const &aem, FrameBase &pdu )
-{
-    (void)aem;
-    (void)pdu;
-
-    return JDKSAVDECC_AECP_STATUS_NOT_IMPLEMENTED;
-}
-
-uint8_t Entity::receiveControllerAvailableCommand( jdksavdecc_aecpdu_aem const &aem, FrameBase &pdu )
+uint8_t Entity::receiveEntityAvailableCommand( jdksavdecc_aecpdu_aem const &aem,
+                                               FrameBase &pdu )
 {
     (void)aem;
     (void)pdu;
@@ -542,18 +656,31 @@ uint8_t Entity::receiveControllerAvailableCommand( jdksavdecc_aecpdu_aem const &
     return JDKSAVDECC_AECP_STATUS_NOT_IMPLEMENTED;
 }
 
-bool Entity::receiveControllerAvailableResponse( jdksavdecc_aecpdu_aem const &aem, FrameBase &pdu )
+uint8_t
+    Entity::receiveControllerAvailableCommand( jdksavdecc_aecpdu_aem const &aem,
+                                               FrameBase &pdu )
 {
     (void)aem;
     (void)pdu;
 
-    // TODO: Send a failed message to the controller that was attempting to acquire me
+    return JDKSAVDECC_AECP_STATUS_NOT_IMPLEMENTED;
+}
+
+bool Entity::receiveControllerAvailableResponse(
+    jdksavdecc_aecpdu_aem const &aem, FrameBase &pdu )
+{
+    (void)aem;
+    (void)pdu;
+
+    // TODO: Send a failed message to the controller that was attempting to
+    // acquire me
     // cancel any acquire in progress
     jdksavdecc_eui64_init( &m_acquire_in_progress_by_controller_entity_id );
     return false;
 }
 
-uint8_t Entity::receiveReadDescriptorCommand( jdksavdecc_aecpdu_aem const &aem, FrameBase &pdu )
+uint8_t Entity::receiveReadDescriptorCommand( jdksavdecc_aecpdu_aem const &aem,
+                                              FrameBase &pdu )
 {
     (void)aem;
     (void)pdu;
@@ -561,7 +688,9 @@ uint8_t Entity::receiveReadDescriptorCommand( jdksavdecc_aecpdu_aem const &aem, 
     return JDKSAVDECC_AECP_STATUS_NOT_IMPLEMENTED;
 }
 
-uint8_t Entity::receiveSetConfigurationCommand( jdksavdecc_aecpdu_aem const &aem, FrameBase &pdu )
+uint8_t
+    Entity::receiveSetConfigurationCommand( jdksavdecc_aecpdu_aem const &aem,
+                                            FrameBase &pdu )
 {
     (void)aem;
     (void)pdu;
@@ -569,7 +698,9 @@ uint8_t Entity::receiveSetConfigurationCommand( jdksavdecc_aecpdu_aem const &aem
     return JDKSAVDECC_AECP_STATUS_NOT_IMPLEMENTED;
 }
 
-uint8_t Entity::receiveGetConfigurationCommand( jdksavdecc_aecpdu_aem const &aem, FrameBase &pdu )
+uint8_t
+    Entity::receiveGetConfigurationCommand( jdksavdecc_aecpdu_aem const &aem,
+                                            FrameBase &pdu )
 {
     (void)aem;
     (void)pdu;
@@ -577,7 +708,8 @@ uint8_t Entity::receiveGetConfigurationCommand( jdksavdecc_aecpdu_aem const &aem
     return JDKSAVDECC_AECP_STATUS_NOT_IMPLEMENTED;
 }
 
-uint8_t Entity::receiveSetNameCommand( jdksavdecc_aecpdu_aem const &aem, FrameBase &pdu )
+uint8_t Entity::receiveSetNameCommand( jdksavdecc_aecpdu_aem const &aem,
+                                       FrameBase &pdu )
 {
     (void)aem;
     (void)pdu;
@@ -585,7 +717,8 @@ uint8_t Entity::receiveSetNameCommand( jdksavdecc_aecpdu_aem const &aem, FrameBa
     return JDKSAVDECC_AECP_STATUS_NOT_IMPLEMENTED;
 }
 
-uint8_t Entity::receiveGetNameCommand( jdksavdecc_aecpdu_aem const &aem, FrameBase &pdu )
+uint8_t Entity::receiveGetNameCommand( jdksavdecc_aecpdu_aem const &aem,
+                                       FrameBase &pdu )
 {
     (void)aem;
     (void)pdu;
@@ -593,7 +726,8 @@ uint8_t Entity::receiveGetNameCommand( jdksavdecc_aecpdu_aem const &aem, FrameBa
     return JDKSAVDECC_AECP_STATUS_NOT_IMPLEMENTED;
 }
 
-uint8_t Entity::receiveSetControlCommand( jdksavdecc_aecpdu_aem const &aem, FrameBase &pdu )
+uint8_t Entity::receiveSetControlCommand( jdksavdecc_aecpdu_aem const &aem,
+                                          FrameBase &pdu )
 {
     (void)aem;
     (void)pdu;
@@ -601,7 +735,8 @@ uint8_t Entity::receiveSetControlCommand( jdksavdecc_aecpdu_aem const &aem, Fram
     return JDKSAVDECC_AECP_STATUS_NOT_IMPLEMENTED;
 }
 
-uint8_t Entity::receiveGetControlCommand( jdksavdecc_aecpdu_aem const &aem, FrameBase &pdu )
+uint8_t Entity::receiveGetControlCommand( jdksavdecc_aecpdu_aem const &aem,
+                                          FrameBase &pdu )
 {
     (void)aem;
     (void)pdu;
@@ -609,7 +744,8 @@ uint8_t Entity::receiveGetControlCommand( jdksavdecc_aecpdu_aem const &aem, Fram
     return JDKSAVDECC_AECP_STATUS_NOT_IMPLEMENTED;
 }
 
-uint8_t Entity::receiveRegisterUnsolicitedNotificationCommand( jdksavdecc_aecpdu_aem const &aem, FrameBase &pdu )
+uint8_t Entity::receiveRegisterUnsolicitedNotificationCommand(
+    jdksavdecc_aecpdu_aem const &aem, FrameBase &pdu )
 {
     (void)aem;
     (void)pdu;
@@ -617,7 +753,8 @@ uint8_t Entity::receiveRegisterUnsolicitedNotificationCommand( jdksavdecc_aecpdu
     return JDKSAVDECC_AECP_STATUS_NOT_IMPLEMENTED;
 }
 
-uint8_t Entity::receiveDeRegisterUnsolicitedNotificationCommand( jdksavdecc_aecpdu_aem const &aem, FrameBase &pdu )
+uint8_t Entity::receiveDeRegisterUnsolicitedNotificationCommand(
+    jdksavdecc_aecpdu_aem const &aem, FrameBase &pdu )
 {
     (void)aem;
     (void)pdu;
@@ -625,7 +762,8 @@ uint8_t Entity::receiveDeRegisterUnsolicitedNotificationCommand( jdksavdecc_aecp
     return JDKSAVDECC_AECP_STATUS_NOT_IMPLEMENTED;
 }
 
-uint8_t Entity::readDescriptorEntity( jdksavdecc_aecpdu_aem const &aem, FrameBase &pdu )
+uint8_t Entity::readDescriptorEntity( jdksavdecc_aecpdu_aem const &aem,
+                                      FrameBase &pdu )
 {
     (void)aem;
     (void)pdu;
@@ -633,7 +771,8 @@ uint8_t Entity::readDescriptorEntity( jdksavdecc_aecpdu_aem const &aem, FrameBas
     return JDKSAVDECC_AECP_STATUS_NOT_IMPLEMENTED;
 }
 
-uint8_t Entity::readDescriptorConfiguration( jdksavdecc_aecpdu_aem const &aem, FrameBase &pdu )
+uint8_t Entity::readDescriptorConfiguration( jdksavdecc_aecpdu_aem const &aem,
+                                             FrameBase &pdu )
 {
     (void)aem;
     (void)pdu;
@@ -641,7 +780,8 @@ uint8_t Entity::readDescriptorConfiguration( jdksavdecc_aecpdu_aem const &aem, F
     return JDKSAVDECC_AECP_STATUS_NOT_IMPLEMENTED;
 }
 
-uint8_t Entity::readDescriptorControl( jdksavdecc_aecpdu_aem const &aem, FrameBase &pdu )
+uint8_t Entity::readDescriptorControl( jdksavdecc_aecpdu_aem const &aem,
+                                       FrameBase &pdu )
 {
     (void)aem;
     (void)pdu;
@@ -649,7 +789,8 @@ uint8_t Entity::readDescriptorControl( jdksavdecc_aecpdu_aem const &aem, FrameBa
     return JDKSAVDECC_AECP_STATUS_NOT_IMPLEMENTED;
 }
 
-uint8_t Entity::readDescriptorLocale( jdksavdecc_aecpdu_aem const &aem, FrameBase &pdu )
+uint8_t Entity::readDescriptorLocale( jdksavdecc_aecpdu_aem const &aem,
+                                      FrameBase &pdu )
 {
     (void)aem;
     (void)pdu;
@@ -657,7 +798,8 @@ uint8_t Entity::readDescriptorLocale( jdksavdecc_aecpdu_aem const &aem, FrameBas
     return JDKSAVDECC_AECP_STATUS_NOT_IMPLEMENTED;
 }
 
-uint8_t Entity::readDescriptorStrings( jdksavdecc_aecpdu_aem const &aem, FrameBase &pdu )
+uint8_t Entity::readDescriptorStrings( jdksavdecc_aecpdu_aem const &aem,
+                                       FrameBase &pdu )
 {
     (void)aem;
     (void)pdu;
@@ -665,7 +807,8 @@ uint8_t Entity::readDescriptorStrings( jdksavdecc_aecpdu_aem const &aem, FrameBa
     return JDKSAVDECC_AECP_STATUS_NOT_IMPLEMENTED;
 }
 
-uint8_t Entity::readDescriptorMemory( jdksavdecc_aecpdu_aem const &aem, FrameBase &pdu )
+uint8_t Entity::readDescriptorMemory( jdksavdecc_aecpdu_aem const &aem,
+                                      FrameBase &pdu )
 {
     (void)aem;
     (void)pdu;
@@ -673,7 +816,10 @@ uint8_t Entity::readDescriptorMemory( jdksavdecc_aecpdu_aem const &aem, FrameBas
     return JDKSAVDECC_AECP_STATUS_NOT_IMPLEMENTED;
 }
 
-uint8_t Entity::receiveAARead( jdksavdecc_aecp_aa const &aa, uint32_t virtual_base_address, uint16_t length, uint8_t *response )
+uint8_t Entity::receiveAARead( jdksavdecc_aecp_aa const &aa,
+                               uint32_t virtual_base_address,
+                               uint16_t length,
+                               uint8_t *response )
 {
     (void)aa;
     (void)virtual_base_address;

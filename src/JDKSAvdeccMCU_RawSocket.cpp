@@ -37,26 +37,31 @@ namespace JDKSAvdeccMCU
 
 RawSocket *RawSocket::net[JDKSAVDECCMCU_MAX_RAWSOCKETS] = {};
 uint16_t RawSocket::num_rawsockets = 0;
-uint16_t RawSocket::last_recv = 0;
+uint16_t RawSocket::last_recv_socket = 0;
 
 bool RawSocket::multiRecvFrame( FrameBase *frame )
 {
     bool r = false;
-    if ( net[last_recv]->recvFrame( frame ) )
+    if ( net[last_recv_socket]->recvFrame( frame ) )
     {
         r = true;
     }
-    last_recv = ( last_recv + 1 ) % num_rawsockets;
+    last_recv_socket = ( last_recv_socket + 1 ) % num_rawsockets;
     return r;
 }
 
-bool RawSocket::multiSendFrame(
-    FrameBase const &frame, uint8_t const *data1, uint16_t len1, uint8_t const *data2, uint16_t len2 )
+bool RawSocket::multiSendFrame( FrameBase const &frame,
+                                uint8_t const *data1,
+                                uint16_t len1,
+                                uint8_t const *data2,
+                                uint16_t len2 )
 {
     for ( uint16_t i = 0; i < num_rawsockets; ++i )
     {
         if ( ( frame.getBuf()[JDKSAVDECC_FRAME_HEADER_DA_OFFSET] & 0x01 )
-             || ( memcmp( frame.getBuf() + JDKSAVDECC_FRAME_HEADER_SA_OFFSET, net[i]->getMACAddress().value, 6 ) == 0 ) )
+             || ( memcmp( frame.getBuf() + JDKSAVDECC_FRAME_HEADER_SA_OFFSET,
+                          net[i]->getMACAddress().value,
+                          6 ) == 0 ) )
         {
             net[i]->sendFrame( frame, data1, len1, data2, len2 );
         }
@@ -64,13 +69,18 @@ bool RawSocket::multiSendFrame(
     return true;
 }
 
-bool
-    RawSocket::multiSendReplyFrame( FrameBase &frame, uint8_t const *data1, uint16_t len1, uint8_t const *data2, uint16_t len2 )
+bool RawSocket::multiSendReplyFrame( FrameBase &frame,
+                                     uint8_t const *data1,
+                                     uint16_t len1,
+                                     uint8_t const *data2,
+                                     uint16_t len2 )
 {
     for ( uint16_t i = 0; i < num_rawsockets; ++i )
     {
         if ( ( frame.getBuf()[JDKSAVDECC_FRAME_HEADER_SA_OFFSET] & 0x01 )
-             || ( memcmp( frame.getBuf() + JDKSAVDECC_FRAME_HEADER_DA_OFFSET, net[i]->getMACAddress().value, 6 ) == 0 ) )
+             || ( memcmp( frame.getBuf() + JDKSAVDECC_FRAME_HEADER_DA_OFFSET,
+                          net[i]->getMACAddress().value,
+                          6 ) == 0 ) )
         {
             net[i]->sendReplyFrame( frame, data1, len1, data2, len2 );
         }

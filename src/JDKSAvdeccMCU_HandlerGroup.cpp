@@ -36,7 +36,11 @@ namespace JDKSAvdeccMCU
 {
 
 HandlerGroupBase::HandlerGroupBase( RawSocket &net, Handler **item_storage )
-    : m_net( net ), m_num_items( 0 ), m_item( item_storage ), m_rx_count( 0 ), m_handled_count( 0 )
+    : m_net( net )
+    , m_num_items( 0 )
+    , m_item( item_storage )
+    , m_rx_count( 0 )
+    , m_handled_count( 0 )
 {
 }
 
@@ -51,7 +55,8 @@ bool HandlerGroupBase::pollNet()
         // Make sure we read DA,SA,Ethertype
         if ( aecp_frame.getSize() > JDKSAVDECC_FRAME_HEADER_LEN )
         {
-            // Ok, this PDU is worth spending time on. Send it on to all known Handlers.
+            // Ok, this PDU is worth spending time on. Send it on to all known
+            // Handlers.
 
             m_rx_count++;
             r = receivedPDU( aecp_frame );

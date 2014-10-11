@@ -39,7 +39,8 @@ class PcapFileReader
     PcapFileReader( std::string const &filename );
     virtual ~PcapFileReader();
 
-    bool ReadPacket( uint64_t *timestamp_in_microseconds, PcapFilePacket &results );
+    bool ReadPacket( uint64_t *timestamp_in_microseconds,
+                     PcapFilePacket &results );
     bool ReadPacket( uint64_t *timestamp_in_microseconds,
                      uint8_t da[6],
                      uint8_t sa[6],

@@ -32,7 +32,7 @@
 #include "JDKSAvdeccMCU_World.hpp"
 #include "JDKSAvdeccMCU_RawSocketLinux.hpp"
 
-#if defined( __linux__ )
+#if JDKSAVDECCMCU_ENABLE_RAWSOCKETLINUX
 namespace JDKSAvdeccMCU
 {
 }

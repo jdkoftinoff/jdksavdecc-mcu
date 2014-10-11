@@ -34,25 +34,56 @@
 #include "jdksavdecc_plus.hpp"
 
 #ifndef JDKSAVDECCMCU_BARE_METAL
-#if defined( __AVR__ ) && !defined( __linux__ ) && !defined( __APPLE__ ) && !defined( _WIN32 )
-#define JDKSAVDECCMCU_BARE_METAL
+#if defined( __AVR__ ) && !defined( __linux__ ) && !defined( __APPLE__ )       \
+    && !defined( _WIN32 )
+#define JDKSAVDECCMCU_BARE_METAL 1
+#ifndef JDKSAVDECCMCU_ENABLE_RAWSOCKETWIZNET
+#define JDKSAVDECCMCU_ENABLE_RAWSOCKETWIZNET 1
+#ifndef JDKSAVDECCMCU_ENABLE_PCAP
+#define JDKSAVDECCMCU_ENABLE_PCAP 0
+#endif
+#ifndef JDKSAVDECCMCU_ENABLE_PCAPFILE
+#define JDKSAVDECCMCU_ENABLE_PCAPFILE 0
+#endif
+#ifndef JDKSAVDECCMCU_ENABLE_RAWSOCKETPCAPFILE
+#define JDKSAVDECCMCU_ENABLE_RAWSOCKETPCAPFILE 0
+#endif
+#ifndef JDKSAVDECCMCU_ENABLE_RAWSOCKETLINUX
+#define JDKSAVDECCMCU_ENABLE_RAWSOCKETLINUX 0
+#endif
+#ifndef JDKSAVDECCMCU_ENABLE_RAWSOCKETMACOSX
+#define JDKSAVDECCMCU_ENABLE_RAWSOCKETMACOSX 0
+#endif
+#ifndef JDKSAVDECCMCU_ENABLE_RAWSOCKETWIN32
+#define JDKSAVDECCMCU_ENABLE_RAWSOCKETWIN32 0
+#endif
+#endif
+#else
+#define JDKSAVDECCMCU_BARE_METAL 0
 #endif
 #endif
 
-#ifndef JDKSAVDECCMCU_BARE_METAL
-#define JDKSAVDECCMCU_ENABLE_RAW
-#define JDKSAVDECCMCU_ENABLE_PCAPFILE
+#if JDKSAVDECCMCU_BARE_METAL == 0
+#ifndef JDKSAVDECCMCU_ENABLE_RAWSOCKETWIZNET
+#define JDKSAVDECCMCU_ENABLE_RAWSOCKETWIZNET 0
 #endif
-
-#ifndef JDKSAVDECC_ENABLE_PCAP
-#if defined( __APPLE__ )
-#define JDKSAVDECC_ENABLE_PCAP
+#ifndef JDKSAVDECCMCU_ENABLE_PCAP
+#define JDKSAVDECCMCU_ENABLE_PCAP 1
 #endif
+#ifndef JDKSAVDECCMCU_ENABLE_PCAPFILE
+#define JDKSAVDECCMCU_ENABLE_PCAPFILE 1
 #endif
-
-#ifndef JDKSAVDECC_ENABLE_WIN32
-#if defined( _WIN32 )
-#define JDKSAVDECC_ENABLE_WIN32
+#ifndef JDKSAVDECCMCU_ENABLE_RAWSOCKETPCAPFILE
+#define JDKSAVDECCMCU_ENABLE_RAWSOCKETPCAPFILE 1
+#endif
+#if defined( __linux__ )
+#define JDKSAVDECCMCU_ENABLE_RAWSOCKETLINUX 1
+#endif
+#if defined( __APPLE__ ) && ( JDKSAVDECCMCU_ENABLE_PCAP == 1 )
+#define JDKSAVDECCMCU_ENABLE_RAWSOCKETMACOSX 1
+#endif
+#if defined( _WIN32 ) && ( JDKSAVDECCMCU_ENABLE_PCAP == 1 )
+#define JDKSAVDECCMCU_ENABLE_RAWSOCKETWIN32 1
 #endif
 #endif
 
@@ -64,7 +95,10 @@ using namespace jdksavdecc;
 #if defined( __AVR__ )
 #include "SPI.h"
 
-inline jdksavdecc_timestamp_in_milliseconds getTimeInMilliseconds() { return millis(); }
+inline jdksavdecc_timestamp_in_milliseconds getTimeInMilliseconds()
+{
+    return millis();
+}
 #elif defined( __APPLE__ ) || defined( __linux__ )
 #include <sys/time.h>
 #include <iostream>
@@ -74,9 +108,10 @@ inline jdksavdecc_timestamp_in_milliseconds getTimeInMilliseconds()
     timeval tv;
 
     gettimeofday( &tv, 0 );
-    return jdksavdecc_timestamp_in_milliseconds( tv.tv_usec / 1000 ) + jdksavdecc_timestamp_in_milliseconds( tv.tv_sec * 1000 );
+    return jdksavdecc_timestamp_in_milliseconds( tv.tv_usec / 1000 )
+           + jdksavdecc_timestamp_in_milliseconds( tv.tv_sec * 1000 );
 }
-#elif defined( WIN32 )
+#elif defined( _WIN32 )
 #include <iostream>
 #include <iomanip>
 inline jdksavdecc_timestamp_in_milliseconds getTimeInMilliseconds()

@@ -30,16 +30,12 @@
 */
 
 #include "JDKSAvdeccMCU_World.hpp"
-#include "JDKSAvdeccMCU_RawSocketPcap.hpp"
+#include "JDKSAvdeccMCU_RawSocketMacOSX.hpp"
 
-#if defined( JDKSAVDECCMCU_ENABLE_PCAP )
+#if JDKSAVDECCMCU_ENABLE_RAWSOCKETMACOSX
 namespace JDKSAvdeccMCU
 {
 }
 #else
-const char *jdksavdeccmcu_rawsocketlinux_file = __FILE__;
+const char *jdksavdeccmcu_rawsocketmacosx_file = __FILE__;
 #endif
-
-namespace JDKSAvdeccMCU
-{
-}

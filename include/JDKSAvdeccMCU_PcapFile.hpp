@@ -33,7 +33,8 @@ namespace JDKSAvdeccMCU
 {
 uint64_t get_current_time_in_microseconds();
 
-/* wireshark PCAP file header from http://wiki.wireshark.org/Development/LibpcapFileFormat#File_Format */
+/* wireshark PCAP file header from
+ * http://wiki.wireshark.org/Development/LibpcapFileFormat#File_Format */
 struct pcap_hdr_t
 {
     uint32_t magic_number;  /* magic number */
@@ -45,7 +46,8 @@ struct pcap_hdr_t
     uint32_t network;       /* data link type */
 };
 
-/* wireshark PCAP record header from http://wiki.wireshark.org/Development/LibpcapFileFormat#File_Format */
+/* wireshark PCAP record header from
+ * http://wiki.wireshark.org/Development/LibpcapFileFormat#File_Format */
 
 struct pcaprec_hdr_t
 {
@@ -94,6 +96,6 @@ class PcapFile
   private:
     FILE *m_f;
 };
+}
 
 #endif
-}

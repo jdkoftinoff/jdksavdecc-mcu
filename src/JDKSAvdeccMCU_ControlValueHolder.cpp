@@ -35,7 +35,8 @@
 namespace JDKSAvdeccMCU
 {
 
-ControlValueHolder::ControlValueHolder( uint8_t value_length ) : m_value_length( value_length ), m_dirty( true )
+ControlValueHolder::ControlValueHolder( uint8_t value_length )
+    : m_value_length( value_length ), m_dirty( true )
 {
     m_value[0] = 0;
     m_value[1] = 0;
@@ -68,7 +69,9 @@ uint32_t ControlValueHolder::getValueQuadlet() const
     uint32_t r = 0;
     if ( m_value_length == 4 )
     {
-        r = ( ( (uint32_t)m_value[0] ) << 24 ) + ( ( (uint32_t)m_value[1] ) << 16 ) + ( ( (uint32_t)m_value[2] ) << 8 )
+        r = ( ( (uint32_t)m_value[0] ) << 24 )
+            + ( ( (uint32_t)m_value[1] ) << 16 )
+            + ( ( (uint32_t)m_value[2] ) << 8 )
             + ( ( (uint32_t)m_value[3] ) << 0 );
     }
     return r;

@@ -57,8 +57,13 @@ class FrameBase
         putDoublet( ethertype );
     }
 
-    FrameBase( jdksavdecc_timestamp_in_milliseconds time_in_ms, uint8_t *buf, uint16_t len )
-        : m_time_in_ms( time_in_ms ), m_buf( buf ), m_pos( JDKSAVDECC_FRAME_HEADER_LEN ), m_len( len )
+    FrameBase( jdksavdecc_timestamp_in_milliseconds time_in_ms,
+               uint8_t *buf,
+               uint16_t len )
+        : m_time_in_ms( time_in_ms )
+        , m_buf( buf )
+        , m_pos( JDKSAVDECC_FRAME_HEADER_LEN )
+        , m_len( len )
     {
     }
 
@@ -131,23 +136,49 @@ class FrameBase
     void setPosition( uint16_t n = JDKSAVDECC_FRAME_HEADER_LEN ) { m_pos = n; }
     void setLength( uint16_t n ) { m_pos = n; }
 
-    jdksavdecc_eui48 getDA() const { return jdksavdecc_eui48_get( m_buf, JDKSAVDECC_FRAME_HEADER_DA_OFFSET ); }
+    jdksavdecc_eui48 getDA() const
+    {
+        return jdksavdecc_eui48_get( m_buf, JDKSAVDECC_FRAME_HEADER_DA_OFFSET );
+    }
 
-    void setDA( jdksavdecc_eui48 const &da ) { jdksavdecc_eui48_set( da, m_buf, JDKSAVDECC_FRAME_HEADER_DA_OFFSET ); }
+    void setDA( jdksavdecc_eui48 const &da )
+    {
+        jdksavdecc_eui48_set( da, m_buf, JDKSAVDECC_FRAME_HEADER_DA_OFFSET );
+    }
 
-    jdksavdecc_eui48 getSA() const { return jdksavdecc_eui48_get( m_buf, JDKSAVDECC_FRAME_HEADER_SA_OFFSET ); }
+    jdksavdecc_eui48 getSA() const
+    {
+        return jdksavdecc_eui48_get( m_buf, JDKSAVDECC_FRAME_HEADER_SA_OFFSET );
+    }
 
-    void setSA( jdksavdecc_eui48 const &sa ) { jdksavdecc_eui48_set( sa, m_buf, JDKSAVDECC_FRAME_HEADER_SA_OFFSET ); }
+    void setSA( jdksavdecc_eui48 const &sa )
+    {
+        jdksavdecc_eui48_set( sa, m_buf, JDKSAVDECC_FRAME_HEADER_SA_OFFSET );
+    }
 
-    uint16_t getEtherType() const { return jdksavdecc_uint16_get( m_buf, JDKSAVDECC_FRAME_HEADER_ETHERTYPE_OFFSET ); }
+    uint16_t getEtherType() const
+    {
+        return jdksavdecc_uint16_get(
+            m_buf, JDKSAVDECC_FRAME_HEADER_ETHERTYPE_OFFSET );
+    }
 
-    void setEtherType( uint16_t et ) { jdksavdecc_uint16_set( et, m_buf, JDKSAVDECC_FRAME_HEADER_ETHERTYPE_OFFSET ); }
+    void setEtherType( uint16_t et )
+    {
+        jdksavdecc_uint16_set(
+            et, m_buf, JDKSAVDECC_FRAME_HEADER_ETHERTYPE_OFFSET );
+    }
 
     uint8_t *getPayload() { return &m_buf[JDKSAVDECC_FRAME_HEADER_LEN]; }
 
-    uint8_t const *getPayload() const { return &m_buf[JDKSAVDECC_FRAME_HEADER_LEN]; }
+    uint8_t const *getPayload() const
+    {
+        return &m_buf[JDKSAVDECC_FRAME_HEADER_LEN];
+    }
 
-    jdksavdecc_timestamp_in_milliseconds getTimeInMilliseconds() const { return m_time_in_ms; }
+    jdksavdecc_timestamp_in_milliseconds getTimeInMilliseconds() const
+    {
+        return m_time_in_ms;
+    }
 };
 
 template <size_t MaxSize>
@@ -163,7 +194,8 @@ class Frame : public FrameBase
            jdksavdecc_eui48 const &dest_mac,
            jdksavdecc_eui48 const &src_mac,
            uint16_t ethertype )
-        : FrameBase( time_in_ms, m_buf_storage, MaxSize, dest_mac, src_mac, ethertype )
+        : FrameBase(
+              time_in_ms, m_buf_storage, MaxSize, dest_mac, src_mac, ethertype )
     {
     }
 };

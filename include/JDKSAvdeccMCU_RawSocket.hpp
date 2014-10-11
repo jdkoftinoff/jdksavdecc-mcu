@@ -58,11 +58,17 @@ class RawSocket
 
     virtual bool recvFrame( FrameBase *frame ) = 0;
 
-    virtual bool sendFrame(
-        FrameBase const &frame, uint8_t const *data1 = 0, uint16_t len1 = 0, uint8_t const *data2 = 0, uint16_t len2 = 0 ) = 0;
+    virtual bool sendFrame( FrameBase const &frame,
+                            uint8_t const *data1 = 0,
+                            uint16_t len1 = 0,
+                            uint8_t const *data2 = 0,
+                            uint16_t len2 = 0 ) = 0;
 
-    virtual bool sendReplyFrame(
-        FrameBase &frame, uint8_t const *data1 = 0, uint16_t len1 = 0, uint8_t const *data2 = 0, uint16_t len2 = 0 ) = 0;
+    virtual bool sendReplyFrame( FrameBase &frame,
+                                 uint8_t const *data1 = 0,
+                                 uint16_t len1 = 0,
+                                 uint8_t const *data2 = 0,
+                                 uint16_t len2 = 0 ) = 0;
 
     /**
     * Attempt to join an additional multicast mac address group
@@ -81,20 +87,42 @@ class RawSocket
     */
     virtual filedescriptor_t getFd() const = 0;
 
+    /**
+     * Get the MAC address of the ethernet port
+     */
     virtual jdksavdecc_eui48 const &getMACAddress() const = 0;
 
-    static jdksavdecc_timestamp_in_milliseconds multiGetTimeInMilliseconds() { return net[0]->getTimeInMilliseconds(); }
+    /**
+     * Ask the first ethernet port for the current time in milliseconds
+     */
+    static jdksavdecc_timestamp_in_milliseconds multiGetTimeInMilliseconds()
+    {
+        return net[0]->getTimeInMilliseconds();
+    }
 
+    /**
+     * @brief multiRecvFrame Poll all ethernet ports for a received ethernet
+     * frame
+     * @param frame pointer to the frame
+     * @return bool true if the frame was received
+     */
     static bool multiRecvFrame( FrameBase *frame );
 
-    static bool multiSendFrame(
-        FrameBase const &frame, uint8_t const *data1 = 0, uint16_t len1 = 0, uint8_t const *data2 = 0, uint16_t len2 = 0 );
+    static bool multiSendFrame( FrameBase const &frame,
+                                uint8_t const *data1 = 0,
+                                uint16_t len1 = 0,
+                                uint8_t const *data2 = 0,
+                                uint16_t len2 = 0 );
 
-    static bool multiSendReplyFrame(
-        FrameBase &frame, uint8_t const *data1 = 0, uint16_t len1 = 0, uint8_t const *data2 = 0, uint16_t len2 = 0 );
+    static bool multiSendReplyFrame( FrameBase &frame,
+                                     uint8_t const *data1 = 0,
+                                     uint16_t len1 = 0,
+                                     uint8_t const *data2 = 0,
+                                     uint16_t len2 = 0 );
 
+  protected:
     static RawSocket *net[JDKSAVDECCMCU_MAX_RAWSOCKETS];
     static uint16_t num_rawsockets;
-    static uint16_t last_recv;
+    static uint16_t last_recv_socket;
 };
 }
