@@ -24,14 +24,8 @@ set(LIBS ${LIBS} ${CHECK_LIBRARIES} ${PROJECT})
 
 include_directories( include ${ADDITIONAL_INCLUDE_DIRECTORIES} )
 
-if(TESTS MATCHES "ON")
-   message(STATUS "Extended test code functions are enabled")
-   file(GLOB PROJECT_INCLUDES "include/*.hpp" "include/tests/*.hpp" "include/*.h" "include/tests/*.h" ${ADDITIONAL_PROJECT_INCLUDES} )
-   file(GLOB PROJECT_SRC "src/*.c" "src/test/*.c" "src/*.cpp" "src/test/*.cpp" ${ADDITIONAL_PROJECT_SRC} )
-else()
-   file(GLOB PROJECT_INCLUDES "include/*.h" "include/*.hpp" ${ADDITIONAL_PROJECT_INCLUDES})
-   file(GLOB PROJECT_SRC "src/*.c" "src/*.cpp" ${ADDITIONAL_PROJECT_SRC} )
-endif()
+file(GLOB PROJECT_INCLUDES "jdkavdecc-c/include/*.h" "jdkavdecc-c/include/*.hpp" "include/*.hpp" "include/tests/*.hpp" "include/*.h" "include/tests/*.h" ${ADDITIONAL_PROJECT_INCLUDES} )
+file(GLOB PROJECT_SRC "src/*.c" "src/test/*.c" "src/*.cpp" "src/test/*.cpp" ${ADDITIONAL_PROJECT_SRC} )
 
 add_library (${PROJECT} ${PROJECT_SRC} ${PROJECT_INCLUDES})
 
