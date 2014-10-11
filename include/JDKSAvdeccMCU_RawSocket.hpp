@@ -56,15 +56,15 @@ class RawSocket
 
     virtual jdksavdecc_timestamp_in_milliseconds getTimeInMilliseconds() = 0;
 
-    virtual bool recvFrame( FrameBase *frame ) = 0;
+    virtual bool recvFrame( Frame *frame ) = 0;
 
-    virtual bool sendFrame( FrameBase const &frame,
+    virtual bool sendFrame( Frame const &frame,
                             uint8_t const *data1 = 0,
                             uint16_t len1 = 0,
                             uint8_t const *data2 = 0,
                             uint16_t len2 = 0 ) = 0;
 
-    virtual bool sendReplyFrame( FrameBase &frame,
+    virtual bool sendReplyFrame( Frame &frame,
                                  uint8_t const *data1 = 0,
                                  uint16_t len1 = 0,
                                  uint8_t const *data2 = 0,
@@ -106,15 +106,15 @@ class RawSocket
      * @param frame pointer to the frame
      * @return bool true if the frame was received
      */
-    static bool multiRecvFrame( FrameBase *frame );
+    static bool multiRecvFrame( Frame *frame );
 
-    static bool multiSendFrame( FrameBase const &frame,
+    static bool multiSendFrame( Frame const &frame,
                                 uint8_t const *data1 = 0,
                                 uint16_t len1 = 0,
                                 uint8_t const *data2 = 0,
                                 uint16_t len2 = 0 );
 
-    static bool multiSendReplyFrame( FrameBase &frame,
+    static bool multiSendReplyFrame( Frame &frame,
                                      uint8_t const *data1 = 0,
                                      uint16_t len1 = 0,
                                      uint8_t const *data2 = 0,

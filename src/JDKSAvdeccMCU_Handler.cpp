@@ -39,7 +39,7 @@ Handler::~Handler() {}
 
 void Handler::tick() {}
 
-bool Handler::receivedPDU( FrameBase &frame )
+bool Handler::receivedPDU( Frame &frame )
 {
     (void)frame;
     return false;

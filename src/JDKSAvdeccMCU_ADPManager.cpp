@@ -70,7 +70,7 @@ void ADPManager::sendADP()
 {
     jdksavdecc_eui48 adp_multicast_addr = JDKSAVDECC_MULTICAST_ADP_ACMP;
 
-    Frame<82> adp(
+    FrameWithSize<82> adp(
         0,
         adp_multicast_addr,
         m_net.getMACAddress(),
@@ -116,7 +116,7 @@ void ADPManager::sendADP()
     m_available_index++;
 }
 
-bool ADPManager::receivedPDU( FrameBase &frame )
+bool ADPManager::receivedPDU( Frame &frame )
 {
     (void)frame;
     return false;

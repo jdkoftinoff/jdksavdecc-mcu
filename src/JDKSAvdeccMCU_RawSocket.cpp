@@ -39,7 +39,7 @@ RawSocket *RawSocket::net[JDKSAVDECCMCU_MAX_RAWSOCKETS] = {};
 uint16_t RawSocket::num_rawsockets = 0;
 uint16_t RawSocket::last_recv_socket = 0;
 
-bool RawSocket::multiRecvFrame( FrameBase *frame )
+bool RawSocket::multiRecvFrame( Frame *frame )
 {
     bool r = false;
     if ( net[last_recv_socket]->recvFrame( frame ) )
@@ -50,7 +50,7 @@ bool RawSocket::multiRecvFrame( FrameBase *frame )
     return r;
 }
 
-bool RawSocket::multiSendFrame( FrameBase const &frame,
+bool RawSocket::multiSendFrame( Frame const &frame,
                                 uint8_t const *data1,
                                 uint16_t len1,
                                 uint8_t const *data2,
@@ -69,7 +69,7 @@ bool RawSocket::multiSendFrame( FrameBase const &frame,
     return true;
 }
 
-bool RawSocket::multiSendReplyFrame( FrameBase &frame,
+bool RawSocket::multiSendReplyFrame( Frame &frame,
                                      uint8_t const *data1,
                                      uint16_t len1,
                                      uint8_t const *data2,

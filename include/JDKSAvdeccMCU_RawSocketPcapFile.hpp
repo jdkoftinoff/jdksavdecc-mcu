@@ -53,15 +53,15 @@ class RawSocketPcapFile : public RawSocket
 
     virtual jdksavdecc_timestamp_in_milliseconds getTimeInMilliseconds();
 
-    virtual bool recvFrame( FrameBase *frame );
+    virtual bool recvFrame( Frame *frame );
 
-    virtual bool sendFrame( FrameBase const &frame,
+    virtual bool sendFrame( Frame const &frame,
                             uint8_t const *data1,
                             uint16_t len1,
                             uint8_t const *data2,
                             uint16_t len2 );
 
-    virtual bool sendReplyFrame( FrameBase &frame,
+    virtual bool sendReplyFrame( Frame &frame,
                                  uint8_t const *data1,
                                  uint16_t len1,
                                  uint8_t const *data2,

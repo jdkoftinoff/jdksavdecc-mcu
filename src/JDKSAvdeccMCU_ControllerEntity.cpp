@@ -36,7 +36,7 @@
 namespace JDKSAvdeccMCU
 {
 
-bool ControllerEntity::receivedPDU( FrameBase &frame )
+bool ControllerEntity::receivedPDU( Frame &frame )
 {
     bool r = false;
     bool done = false;
@@ -80,7 +80,7 @@ bool ControllerEntity::receivedPDU( FrameBase &frame )
 }
 
 bool ControllerEntity::receivedAEMResponse( jdksavdecc_aecpdu_aem const &aem,
-                                            FrameBase &pdu )
+                                            Frame &pdu )
 {
     bool r = false;
     // figure out if it is unsolicited from the high bit of command_type
@@ -166,7 +166,7 @@ bool ControllerEntity::receivedAEMResponse( jdksavdecc_aecpdu_aem const &aem,
 }
 
 bool ControllerEntity::receivedAAResponse( jdksavdecc_aecp_aa const &aa,
-                                           FrameBase &pdu )
+                                           Frame &pdu )
 {
     (void)aa;
     (void)pdu;
@@ -174,7 +174,7 @@ bool ControllerEntity::receivedAAResponse( jdksavdecc_aecp_aa const &aa,
 }
 
 bool ControllerEntity::receiveAcquireEntityResponse(
-    jdksavdecc_aecpdu_aem const &aem, FrameBase &pdu )
+    jdksavdecc_aecpdu_aem const &aem, Frame &pdu )
 {
     (void)aem;
     (void)pdu;
@@ -182,7 +182,7 @@ bool ControllerEntity::receiveAcquireEntityResponse(
 }
 
 bool ControllerEntity::receiveLockEntityResponse(
-    jdksavdecc_aecpdu_aem const &aem, FrameBase &pdu )
+    jdksavdecc_aecpdu_aem const &aem, Frame &pdu )
 {
     (void)aem;
     (void)pdu;
@@ -190,7 +190,7 @@ bool ControllerEntity::receiveLockEntityResponse(
 }
 
 bool ControllerEntity::receiveEntityAvailableResponse(
-    jdksavdecc_aecpdu_aem const &aem, FrameBase &pdu )
+    jdksavdecc_aecpdu_aem const &aem, Frame &pdu )
 {
     (void)aem;
     (void)pdu;
@@ -198,7 +198,7 @@ bool ControllerEntity::receiveEntityAvailableResponse(
 }
 
 bool ControllerEntity::receiveReadDescriptorResponse(
-    jdksavdecc_aecpdu_aem const &aem, FrameBase &pdu )
+    jdksavdecc_aecpdu_aem const &aem, Frame &pdu )
 {
     (void)aem;
     (void)pdu;
@@ -206,7 +206,7 @@ bool ControllerEntity::receiveReadDescriptorResponse(
 }
 
 bool ControllerEntity::receiveSetConfigurationResponse(
-    jdksavdecc_aecpdu_aem const &aem, FrameBase &pdu )
+    jdksavdecc_aecpdu_aem const &aem, Frame &pdu )
 {
     (void)aem;
     (void)pdu;
@@ -214,7 +214,7 @@ bool ControllerEntity::receiveSetConfigurationResponse(
 }
 
 bool ControllerEntity::receiveGetConfigurationResponse(
-    jdksavdecc_aecpdu_aem const &aem, FrameBase &pdu )
+    jdksavdecc_aecpdu_aem const &aem, Frame &pdu )
 {
     (void)aem;
     (void)pdu;
@@ -222,7 +222,7 @@ bool ControllerEntity::receiveGetConfigurationResponse(
 }
 
 bool ControllerEntity::receiveSetNameResponse( jdksavdecc_aecpdu_aem const &aem,
-                                               FrameBase &pdu )
+                                               Frame &pdu )
 {
     (void)aem;
     (void)pdu;
@@ -230,7 +230,7 @@ bool ControllerEntity::receiveSetNameResponse( jdksavdecc_aecpdu_aem const &aem,
 }
 
 bool ControllerEntity::receiveGetNameResponse( jdksavdecc_aecpdu_aem const &aem,
-                                               FrameBase &pdu )
+                                               Frame &pdu )
 {
     (void)aem;
     (void)pdu;
@@ -238,7 +238,7 @@ bool ControllerEntity::receiveGetNameResponse( jdksavdecc_aecpdu_aem const &aem,
 }
 
 bool ControllerEntity::receiveSetControlResponse(
-    jdksavdecc_aecpdu_aem const &aem, FrameBase &pdu )
+    jdksavdecc_aecpdu_aem const &aem, Frame &pdu )
 {
     (void)aem;
     (void)pdu;
@@ -246,7 +246,7 @@ bool ControllerEntity::receiveSetControlResponse(
 }
 
 bool ControllerEntity::receiveGetControlResponse(
-    jdksavdecc_aecpdu_aem const &aem, FrameBase &pdu )
+    jdksavdecc_aecpdu_aem const &aem, Frame &pdu )
 {
     (void)aem;
     (void)pdu;
@@ -267,7 +267,7 @@ uint8_t ControllerEntity::receiveControlValue(
 }
 
 bool ControllerEntity::receiveRegisterUnsolicitedNotificationResponse(
-    jdksavdecc_aecpdu_aem const &aem, FrameBase &pdu )
+    jdksavdecc_aecpdu_aem const &aem, Frame &pdu )
 {
     (void)aem;
     (void)pdu;
@@ -275,7 +275,7 @@ bool ControllerEntity::receiveRegisterUnsolicitedNotificationResponse(
 }
 
 bool ControllerEntity::receiveDeRegisterUnsolicitedNotificationResponse(
-    jdksavdecc_aecpdu_aem const &aem, FrameBase &pdu )
+    jdksavdecc_aecpdu_aem const &aem, Frame &pdu )
 {
     (void)aem;
     (void)pdu;

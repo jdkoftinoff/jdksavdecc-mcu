@@ -56,7 +56,7 @@ class ControlSender : public Handler
     virtual void tick();
 
     /// Handle incoming PDU
-    virtual bool receivedPDU( FrameBase &frame );
+    virtual bool receivedPDU( Frame &frame );
 
     /// Set a one byte value. If it actually changed, then force Tick to send
     /// ASAP

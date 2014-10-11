@@ -35,7 +35,7 @@
 namespace JDKSAvdeccMCU
 {
 
-class FrameBase
+class Frame
 {
   protected:
     jdksavdecc_timestamp_in_milliseconds m_time_in_ms;
@@ -44,12 +44,12 @@ class FrameBase
     uint16_t m_len;
 
   public:
-    FrameBase( jdksavdecc_timestamp_in_milliseconds time_in_ms,
-               uint8_t *buf,
-               uint16_t len,
-               jdksavdecc_eui48 const &dest_mac,
-               jdksavdecc_eui48 const &src_mac,
-               uint16_t ethertype )
+    Frame( jdksavdecc_timestamp_in_milliseconds time_in_ms,
+           uint8_t *buf,
+           uint16_t len,
+           jdksavdecc_eui48 const &dest_mac,
+           jdksavdecc_eui48 const &src_mac,
+           uint16_t ethertype )
         : m_time_in_ms( time_in_ms ), m_buf( buf ), m_pos( 0 ), m_len( len )
     {
         putEUI48( dest_mac );
@@ -57,9 +57,9 @@ class FrameBase
         putDoublet( ethertype );
     }
 
-    FrameBase( jdksavdecc_timestamp_in_milliseconds time_in_ms,
-               uint8_t *buf,
-               uint16_t len )
+    Frame( jdksavdecc_timestamp_in_milliseconds time_in_ms,
+           uint8_t *buf,
+           uint16_t len )
         : m_time_in_ms( time_in_ms )
         , m_buf( buf )
         , m_pos( JDKSAVDECC_FRAME_HEADER_LEN )
@@ -129,8 +129,14 @@ class FrameBase
         }
     }
 
+    void setOctet( uint16_t pos, uint8_t val ) { m_buf[pos] = val; }
+    uint8_t getOctet( uint16_t pos ) const { return m_buf[pos]; }
+
     uint8_t const *getBuf() const { return m_buf; }
     uint8_t *getBuf() { return m_buf; }
+    uint8_t const *getBuf( uint16_t pos ) const { return &m_buf[pos]; }
+    uint8_t *getBuf( uint16_t pos ) { return &m_buf[pos]; }
+
     uint16_t getPosition() const { return m_pos; }
     uint16_t getSize() const { return m_pos; }
     void setPosition( uint16_t n = JDKSAVDECC_FRAME_HEADER_LEN ) { m_pos = n; }
@@ -182,19 +188,19 @@ class FrameBase
 };
 
 template <size_t MaxSize>
-class Frame : public FrameBase
+class FrameWithSize : public Frame
 {
   protected:
     uint8_t m_buf_storage[MaxSize];
 
   public:
-    Frame() : FrameBase( 0, m_buf_storage, 0 ) {}
+    FrameWithSize() : Frame( 0, m_buf_storage, 0 ) {}
 
-    Frame( jdksavdecc_timestamp_in_milliseconds time_in_ms,
-           jdksavdecc_eui48 const &dest_mac,
-           jdksavdecc_eui48 const &src_mac,
-           uint16_t ethertype )
-        : FrameBase(
+    FrameWithSize( jdksavdecc_timestamp_in_milliseconds time_in_ms,
+                   jdksavdecc_eui48 const &dest_mac,
+                   jdksavdecc_eui48 const &src_mac,
+                   uint16_t ethertype )
+        : Frame(
               time_in_ms, m_buf_storage, MaxSize, dest_mac, src_mac, ethertype )
     {
     }

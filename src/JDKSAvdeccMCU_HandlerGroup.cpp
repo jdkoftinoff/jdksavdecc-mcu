@@ -48,7 +48,7 @@ HandlerGroupBase::HandlerGroupBase( RawSocket &net, Handler **item_storage )
 bool HandlerGroupBase::pollNet()
 {
     bool r = false;
-    Frame<JDKSAVDECC_AECP_FRAME_MAX_SIZE> aecp_frame;
+    FrameWithSize<JDKSAVDECC_AECP_FRAME_MAX_SIZE> aecp_frame;
     // Try receive data
     if ( m_net.recvFrame( &aecp_frame ) )
     {
@@ -81,7 +81,7 @@ void HandlerGroupBase::tick()
 }
 
 /// Send ReceivedPDU message to each handler until one returns true.
-bool HandlerGroupBase::receivedPDU( FrameBase &frame )
+bool HandlerGroupBase::receivedPDU( Frame &frame )
 {
     bool r = false;
     for ( uint16_t i = 0; i < m_num_items; ++i )

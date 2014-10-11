@@ -240,7 +240,7 @@ void setup()
 void jdksavdeccmcu_debug_log( const char *str, uint16_t v )
 {
     char txt[64];
-    Frame<256> pdu;
+    FrameWithSize<256> pdu;
     uint16_t r;
     sprintf( txt, "%s %u", str, (unsigned)v );
     r = jdksavdecc_jdks_log_control_generate( &my_entity_id,
@@ -255,7 +255,7 @@ void jdksavdeccmcu_debug_log( const char *str, uint16_t v )
     {
         pdu.setLength( r );
         memcpy(
-            pdu.getBuf() + JDKSAVDECC_FRAME_HEADER_SA_OFFSET, my_mac.value, 6 );
+            pdu.getBuf( JDKSAVDECC_FRAME_HEADER_SA_OFFSET ), my_mac.value, 6 );
         RawSocket::multiSendFrame( pdu );
     }
     else

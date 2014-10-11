@@ -54,7 +54,7 @@ class ADPManager : public Handler
     virtual void tick();
 
     /// Handle any incoming ADPDU. Return true if handled
-    virtual bool receivedPDU( FrameBase &frame );
+    virtual bool receivedPDU( Frame &frame );
 
     /// Formulate the ADPDU and send it
     void sendADP();

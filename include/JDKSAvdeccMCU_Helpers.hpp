@@ -105,7 +105,7 @@ void formAEMSetControl( jdksavdecc_eui48 const &dest_mac,
                         uint16_t value_data_length,
                         uint8_t *buf );
 
-inline bool parseAEM( jdksavdecc_aecpdu_aem *aem, FrameBase const &rx )
+inline bool parseAEM( jdksavdecc_aecpdu_aem *aem, Frame const &rx )
 {
     bool r = false;
     // Validate subtype is AECP
@@ -172,25 +172,25 @@ inline bool
     return r;
 }
 
-inline void
-    setAEMReply( uint8_t status_code, uint16_t new_length, FrameBase &pdu )
+inline void setAEMReply( uint8_t status_code, uint16_t new_length, Frame &pdu )
 {
     // offset 1: sv=0, version=0, control_data = AEM_RESPONSE
-    pdu.getBuf()[pdu.getPosition() + 1]
-        = JDKSAVDECC_AECP_MESSAGE_TYPE_AEM_RESPONSE;
+    pdu.setOctet( pdu.getPosition() + 1,
+                  JDKSAVDECC_AECP_MESSAGE_TYPE_AEM_RESPONSE );
     // new control data length is new_length minus frame beginning position pos
     // and the common control header.
     // See IEEE 1722-2011 Clause 5.3.3
     uint16_t control_data_length = new_length - pdu.getPosition()
                                    - JDKSAVDECC_COMMON_CONTROL_HEADER_LEN;
     // offset 2: status = status code, top 3 bits of new control_data_length
-    pdu.getBuf()[pdu.getPosition() + 2]
-        = ( status_code << 3 ) + ( ( control_data_length >> 8 ) & 0x7 );
+    pdu.setOctet( pdu.getPosition() + 2,
+                  ( status_code << 3 )
+                  + ( ( control_data_length >> 8 ) & 0x7 ) );
     // offset 3: bottom 8 bits of new control_data_length
     // TODO: new control_data_length
 }
 
-inline bool parseAA( jdksavdecc_aecp_aa *aa, FrameBase const &pdu )
+inline bool parseAA( jdksavdecc_aecp_aa *aa, Frame const &pdu )
 {
     bool r = false;
     // Validate subtype is AA

@@ -67,7 +67,7 @@ class HandlerGroupBase : public Handler
     virtual void tick();
 
     /// Send ReceivedPDU message to each handler until one returns true.
-    virtual bool receivedPDU( FrameBase &frame );
+    virtual bool receivedPDU( Frame &frame );
 };
 
 /// HandlerGroup is a HandlerGroupBase and contains

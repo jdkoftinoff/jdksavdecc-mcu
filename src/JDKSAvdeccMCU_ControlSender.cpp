@@ -113,10 +113,11 @@ void ControlSender::tick()
 
 void ControlSender::sendSetControl()
 {
-    Frame<128> pdu( 0,
-                    m_target_mac_address,
-                    m_net.getMACAddress(),
-                    JDKSAVDECC_AVTP_ETHERTYPE ); // DA, SA, EtherType, ADPDU
+    FrameWithSize<128> pdu(
+        0,
+        m_target_mac_address,
+        m_net.getMACAddress(),
+        JDKSAVDECC_AVTP_ETHERTYPE ); // DA, SA, EtherType, ADPDU
 
     // AECPDU common control header
     pdu.putOctet( 0x80 + JDKSAVDECC_SUBTYPE_AECP ); // cd=1, subtype=0x7b (AECP)
@@ -146,7 +147,7 @@ void ControlSender::sendSetControl()
     m_sequence_id++;
 }
 
-bool ControlSender::receivedPDU( FrameBase &frame )
+bool ControlSender::receivedPDU( Frame &frame )
 {
     (void)frame;
     return false;

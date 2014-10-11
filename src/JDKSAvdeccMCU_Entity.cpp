@@ -121,7 +121,7 @@ void Entity::commandTimedOut( jdksavdecc_eui64 const &target_entity_id,
             sizeof( m_last_sent_command_target_entity_id ) );
 }
 
-bool Entity::receivedPDU( FrameBase &frame )
+bool Entity::receivedPDU( Frame &frame )
 {
     bool r = false;
     // we already know the message is AVTP ethertype and is either directly
@@ -158,7 +158,7 @@ bool Entity::receivedPDU( FrameBase &frame )
 }
 
 uint8_t Entity::receivedAEMCommand( jdksavdecc_aecpdu_aem const &aem,
-                                    FrameBase &pdu )
+                                    Frame &pdu )
 {
     // The low 15 bits of command_type is the command. High bit is the 'u' bit.
     uint16_t actual_command_type = aem.command_type & 0x7fff;
@@ -229,9 +229,9 @@ uint8_t Entity::receivedAEMCommand( jdksavdecc_aecpdu_aem const &aem,
     }
 
     // fill in the new response status
-    pdu.getBuf()[JDKSAVDECC_FRAME_HEADER_LEN + 2]
-        = ( pdu.getBuf()[JDKSAVDECC_FRAME_HEADER_LEN + 2] & 0x7 )
-          + ( response_status << 3 );
+    pdu.setOctet( JDKSAVDECC_FRAME_HEADER_LEN + 2,
+                  ( pdu.getOctet( JDKSAVDECC_FRAME_HEADER_LEN + 2 ) & 0x7 )
+                  + ( response_status << 3 ) );
 
     // Send the response to either just the requesting controller or it and all
     // registered controllers
@@ -292,8 +292,7 @@ uint8_t Entity::validatePermissions( jdksavdecc_aecpdu_aem const &aem )
     return response_status;
 }
 
-uint8_t Entity::receivedAACommand( jdksavdecc_aecp_aa const &aa,
-                                   FrameBase &pdu )
+uint8_t Entity::receivedAACommand( jdksavdecc_aecp_aa const &aa, Frame &pdu )
 {
     // Yes go through the TLV's and dispatch the read/writes and respond
     uint8_t *p = pdu.getBuf() + JDKSAVDECC_FRAME_HEADER_LEN
@@ -348,9 +347,9 @@ uint8_t Entity::receivedAACommand( jdksavdecc_aecp_aa const &aa,
     }
     // Send the response to either just the requesting controller or it and all
     // registered controllers
-    pdu.getBuf()[JDKSAVDECC_FRAME_HEADER_LEN + 2]
-        = ( pdu.getBuf()[JDKSAVDECC_FRAME_HEADER_LEN + 2] & 0x7 )
-          + ( aa_status << 3 );
+    pdu.setOctet( JDKSAVDECC_FRAME_HEADER_LEN + 2,
+                  ( pdu.getOctet( JDKSAVDECC_FRAME_HEADER_LEN + 2 ) & 0x7 )
+                  + ( aa_status << 3 ) );
 
     // Only send responses to the requesting controller
     sendResponses( false, false, pdu );
@@ -360,7 +359,7 @@ uint8_t Entity::receivedAACommand( jdksavdecc_aecp_aa const &aa,
 
 void Entity::sendResponses( bool internally_generated,
                             bool send_to_registered_controllers,
-                            FrameBase &pdu,
+                            Frame &pdu,
                             uint8_t const *additional_data1,
                             uint16_t additional_data_length1,
                             uint8_t const *additional_data2,
@@ -453,7 +452,7 @@ void Entity::sendCommand( jdksavdecc_eui64 const &target_entity_id,
     // Make a temp pdu buffer just long enough to contain:
     // ethernet frame DA,SA,Ethertype, AVTP Common Control Header, AVDECC AEM
     // Common Format.
-    Frame<JDKSAVDECC_FRAME_HEADER_LEN + JDKSAVDECC_AECPDU_AEM_LEN> pdu(
+    FrameWithSize<JDKSAVDECC_FRAME_HEADER_LEN + JDKSAVDECC_AECPDU_AEM_LEN> pdu(
         0,
         target_mac_address,
         m_net.getMACAddress(),
@@ -515,7 +514,7 @@ void Entity::sendUnsolicitedResponses( uint16_t aem_command_type,
     // Make a temp pdu buffer just long enough to contain:
     // ethernet frame DA,SA,Ethertype, AVTP Common Control Header, AVDECC AEM
     // Common Format.
-    Frame<JDKSAVDECC_FRAME_HEADER_LEN + JDKSAVDECC_AECPDU_AEM_LEN> pdu(
+    FrameWithSize<JDKSAVDECC_FRAME_HEADER_LEN + JDKSAVDECC_AECPDU_AEM_LEN> pdu(
         0,
         m_net.getMACAddress(),
         m_net.getMACAddress(),
@@ -560,7 +559,7 @@ void Entity::sendUnsolicitedResponses( uint16_t aem_command_type,
 }
 
 uint8_t Entity::receiveAcquireEntityCommand( jdksavdecc_aecpdu_aem const &aem,
-                                             FrameBase &pdu )
+                                             Frame &pdu )
 {
 
     uint8_t status = JDKSAVDECC_AECP_STATUS_NOT_IMPLEMENTED;
@@ -640,7 +639,7 @@ uint8_t Entity::receiveAcquireEntityCommand( jdksavdecc_aecpdu_aem const &aem,
 }
 
 uint8_t Entity::receiveLockEntityCommand( jdksavdecc_aecpdu_aem const &aem,
-                                          FrameBase &pdu )
+                                          Frame &pdu )
 {
     (void)aem;
     (void)pdu;
@@ -648,7 +647,7 @@ uint8_t Entity::receiveLockEntityCommand( jdksavdecc_aecpdu_aem const &aem,
 }
 
 uint8_t Entity::receiveEntityAvailableCommand( jdksavdecc_aecpdu_aem const &aem,
-                                               FrameBase &pdu )
+                                               Frame &pdu )
 {
     (void)aem;
     (void)pdu;
@@ -658,7 +657,7 @@ uint8_t Entity::receiveEntityAvailableCommand( jdksavdecc_aecpdu_aem const &aem,
 
 uint8_t
     Entity::receiveControllerAvailableCommand( jdksavdecc_aecpdu_aem const &aem,
-                                               FrameBase &pdu )
+                                               Frame &pdu )
 {
     (void)aem;
     (void)pdu;
@@ -667,7 +666,7 @@ uint8_t
 }
 
 bool Entity::receiveControllerAvailableResponse(
-    jdksavdecc_aecpdu_aem const &aem, FrameBase &pdu )
+    jdksavdecc_aecpdu_aem const &aem, Frame &pdu )
 {
     (void)aem;
     (void)pdu;
@@ -680,7 +679,7 @@ bool Entity::receiveControllerAvailableResponse(
 }
 
 uint8_t Entity::receiveReadDescriptorCommand( jdksavdecc_aecpdu_aem const &aem,
-                                              FrameBase &pdu )
+                                              Frame &pdu )
 {
     (void)aem;
     (void)pdu;
@@ -690,7 +689,7 @@ uint8_t Entity::receiveReadDescriptorCommand( jdksavdecc_aecpdu_aem const &aem,
 
 uint8_t
     Entity::receiveSetConfigurationCommand( jdksavdecc_aecpdu_aem const &aem,
-                                            FrameBase &pdu )
+                                            Frame &pdu )
 {
     (void)aem;
     (void)pdu;
@@ -700,7 +699,7 @@ uint8_t
 
 uint8_t
     Entity::receiveGetConfigurationCommand( jdksavdecc_aecpdu_aem const &aem,
-                                            FrameBase &pdu )
+                                            Frame &pdu )
 {
     (void)aem;
     (void)pdu;
@@ -709,7 +708,7 @@ uint8_t
 }
 
 uint8_t Entity::receiveSetNameCommand( jdksavdecc_aecpdu_aem const &aem,
-                                       FrameBase &pdu )
+                                       Frame &pdu )
 {
     (void)aem;
     (void)pdu;
@@ -718,7 +717,7 @@ uint8_t Entity::receiveSetNameCommand( jdksavdecc_aecpdu_aem const &aem,
 }
 
 uint8_t Entity::receiveGetNameCommand( jdksavdecc_aecpdu_aem const &aem,
-                                       FrameBase &pdu )
+                                       Frame &pdu )
 {
     (void)aem;
     (void)pdu;
@@ -727,7 +726,7 @@ uint8_t Entity::receiveGetNameCommand( jdksavdecc_aecpdu_aem const &aem,
 }
 
 uint8_t Entity::receiveSetControlCommand( jdksavdecc_aecpdu_aem const &aem,
-                                          FrameBase &pdu )
+                                          Frame &pdu )
 {
     (void)aem;
     (void)pdu;
@@ -736,7 +735,7 @@ uint8_t Entity::receiveSetControlCommand( jdksavdecc_aecpdu_aem const &aem,
 }
 
 uint8_t Entity::receiveGetControlCommand( jdksavdecc_aecpdu_aem const &aem,
-                                          FrameBase &pdu )
+                                          Frame &pdu )
 {
     (void)aem;
     (void)pdu;
@@ -745,7 +744,7 @@ uint8_t Entity::receiveGetControlCommand( jdksavdecc_aecpdu_aem const &aem,
 }
 
 uint8_t Entity::receiveRegisterUnsolicitedNotificationCommand(
-    jdksavdecc_aecpdu_aem const &aem, FrameBase &pdu )
+    jdksavdecc_aecpdu_aem const &aem, Frame &pdu )
 {
     (void)aem;
     (void)pdu;
@@ -754,7 +753,7 @@ uint8_t Entity::receiveRegisterUnsolicitedNotificationCommand(
 }
 
 uint8_t Entity::receiveDeRegisterUnsolicitedNotificationCommand(
-    jdksavdecc_aecpdu_aem const &aem, FrameBase &pdu )
+    jdksavdecc_aecpdu_aem const &aem, Frame &pdu )
 {
     (void)aem;
     (void)pdu;
@@ -763,7 +762,7 @@ uint8_t Entity::receiveDeRegisterUnsolicitedNotificationCommand(
 }
 
 uint8_t Entity::readDescriptorEntity( jdksavdecc_aecpdu_aem const &aem,
-                                      FrameBase &pdu )
+                                      Frame &pdu )
 {
     (void)aem;
     (void)pdu;
@@ -772,7 +771,7 @@ uint8_t Entity::readDescriptorEntity( jdksavdecc_aecpdu_aem const &aem,
 }
 
 uint8_t Entity::readDescriptorConfiguration( jdksavdecc_aecpdu_aem const &aem,
-                                             FrameBase &pdu )
+                                             Frame &pdu )
 {
     (void)aem;
     (void)pdu;
@@ -781,7 +780,7 @@ uint8_t Entity::readDescriptorConfiguration( jdksavdecc_aecpdu_aem const &aem,
 }
 
 uint8_t Entity::readDescriptorControl( jdksavdecc_aecpdu_aem const &aem,
-                                       FrameBase &pdu )
+                                       Frame &pdu )
 {
     (void)aem;
     (void)pdu;
@@ -790,7 +789,7 @@ uint8_t Entity::readDescriptorControl( jdksavdecc_aecpdu_aem const &aem,
 }
 
 uint8_t Entity::readDescriptorLocale( jdksavdecc_aecpdu_aem const &aem,
-                                      FrameBase &pdu )
+                                      Frame &pdu )
 {
     (void)aem;
     (void)pdu;
@@ -799,7 +798,7 @@ uint8_t Entity::readDescriptorLocale( jdksavdecc_aecpdu_aem const &aem,
 }
 
 uint8_t Entity::readDescriptorStrings( jdksavdecc_aecpdu_aem const &aem,
-                                       FrameBase &pdu )
+                                       Frame &pdu )
 {
     (void)aem;
     (void)pdu;
@@ -808,7 +807,7 @@ uint8_t Entity::readDescriptorStrings( jdksavdecc_aecpdu_aem const &aem,
 }
 
 uint8_t Entity::readDescriptorMemory( jdksavdecc_aecpdu_aem const &aem,
-                                      FrameBase &pdu )
+                                      Frame &pdu )
 {
     (void)aem;
     (void)pdu;

@@ -47,6 +47,6 @@ class Handler
     virtual void tick();
 
     /// Notification of received raw PDU. Return true if PDU is handled
-    virtual bool receivedPDU( FrameBase &frame );
+    virtual bool receivedPDU( Frame &frame );
 };
 }

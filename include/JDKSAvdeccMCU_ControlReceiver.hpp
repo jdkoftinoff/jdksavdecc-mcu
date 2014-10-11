@@ -64,7 +64,7 @@ class ControlReceiver : public Handler
     }
 
     virtual bool receivedGetControlCommand( jdksavdecc_aecpdu_aem const &aem,
-                                            FrameBase &pdu )
+                                            Frame &pdu )
     {
         bool r = false;
         // yes, get the descriptor index
@@ -91,7 +91,7 @@ class ControlReceiver : public Handler
     }
 
     virtual bool receivedSetControlCommand( jdksavdecc_aecpdu_aem const &aem,
-                                            FrameBase &pdu )
+                                            Frame &pdu )
     {
         bool r = false;
         // yes, get the descriptor index
@@ -117,7 +117,7 @@ class ControlReceiver : public Handler
 
     virtual bool
         receivedReadDescriptorCommand( jdksavdecc_aecpdu_aem const &aem,
-                                       FrameBase &pdu )
+                                       Frame &pdu )
     {
         bool r = false;
         (void)aem;
@@ -135,7 +135,7 @@ class ControlReceiver : public Handler
         // we already know the message is AVTP ethertype and is either directly
         // targetting my MAC address or is a multicast message
 
-        FrameBase pdu( time_in_millis, buf, len );
+        Frame pdu( time_in_millis, buf, len );
 
         // Try see if it is an AEM message
         jdksavdecc_aecpdu_aem aem;
