@@ -94,7 +94,6 @@
 
 namespace JDKSAvdeccMCU
 {
-using namespace jdksavdecc;
 }
 
 #if defined( __AVR__ )
@@ -105,6 +104,8 @@ inline jdksavdecc_timestamp_in_milliseconds getTimeInMilliseconds()
     return millis();
 }
 #elif defined( __APPLE__ ) || defined( __linux__ )
+#include <vector>
+#include <memory>
 #include <sys/time.h>
 #include <iostream>
 #include <iomanip>
@@ -117,6 +118,8 @@ inline jdksavdecc_timestamp_in_milliseconds getTimeInMilliseconds()
            + jdksavdecc_timestamp_in_milliseconds( tv.tv_sec * 1000 );
 }
 #elif defined( _WIN32 )
+#include <vector>
+#include <memory>
 #include <iostream>
 #include <iomanip>
 inline jdksavdecc_timestamp_in_milliseconds getTimeInMilliseconds()
