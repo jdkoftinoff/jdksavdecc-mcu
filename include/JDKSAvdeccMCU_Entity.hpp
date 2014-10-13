@@ -63,6 +63,9 @@ class Entity : public Handler
     /// Get the ADP Manager
     ADPManager &getADPManager() { return m_adp_manager; }
 
+    /// Get the RawSocket from the ADP Manager
+    RawSocket &getRawSocket() { return m_adp_manager.getRawSocket(); }
+
     /// Get the Entity ID
     jdksavdecc_eui64 const &getEntityID() const
     {
@@ -291,9 +294,6 @@ class Entity : public Handler
                                       uint8_t const *request );
 
   protected:
-    /// The network port
-    RawSocket &m_net;
-
     /// The advertising manager, also contains capabilities, entity_id, and
     /// entity_model_id
     ADPManager &m_adp_manager;
@@ -351,7 +351,7 @@ class Entity : public Handler
     /// This is the entity id that was the target of the last command that we
     /// sent
     jdksavdecc_eui64 m_last_sent_command_target_entity_id;
-    /// THis is the comamnd_type of the last command that we sent to another
+    /// THis is the command_type of the last command that we sent to another
     /// entity
     uint16_t m_last_sent_command_type;
 };

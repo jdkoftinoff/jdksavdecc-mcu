@@ -58,6 +58,7 @@ class ADPManager : public Handler
 
     /// Formulate the ADPDU and send it
     void sendADP();
+    RawSocket &getRawSocket() { return m_net; }
 
     jdksavdecc_eui64 const &getEntityID() const { return m_entity_id; }
     jdksavdecc_eui64 const &getEntityModelID() const

@@ -37,8 +37,7 @@ namespace JDKSAvdeccMCU
 {
 
 Entity::Entity( RawSocket &net, ADPManager &adp_manager )
-    : m_net( net )
-    , m_adp_manager( adp_manager )
+    : m_adp_manager( adp_manager )
     , m_outgoing_sequence_id( 0 )
     , m_acquire_in_progress_time( 0 )
     , m_locked_time( 0 )
@@ -64,7 +63,7 @@ void Entity::tick()
     jdksavdecc_timestamp_in_milliseconds time_in_millis;
     uint16_t cmd = m_last_sent_command_type;
 
-    time_in_millis = m_net.getTimeInMilliseconds();
+    time_in_millis = getRawSocket().getTimeInMilliseconds();
 
     // If we are locked, then time out the lock
     if ( jdksavdecc_eui64_is_set( m_locked_by_controller_entity_id ) )
@@ -380,7 +379,7 @@ void Entity::sendResponses( bool internally_generated,
             JDKSAVDECC_FRAME_HEADER_LEN
             + JDKSAVDECC_AECPDU_COMMON_OFFSET_CONTROLLER_ENTITY_ID );
         // Send the buf to the original
-        m_net.sendReplyFrame( pdu,
+        getRawSocket().sendReplyFrame( pdu,
                               additional_data1,
                               additional_data_length1,
                               additional_data2,
@@ -388,7 +387,7 @@ void Entity::sendResponses( bool internally_generated,
     }
     else
     {
-        pdu.setSA( m_net.getMACAddress() );
+        pdu.setSA( getRawSocket().getMACAddress() );
     }
 
     if ( send_to_registered_controllers )
@@ -428,7 +427,7 @@ void Entity::sendResponses( bool internally_generated,
                         pdu.getBuf(),
                         0 );
                     // Send the frame to that controller
-                    m_net.sendFrame( pdu,
+                    getRawSocket().sendFrame( pdu,
                                      additional_data1,
                                      additional_data_length1,
                                      additional_data2,
@@ -455,7 +454,7 @@ void Entity::sendCommand( jdksavdecc_eui64 const &target_entity_id,
     FrameWithSize<JDKSAVDECC_FRAME_HEADER_LEN + JDKSAVDECC_AECPDU_AEM_LEN> pdu(
         0,
         target_mac_address,
-        m_net.getMACAddress(),
+        getRawSocket().getMACAddress(),
         JDKSAVDECC_AVTP_ETHERTYPE );
 
     // control_data_length field is N + value_length
@@ -487,7 +486,7 @@ void Entity::sendCommand( jdksavdecc_eui64 const &target_entity_id,
     pdu.putDoublet( aem_command_type );
 
     // Send the header appended to any additional data
-    m_net.sendFrame( pdu,
+    getRawSocket().sendFrame( pdu,
                      additional_data1,
                      additional_data_length1,
                      additional_data2,
@@ -516,8 +515,8 @@ void Entity::sendUnsolicitedResponses( uint16_t aem_command_type,
     // Common Format.
     FrameWithSize<JDKSAVDECC_FRAME_HEADER_LEN + JDKSAVDECC_AECPDU_AEM_LEN> pdu(
         0,
-        m_net.getMACAddress(),
-        m_net.getMACAddress(),
+        getRawSocket().getMACAddress(),
+        getRawSocket().getMACAddress(),
         JDKSAVDECC_AVTP_ETHERTYPE );
 
     // control_data_length field is N + value_length
