@@ -229,8 +229,8 @@ uint8_t Entity::receivedAEMCommand( jdksavdecc_aecpdu_aem const &aem,
 
     // fill in the new response status
     pdu.setOctet( ( pdu.getOctet( JDKSAVDECC_FRAME_HEADER_LEN + 2 ) & 0x7 )
-                   + ( response_status << 3 ),
-                   JDKSAVDECC_FRAME_HEADER_LEN + 2 );
+                  + ( response_status << 3 ),
+                  JDKSAVDECC_FRAME_HEADER_LEN + 2 );
 
     // Send the response to either just the requesting controller or it and all
     // registered controllers
@@ -347,8 +347,8 @@ uint8_t Entity::receivedAACommand( jdksavdecc_aecp_aa const &aa, Frame &pdu )
     // Send the response to either just the requesting controller or it and all
     // registered controllers
     pdu.setOctet( ( pdu.getOctet( JDKSAVDECC_FRAME_HEADER_LEN + 2 ) & 0x7 )
-                   + ( aa_status << 3 ),
-                   JDKSAVDECC_FRAME_HEADER_LEN + 2 );
+                  + ( aa_status << 3 ),
+                  JDKSAVDECC_FRAME_HEADER_LEN + 2 );
 
     // Only send responses to the requesting controller
     sendResponses( false, false, pdu );

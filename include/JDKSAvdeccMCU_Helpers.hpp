@@ -178,20 +178,19 @@ inline void setAEMReply( uint8_t status_code, uint16_t new_length, Frame &pdu )
 {
     // offset 1: sv=0, version=0, control_data = AEM_RESPONSE
     pdu.setOctet( JDKSAVDECC_AECP_MESSAGE_TYPE_AEM_RESPONSE,
-                   JDKSAVDECC_FRAME_HEADER_LEN + 1 );
+                  JDKSAVDECC_FRAME_HEADER_LEN + 1 );
     // new control data length is new_length minus frame beginning position pos
     // and the common control header.
     // See IEEE 1722-2011 Clause 5.3.3
     uint16_t control_data_length = new_length - JDKSAVDECC_FRAME_HEADER_LEN
                                    - JDKSAVDECC_COMMON_CONTROL_HEADER_LEN;
     // offset 2: status = status code, top 3 bits of new control_data_length
-    pdu.setOctet( ( status_code << 3 )
-                   + ( ( control_data_length >> 8 ) & 0x7 ),
-                   JDKSAVDECC_FRAME_HEADER_LEN + 2 );
+    pdu.setOctet( ( status_code << 3 ) + ( ( control_data_length >> 8 ) & 0x7 ),
+                  JDKSAVDECC_FRAME_HEADER_LEN + 2 );
     // offset 3: bottom 8 bits of new control_data_length
 
     pdu.setOctet( uint8_t( control_data_length & 0xff ),
-                   JDKSAVDECC_FRAME_HEADER_LEN + 3 );
+                  JDKSAVDECC_FRAME_HEADER_LEN + 3 );
 }
 
 inline bool parseAA( jdksavdecc_aecp_aa *aa, Frame const &pdu )

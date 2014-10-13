@@ -117,6 +117,7 @@ class FixedBuffer
     {
         jdksavdecc_uint16_set( v, m_buf, pos );
     }
+
     uint16_t getDoublet( uint16_t pos ) const
     {
         return jdksavdecc_uint16_get( m_buf, pos );
