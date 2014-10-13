@@ -109,13 +109,15 @@ inline bool parseAEM( jdksavdecc_aecpdu_aem *aem, Frame const &rx )
 {
     bool r = false;
     // Validate subtype is AECP
-    if ( jdksavdecc_uint8_get( rx.getBuf(), rx.getPosition() )
-         == ( 0x80 + JDKSAVDECC_SUBTYPE_AECP ) )
+    if ( rx.getOctet( JDKSAVDECC_FRAME_HEADER_LEN )
+         == JDKSAVDECC_1722A_SUBTYPE_AECP )
     {
         // Yes, read the aem header
         memset( aem, 0, sizeof( *aem ) );
-        if ( jdksavdecc_aecpdu_aem_read(
-                 aem, rx.getBuf(), rx.getPosition(), rx.getMaxLength() ) > 0 )
+        if ( jdksavdecc_aecpdu_aem_read( aem,
+                                         rx.getBuf(),
+                                         JDKSAVDECC_FRAME_HEADER_LEN,
+                                         rx.getMaxLength() ) > 0 )
         {
             // make sure it is version 0 and an AEM_COMMAND or AEM_RESPONSE
             if ( aem->aecpdu_header.header.version == 0
@@ -175,32 +177,36 @@ inline bool
 inline void setAEMReply( uint8_t status_code, uint16_t new_length, Frame &pdu )
 {
     // offset 1: sv=0, version=0, control_data = AEM_RESPONSE
-    pdu.setOctet( pdu.getPosition() + 1,
-                  JDKSAVDECC_AECP_MESSAGE_TYPE_AEM_RESPONSE );
+    pdu.setOctetx( JDKSAVDECC_AECP_MESSAGE_TYPE_AEM_RESPONSE,
+                   JDKSAVDECC_FRAME_HEADER_LEN + 1 );
     // new control data length is new_length minus frame beginning position pos
     // and the common control header.
     // See IEEE 1722-2011 Clause 5.3.3
-    uint16_t control_data_length = new_length - pdu.getPosition()
+    uint16_t control_data_length = new_length - JDKSAVDECC_FRAME_HEADER_LEN
                                    - JDKSAVDECC_COMMON_CONTROL_HEADER_LEN;
     // offset 2: status = status code, top 3 bits of new control_data_length
-    pdu.setOctet( pdu.getPosition() + 2,
-                  ( status_code << 3 )
-                  + ( ( control_data_length >> 8 ) & 0x7 ) );
+    pdu.setOctetx( ( status_code << 3 )
+                   + ( ( control_data_length >> 8 ) & 0x7 ),
+                   JDKSAVDECC_FRAME_HEADER_LEN + 2 );
     // offset 3: bottom 8 bits of new control_data_length
-    // TODO: new control_data_length
+
+    pdu.setOctetx( uint8_t( control_data_length & 0xff ),
+                   JDKSAVDECC_FRAME_HEADER_LEN + 3 );
 }
 
 inline bool parseAA( jdksavdecc_aecp_aa *aa, Frame const &pdu )
 {
     bool r = false;
     // Validate subtype is AA
-    if ( jdksavdecc_uint8_get( pdu.getBuf(), pdu.getPosition() )
-         == ( 0x80 + JDKSAVDECC_SUBTYPE_AECP ) )
+    if ( pdu.getOctet( JDKSAVDECC_FRAME_HEADER_LEN )
+         == JDKSAVDECC_1722A_SUBTYPE_AECP )
     {
         // Yes, read the aa header
 
-        if ( jdksavdecc_aecp_aa_read(
-                 aa, pdu.getBuf(), pdu.getPosition(), pdu.getMaxLength() ) > 0 )
+        if ( jdksavdecc_aecp_aa_read( aa,
+                                      pdu.getBuf(),
+                                      JDKSAVDECC_FRAME_HEADER_LEN,
+                                      pdu.getMaxLength() ) > 0 )
         {
             // make sure it is version 0 and an AA_COMMAND or AA_RESPONSE
             if ( aa->aecpdu_header.header.version == 0

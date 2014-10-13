@@ -71,7 +71,7 @@ class ControlReceiver : public Handler
         // yes, get the descriptor index
         uint16_t descriptor_index
             = jdksavdecc_aem_command_set_control_get_descriptor_index(
-                pdu.getBuf(), pdu.getPosition() );
+                pdu.getBuf(), JDKSAVDECC_FRAME_HEADER_LEN );
         (void)aem;
         // is it a descriptor index that we care about?
         if ( ( descriptor_index >= m_descriptor_index_offset )
@@ -98,7 +98,7 @@ class ControlReceiver : public Handler
         // yes, get the descriptor index
         uint16_t descriptor_index
             = jdksavdecc_aem_command_set_control_get_descriptor_index(
-                pdu.getBuf(), pdu.getPosition() );
+                pdu.getBuf(), JDKSAVDECC_FRAME_HEADER_LEN );
         (void)aem;
         // is it a descriptor index that we care about?
         if ( ( descriptor_index >= m_descriptor_index_offset )
@@ -108,7 +108,7 @@ class ControlReceiver : public Handler
             // yes, it is in range, extract the data value
 
             m_values[descriptor_index - m_descriptor_index_offset]->setValue(
-                pdu.getBuf() + pdu.getPosition()
+                pdu.getBuf() + JDKSAVDECC_FRAME_HEADER_LEN
                 + JDKSAVDECC_AEM_COMMAND_SET_CONTROL_COMMAND_OFFSET_VALUES );
 
             r = true;

@@ -228,9 +228,9 @@ uint8_t Entity::receivedAEMCommand( jdksavdecc_aecpdu_aem const &aem,
     }
 
     // fill in the new response status
-    pdu.setOctet( JDKSAVDECC_FRAME_HEADER_LEN + 2,
-                  ( pdu.getOctet( JDKSAVDECC_FRAME_HEADER_LEN + 2 ) & 0x7 )
-                  + ( response_status << 3 ) );
+    pdu.setOctetx( ( pdu.getOctet( JDKSAVDECC_FRAME_HEADER_LEN + 2 ) & 0x7 )
+                   + ( response_status << 3 ),
+                   JDKSAVDECC_FRAME_HEADER_LEN + 2 );
 
     // Send the response to either just the requesting controller or it and all
     // registered controllers
@@ -346,9 +346,9 @@ uint8_t Entity::receivedAACommand( jdksavdecc_aecp_aa const &aa, Frame &pdu )
     }
     // Send the response to either just the requesting controller or it and all
     // registered controllers
-    pdu.setOctet( JDKSAVDECC_FRAME_HEADER_LEN + 2,
-                  ( pdu.getOctet( JDKSAVDECC_FRAME_HEADER_LEN + 2 ) & 0x7 )
-                  + ( aa_status << 3 ) );
+    pdu.setOctetx( ( pdu.getOctet( JDKSAVDECC_FRAME_HEADER_LEN + 2 ) & 0x7 )
+                   + ( aa_status << 3 ),
+                   JDKSAVDECC_FRAME_HEADER_LEN + 2 );
 
     // Only send responses to the requesting controller
     sendResponses( false, false, pdu );
@@ -574,15 +574,15 @@ uint8_t Entity::receiveAcquireEntityCommand( jdksavdecc_aecpdu_aem const &aem,
 
     // First, make sure this is entity level:
     if ( jdksavdecc_aem_command_acquire_entity_get_descriptor_index(
-             pdu.getBuf(), pdu.getPosition() ) == 0
+             pdu.getBuf(), JDKSAVDECC_FRAME_HEADER_LEN ) == 0
          && jdksavdecc_aem_command_acquire_entity_get_descriptor_type(
-                pdu.getBuf(), pdu.getPosition() )
+                pdu.getBuf(), JDKSAVDECC_FRAME_HEADER_LEN )
             == JDKSAVDECC_DESCRIPTOR_ENTITY )
     {
 
         // is it a release or an acquire?
         if ( jdksavdecc_aem_command_acquire_entity_get_aem_acquire_flags(
-                 pdu.getBuf(), pdu.getPosition() ) & 0x80000000 )
+                 pdu.getBuf(), JDKSAVDECC_FRAME_HEADER_LEN ) & 0x80000000 )
         {
             // This is a request to release.  A release only works if the
             // requesting controller is the current owner, or there is no

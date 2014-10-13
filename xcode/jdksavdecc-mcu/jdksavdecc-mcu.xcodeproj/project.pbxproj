@@ -106,6 +106,8 @@
 		BF1617DB19EC2BF700CD64A2 /* jdksavdecc_print.c in Sources */ = {isa = PBXBuildFile; fileRef = BF1617C619EC2BF700CD64A2 /* jdksavdecc_print.c */; };
 		BF1617DC19EC2BF700CD64A2 /* jdksavdecc_util.c in Sources */ = {isa = PBXBuildFile; fileRef = BF1617C719EC2BF700CD64A2 /* jdksavdecc_util.c */; };
 		BF1617DD19EC2BF700CD64A2 /* jdksavdecc.c in Sources */ = {isa = PBXBuildFile; fileRef = BF1617C819EC2BF700CD64A2 /* jdksavdecc.c */; };
+		BFDF9A2B19EC6D7900E72732 /* JDKSAvdeccMCU_FixedBuffer.hpp in Headers */ = {isa = PBXBuildFile; fileRef = BFDF9A2A19EC6D7900E72732 /* JDKSAvdeccMCU_FixedBuffer.hpp */; };
+		BFDF9A2D19EC6D8500E72732 /* JDKSAvdeccMCU_FixedBuffer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BFDF9A2C19EC6D8500E72732 /* JDKSAvdeccMCU_FixedBuffer.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -210,6 +212,8 @@
 		BF1617C619EC2BF700CD64A2 /* jdksavdecc_print.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = jdksavdecc_print.c; path = "../../jdksavdecc-c/src/jdksavdecc_print.c"; sourceTree = "<group>"; };
 		BF1617C719EC2BF700CD64A2 /* jdksavdecc_util.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = jdksavdecc_util.c; path = "../../jdksavdecc-c/src/jdksavdecc_util.c"; sourceTree = "<group>"; };
 		BF1617C819EC2BF700CD64A2 /* jdksavdecc.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = jdksavdecc.c; path = "../../jdksavdecc-c/src/jdksavdecc.c"; sourceTree = "<group>"; };
+		BFDF9A2A19EC6D7900E72732 /* JDKSAvdeccMCU_FixedBuffer.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = JDKSAvdeccMCU_FixedBuffer.hpp; path = ../../include/JDKSAvdeccMCU_FixedBuffer.hpp; sourceTree = "<group>"; };
+		BFDF9A2C19EC6D8500E72732 /* JDKSAvdeccMCU_FixedBuffer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = JDKSAvdeccMCU_FixedBuffer.cpp; path = ../../src/JDKSAvdeccMCU_FixedBuffer.cpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -259,6 +263,8 @@
 				BF16171D19EC2BB100CD64A2 /* JDKSAvdeccMCU_EEPromStorage.hpp */,
 				BF16174E19EC2BBF00CD64A2 /* JDKSAvdeccMCU_Entity.cpp */,
 				BF16171E19EC2BB100CD64A2 /* JDKSAvdeccMCU_Entity.hpp */,
+				BFDF9A2C19EC6D8500E72732 /* JDKSAvdeccMCU_FixedBuffer.cpp */,
+				BFDF9A2A19EC6D7900E72732 /* JDKSAvdeccMCU_FixedBuffer.hpp */,
 				BF16171F19EC2BB100CD64A2 /* JDKSAvdeccMCU_Frame.hpp */,
 				BF16174F19EC2BBF00CD64A2 /* JDKSAvdeccMCU_Handler.cpp */,
 				BF16172019EC2BB100CD64A2 /* JDKSAvdeccMCU_Handler.hpp */,
@@ -404,6 +410,7 @@
 				BF16179E19EC2BE700CD64A2 /* jdksavdecc_aem_print.h in Headers */,
 				BF16179519EC2BE700CD64A2 /* jdksavdecc_aecp_aa.h in Headers */,
 				BF16173819EC2BB100CD64A2 /* JDKSAvdeccMCU_Frame.hpp in Headers */,
+				BFDF9A2B19EC6D7900E72732 /* JDKSAvdeccMCU_FixedBuffer.hpp in Headers */,
 				BF1617AB19EC2BE700CD64A2 /* jdksavdecc_msinttypes.h in Headers */,
 				BF16173B19EC2BB100CD64A2 /* JDKSAvdeccMCU_Helpers.hpp in Headers */,
 				BF1617A719EC2BE700CD64A2 /* jdksavdecc_jdks.h in Headers */,
@@ -494,6 +501,7 @@
 				BF16175B19EC2BBF00CD64A2 /* JDKSAvdeccMCU_Arduino.cpp in Sources */,
 				BF16176B19EC2BBF00CD64A2 /* JDKSAvdeccMCU_RawSocketWizNet.cpp in Sources */,
 				BF16176719EC2BBF00CD64A2 /* JDKSAvdeccMCU_RawSocketLinux.cpp in Sources */,
+				BFDF9A2D19EC6D8500E72732 /* JDKSAvdeccMCU_FixedBuffer.cpp in Sources */,
 				BF1617DB19EC2BF700CD64A2 /* jdksavdecc_print.c in Sources */,
 				BF16175A19EC2BBF00CD64A2 /* JDKSAvdeccMCU_ADPManager.cpp in Sources */,
 				BF16176019EC2BBF00CD64A2 /* JDKSAvdeccMCU_Entity.cpp in Sources */,
