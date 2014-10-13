@@ -51,8 +51,7 @@ class ControlSender : public Handler
                    uint16_t target_descriptor_index,
                    jdksavdecc_timestamp_in_milliseconds update_rate_in_millis,
                    uint16_t value_length,
-                   uint8_t *value_storage
-                   );
+                   uint8_t *value_storage );
 
     /// Send the SET_CONTROL message if it is time to
     virtual void tick();
@@ -78,7 +77,10 @@ class ControlSender : public Handler
     ControllerEntity &getControllerEntity() { return m_controller_entity; }
     RawSocket &getRawSocket() { return m_controller_entity.getRawSocket(); }
 
-    jdksavdecc_eui64 const &getEntityID() const { return m_controller_entity.getEntityID(); }
+    jdksavdecc_eui64 const &getEntityID() const
+    {
+        return m_controller_entity.getEntityID();
+    }
 
     jdksavdecc_eui64 const &getTargetEntityID() const
     {
@@ -103,24 +105,24 @@ class ControlSender : public Handler
 template <size_t StorageSize>
 class ControlSenderWithStorage : public ControlSender
 {
-    ControlSenderWithStorage( ControllerEntity &controller_entity,
-                              jdksavdecc_eui64 const &target_entity_id,
-                              jdksavdecc_eui48 const &target_mac_address,
-                              uint16_t target_descriptor_index,
-                              jdksavdecc_timestamp_in_milliseconds update_rate_in_millis )
-        : ControlSender(
-              controller_entity,
-              target_entity_id,
-              target_mac_address,
-              target_descriptor_index,
-              update_rate_in_millis,
-              StorageSize,
-              m_value_storage )
+    ControlSenderWithStorage(
+        ControllerEntity &controller_entity,
+        jdksavdecc_eui64 const &target_entity_id,
+        jdksavdecc_eui48 const &target_mac_address,
+        uint16_t target_descriptor_index,
+        jdksavdecc_timestamp_in_milliseconds update_rate_in_millis )
+        : ControlSender( controller_entity,
+                         target_entity_id,
+                         target_mac_address,
+                         target_descriptor_index,
+                         update_rate_in_millis,
+                         StorageSize,
+                         m_value_storage )
     {
-        bzero(m_value_storage,StorageSize);
+        bzero( m_value_storage, StorageSize );
     }
-private:
+
+  private:
     uint8_t m_value_storage[StorageSize];
 };
-
 }

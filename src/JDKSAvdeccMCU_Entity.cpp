@@ -380,10 +380,10 @@ void Entity::sendResponses( bool internally_generated,
             + JDKSAVDECC_AECPDU_COMMON_OFFSET_CONTROLLER_ENTITY_ID );
         // Send the buf to the original
         getRawSocket().sendReplyFrame( pdu,
-                              additional_data1,
-                              additional_data_length1,
-                              additional_data2,
-                              additional_data_length2 );
+                                       additional_data1,
+                                       additional_data_length1,
+                                       additional_data2,
+                                       additional_data_length2 );
     }
     else
     {
@@ -428,10 +428,10 @@ void Entity::sendResponses( bool internally_generated,
                         0 );
                     // Send the frame to that controller
                     getRawSocket().sendFrame( pdu,
-                                     additional_data1,
-                                     additional_data_length1,
-                                     additional_data2,
-                                     additional_data_length2 );
+                                              additional_data1,
+                                              additional_data_length1,
+                                              additional_data2,
+                                              additional_data_length2 );
                 }
             }
         }
@@ -487,10 +487,10 @@ void Entity::sendCommand( jdksavdecc_eui64 const &target_entity_id,
 
     // Send the header appended to any additional data
     getRawSocket().sendFrame( pdu,
-                     additional_data1,
-                     additional_data_length1,
-                     additional_data2,
-                     additional_data_length2 );
+                              additional_data1,
+                              additional_data_length1,
+                              additional_data2,
+                              additional_data_length2 );
 
     if ( track_for_ack )
     {

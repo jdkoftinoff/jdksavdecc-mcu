@@ -107,8 +107,8 @@ void ControlSender::tick()
 
 void ControlSender::sendSetControl()
 {
-    bool wait_for_ack=false;
-    if( m_controller_entity.CanSendCommand() )
+    bool wait_for_ack = false;
+    if ( m_controller_entity.CanSendCommand() )
     {
         FrameWithSize<16> pdufragment;
 
@@ -116,14 +116,12 @@ void ControlSender::sendSetControl()
         pdufragment.putDoublet( m_target_descriptor_index );
         pdufragment.putBuf( m_value, m_value_length );
 
-        getControllerEntity().sendCommand(
-                    m_target_entity_id,
-                    m_target_mac_address,
-                    JDKSAVDECC_AEM_COMMAND_SET_CONTROL,
-                    wait_for_ack,
-                    m_value,
-                    m_value_length);
-
+        getControllerEntity().sendCommand( m_target_entity_id,
+                                           m_target_mac_address,
+                                           JDKSAVDECC_AEM_COMMAND_SET_CONTROL,
+                                           wait_for_ack,
+                                           m_value,
+                                           m_value_length );
     }
 }
 

@@ -197,7 +197,9 @@ class FrameWithSize : public Frame
     FrameWithSize() : Frame( 0, m_buf_storage, MaxSize ) {}
 
     FrameWithSize( jdksavdecc_timestamp_in_milliseconds time_in_ms )
-        : Frame(time_in_ms,m_buf_storage,MaxSize) {}
+        : Frame( time_in_ms, m_buf_storage, MaxSize )
+    {
+    }
 
     FrameWithSize( jdksavdecc_timestamp_in_milliseconds time_in_ms,
                    jdksavdecc_eui48 const &dest_mac,
