@@ -131,7 +131,7 @@ bool Entity::receivedPDU( Frame &frame )
     jdksavdecc_aecpdu_aem aem;
     if ( parseAEM( &aem, frame ) )
     {
-        if ( isAEMForTarget( aem, m_adp_manager.getEntityID() ) )
+        if ( isAEMForTarget( aem, getEntityID() ) )
         {
             receivedAEMCommand( aem, frame );
             r = true;
@@ -146,7 +146,7 @@ bool Entity::receivedPDU( Frame &frame )
         if ( parseAA( &aa, frame ) )
         {
             // Yes, is it a command to read/write data?
-            if ( isAAForTarget( aa, m_adp_manager.getEntityID() ) )
+            if ( isAAForTarget( aa, getEntityID() ) )
             {
                 receivedAACommand( aa, frame );
                 r = true;
@@ -477,7 +477,7 @@ void Entity::sendCommand( jdksavdecc_eui64 const &target_entity_id,
                   & 0xff ); // lower 8 bits of control_data_length
 
     pdu.putEUI64( target_entity_id ); // entity_id of the device we are setting
-    pdu.putEUI64( m_adp_manager.getEntityID() ); // controller_id
+    pdu.putEUI64( getEntityID() );    // controller_id
 
     // increment outoging sequence id before sending it, so when we receive a
     // response we know what sequence id to expect
@@ -538,9 +538,9 @@ void Entity::sendUnsolicitedResponses( uint16_t aem_command_type,
     pdu.putOctet( control_data_length
                   & 0xff ); // lower 8 bits of control_data_length
 
-    pdu.putEUI64( m_adp_manager.getEntityID() ); // entity_id of the device we
-                                                 // are setting (placeholder)
-    pdu.putEUI64( m_adp_manager.getEntityID() ); // controller_id
+    pdu.putEUI64( getEntityID() ); // entity_id of the device we
+                                   // are setting (placeholder)
+    pdu.putEUI64( getEntityID() ); // controller_id
 
     // increment outoging sequence id before sending it, so when we receive a
     // response we know what sequence id to expect

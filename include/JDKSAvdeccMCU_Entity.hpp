@@ -60,6 +60,15 @@ class Entity : public Handler
     /// Handle received AECPDU's
     virtual bool receivedPDU( Frame &frame );
 
+    /// Get the ADP Manager
+    ADPManager &getADPManager() { return m_adp_manager; }
+
+    /// Get the Entity ID
+    jdksavdecc_eui64 const &getEntityID() const
+    {
+        return m_adp_manager.getEntityID();
+    }
+
     /// Check to make sure the command is allowed or disallowed due to acquire
     /// or locking
     uint8_t validatePermissions( jdksavdecc_aecpdu_aem const &aem );

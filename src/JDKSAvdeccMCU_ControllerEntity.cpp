@@ -47,12 +47,12 @@ bool ControllerEntity::receivedPDU( Frame &frame )
     jdksavdecc_aecpdu_aem aem;
     if ( parseAEM( &aem, frame ) )
     {
-        if ( isAEMForTarget( aem, m_adp_manager.getEntityID() ) )
+        if ( isAEMForTarget( aem, getEntityID() ) )
         {
             receivedAEMCommand( aem, frame );
             r = true;
         }
-        else if ( isAEMForController( aem, m_adp_manager.getEntityID() ) )
+        else if ( isAEMForController( aem, getEntityID() ) )
         {
             r = receivedAEMResponse( aem, frame );
         }
@@ -67,7 +67,7 @@ bool ControllerEntity::receivedPDU( Frame &frame )
         if ( parseAA( &aa, frame ) )
         {
             // Yes, is it a command to read/write data?
-            if ( isAAForTarget( aa, m_adp_manager.getEntityID() ) )
+            if ( isAAForTarget( aa, getEntityID() ) )
             {
                 receivedAACommand( aa, frame );
                 r = true;
