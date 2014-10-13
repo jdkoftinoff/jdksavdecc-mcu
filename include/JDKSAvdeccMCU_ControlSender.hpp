@@ -35,6 +35,8 @@
 #include "JDKSAvdeccMCU_Frame.hpp"
 #include "JDKSAvdeccMCU_Handler.hpp"
 #include "JDKSAvdeccMCU_Helpers.hpp"
+#include "JDKSAvdeccMCU_Entity.hpp"
+#include "JDKSAvdeccMCU_ControllerEntity.hpp"
 
 namespace JDKSAvdeccMCU
 {
@@ -43,14 +45,14 @@ class ControlSender : public Handler
 {
   public:
     /// Construct the SetControlSender object
-    ControlSender( RawSocket &net,
-                   jdksavdecc_eui64 const &entity_id,
+    ControlSender( ControllerEntity &controller_entity,
                    jdksavdecc_eui64 const &target_entity_id,
                    jdksavdecc_eui48 const &target_mac_address,
-                   uint16_t &sequence_id,
                    uint16_t target_descriptor_index,
+                   jdksavdecc_timestamp_in_milliseconds update_rate_in_millis,
                    uint16_t value_length,
-                   jdksavdecc_timestamp_in_milliseconds update_rate_in_millis );
+                   uint8_t *value_storage
+                   );
 
     /// Send the SET_CONTROL message if it is time to
     virtual void tick();
@@ -73,7 +75,11 @@ class ControlSender : public Handler
     /// Formulate the ADPDU and send it
     void sendSetControl();
 
-    jdksavdecc_eui64 const &getEntityID() const { return m_entity_id; }
+    ControllerEntity &getControllerEntity() { return m_controller_entity; }
+    RawSocket &getRawSocket() { return m_controller_entity.getRawSocket(); }
+
+    jdksavdecc_eui64 const &getEntityID() const { return m_controller_entity.getEntityID(); }
+
     jdksavdecc_eui64 const &getTargetEntityID() const
     {
         return m_target_entity_id;
@@ -82,18 +88,39 @@ class ControlSender : public Handler
     {
         return m_target_mac_address;
     }
-    uint16_t getSequenceID() const { return m_sequence_id; }
 
   protected:
-    RawSocket &m_net;
-    jdksavdecc_eui64 m_entity_id;
+    ControllerEntity &m_controller_entity;
     jdksavdecc_eui64 m_target_entity_id;
     jdksavdecc_eui48 m_target_mac_address;
-    uint16_t &m_sequence_id;
     uint16_t m_target_descriptor_index;
-    uint16_t m_value_length;
-    uint8_t m_value[4];
     jdksavdecc_timestamp_in_milliseconds m_update_rate_in_millis;
     jdksavdecc_timestamp_in_milliseconds m_last_send_time_in_millis;
+    uint16_t m_value_length;
+    uint8_t *m_value;
 };
+
+template <size_t StorageSize>
+class ControlSenderWithStorage : public ControlSender
+{
+    ControlSenderWithStorage( ControllerEntity &controller_entity,
+                              jdksavdecc_eui64 const &target_entity_id,
+                              jdksavdecc_eui48 const &target_mac_address,
+                              uint16_t target_descriptor_index,
+                              jdksavdecc_timestamp_in_milliseconds update_rate_in_millis )
+        : ControlSender(
+              controller_entity,
+              target_entity_id,
+              target_mac_address,
+              target_descriptor_index,
+              update_rate_in_millis,
+              StorageSize,
+              m_value_storage )
+    {
+        bzero(m_value_storage,StorageSize);
+    }
+private:
+    uint8_t m_value_storage[StorageSize];
+};
+
 }

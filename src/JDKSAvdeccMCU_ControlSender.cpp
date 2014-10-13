@@ -36,28 +36,22 @@ namespace JDKSAvdeccMCU
 {
 
 ControlSender::ControlSender(
-    RawSocket &net,
-    jdksavdecc_eui64 const &entity_id,
+    ControllerEntity &controller_entity,
     jdksavdecc_eui64 const &target_entity_id,
     jdksavdecc_eui48 const &target_mac_address,
-    uint16_t &sequence_id,
     uint16_t target_descriptor_index,
+    jdksavdecc_timestamp_in_milliseconds update_rate_in_millis,
     uint16_t value_length,
-    jdksavdecc_timestamp_in_milliseconds update_rate_in_millis )
-    : m_net( net )
-    , m_entity_id( entity_id )
+    uint8_t *value_storage )
+    : m_controller_entity( controller_entity )
     , m_target_entity_id( target_entity_id )
     , m_target_mac_address( target_mac_address )
-    , m_sequence_id( sequence_id )
     , m_target_descriptor_index( target_descriptor_index )
-    , m_value_length( value_length )
     , m_update_rate_in_millis( update_rate_in_millis )
     , m_last_send_time_in_millis( 0 )
+    , m_value_length( value_length )
+    , m_value( value_storage )
 {
-    m_value[0] = 0;
-    m_value[1] = 0;
-    m_value[2] = 0;
-    m_value[3] = 0;
 }
 
 void ControlSender::setValueOctet( uint8_t val )
@@ -101,7 +95,7 @@ void ControlSender::setValueQuadlet( uint32_t val )
 void ControlSender::tick()
 {
     jdksavdecc_timestamp_in_milliseconds time_in_millis
-        = m_net.getTimeInMilliseconds();
+        = getRawSocket().getTimeInMilliseconds();
     if ( wasTimeOutHit( time_in_millis,
                         m_last_send_time_in_millis,
                         m_update_rate_in_millis ) )
@@ -113,38 +107,24 @@ void ControlSender::tick()
 
 void ControlSender::sendSetControl()
 {
-    FrameWithSize<128> pdu(
-        0,
-        m_target_mac_address,
-        m_net.getMACAddress(),
-        JDKSAVDECC_AVTP_ETHERTYPE ); // DA, SA, EtherType, ADPDU
+    bool wait_for_ack=false;
+    if( m_controller_entity.CanSendCommand() )
+    {
+        FrameWithSize<16> pdufragment;
 
-    // AECPDU common control header
-    pdu.putOctet( 0x80 + JDKSAVDECC_SUBTYPE_AECP ); // cd=1, subtype=0x7b (AECP)
-    pdu.putOctet(
-        0x00 + JDKSAVDECC_AECP_MESSAGE_TYPE_AEM_COMMAND ); // sv=0, version=0,
-                                                           // message_type =
-                                                           // AEM_COMMAND
-    pdu.putOctet(
-        ( ( JDKSAVDECC_AEM_STATUS_SUCCESS ) << 3 )
-        + 0 ); // Send success code. top 3 bits of control_data_length is 0
-    pdu.putOctet(
-        JDKSAVDECC_AEM_COMMAND_SET_CONTROL_COMMAND_LEN
-        - JDKSAVDECC_COMMON_CONTROL_HEADER_LEN
-        + m_value_length ); // control_data_length field is N + value_length
+        pdufragment.putDoublet( JDKSAVDECC_DESCRIPTOR_CONTROL );
+        pdufragment.putDoublet( m_target_descriptor_index );
+        pdufragment.putBuf( m_value, m_value_length );
 
-    pdu.putEUI64(
-        m_target_entity_id );    // entity_id of the device we are setting
-    pdu.putEUI64( m_entity_id ); // controller_id
+        getControllerEntity().sendCommand(
+                    m_target_entity_id,
+                    m_target_mac_address,
+                    JDKSAVDECC_AEM_COMMAND_SET_CONTROL,
+                    wait_for_ack,
+                    m_value,
+                    m_value_length);
 
-    pdu.putDoublet( m_sequence_id );
-    pdu.putDoublet( JDKSAVDECC_AEM_COMMAND_SET_CONTROL );
-    pdu.putDoublet( JDKSAVDECC_DESCRIPTOR_CONTROL );
-    pdu.putDoublet( m_target_descriptor_index );
-    pdu.putBuf( m_value, m_value_length );
-
-    m_net.sendFrame( pdu );
-    m_sequence_id++;
+    }
 }
 
 bool ControlSender::receivedPDU( Frame &frame )
