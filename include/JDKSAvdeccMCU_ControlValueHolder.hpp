@@ -41,29 +41,43 @@ namespace JDKSAvdeccMCU
 class ControlValueHolder : public Handler
 {
   public:
-    ControlValueHolder( uint8_t value_length );
+    ControlValueHolder( uint8_t value_length, uint8_t *value );
 
     bool isDirty() const { return m_dirty; }
     void clearDirty() { m_dirty = false; }
 
     uint8_t getValueLength() const { return m_value_length; }
 
-    uint8_t getValueOctet() const;
-    uint16_t getValueDoublet() const;
-    uint32_t getValueQuadlet() const;
+    uint8_t getValueOctet( uint16_t item = 0 ) const;
+    uint16_t getValueDoublet( uint16_t item = 0 ) const;
+    uint32_t getValueQuadlet( uint16_t item = 0 ) const;
 
-    uint32_t getValue() const;
+    uint32_t getValue( uint16_t item = 0 ) const;
 
-    void setValueOctet( uint8_t v );
-    void setValueDoublet( uint16_t v );
-    void setValueQuadlet( uint32_t v );
+    void setValueOctet( uint8_t v, uint16_t item = 0 );
+    void setValueDoublet( uint16_t v, uint16_t item = 0 );
+    void setValueQuadlet( uint32_t v, uint16_t item = 0 );
 
-    void setValue( uint32_t v );
+    void setValue( uint32_t v, uint16_t item = 0 );
     void setValue( uint8_t const *v );
 
   protected:
-    uint8_t m_value[4];
     uint8_t m_value_length;
+    uint8_t *m_value;
     bool m_dirty;
+};
+
+template <size_t ControlValueSize>
+class ControlValueHolderWithStorage : public ControlValueHolder
+{
+  public:
+    ControlValueHolderWithStorage()
+        : ControlValueHolder( ControlValueSize, m_value_storage )
+    {
+        bzero( m_value_storage, ControlValueSize );
+    }
+
+  protected:
+    uint8_t m_value_storage[ControlValueSize];
 };
 }

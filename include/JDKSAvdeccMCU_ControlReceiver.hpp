@@ -36,6 +36,7 @@
 #include "JDKSAvdeccMCU_Handler.hpp"
 #include "JDKSAvdeccMCU_ControlValueHolder.hpp"
 #include "JDKSAvdeccMCU_Helpers.hpp"
+#include "JDKSAvdeccMCU_Entity.hpp"
 
 namespace JDKSAvdeccMCU
 {

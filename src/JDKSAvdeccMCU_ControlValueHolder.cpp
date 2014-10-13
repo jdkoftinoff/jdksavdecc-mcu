@@ -35,109 +35,113 @@
 namespace JDKSAvdeccMCU
 {
 
-ControlValueHolder::ControlValueHolder( uint8_t value_length )
-    : m_value_length( value_length ), m_dirty( true )
+ControlValueHolder::ControlValueHolder( uint8_t value_length, uint8_t *value )
+    : m_value_length( value_length ), m_value( value ), m_dirty( true )
 {
-    m_value[0] = 0;
-    m_value[1] = 0;
-    m_value[2] = 0;
-    m_value[3] = 0;
 }
 
-uint8_t ControlValueHolder::getValueOctet() const
+uint8_t ControlValueHolder::getValueOctet( uint16_t item ) const
 {
     uint8_t r = 0;
-    if ( m_value_length == 1 )
+    uint16_t pos = item * sizeof( uint8_t );
+    if ( m_value_length > pos )
     {
-        r = m_value[0];
+        r = m_value[pos];
     }
     return r;
 }
 
-uint16_t ControlValueHolder::getValueDoublet() const
+uint16_t ControlValueHolder::getValueDoublet( uint16_t item ) const
 {
     uint16_t r = 0;
-    if ( m_value_length == 2 )
+    uint16_t pos = item * sizeof( uint16_t );
+    if ( m_value_length > pos )
     {
-        r = ( ( (uint16_t)m_value[0] ) << 8 ) + m_value[1];
+        r = ( ( (uint16_t)m_value[pos + 0] ) << 8 ) + m_value[item + 1];
     }
     return r;
 }
 
-uint32_t ControlValueHolder::getValueQuadlet() const
+uint32_t ControlValueHolder::getValueQuadlet( uint16_t item ) const
 {
     uint32_t r = 0;
-    if ( m_value_length == 4 )
+    uint16_t pos = item * sizeof( uint32_t );
+    if ( m_value_length == item * sizeof( uint32_t ) )
     {
-        r = ( ( (uint32_t)m_value[0] ) << 24 )
-            + ( ( (uint32_t)m_value[1] ) << 16 )
-            + ( ( (uint32_t)m_value[2] ) << 8 )
-            + ( ( (uint32_t)m_value[3] ) << 0 );
+
+        r = ( ( (uint32_t)m_value[pos + 0] ) << 24 )
+            + ( ( (uint32_t)m_value[pos + 1] ) << 16 )
+            + ( ( (uint32_t)m_value[pos + 2] ) << 8 )
+            + ( ( (uint32_t)m_value[pos + 3] ) << 0 );
     }
     return r;
 }
 
-uint32_t ControlValueHolder::getValue() const
+uint32_t ControlValueHolder::getValue( uint16_t item ) const
 {
     uint32_t r = 0;
     switch ( m_value_length )
     {
     case 1:
-        r = getValueOctet();
+        r = getValueOctet( item );
         break;
     case 2:
-        r = getValueDoublet();
+        r = getValueDoublet( item );
         break;
     case 3:
-        r = getValueQuadlet();
+        r = getValueQuadlet( item );
         break;
     }
     return r;
 }
 
-void ControlValueHolder::setValueOctet( uint8_t v )
+void ControlValueHolder::setValueOctet( uint8_t v, uint16_t item )
 {
-    if ( m_value_length == 1 && getValueOctet() != v )
+    if ( m_value_length == 1 && getValueOctet( item ) != v )
     {
+        uint16_t pos = item * sizeof( uint8_t );
+
         m_dirty = true;
-        m_value[0] = v;
+        m_value[pos] = v;
     }
 }
 
-void ControlValueHolder::setValueDoublet( uint16_t v )
+void ControlValueHolder::setValueDoublet( uint16_t v, uint16_t item )
 {
     if ( m_value_length == 2 && getValueDoublet() != v )
     {
+        uint16_t pos = item * sizeof( uint16_t );
         m_dirty = true;
-        m_value[0] = ( v >> 8 ) & 0xff;
-        m_value[1] = ( v >> 0 ) & 0xff;
+        m_value[pos + 0] = ( v >> 8 ) & 0xff;
+        m_value[pos + 1] = ( v >> 0 ) & 0xff;
     }
 }
 
-void ControlValueHolder::setValueQuadlet( uint32_t v )
+void ControlValueHolder::setValueQuadlet( uint32_t v, uint16_t item )
 {
     if ( m_value_length == 4 && getValueQuadlet() != v )
     {
+        uint16_t pos = item * sizeof( uint32_t );
         m_dirty = true;
-        m_value[0] = ( v >> 24 ) & 0xff;
-        m_value[1] = ( v >> 16 ) & 0xff;
-        m_value[2] = ( v >> 8 ) & 0xff;
-        m_value[3] = ( v >> 0 ) & 0xff;
+        m_value[pos + 0] = ( v >> 24 ) & 0xff;
+        m_value[pos + 1] = ( v >> 16 ) & 0xff;
+        m_value[pos + 2] = ( v >> 8 ) & 0xff;
+        m_value[pos + 3] = ( v >> 0 ) & 0xff;
     }
 }
 
-void ControlValueHolder::setValue( uint32_t v )
+void ControlValueHolder::setValue( uint32_t v, uint16_t item )
 {
     switch ( m_value_length )
     {
     case 1:
-        setValueOctet( v );
+        setValueOctet( v, item );
         break;
     case 2:
-        setValueDoublet( v );
+        setValueDoublet( v, item );
         break;
     case 3:
-        setValueQuadlet( v );
+        setValueQuadlet( v, item );
         break;
     }
 }
