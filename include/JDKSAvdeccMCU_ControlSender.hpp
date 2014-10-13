@@ -71,8 +71,9 @@ class ControlSender : public Handler
     /// ASAP
     void setValueQuadlet( uint32_t val );
 
-    /// Formulate the ADPDU and send it
-    void sendSetControl();
+    /// Formulate the ADPDU and send it. Returns true if the message was
+    /// actually sent.
+    bool sendSetControl( bool wait_for_ack = false );
 
     ControllerEntity &getControllerEntity() { return m_controller_entity; }
     RawSocket &getRawSocket() { return m_controller_entity.getRawSocket(); }

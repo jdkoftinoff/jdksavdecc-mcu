@@ -105,24 +105,30 @@ void ControlSender::tick()
     }
 }
 
-void ControlSender::sendSetControl()
+bool ControlSender::sendSetControl( bool wait_for_ack )
 {
-    bool wait_for_ack = false;
-    if ( m_controller_entity.CanSendCommand() )
+    bool r = false;
+    // If we are told to wait for an ACK, then we have to wait until we can send
+    // a command that can be tracked
+    if ( ( !wait_for_ack )
+         || ( wait_for_ack && m_controller_entity.canSendCommand() ) )
     {
-        FrameWithSize<16> pdufragment;
+        FrameWithSize<4> pdufragment;
 
         pdufragment.putDoublet( JDKSAVDECC_DESCRIPTOR_CONTROL );
         pdufragment.putDoublet( m_target_descriptor_index );
-        pdufragment.putBuf( m_value, m_value_length );
 
         getControllerEntity().sendCommand( m_target_entity_id,
                                            m_target_mac_address,
                                            JDKSAVDECC_AEM_COMMAND_SET_CONTROL,
                                            wait_for_ack,
+                                           pdufragment.getBuf(),
+                                           pdufragment.getSize(),
                                            m_value,
                                            m_value_length );
+        r = true;
     }
+    return r;
 }
 
 bool ControlSender::receivedPDU( Frame &frame )

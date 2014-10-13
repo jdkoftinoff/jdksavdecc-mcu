@@ -88,8 +88,10 @@ class Entity : public Handler
 
     /// Can we send a command now? i.e. are there no in-flight commands waiting
     /// to be acknowledged?
-    inline bool CanSendCommand() const
+    inline bool canSendCommand() const
     {
+        // last sent command type is set to JDKSAVDECC_AEM_COMMAND_EXPANSION
+        // when there is no command in flight
         return m_last_sent_command_type != JDKSAVDECC_AEM_COMMAND_EXPANSION;
     }
 
