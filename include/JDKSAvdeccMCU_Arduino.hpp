@@ -30,19 +30,16 @@
   POSSIBILITY OF SUCH DAMAGE.
 */
 
-#if defined(__AVR__) && !defined(JDKSAVDECC_MCU_BARE_METAL)
-#define JDKSAVDECCMCU_BARE_METAL
-#endif
 #include "JDKSAvdeccMCU_World.hpp"
 #include "JDKSAvdeccMCU.hpp"
 
-#if defined(__AVR__)
+#if defined( __AVR__ )
 
 #include "Arduino.h"
 #include "Ethernet.h"
 #include "SPI.h"
 
-#else
+#elif JDKSAVDECCMCU_ARDUINO == 1 && JDKSAVDECCMCU_BARE_METAL == 0
 
 #ifdef __cplusplus
 extern "C" {
@@ -133,7 +130,7 @@ void analogWrite( uint8_t, int );
 
 unsigned long millis( void );
 unsigned long micros( void );
-void delay( unsigned long );
+void delay( unsigned int );
 void delayMicroseconds( unsigned int us );
 unsigned long pulseIn( uint8_t pin, uint8_t state, unsigned long timeout );
 

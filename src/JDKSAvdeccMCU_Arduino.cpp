@@ -1,6 +1,7 @@
 #include "JDKSAvdeccMCU_Arduino.hpp"
 
-#if !defined( __AVR__ )
+#if JDKSAVDECCMCU_ARDUINO == 1 && JDKSAVDECCMCU_BARE_METAL == 0
+
 Serial_ Serial( stdin, stdout );
 
 extern "C" {
@@ -25,7 +26,7 @@ void analogWrite( uint8_t, int ) {}
 
 unsigned long millis( void ) { return getTimeInMilliseconds(); }
 unsigned long micros( void ) { return getTimeInMilliseconds() * 1000; }
-void delay( unsigned long t ) { usleep( t * 1000 ); }
+void delay( unsigned int t ) { usleep( t * 1000 ); }
 void delayMicroseconds( unsigned int us ) { usleep( us ); }
 unsigned long pulseIn( uint8_t pin, uint8_t state, unsigned long timeout )
 {
