@@ -137,7 +137,7 @@ class ControlValueHolder : private FixedBuffer
         }
     }
 
-    void setValue( uint8_t const *v )
+    void setValue( void const *v )
     {
         memcpy( m_buf, v, m_value_length * m_num_items );
         m_dirty = true;
