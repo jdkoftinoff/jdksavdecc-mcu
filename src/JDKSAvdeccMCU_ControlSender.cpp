@@ -123,7 +123,7 @@ bool ControlSender::sendSetControl( bool wait_for_ack )
                                            JDKSAVDECC_AEM_COMMAND_SET_CONTROL,
                                            wait_for_ack,
                                            pdufragment.getBuf(),
-                                           pdufragment.getSize(),
+                                           pdufragment.getLength(),
                                            m_value,
                                            m_value_length );
         r = true;

@@ -39,22 +39,22 @@ class FixedBuffer
 {
   protected:
     uint8_t *m_buf;
-    uint16_t m_write_pos;
-    uint16_t m_len;
+    uint16_t m_length;
+    uint16_t m_max_length;
 
   public:
-    FixedBuffer( uint8_t *buf, uint16_t len )
-        : m_buf( buf ), m_write_pos( 0 ), m_len( len )
+    FixedBuffer( uint8_t *buf, uint16_t max_length )
+        : m_buf( buf ), m_length( 0 ), m_max_length( max_length )
     {
     }
 
-    uint16_t getMaxLength() const { return m_len; }
+    uint16_t getMaxLength() const { return m_max_length; }
 
     void putEUI48( jdksavdecc_eui48 const &val )
     {
         for ( uint16_t i = 0; i < 6; ++i )
         {
-            m_buf[m_write_pos++] = val.value[i];
+            m_buf[m_length++] = val.value[i];
         }
     }
 
@@ -62,43 +62,43 @@ class FixedBuffer
     {
         for ( uint16_t i = 0; i < 8; ++i )
         {
-            m_buf[m_write_pos++] = val.value[i];
+            m_buf[m_length++] = val.value[i];
         }
     }
 
-    void putOctet( uint8_t val ) { m_buf[m_write_pos++] = val; }
+    void putOctet( uint8_t val ) { m_buf[m_length++] = val; }
 
     void putDoublet( uint16_t val )
     {
-        m_buf[m_write_pos++] = ( val >> 8 ) & 0xff;
-        m_buf[m_write_pos++] = ( val >> 0 ) & 0xff;
+        m_buf[m_length++] = ( val >> 8 ) & 0xff;
+        m_buf[m_length++] = ( val >> 0 ) & 0xff;
     }
 
     void putQuadlet( uint32_t val )
     {
-        m_buf[m_write_pos++] = ( val >> 24 ) & 0xff;
-        m_buf[m_write_pos++] = ( val >> 16 ) & 0xff;
-        m_buf[m_write_pos++] = ( val >> 8 ) & 0xff;
-        m_buf[m_write_pos++] = ( val >> 0 ) & 0xff;
+        m_buf[m_length++] = ( val >> 24 ) & 0xff;
+        m_buf[m_length++] = ( val >> 16 ) & 0xff;
+        m_buf[m_length++] = ( val >> 8 ) & 0xff;
+        m_buf[m_length++] = ( val >> 0 ) & 0xff;
     }
 
     void putOctlet( uint64_t val )
     {
-        m_buf[m_write_pos++] = ( val >> 56 ) & 0xff;
-        m_buf[m_write_pos++] = ( val >> 48 ) & 0xff;
-        m_buf[m_write_pos++] = ( val >> 40 ) & 0xff;
-        m_buf[m_write_pos++] = ( val >> 32 ) & 0xff;
-        m_buf[m_write_pos++] = ( val >> 24 ) & 0xff;
-        m_buf[m_write_pos++] = ( val >> 16 ) & 0xff;
-        m_buf[m_write_pos++] = ( val >> 8 ) & 0xff;
-        m_buf[m_write_pos++] = ( val >> 0 ) & 0xff;
+        m_buf[m_length++] = ( val >> 56 ) & 0xff;
+        m_buf[m_length++] = ( val >> 48 ) & 0xff;
+        m_buf[m_length++] = ( val >> 40 ) & 0xff;
+        m_buf[m_length++] = ( val >> 32 ) & 0xff;
+        m_buf[m_length++] = ( val >> 24 ) & 0xff;
+        m_buf[m_length++] = ( val >> 16 ) & 0xff;
+        m_buf[m_length++] = ( val >> 8 ) & 0xff;
+        m_buf[m_length++] = ( val >> 0 ) & 0xff;
     }
 
     void putZeros( uint16_t count )
     {
         for ( uint16_t i = 0; i < count; ++i )
         {
-            m_buf[m_write_pos++] = 0;
+            m_buf[m_length++] = 0;
         }
     }
 
@@ -106,11 +106,12 @@ class FixedBuffer
     {
         for ( uint16_t i = 0; i < len; ++i )
         {
-            m_buf[m_write_pos++] = buf[i];
+            m_buf[m_length++] = buf[i];
         }
     }
 
     void setOctet( uint16_t val, uint8_t pos ) { m_buf[pos] = val; }
+
     uint8_t getOctet( uint16_t pos ) const { return m_buf[pos]; }
 
     void setDoublet( uint16_t v, uint16_t pos )
@@ -158,10 +159,8 @@ class FixedBuffer
     uint8_t const *getBuf( uint16_t pos ) const { return &m_buf[pos]; }
     uint8_t *getBuf( uint16_t pos ) { return &m_buf[pos]; }
 
-    uint16_t getWritePosition() const { return m_write_pos; }
-    uint16_t getSize() const { return m_write_pos; }
-    void setWritePosition( uint16_t n ) { m_write_pos = n; }
-    void setLength( uint16_t n ) { m_write_pos = n; }
+    uint16_t getLength() const { return m_length; }
+    void setLength( uint16_t n ) { m_length = n; }
 };
 
 template <size_t MaxSize>

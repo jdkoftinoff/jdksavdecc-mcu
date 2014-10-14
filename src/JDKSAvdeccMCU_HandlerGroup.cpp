@@ -53,7 +53,7 @@ bool HandlerGroupBase::pollNet()
     if ( m_net.recvFrame( &aecp_frame ) )
     {
         // Make sure we read DA,SA,Ethertype
-        if ( aecp_frame.getSize() > JDKSAVDECC_FRAME_HEADER_LEN )
+        if ( aecp_frame.getLength() > JDKSAVDECC_FRAME_HEADER_LEN )
         {
             // Ok, this PDU is worth spending time on. Send it on to all known
             // Handlers.
