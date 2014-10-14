@@ -68,12 +68,12 @@ class ControlValueHolder : private FixedBuffer
 
     uint16_t getValueDoublet( uint8_t item = 0 ) const
     {
-        return getOctet( item * sizeof( uint16_t ) );
+        return getDoublet( item * sizeof( uint16_t ) );
     }
 
     uint32_t getValueQuadlet( uint8_t item = 0 ) const
     {
-        return getOctet( item * sizeof( uint32_t ) );
+        return getQuadlet( item * sizeof( uint32_t ) );
     }
 
     template <typename T>
@@ -136,6 +136,21 @@ class ControlValueHolder : private FixedBuffer
         }
         }
     }
+
+#if JDKSAVDECCMCU_ENABLE_FLOAT
+    float getValueFloat( uint8_t item = 0 ) const
+    {
+        uint32_t q = getValueQuadlet( item );
+        float *fq = reinterpret_cast<float *>( &q );
+        return *fq;
+    }
+
+    void setValueFloat( float v, uint8_t item = 0 )
+    {
+        uint32_t *qv = reinterpret_cast<uint32_t *>( &v );
+        setValueQuadlet( *qv, item );
+    }
+#endif
 
     void setValue( void const *v )
     {
