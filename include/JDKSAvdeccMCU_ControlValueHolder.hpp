@@ -59,6 +59,8 @@ class ControlValueHolder : private FixedBuffer
 
     uint8_t getValueLength() const { return m_value_length; }
 
+    uint8_t getNumItems() const { return m_num_items; }
+
     uint8_t getValueOctet( uint8_t item = 0 ) const
     {
         return getOctet( item * sizeof( uint8_t ) );
@@ -147,17 +149,20 @@ class ControlValueHolder : private FixedBuffer
     bool m_dirty;
 };
 
-template <uint16_t ControlValueLength, uint8_t ControlValueItems>
+template <typename BaseValueType, uint8_t NumItems>
 class ControlValueHolderWithStorage : public ControlValueHolder
 {
   public:
+    typedef BaseValueType value_type;
+    static const uint8_t num_items = NumItems;
+
     ControlValueHolderWithStorage()
         : ControlValueHolder(
-              m_value_storage, ControlValueLength, ControlValueItems )
+              m_value_storage, sizeof( BaseValueType ), NumItems )
     {
     }
 
   protected:
-    uint8_t m_value_storage[ControlValueLength * ControlValueItems];
+    uint8_t m_value_storage[sizeof( BaseValueType ) * NumItems];
 };
 }
