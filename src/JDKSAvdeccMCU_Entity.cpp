@@ -463,7 +463,7 @@ void Entity::sendCommand( jdksavdecc_eui64 const &target_entity_id,
           + additional_data_length1 + additional_data_length2;
 
     // AECPDU common control header
-    pdu.putOctet( 0x80 + JDKSAVDECC_SUBTYPE_AECP ); // cd=1, subtype=0x7b (AECP)
+    pdu.putOctet( JDKSAVDECC_1722A_SUBTYPE_AECP ); // cd=1, subtype=0x7b (AECP)
     pdu.putOctet(
         0x00 + JDKSAVDECC_AECP_MESSAGE_TYPE_AEM_COMMAND ); // sv=0, version=0,
                                                            // message_type =
@@ -525,7 +525,7 @@ void Entity::sendUnsolicitedResponses( uint16_t aem_command_type,
           + additional_data_length1 + additional_data_length2;
 
     // AECPDU common control header
-    pdu.putOctet( 0x80 + JDKSAVDECC_SUBTYPE_AECP ); // cd=1, subtype=0x7b (AECP)
+    pdu.putOctet( JDKSAVDECC_1722A_SUBTYPE_AECP ); // cd=1, subtype=0x7b (AECP)
     pdu.putOctet(
         0x00 + JDKSAVDECC_AECP_MESSAGE_TYPE_AEM_COMMAND ); // sv=0, version=0,
                                                            // message_type =
