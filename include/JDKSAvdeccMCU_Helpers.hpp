@@ -62,9 +62,8 @@ bool
                         jdksavdecc_eui64 const &expected_controller_entity_id );
 
 /// Twiddle the header bytes to convert this message from AEM_COMMAND to
-/// AEM_RESPONSE in place
-/// with the new status code, and the new control_data_length to match the
-/// new_length
+/// AEM_RESPONSE in place with the new status code, and the new
+/// control_data_length to match the new_length
 void setAEMReply( uint8_t status_code,
                   uint16_t new_length,
                   uint8_t *buf,
@@ -88,9 +87,8 @@ bool isAAForController( jdksavdecc_aecp_aa const &aa,
                         jdksavdecc_eui64 const &expected_controller_entity_id );
 
 /// Twiddle the header bytes to convert this message from ADDRESS_ACCESS_COMMAND
-/// to ADDRESS_ACCESS_RESPONSE in place
-/// with the new status code, and the new control_data_length to match the
-/// new_length
+/// to ADDRESS_ACCESS_RESPONSE in place with the new status code, and the new
+/// control_data_length to match the new_length
 void
     setAAReply( uint16_t new_length, uint8_t *buf, uint16_t pos, uint16_t len );
 
