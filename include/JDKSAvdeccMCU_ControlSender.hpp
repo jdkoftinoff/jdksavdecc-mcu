@@ -121,7 +121,7 @@ class ControlSenderWithStorage : public ControlSender
                          StorageSize,
                          m_value_storage )
     {
-        bzero( m_value_storage, StorageSize );
+        memset( m_value_storage, 0, StorageSize );
     }
 
   private:

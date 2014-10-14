@@ -50,7 +50,7 @@ class ControlValueHolder : private FixedBuffer
         , m_num_items( num_items )
         , m_dirty( true )
     {
-        bzero( buf, m_value_length * m_num_items );
+        memset( buf, 0, m_value_length * m_num_items );
         setLength( m_value_length * m_num_items );
     }
 
