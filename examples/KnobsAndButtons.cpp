@@ -1,4 +1,8 @@
 
+#if defined( __APPLE__ ) || defined( __linux__ )
+#define JDKSAVDECCMCU_ARDUINO 1
+#endif
+
 #include "JDKSAvdeccMCU_Arduino.h"
 
 #define REFRESH_TIME ( 1000 )
@@ -14,17 +18,17 @@ jdksavdecc_eui48 my_mac = {{0x70, 0xb3, 0xd5, 0xed, 0xcf, 0xf0}};
 
 /// Ethernet handler object
 
-#if defined( JDKSAVDECCMCU_BARE_METAL )
+#if JDKSAVDECCMCU_ENABLE_RAWSOCKETWIZNET == 1
 RawSocketWizeNet rawnet( my_mac,
                          JDKSAVDECC_AVTP_ETHERTYPE,
                          &jdksavdecc_multicast_adp_acmp ); // For embedded
                                                            // systems
-#elif defined( JDKSAVDECCMCU_ENABLE_RAW )
-RawSocketPcap rawnet( "en0",
-                      JDKSAVDECC_AVTP_ETHERTYPE,
-                      &jdksavdecc_multicast_adp_acmp ); // For non-embedded
-                                                        // systems
-#else
+#elif JDKSAVDECCMCU_ENABLE_RAWSOCKETMACOSX
+RawSocketMacOSX rawnet( "en0",
+                        JDKSAVDECC_AVTP_ETHERTYPE,
+                        &jdksavdecc_multicast_adp_acmp ); // For non-embedded
+                                                          // systems
+#elif JDKSAVDECCMCU_ENABLE_RAWSOCKETPCAPFILE
 RawSocketPcapFile rawnet( JDKSAVDECC_AVTP_ETHERTYPE,
                           "input.pcap",
                           "output.pcap",
@@ -59,98 +63,50 @@ ADPManager adp_manager( rawnet,
                         JDKSAVDECC_ADP_CONTROLLER_CAPABILITY_IMPLEMENTED,
                         20 );
 
-// ControllerEntity my_entity(adp_manager);
+ControllerEntity my_entity( rawnet, adp_manager );
 
 /// The shared sequence ID for transmitted messages
 uint16_t sequence_id = 0;
 
 /// The mapping of Knob 1 to control descriptor 0x0000. 2 byte payload, refresh
 /// time of 1000 ms
-ControlSender knob1( rawnet,
-                     my_entity_id,
-                     target_entity_id,
-                     target_mac_address,
-                     sequence_id,
-                     0x0000,
-                     2,
-                     REFRESH_TIME );
+ControlSenderWithStorage<2> knob1(
+    my_entity, target_entity_id, target_mac_address, 0x0000, REFRESH_TIME );
 
 /// The mapping of Knob 2 to control descriptor 0x0001. 2 byte payload, refresh
 /// time of 1000 ms
-ControlSender knob2( rawnet,
-                     my_entity_id,
-                     target_entity_id,
-                     target_mac_address,
-                     sequence_id,
-                     0x0001,
-                     2,
-                     REFRESH_TIME );
+ControlSenderWithStorage<2> knob2(
+    my_entity, target_entity_id, target_mac_address, 0x0001, REFRESH_TIME );
 
 /// The mapping of Knob 2 to control descriptor 0x0002. 2 byte payload, refresh
 /// time of 1000 ms
-ControlSender knob3( rawnet,
-                     my_entity_id,
-                     target_entity_id,
-                     target_mac_address,
-                     sequence_id,
-                     0x0002,
-                     2,
-                     REFRESH_TIME );
+ControlSenderWithStorage<2> knob3(
+    my_entity, target_entity_id, target_mac_address, 0x0002, REFRESH_TIME );
 
-/// The mapping of Button 1 to control descriptor 0x0003. 2 byte payload,
+/// The mapping of Button 1 to control descriptor 0x0003. 1 byte payload,
 /// refresh time of 1000 ms
-ControlSender button1( rawnet,
-                       my_entity_id,
-                       target_entity_id,
-                       target_mac_address,
-                       sequence_id,
-                       0x0003,
-                       1,
-                       REFRESH_TIME );
+ControlSenderWithStorage<1> button1(
+    my_entity, target_entity_id, target_mac_address, 0x0003, REFRESH_TIME );
 
-/// The mapping of Button 2 to control descriptor 0x0004. 2 byte payload,
+/// The mapping of Button 2 to control descriptor 0x0004. 1 byte payload,
 /// refresh time of 1000 ms
-ControlSender button2( rawnet,
-                       my_entity_id,
-                       target_entity_id,
-                       target_mac_address,
-                       sequence_id,
-                       0x0004,
-                       1,
-                       REFRESH_TIME );
+ControlSenderWithStorage<1> button2(
+    my_entity, target_entity_id, target_mac_address, 0x0004, REFRESH_TIME );
 
-/// The mapping of Button 3 to control descriptor 0x0005. 2 byte payload,
+/// The mapping of Button 3 to control descriptor 0x0005. 1 byte payload,
 /// refresh time of 1000 ms
-ControlSender button3( rawnet,
-                       my_entity_id,
-                       target_entity_id,
-                       target_mac_address,
-                       sequence_id,
-                       0x0005,
-                       1,
-                       REFRESH_TIME );
+ControlSenderWithStorage<1> button3(
+    my_entity, target_entity_id, target_mac_address, 0x0005, REFRESH_TIME );
 
-/// The mapping of Button 3 to control descriptor 0x0006. 2 byte payload,
+/// The mapping of Button 3 to control descriptor 0x0006. 1 byte payload,
 /// refresh time of 1000 ms
-ControlSender button4( rawnet,
-                       my_entity_id,
-                       target_entity_id,
-                       target_mac_address,
-                       sequence_id,
-                       0x0006,
-                       1,
-                       REFRESH_TIME );
+ControlSenderWithStorage<1> button4(
+    my_entity, target_entity_id, target_mac_address, 0x0006, REFRESH_TIME );
 
-/// The mapping of Button 3 to control descriptor 0x0007. 2 byte payload,
+/// The mapping of Button 3 to control descriptor 0x0007. 1 byte payload,
 /// refresh time of 1000 ms
-ControlSender button5( rawnet,
-                       my_entity_id,
-                       target_entity_id,
-                       target_mac_address,
-                       sequence_id,
-                       0x0007,
-                       1,
-                       REFRESH_TIME );
+ControlSenderWithStorage<1> button5(
+    my_entity, target_entity_id, target_mac_address, 0x0007, REFRESH_TIME );
 
 /// The ValueMapper scans the A/D's and Digital input pins at the specified rate
 /// and applies the new values to the appropriate knob or button

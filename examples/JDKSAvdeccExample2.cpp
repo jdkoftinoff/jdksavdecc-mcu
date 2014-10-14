@@ -297,7 +297,7 @@ using namespace JDKSAvdeccMCU;
 
 #endif
 
-#ifndef JDKSAVDECCMCU_BARE_METAL
+#if JDKSAVDECCMCU_BARE_METAL == 0
 
 int main( int, char ** ) { return 0; }
 

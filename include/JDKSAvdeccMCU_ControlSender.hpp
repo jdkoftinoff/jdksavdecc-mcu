@@ -106,6 +106,7 @@ class ControlSender : public Handler
 template <size_t StorageSize>
 class ControlSenderWithStorage : public ControlSender
 {
+  public:
     ControlSenderWithStorage(
         ControllerEntity &controller_entity,
         jdksavdecc_eui64 const &target_entity_id,
