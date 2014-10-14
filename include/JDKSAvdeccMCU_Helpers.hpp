@@ -112,10 +112,9 @@ inline bool parseAEM( jdksavdecc_aecpdu_aem *aem, Frame const &rx )
     {
         // Yes, read the aem header
         memset( aem, 0, sizeof( *aem ) );
-        if ( jdksavdecc_aecpdu_aem_read( aem,
-                                         rx.getBuf(),
-                                         JDKSAVDECC_FRAME_HEADER_LEN,
-                                         rx.getMaxLength() ) > 0 )
+        if ( jdksavdecc_aecpdu_aem_read(
+                 aem, rx.getBuf(), JDKSAVDECC_FRAME_HEADER_LEN, rx.getLength() )
+             > 0 )
         {
             // make sure it is version 0 and an AEM_COMMAND or AEM_RESPONSE
             if ( aem->aecpdu_header.header.version == 0
@@ -203,7 +202,7 @@ inline bool parseAA( jdksavdecc_aecp_aa *aa, Frame const &pdu )
         if ( jdksavdecc_aecp_aa_read( aa,
                                       pdu.getBuf(),
                                       JDKSAVDECC_FRAME_HEADER_LEN,
-                                      pdu.getMaxLength() ) > 0 )
+                                      pdu.getLength() ) > 0 )
         {
             // make sure it is version 0 and an AA_COMMAND or AA_RESPONSE
             if ( aa->aecpdu_header.header.version == 0
@@ -282,5 +281,50 @@ inline void setAAReply( uint8_t status_code,
         // offset 3: bottom 8 bits of new control_data_length
         buf[pos + 3] = ( control_data_length & 0xff );
     }
+}
+
+inline bool parseACMP( jdksavdecc_acmpdu *acmpdu, Frame const &pdu )
+{
+    bool r = false;
+    // Validate subtype is ACMP
+    if ( pdu.getOctet( JDKSAVDECC_FRAME_HEADER_LEN )
+         == JDKSAVDECC_1722A_SUBTYPE_ACMP )
+    {
+        // Yes, read the acmp message
+
+        if ( jdksavdecc_acmpdu_read( acmpdu,
+                                     pdu.getBuf(),
+                                     JDKSAVDECC_FRAME_HEADER_LEN,
+                                     pdu.getLength() ) > 0 )
+        {
+            // make sure it is version 0 and an AA_COMMAND or AA_RESPONSE
+            if ( acmpdu->header.version == 0
+                 && acmpdu->header.control_data_length
+                    >= ( JDKSAVDECC_ACMPDU_LEN
+                         - JDKSAVDECC_COMMON_CONTROL_HEADER_LEN ) )
+            {
+                r = true;
+            }
+        }
+    }
+    return r;
+}
+
+inline bool isACMPInvolvingTarget( jdksavdecc_acmpdu const &acmpdu,
+                                   jdksavdecc_eui64 const &entity_id )
+{
+    bool r = false;
+
+    if ( jdksavdecc_eui64_compare( &acmpdu.controller_entity_id, &entity_id )
+         == 0
+         || jdksavdecc_eui64_compare( &acmpdu.talker_entity_id, &entity_id )
+            == 0
+         || jdksavdecc_eui64_compare( &acmpdu.listener_entity_id, &entity_id )
+            == 0 )
+    {
+        r = true;
+    }
+
+    return r;
 }
 }

@@ -86,6 +86,9 @@ class Entity : public Handler
     /// code
     uint8_t receivedAACommand( jdksavdecc_aecp_aa const &aa, Frame &pdu );
 
+    virtual uint8_t receivedACMPMessage( jdksavdecc_acmpdu const &acmpdu,
+                                         Frame &pdu );
+
     /// Can we send a command now? i.e. are there no in-flight commands waiting
     /// to be acknowledged?
     inline bool canSendCommand() const

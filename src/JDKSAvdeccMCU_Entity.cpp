@@ -122,18 +122,24 @@ void Entity::commandTimedOut( jdksavdecc_eui64 const &target_entity_id,
 
 bool Entity::receivedPDU( Frame &frame )
 {
+    // default status code to not implemented, this value is common to all sub
+    // protocols
+    uint8_t status_code = JDKSAVDECC_AEM_STATUS_NOT_IMPLEMENTED;
+
     bool r = false;
     // we already know the message is AVTP ethertype and is either directly
     // targetting my MAC address or is a multicast message
 
     // Try see if it is an AEM message
-    jdksavdecc_aecpdu_aem aem;
-    if ( parseAEM( &aem, frame ) )
     {
-        if ( isAEMForTarget( aem, getEntityID() ) )
+        jdksavdecc_aecpdu_aem aem;
+        if ( parseAEM( &aem, frame ) )
         {
-            receivedAEMCommand( aem, frame );
-            r = true;
+            if ( isAEMForTarget( aem, getEntityID() ) )
+            {
+                status_code = receivedAEMCommand( aem, frame );
+                r = true;
+            }
         }
     }
 
@@ -147,11 +153,28 @@ bool Entity::receivedPDU( Frame &frame )
             // Yes, is it a command to read/write data?
             if ( isAAForTarget( aa, getEntityID() ) )
             {
-                receivedAACommand( aa, frame );
+                status_code = receivedAACommand( aa, frame );
                 r = true;
             }
         }
     }
+
+    if ( !r )
+    {
+        // Try see if it is an ACMP message
+        jdksavdecc_acmpdu acmpdu;
+        memset( &acmpdu, 0, sizeof( acmpdu ) );
+        if ( parseACMP( &acmpdu, frame ) )
+        {
+            if ( isACMPInvolvingTarget( acmpdu, getEntityID() ) )
+            {
+                status_code = receivedACMPMessage( acmpdu, frame );
+                r = true;
+            }
+        }
+    }
+
+    (void)status_code;
 
     return r;
 }
@@ -354,6 +377,12 @@ uint8_t Entity::receivedAACommand( jdksavdecc_aecp_aa const &aa, Frame &pdu )
     sendResponses( false, false, pdu );
 
     return aa_status;
+}
+
+uint8_t Entity::receivedACMPMessage( const jdksavdecc_acmpdu &acmpdu,
+                                     Frame &pdu )
+{
+    return JDKSAVDECC_ACMP_STATUS_NOT_SUPPORTED;
 }
 
 void Entity::sendResponses( bool internally_generated,
