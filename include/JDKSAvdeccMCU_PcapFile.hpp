@@ -28,7 +28,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "JDKSAvdeccMCU_World.hpp"
 
-#ifdef JDKSAVDECCMCU_ENABLE_PCAPFILE
+#if JDKSAVDECCMCU_ENABLE_PCAPFILE==1
+
 namespace JDKSAvdeccMCU
 {
 uint64_t get_current_time_in_microseconds();

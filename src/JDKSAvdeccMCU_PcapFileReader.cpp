@@ -31,7 +31,7 @@
 
 #include "JDKSAvdeccMCU_World.hpp"
 
-#ifdef JDKSAVDECCMCU_ENABLE_PCAPFILE
+#if JDKSAVDECCMCU_ENABLE_PCAPFILE==1
 
 #include "JDKSAvdeccMCU_PcapFileReader.hpp"
 
