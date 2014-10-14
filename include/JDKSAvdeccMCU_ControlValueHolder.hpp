@@ -147,17 +147,17 @@ class ControlValueHolder : private FixedBuffer
     bool m_dirty;
 };
 
-template <size_t ControlValueSize>
+template <uint16_t ControlValueLength, uint8_t ControlValueItems>
 class ControlValueHolderWithStorage : public ControlValueHolder
 {
   public:
     ControlValueHolderWithStorage()
-        : ControlValueHolder( ControlValueSize, m_value_storage )
+        : ControlValueHolder(
+              m_value_storage, ControlValueLength, ControlValueItems )
     {
-        bzero( m_value_storage, ControlValueSize );
     }
 
   protected:
-    uint8_t m_value_storage[ControlValueSize];
+    uint8_t m_value_storage[ControlValueLength * ControlValueItems];
 };
 }
