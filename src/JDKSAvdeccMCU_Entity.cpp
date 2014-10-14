@@ -497,7 +497,7 @@ void Entity::sendCommand( jdksavdecc_eui64 const &target_entity_id,
         // Keep track of when we sent this message and who we sent it to so we
         // can
         // manage time outs
-        m_last_sent_command_time = getTimeInMilliseconds();
+        m_last_sent_command_time = getRawSocket().getTimeInMilliseconds();
         m_last_sent_command_type = aem_command_type;
         m_last_sent_command_target_entity_id = target_entity_id;
     }
@@ -619,7 +619,8 @@ uint8_t Entity::receiveAcquireEntityCommand( jdksavdecc_aecpdu_aem const &aem,
                 sendControllerAvailable( m_acquired_by_controller_entity_id,
                                          m_acquired_by_controller_mac_address );
                 // Keep track of when this happened
-                m_acquire_in_progress_time = getTimeInMilliseconds();
+                m_acquire_in_progress_time
+                    = getRawSocket().getTimeInMilliseconds();
                 // Return IN_PROGRESS, the real response will be coming either
                 // when the owning controller responds, or
                 // if it times out.
