@@ -100,6 +100,7 @@
 #endif
 
 #include "jdksavdecc.h"
+#include "jdksavdecc_aem_descriptor.h"
 
 namespace JDKSAvdeccMCU
 {
