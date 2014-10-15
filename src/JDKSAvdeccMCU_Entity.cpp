@@ -32,17 +32,21 @@
 #include "JDKSAvdeccMCU_World.hpp"
 
 #include "JDKSAvdeccMCU_Entity.hpp"
+#include "JDKSAvdeccMCU_EntityState.hpp"
 
 namespace JDKSAvdeccMCU
 {
 
-Entity::Entity( RawSocket &net, ADPManager &adp_manager )
+Entity::Entity( RawSocket &net,
+                ADPManager &adp_manager,
+                EntityState *entity_state )
     : m_adp_manager( adp_manager )
     , m_outgoing_sequence_id( 0 )
     , m_acquire_in_progress_time( 0 )
     , m_locked_time( 0 )
     , m_last_sent_command_time( 0 )
     , m_last_sent_command_type( JDKSAVDECC_AEM_COMMAND_EXPANSION )
+    , m_entity_state( entity_state )
 {
     // clear info on sent command state
     jdksavdecc_eui64_init( &m_last_sent_command_target_entity_id );
@@ -205,40 +209,60 @@ uint8_t Entity::receivedAEMCommand( jdksavdecc_aecpdu_aem const &aem,
         response_status = receiveEntityAvailableCommand( aem, pdu );
         break;
     case JDKSAVDECC_AEM_COMMAND_READ_DESCRIPTOR:
-        response_status = receiveReadDescriptorCommand( aem, pdu );
+        if ( m_entity_state )
+        {
+            response_status
+                = m_entity_state->receiveReadDescriptorCommand( aem, pdu );
+        }
         break;
     case JDKSAVDECC_AEM_COMMAND_SET_CONFIGURATION:
         command_is_set_something = true;
         response_status = validatePermissions( aem );
-        if ( response_status == JDKSAVDECC_AEM_STATUS_SUCCESS )
+        if ( response_status == JDKSAVDECC_AEM_STATUS_SUCCESS
+             && m_entity_state )
         {
-            response_status = receiveSetConfigurationCommand( aem, pdu );
+            response_status
+                = m_entity_state->receiveSetConfigurationCommand( aem, pdu );
         }
         break;
     case JDKSAVDECC_AEM_COMMAND_GET_CONFIGURATION:
-        response_status = receiveGetConfigurationCommand( aem, pdu );
+        if ( m_entity_state )
+        {
+            response_status
+                = m_entity_state->receiveGetConfigurationCommand( aem, pdu );
+        }
         break;
     case JDKSAVDECC_AEM_COMMAND_SET_NAME:
         command_is_set_something = true;
         response_status = validatePermissions( aem );
-        if ( response_status == JDKSAVDECC_AEM_STATUS_SUCCESS )
+        if ( response_status == JDKSAVDECC_AEM_STATUS_SUCCESS
+             && m_entity_state )
         {
-            response_status = receiveSetNameCommand( aem, pdu );
+            response_status = m_entity_state->receiveSetNameCommand( aem, pdu );
         }
         break;
     case JDKSAVDECC_AEM_COMMAND_GET_NAME:
-        response_status = receiveGetNameCommand( aem, pdu );
+        if ( m_entity_state )
+        {
+            response_status = m_entity_state->receiveGetNameCommand( aem, pdu );
+        }
         break;
     case JDKSAVDECC_AEM_COMMAND_SET_CONTROL:
         command_is_set_something = true;
         response_status = validatePermissions( aem );
-        if ( response_status == JDKSAVDECC_AEM_STATUS_SUCCESS )
+        if ( response_status == JDKSAVDECC_AEM_STATUS_SUCCESS
+             && m_entity_state )
         {
-            response_status = receiveSetControlCommand( aem, pdu );
+            response_status
+                = m_entity_state->receiveSetControlCommand( aem, pdu );
         }
         break;
     case JDKSAVDECC_AEM_COMMAND_GET_CONTROL:
-        response_status = receiveGetControlCommand( aem, pdu );
+        if ( m_entity_state )
+        {
+            response_status
+                = m_entity_state->receiveGetControlCommand( aem, pdu );
+        }
         break;
     case JDKSAVDECC_AEM_COMMAND_REGISTER_UNSOLICITED_NOTIFICATION:
         response_status
@@ -341,23 +365,34 @@ uint8_t Entity::receivedAACommand( jdksavdecc_aecp_aa const &aa, Frame &pdu )
             switch ( tlv_mode )
             {
             case JDKSAVDECC_AECP_AA_MODE_READ:
-                aa_status = receiveAARead( aa,
-                                           tlv_address,
-                                           tlv_length,
-                                           p + JDKSAVDECC_AECPDU_AA_TLV_LEN );
+                if ( m_entity_state )
+                {
+                    aa_status = m_entity_state->receiveAARead(
+                        aa,
+                        tlv_address,
+                        tlv_length,
+                        p + JDKSAVDECC_AECPDU_AA_TLV_LEN );
+                }
                 break;
             case JDKSAVDECC_AECP_AA_MODE_WRITE:
-                aa_status = receiveAAWrite( aa,
-                                            tlv_address,
-                                            tlv_length,
-                                            p + JDKSAVDECC_AECPDU_AA_TLV_LEN );
+                if ( m_entity_state )
+                {
+                    aa_status = m_entity_state->receiveAAWrite(
+                        aa,
+                        tlv_address,
+                        tlv_length,
+                        p + JDKSAVDECC_AECPDU_AA_TLV_LEN );
+                }
                 break;
             case JDKSAVDECC_AECP_AA_MODE_EXECUTE:
-                aa_status
-                    = receiveAAExecute( aa,
-                                        tlv_address,
-                                        tlv_length,
-                                        p + JDKSAVDECC_AECPDU_AA_TLV_LEN );
+                if ( m_entity_state )
+                {
+                    aa_status = m_entity_state->receiveAAExecute(
+                        aa,
+                        tlv_address,
+                        tlv_length,
+                        p + JDKSAVDECC_AECPDU_AA_TLV_LEN );
+                }
                 break;
             }
         }
@@ -681,7 +716,7 @@ uint8_t Entity::receiveEntityAvailableCommand( jdksavdecc_aecpdu_aem const &aem,
     (void)aem;
     (void)pdu;
 
-    return JDKSAVDECC_AECP_STATUS_NOT_IMPLEMENTED;
+    return JDKSAVDECC_AECP_STATUS_SUCCESS;
 }
 
 uint8_t
@@ -691,7 +726,7 @@ uint8_t
     (void)aem;
     (void)pdu;
 
-    return JDKSAVDECC_AECP_STATUS_NOT_IMPLEMENTED;
+    return JDKSAVDECC_AECP_STATUS_SUCCESS;
 }
 
 bool Entity::receiveControllerAvailableResponse(
@@ -705,71 +740,6 @@ bool Entity::receiveControllerAvailableResponse(
     // cancel any acquire in progress
     jdksavdecc_eui64_init( &m_acquire_in_progress_by_controller_entity_id );
     return false;
-}
-
-uint8_t Entity::receiveReadDescriptorCommand( jdksavdecc_aecpdu_aem const &aem,
-                                              Frame &pdu )
-{
-    (void)aem;
-    (void)pdu;
-
-    return JDKSAVDECC_AECP_STATUS_NOT_IMPLEMENTED;
-}
-
-uint8_t
-    Entity::receiveSetConfigurationCommand( jdksavdecc_aecpdu_aem const &aem,
-                                            Frame &pdu )
-{
-    (void)aem;
-    (void)pdu;
-
-    return JDKSAVDECC_AECP_STATUS_NOT_IMPLEMENTED;
-}
-
-uint8_t
-    Entity::receiveGetConfigurationCommand( jdksavdecc_aecpdu_aem const &aem,
-                                            Frame &pdu )
-{
-    (void)aem;
-    (void)pdu;
-
-    return JDKSAVDECC_AECP_STATUS_NOT_IMPLEMENTED;
-}
-
-uint8_t Entity::receiveSetNameCommand( jdksavdecc_aecpdu_aem const &aem,
-                                       Frame &pdu )
-{
-    (void)aem;
-    (void)pdu;
-
-    return JDKSAVDECC_AECP_STATUS_NOT_IMPLEMENTED;
-}
-
-uint8_t Entity::receiveGetNameCommand( jdksavdecc_aecpdu_aem const &aem,
-                                       Frame &pdu )
-{
-    (void)aem;
-    (void)pdu;
-
-    return JDKSAVDECC_AECP_STATUS_NOT_IMPLEMENTED;
-}
-
-uint8_t Entity::receiveSetControlCommand( jdksavdecc_aecpdu_aem const &aem,
-                                          Frame &pdu )
-{
-    (void)aem;
-    (void)pdu;
-
-    return JDKSAVDECC_AECP_STATUS_NOT_IMPLEMENTED;
-}
-
-uint8_t Entity::receiveGetControlCommand( jdksavdecc_aecpdu_aem const &aem,
-                                          Frame &pdu )
-{
-    (void)aem;
-    (void)pdu;
-
-    return JDKSAVDECC_AECP_STATUS_NOT_IMPLEMENTED;
 }
 
 uint8_t Entity::receiveRegisterUnsolicitedNotificationCommand(
@@ -787,97 +757,6 @@ uint8_t Entity::receiveDeRegisterUnsolicitedNotificationCommand(
     (void)aem;
     (void)pdu;
 
-    return JDKSAVDECC_AECP_STATUS_NOT_IMPLEMENTED;
-}
-
-uint8_t Entity::readDescriptorEntity( jdksavdecc_aecpdu_aem const &aem,
-                                      Frame &pdu )
-{
-    (void)aem;
-    (void)pdu;
-
-    return JDKSAVDECC_AECP_STATUS_NOT_IMPLEMENTED;
-}
-
-uint8_t Entity::readDescriptorConfiguration( jdksavdecc_aecpdu_aem const &aem,
-                                             Frame &pdu )
-{
-    (void)aem;
-    (void)pdu;
-
-    return JDKSAVDECC_AECP_STATUS_NOT_IMPLEMENTED;
-}
-
-uint8_t Entity::readDescriptorControl( jdksavdecc_aecpdu_aem const &aem,
-                                       Frame &pdu )
-{
-    (void)aem;
-    (void)pdu;
-
-    return JDKSAVDECC_AECP_STATUS_NOT_IMPLEMENTED;
-}
-
-uint8_t Entity::readDescriptorLocale( jdksavdecc_aecpdu_aem const &aem,
-                                      Frame &pdu )
-{
-    (void)aem;
-    (void)pdu;
-
-    return JDKSAVDECC_AECP_STATUS_NOT_IMPLEMENTED;
-}
-
-uint8_t Entity::readDescriptorStrings( jdksavdecc_aecpdu_aem const &aem,
-                                       Frame &pdu )
-{
-    (void)aem;
-    (void)pdu;
-
-    return JDKSAVDECC_AECP_STATUS_NOT_IMPLEMENTED;
-}
-
-uint8_t Entity::readDescriptorMemory( jdksavdecc_aecpdu_aem const &aem,
-                                      Frame &pdu )
-{
-    (void)aem;
-    (void)pdu;
-
-    return JDKSAVDECC_AECP_STATUS_NOT_IMPLEMENTED;
-}
-
-uint8_t Entity::receiveAARead( jdksavdecc_aecp_aa const &aa,
-                               uint32_t virtual_base_address,
-                               uint16_t length,
-                               uint8_t *response )
-{
-    (void)aa;
-    (void)virtual_base_address;
-    (void)length;
-    (void)response;
-
-    return JDKSAVDECC_AECP_STATUS_NOT_IMPLEMENTED;
-}
-
-uint8_t Entity::receiveAAWrite( jdksavdecc_aecp_aa const &aa,
-                                uint32_t virtual_base_address,
-                                uint16_t length,
-                                uint8_t const *request )
-{
-    (void)aa;
-    (void)virtual_base_address;
-    (void)length;
-    (void)request;
-    return JDKSAVDECC_AECP_STATUS_NOT_IMPLEMENTED;
-}
-
-uint8_t Entity::receiveAAExecute( jdksavdecc_aecp_aa const &aa,
-                                  uint32_t virtual_base_address,
-                                  uint16_t length,
-                                  uint8_t const *request )
-{
-    (void)aa;
-    (void)virtual_base_address;
-    (void)length;
-    (void)request;
     return JDKSAVDECC_AECP_STATUS_NOT_IMPLEMENTED;
 }
 }

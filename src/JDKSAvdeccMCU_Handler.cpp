@@ -31,6 +31,7 @@
 
 #include "JDKSAvdeccMCU_World.hpp"
 #include "JDKSAvdeccMCU_Handler.hpp"
+#include "JDKSAvdeccMCU_HandlerGroup.hpp"
 
 namespace JDKSAvdeccMCU
 {
@@ -44,4 +45,6 @@ bool Handler::receivedPDU( Frame &frame )
     (void)frame;
     return false;
 }
+
+void Handler::addToHandlerGroup( HandlerGroup &group ) { group.add( this ); }
 }

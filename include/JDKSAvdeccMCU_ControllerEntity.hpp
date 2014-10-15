@@ -37,6 +37,7 @@
 #include "JDKSAvdeccMCU_Frame.hpp"
 #include "JDKSAvdeccMCU_ADPManager.hpp"
 #include "JDKSAvdeccMCU_Entity.hpp"
+#include "JDKSAvdeccMCU_EntityState.hpp"
 
 namespace JDKSAvdeccMCU
 {
@@ -44,8 +45,10 @@ namespace JDKSAvdeccMCU
 class ControllerEntity : public Entity
 {
   public:
-    ControllerEntity( RawSocket &net, ADPManager &adp_manager )
-        : Entity( net, adp_manager )
+    ControllerEntity( RawSocket &net,
+                      ADPManager &adp_manager,
+                      EntityState *entity_state )
+        : Entity( net, adp_manager, entity_state )
     {
     }
 
@@ -288,9 +291,8 @@ class ControllerEntity : public Entity
         jdksavdecc_aecpdu_aem const &aem, Frame &pdu );
 
     // Notification that a new control value was received from the target
-    // entity,
-    // either because of a solicited or unsolicited SET_CONTROL response or
-    // a GET_CONTROL response
+    // entity, either because of a solicited or unsolicited SET_CONTROL response
+    // or a GET_CONTROL response
     virtual uint8_t
         receiveControlValue( jdksavdecc_eui64 const &target_entity_id,
                              uint16_t target_descriptor_index,
@@ -312,6 +314,7 @@ class ControllerEntity : public Entity
                      additional1,
                      sizeof( additional1 ) );
     }
+
     virtual bool receiveGetControlResponse( jdksavdecc_aecpdu_aem const &aem,
                                             Frame &pdu );
 

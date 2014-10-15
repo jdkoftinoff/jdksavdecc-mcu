@@ -35,7 +35,7 @@
 namespace JDKSAvdeccMCU
 {
 
-HandlerGroupBase::HandlerGroupBase( RawSocket &net, Handler **item_storage )
+HandlerGroup::HandlerGroup( RawSocket &net, Handler **item_storage )
     : m_net( net )
     , m_num_items( 0 )
     , m_item( item_storage )
@@ -45,7 +45,7 @@ HandlerGroupBase::HandlerGroupBase( RawSocket &net, Handler **item_storage )
 }
 
 // Poll the NetIO object for an incoming frame. If it is multicast, or m
-bool HandlerGroupBase::pollNet()
+bool HandlerGroup::pollNet()
 {
     bool r = false;
     FrameWithSize<JDKSAVDECC_AECP_FRAME_MAX_SIZE> aecp_frame;
@@ -71,7 +71,7 @@ bool HandlerGroupBase::pollNet()
 
 /// Send Tick() messages to all encapsulated Handlers
 /// and poll incoming network for PDU's and dispatch them
-void HandlerGroupBase::tick()
+void HandlerGroup::tick()
 {
     pollNet();
     for ( uint16_t i = 0; i < m_num_items; ++i )
@@ -81,7 +81,7 @@ void HandlerGroupBase::tick()
 }
 
 /// Send ReceivedPDU message to each handler until one returns true.
-bool HandlerGroupBase::receivedPDU( Frame &frame )
+bool HandlerGroup::receivedPDU( Frame &frame )
 {
     bool r = false;
     for ( uint16_t i = 0; i < m_num_items; ++i )

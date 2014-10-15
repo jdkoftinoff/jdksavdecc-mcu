@@ -41,7 +41,7 @@ namespace JDKSAvdeccMCU
 /// Dispatches Tick() and ReceivedPDU() calls to all Handlers
 /// It does not contain the storage of the handlers
 /// No bounds checking is done
-class HandlerGroupBase : public Handler
+class HandlerGroup : public Handler
 {
   protected:
     RawSocket &m_net;
@@ -51,7 +51,7 @@ class HandlerGroupBase : public Handler
     uint32_t m_handled_count;
 
   public:
-    HandlerGroupBase( RawSocket &net, Handler **item_storage );
+    HandlerGroup( RawSocket &net, Handler **item_storage );
 
     /// Add a handler to the list
     void add( Handler *v ) { m_item[m_num_items++] = v; }
@@ -74,12 +74,14 @@ class HandlerGroupBase : public Handler
 /// the storage of the contained Handler pointers.
 /// The HandlerGroup is templatelized by the MaxItem count.
 template <uint16_t MaxItems>
-class HandlerGroup : public HandlerGroupBase
+class HandlerGroupWithSize : public HandlerGroup
 {
   private:
     Handler *m_item_storage[MaxItems];
 
   public:
-    HandlerGroup( RawSocket &net ) : HandlerGroupBase( net, m_item_storage ) {}
+    HandlerGroupWithSize( RawSocket &net ) : HandlerGroup( net, m_item_storage )
+    {
+    }
 };
 }

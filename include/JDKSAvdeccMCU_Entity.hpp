@@ -39,6 +39,7 @@
 
 namespace JDKSAvdeccMCU
 {
+class EntityState;
 
 #ifndef JDKSAVDECC_ENTITY_MAX_REGISTERED_CONTROLLERS
 #define JDKSAVDECC_ENTITY_MAX_REGISTERED_CONTROLLERS ( 4 )
@@ -47,18 +48,20 @@ namespace JDKSAvdeccMCU
 class Entity : public Handler
 {
   public:
-    Entity( RawSocket &net, ADPManager &adp_manager );
+    Entity( RawSocket &net,
+            ADPManager &adp_manager,
+            EntityState *entity_state );
 
-    /// Run periodic state machines
+    /// Run periodic state machines (from Handler)
     virtual void tick();
+
+    /// Handle received AECPDU's (from Handler)
+    virtual bool receivedPDU( Frame &frame );
 
     /// Notification that a command to a target entity timed out
     virtual void commandTimedOut( jdksavdecc_eui64 const &target_entity_id,
                                   uint16_t command_type,
                                   uint16_t sequence_id );
-
-    /// Handle received AECPDU's
-    virtual bool receivedPDU( Frame &frame );
 
     /// Get the ADP Manager
     ADPManager &getADPManager() { return m_adp_manager; }
@@ -167,39 +170,6 @@ class Entity : public Handler
         receiveControllerAvailableResponse( jdksavdecc_aecpdu_aem const &aem,
                                             Frame &pdu );
 
-    /// The pdu contains a valid Read Descriptor Command
-    /// Fill in the response in place in the pdu and return an AECP AEM status
-    /// code
-    virtual uint8_t
-        receiveReadDescriptorCommand( jdksavdecc_aecpdu_aem const &aem,
-                                      Frame &pdu );
-
-    /// The pdu contains a valid Set Configuration Command
-    /// Fill in the response in place in the pdu and return an AECP AEM status
-    /// code
-    virtual uint8_t
-        receiveSetConfigurationCommand( jdksavdecc_aecpdu_aem const &aem,
-                                        Frame &pdu );
-
-    /// The pdu contains a valid Get Configuration Command
-    /// Fill in the response in place in the pdu and return an AECP AEM status
-    /// code
-    virtual uint8_t
-        receiveGetConfigurationCommand( jdksavdecc_aecpdu_aem const &aem,
-                                        Frame &pdu );
-
-    /// The pdu contains a valid Set Name Command
-    /// Fill in the response in place in the pdu and return an AECP AEM status
-    /// code
-    virtual uint8_t receiveSetNameCommand( jdksavdecc_aecpdu_aem const &aem,
-                                           Frame &pdu );
-
-    /// The pdu contains a valid Get Name Command
-    /// Fill in the response in place in the pdu and return an AECP AEM status
-    /// code
-    virtual uint8_t receiveGetNameCommand( jdksavdecc_aecpdu_aem const &aem,
-                                           Frame &pdu );
-
     // Formulate and send a SET_CONTROL unsolicited response to all subscribed
     // controllers
     void sendSetControlUnsolicitedResponse( uint16_t target_descriptor_index,
@@ -216,18 +186,6 @@ class Entity : public Handler
                                   control_value_len );
     }
 
-    /// The pdu contains a valid Set Control Command
-    /// Fill in the response in place in the pdu and return an AECP AEM status
-    /// code
-    uint8_t receiveSetControlCommand( jdksavdecc_aecpdu_aem const &aem,
-                                      Frame &pdu );
-
-    /// The pdu contains a valid Get Control Command
-    /// Fill in the response in place in the pdu and return an AECP AEM status
-    /// code
-    uint8_t receiveGetControlCommand( jdksavdecc_aecpdu_aem const &aem,
-                                      Frame &pdu );
-
     /// The pdu contains a valid Register for Unsolicited Notifications Command
     /// Fill in the response in place in the pdu and return an AECP AEM status
     /// code
@@ -240,67 +198,6 @@ class Entity : public Handler
     /// code
     uint8_t receiveDeRegisterUnsolicitedNotificationCommand(
         jdksavdecc_aecpdu_aem const &aem, Frame &pdu );
-
-    /// The pdu contains a valid Read Entity Descriptor command
-    /// Fill in the response in place in the pdu and return an AECP AEM status
-    /// code
-    virtual uint8_t readDescriptorEntity( jdksavdecc_aecpdu_aem const &aem,
-                                          Frame &pdu );
-
-    /// The pdu contains a valid Read Configuration Descriptor command
-    /// Fill in the response in place in the pdu and return an AECP AEM status
-    /// code
-    virtual uint8_t
-        readDescriptorConfiguration( jdksavdecc_aecpdu_aem const &aem,
-                                     Frame &pdu );
-
-    /// The pdu contains a valid Read Control Descriptor command
-    /// Fill in the response in place in the pdu and return an AECP AEM status
-    /// code
-    virtual uint8_t readDescriptorControl( jdksavdecc_aecpdu_aem const &aem,
-                                           Frame &pdu );
-
-    /// The pdu contains a valid Read Locale Descriptor command
-    /// Fill in the response in place in the pdu and return an AECP AEM status
-    /// code
-    virtual uint8_t readDescriptorLocale( jdksavdecc_aecpdu_aem const &aem,
-                                          Frame &pdu );
-
-    /// The pdu contains a valid Read Strings Descriptor command
-    /// Fill in the response in place in the pdu and return an AECP AEM status
-    /// code
-    virtual uint8_t readDescriptorStrings( jdksavdecc_aecpdu_aem const &aem,
-                                           Frame &pdu );
-
-    /// The pdu contains a valid Read Memory Descriptor command
-    /// Fill in the response in place in the pdu and return an AECP AEM status
-    /// code
-    virtual uint8_t readDescriptorMemory( jdksavdecc_aecpdu_aem const &aem,
-                                          Frame &pdu );
-
-    /// The pdu contains a valid Read Address Access TLV command
-    /// Fill in the response in place in the pdu and return an AECP AA status
-    /// code
-    virtual uint8_t receiveAARead( jdksavdecc_aecp_aa const &aa,
-                                   uint32_t virtual_base_address,
-                                   uint16_t length,
-                                   uint8_t *response );
-
-    /// The pdu contains a valid Write Address Access TLV command
-    /// Fill in the response in place in the pdu and return an AECP AA status
-    /// code
-    virtual uint8_t receiveAAWrite( jdksavdecc_aecp_aa const &aa,
-                                    uint32_t virtual_base_address,
-                                    uint16_t length,
-                                    uint8_t const *request );
-
-    /// The pdu contains a valid Execute Address Access TLV command
-    /// Fill in the response in place in the pdu and return an AECP AA status
-    /// code
-    virtual uint8_t receiveAAExecute( jdksavdecc_aecp_aa const &aa,
-                                      uint32_t virtual_base_address,
-                                      uint16_t length,
-                                      uint8_t const *request );
 
   protected:
     /// The advertising manager, also contains capabilities, entity_id, and
@@ -359,5 +256,8 @@ class Entity : public Handler
     /// This is the command_type of the last command that we sent to another
     /// entity
     uint16_t m_last_sent_command_type;
+
+    /// The entity state object, if any
+    EntityState *m_entity_state;
 };
 }

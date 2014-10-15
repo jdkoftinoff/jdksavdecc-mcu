@@ -65,67 +65,69 @@ ADPManager adp_manager( rawnet,
                         JDKSAVDECC_ADP_CONTROLLER_CAPABILITY_IMPLEMENTED,
                         20 );
 
-ControllerEntity my_entity( rawnet, adp_manager );
-
-/// The shared sequence ID for transmitted messages
-uint16_t sequence_id = 0;
-
-/// The mapping of Knob 1 to control descriptor 0x0000. 2 byte payload, refresh
-/// time of 1000 ms
-ControlSenderWithStorage<2> knob1(
-    my_entity, target_entity_id, target_mac_address, 0x0000, REFRESH_TIME );
-
-/// The mapping of Knob 2 to control descriptor 0x0001. 2 byte payload, refresh
-/// time of 1000 ms
-ControlSenderWithStorage<2> knob2(
-    my_entity, target_entity_id, target_mac_address, 0x0001, REFRESH_TIME );
-
-/// The mapping of Knob 2 to control descriptor 0x0002. 2 byte payload, refresh
-/// time of 1000 ms
-ControlSenderWithStorage<2> knob3(
-    my_entity, target_entity_id, target_mac_address, 0x0002, REFRESH_TIME );
-
-/// The mapping of Button 1 to control descriptor 0x0003. 1 byte payload,
-/// refresh time of 1000 ms
-ControlSenderWithStorage<1> button1(
-    my_entity, target_entity_id, target_mac_address, 0x0003, REFRESH_TIME );
-
-/// The mapping of Button 2 to control descriptor 0x0004. 1 byte payload,
-/// refresh time of 1000 ms
-ControlSenderWithStorage<1> button2(
-    my_entity, target_entity_id, target_mac_address, 0x0004, REFRESH_TIME );
-
-/// The mapping of Button 3 to control descriptor 0x0005. 1 byte payload,
-/// refresh time of 1000 ms
-ControlSenderWithStorage<1> button3(
-    my_entity, target_entity_id, target_mac_address, 0x0005, REFRESH_TIME );
-
-/// The mapping of Button 3 to control descriptor 0x0006. 1 byte payload,
-/// refresh time of 1000 ms
-ControlSenderWithStorage<1> button4(
-    my_entity, target_entity_id, target_mac_address, 0x0006, REFRESH_TIME );
-
-/// The mapping of Button 3 to control descriptor 0x0007. 1 byte payload,
-/// refresh time of 1000 ms
-ControlSenderWithStorage<1> button5(
-    my_entity, target_entity_id, target_mac_address, 0x0007, REFRESH_TIME );
-
-/// The ValueMapper scans the A/D's and Digital input pins at the specified rate
-/// and applies the new values to the appropriate knob or button
-class ValueMapper : public Handler
+class MyEntityState : public EntityState
 {
-  private:
-    /// The update rate in milliseconds
-    uint32_t m_update_rate_in_millis;
-
-    /// The time that the last update happened
-    uint32_t m_last_update_time;
-
   public:
-    ValueMapper( jdksavdecc_timestamp_in_milliseconds update_rate_in_millis )
-        : m_update_rate_in_millis( update_rate_in_millis )
+    MyEntityState( RawSocket &net, ADPManager &adp_manager )
+        : m_controller_entity( net, adp_manager, this )
+        , m_update_rate_in_millis( 50 )
         , m_last_update_time( 0 )
+        , m_knob1( m_controller_entity,
+                   target_entity_id,
+                   target_mac_address,
+                   0x0000,
+                   REFRESH_TIME )
+        , m_knob2( m_controller_entity,
+                   target_entity_id,
+                   target_mac_address,
+                   0x0001,
+                   REFRESH_TIME )
+        , m_knob3( m_controller_entity,
+                   target_entity_id,
+                   target_mac_address,
+                   0x0002,
+                   REFRESH_TIME )
+        , m_button1( m_controller_entity,
+                     target_entity_id,
+                     target_mac_address,
+                     0x0003,
+                     REFRESH_TIME )
+        , m_button2( m_controller_entity,
+                     target_entity_id,
+                     target_mac_address,
+                     0x0004,
+                     REFRESH_TIME )
+        , m_button3( m_controller_entity,
+                     target_entity_id,
+                     target_mac_address,
+                     0x0005,
+                     REFRESH_TIME )
+        , m_button4( m_controller_entity,
+                     target_entity_id,
+                     target_mac_address,
+                     0x0006,
+                     REFRESH_TIME )
+        , m_button5( m_controller_entity,
+                     target_entity_id,
+                     target_mac_address,
+                     0x0007,
+                     REFRESH_TIME )
     {
+    }
+
+    virtual void addToHandlerGroup( HandlerGroup &group )
+    {
+        group.add( this );
+        group.add( &m_knob1 );
+        group.add( &m_knob2 );
+        group.add( &m_knob3 );
+        group.add( &m_knob3 );
+        group.add( &m_button1 );
+        group.add( &m_button2 );
+        group.add( &m_button3 );
+        group.add( &m_button4 );
+        group.add( &m_button5 );
+        group.add( &m_controller_entity );
     }
 
     virtual void tick()
@@ -137,30 +139,62 @@ class ValueMapper : public Handler
         {
             m_last_update_time = time_in_millis;
 
-            knob1.setValueDoublet(
+            m_knob1.setValueDoublet(
                 analogRead( 0 ) ); // A/D values range from 0 to 0x3ff
-            knob2.setValueDoublet( analogRead( 1 ) );
-            knob3.setValueDoublet( analogRead( 2 ) );
+            m_knob2.setValueDoublet( analogRead( 1 ) );
+            m_knob3.setValueDoublet( analogRead( 2 ) );
 
-            button1.setValueOctet(
+            m_button1.setValueOctet(
                 digitalRead( 2 ) ? 0x00 : 0xff ); // DLI reads true when not
                                                   // pressed, reverse logic
-            button2.setValueOctet( digitalRead( 3 ) ? 0x00 : 0xff );
-            button3.setValueOctet( digitalRead( 4 ) ? 0x00 : 0xff );
-            button4.setValueOctet( digitalRead( 5 ) ? 0x00 : 0xff );
-            button5.setValueOctet( digitalRead( 6 ) ? 0x00 : 0xff );
+            m_button2.setValueOctet( digitalRead( 3 ) ? 0x00 : 0xff );
+            m_button3.setValueOctet( digitalRead( 4 ) ? 0x00 : 0xff );
+            m_button4.setValueOctet( digitalRead( 5 ) ? 0x00 : 0xff );
+            m_button5.setValueOctet( digitalRead( 6 ) ? 0x00 : 0xff );
 
             digitalWrite( A5, !digitalRead( 2 ) );
             digitalWrite( A4, !digitalRead( 3 ) );
         }
     }
+
+  private:
+    ControllerEntity m_controller_entity;
+
+    /// The update rate in milliseconds
+    uint32_t m_update_rate_in_millis;
+
+    /// The time that the last update happened
+    uint32_t m_last_update_time;
+
+    /// The mapping of Knob 1 to control descriptor 0x0000. 2 byte payload
+    ControlSenderWithStorage<2> m_knob1;
+
+    /// The mapping of Knob 2 to control descriptor 0x0001. 2 byte payload
+    ControlSenderWithStorage<2> m_knob2;
+
+    /// The mapping of Knob 2 to control descriptor 0x0002. 2 byte payload
+    ControlSenderWithStorage<2> m_knob3;
+
+    /// The mapping of Button 1 to control descriptor 0x0003. 1 byte payload
+    ControlSenderWithStorage<1> m_button1;
+
+    /// The mapping of Button 2 to control descriptor 0x0004. 1 byte payload
+    ControlSenderWithStorage<1> m_button2;
+
+    /// The mapping of Button 3 to control descriptor 0x0005. 1 byte payload
+    ControlSenderWithStorage<1> m_button3;
+
+    /// The mapping of Button 3 to control descriptor 0x0006. 1 byte payload
+    ControlSenderWithStorage<1> m_button4;
+
+    /// The mapping of Button 3 to control descriptor 0x0007. 1 byte payload
+    ControlSenderWithStorage<1> m_button5;
 };
 
-/// Create the mapper which polls at 50 ms
-ValueMapper value_mapper( 50 );
+MyEntityState my_entity_state( rawnet, adp_manager );
 
 /// Create a HandlerGroup which can manage up to 16 handlers
-HandlerGroup<16> all_handlers( rawnet );
+HandlerGroupWithSize<16> all_handlers( rawnet );
 
 void setup()
 {
@@ -182,28 +216,20 @@ void setup()
 
     // Put all the handlers into the HandlerGroup
 
-    all_handlers.add( &value_mapper );
-    all_handlers.add( &adp_manager );
-    all_handlers.add( &knob1 );
-    all_handlers.add( &knob2 );
-    all_handlers.add( &knob3 );
-    all_handlers.add( &button1 );
-    all_handlers.add( &button2 );
-    all_handlers.add( &button3 );
-    all_handlers.add( &button4 );
-    all_handlers.add( &button5 );
-    all_handlers.add( &my_entity );
+    adp_manager.addToHandlerGroup( all_handlers );
+    my_entity_state.addToHandlerGroup( all_handlers );
 }
 
 void jdksavdeccmcu_debug_log( const char *str, uint16_t v )
 {
+    static uint16_t debug_sequence_id = 0;
     char txt[64];
     FrameWithSize<256> pdu;
     uint16_t r;
     sprintf( txt, "%s %u", str, (unsigned)v );
     r = jdksavdecc_jdks_log_control_generate( &my_entity_id,
                                               8, // Control index 8
-                                              &sequence_id,
+                                              &debug_sequence_id,
                                               JDKSAVDECC_JDKS_LOG_INFO,
                                               0,
                                               txt,
@@ -238,7 +264,6 @@ void loop()
 }
 
 #ifndef __AVR__
-
 int main( int argc, char **argv )
 {
     (void)argc;

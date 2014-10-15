@@ -36,6 +36,8 @@
 namespace JDKSAvdeccMCU
 {
 
+class HandlerGroup;
+
 /// Abstract base class for classes that need to be notified
 /// of time traversal and received PDU's
 class Handler
@@ -48,5 +50,7 @@ class Handler
 
     /// Notification of received raw PDU. Return true if PDU is handled
     virtual bool receivedPDU( Frame &frame );
+
+    virtual void addToHandlerGroup( HandlerGroup &group );
 };
 }
