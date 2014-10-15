@@ -118,7 +118,24 @@ void ADPManager::sendADP()
 
 bool ADPManager::receivedPDU( Frame &frame )
 {
-    (void)frame;
-    return false;
+    bool r = false;
+    uint8_t *p = frame.getBuf();
+    jdksavdecc_adpdu_common_control_header header;
+    if ( jdksavdecc_adpdu_common_control_header_read(
+             &header, p, JDKSAVDECC_FRAME_HEADER_LEN, frame.getLength() ) > 0 )
+    {
+        if ( header.message_type
+             == JDKSAVDECC_ADP_MESSAGE_TYPE_ENTITY_DISCOVER )
+        {
+            if ( jdksavdecc_eui64_compare( &header.entity_id, &m_entity_id )
+                 == 0 || jdksavdecc_eui64_is_unset( header.entity_id )
+                 || jdksavdecc_eui64_is_zero( header.entity_id ) )
+            {
+                m_last_send_time_in_millis
+                    -= ( m_valid_time_in_seconds * ( 1000 / 4 ) );
+            }
+        }
+    }
+    return r;
 }
 }
