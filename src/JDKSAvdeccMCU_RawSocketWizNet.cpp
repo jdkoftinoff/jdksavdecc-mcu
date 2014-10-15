@@ -79,7 +79,7 @@ bool RawSocketWizNet::recvFrame( Frame *frame )
         if ( ( data[JDKSAVDECC_FRAME_HEADER_ETHERTYPE_OFFSET + 0]
                == ( ( m_ethertype >> 8 ) & 0xff ) )
              && ( data[JDKSAVDECC_FRAME_HEADER_ETHERTYPE_OFFSET + 1]
-                  == ( (m_ethertype >> 0) & 0xff ) ) )
+                  == ( ( m_ethertype >> 0 ) & 0xff ) ) )
         {
 
             // we care if it is for me or the multicast address
@@ -131,7 +131,8 @@ bool RawSocketWizNet::sendFrame( Frame const &frame,
 
         // Tell W5100 the destination hardware address
         W5100.writeSnDHAR( 0,
-                           const_cast<uint8_t *>(frame.getBuf(JDKSAVDECC_FRAME_HEADER_DA_OFFSET)) );
+                           const_cast<uint8_t *>( frame.getBuf(
+                               JDKSAVDECC_FRAME_HEADER_DA_OFFSET ) ) );
 
         // Send the data chunk
         W5100.send_data_processing( 0, frame.getBuf(), frame.getLength() );
@@ -210,7 +211,6 @@ void RawSocketWizNet::initialize()
     // W5100.setIPAddress(IPAddress(0,0,0,0).raw_address());
     socket( 0, SnMR::MACRAW, 0x22f0, 0 );
 }
-
 }
 #else
 const char *jdksavdeccmcu_rawsocketwiznet_file = __FILE__;

@@ -91,7 +91,7 @@ class Entity : public Handler
 
     /// Can we send a command now? i.e. are there no in-flight commands waiting
     /// to be acknowledged?
-    inline bool canSendCommand() const
+    bool canSendCommand() const
     {
         // last sent command type is set to JDKSAVDECC_AEM_COMMAND_EXPANSION
         // when there is no command in flight
@@ -135,8 +135,8 @@ class Entity : public Handler
     /// The pdu contains a valid Lock Entity command.
     /// Fill in the response in place in the pdu and return an AECP AEM status
     /// code
-    uint8_t receiveLockEntityCommand( jdksavdecc_aecpdu_aem const &aem,
-                                      Frame &pdu );
+    virtual uint8_t receiveLockEntityCommand( jdksavdecc_aecpdu_aem const &aem,
+                                              Frame &pdu );
 
     /// The pdu contains a valid Entity Available command.
     /// Fill in the response in place in the pdu and return an AECP AEM status
@@ -157,8 +157,9 @@ class Entity : public Handler
     /// The pdu contains a valid Controller Available command.
     /// Fill in the response in place in the pdu and return an AECP AEM status
     /// code
-    uint8_t receiveControllerAvailableCommand( jdksavdecc_aecpdu_aem const &aem,
-                                               Frame &pdu );
+    virtual uint8_t
+        receiveControllerAvailableCommand( jdksavdecc_aecpdu_aem const &aem,
+                                           Frame &pdu );
 
     /// The pdu contains a valid Controller Available response.
     /// return true if the response is handled
@@ -169,32 +170,35 @@ class Entity : public Handler
     /// The pdu contains a valid Read Descriptor Command
     /// Fill in the response in place in the pdu and return an AECP AEM status
     /// code
-    uint8_t receiveReadDescriptorCommand( jdksavdecc_aecpdu_aem const &aem,
-                                          Frame &pdu );
+    virtual uint8_t
+        receiveReadDescriptorCommand( jdksavdecc_aecpdu_aem const &aem,
+                                      Frame &pdu );
 
     /// The pdu contains a valid Set Configuration Command
     /// Fill in the response in place in the pdu and return an AECP AEM status
     /// code
-    uint8_t receiveSetConfigurationCommand( jdksavdecc_aecpdu_aem const &aem,
-                                            Frame &pdu );
+    virtual uint8_t
+        receiveSetConfigurationCommand( jdksavdecc_aecpdu_aem const &aem,
+                                        Frame &pdu );
 
     /// The pdu contains a valid Get Configuration Command
     /// Fill in the response in place in the pdu and return an AECP AEM status
     /// code
-    uint8_t receiveGetConfigurationCommand( jdksavdecc_aecpdu_aem const &aem,
-                                            Frame &pdu );
+    virtual uint8_t
+        receiveGetConfigurationCommand( jdksavdecc_aecpdu_aem const &aem,
+                                        Frame &pdu );
 
     /// The pdu contains a valid Set Name Command
     /// Fill in the response in place in the pdu and return an AECP AEM status
     /// code
-    uint8_t receiveSetNameCommand( jdksavdecc_aecpdu_aem const &aem,
-                                   Frame &pdu );
+    virtual uint8_t receiveSetNameCommand( jdksavdecc_aecpdu_aem const &aem,
+                                           Frame &pdu );
 
     /// The pdu contains a valid Get Name Command
     /// Fill in the response in place in the pdu and return an AECP AEM status
     /// code
-    uint8_t receiveGetNameCommand( jdksavdecc_aecpdu_aem const &aem,
-                                   Frame &pdu );
+    virtual uint8_t receiveGetNameCommand( jdksavdecc_aecpdu_aem const &aem,
+                                           Frame &pdu );
 
     // Formulate and send a SET_CONTROL unsolicited response to all subscribed
     // controllers
@@ -303,7 +307,7 @@ class Entity : public Handler
     /// entity_model_id
     ADPManager &m_adp_manager;
 
-    /// The seqeunce_id of the last send outgoing command
+    /// The sequence_id of the last send outgoing command
     uint16_t m_outgoing_sequence_id;
 
     /// If we are acquired by a controller, then this is set to the controller's
@@ -316,33 +320,27 @@ class Entity : public Handler
     jdksavdecc_eui48 m_acquired_by_controller_mac_address;
 
     /// If we are acquired by one controller and another controller is trying to
-    /// acquire
-    /// this entity, then this contains the new controller's entity_id during
-    /// the
-    /// controller available negotiation mechanism
+    /// acquire this entity, then this contains the new controller's entity_id
+    /// during the controller available negotiation mechanism
     jdksavdecc_eui64 m_acquire_in_progress_by_controller_entity_id;
 
     /// If we are currently interrogating a controller with a controller
-    /// available, then
-    /// this is the timestamp of when we started the controller available
-    /// negotiation mechanism
+    /// available, then this is the timestamp of when we started the controller
+    /// available negotiation mechanism
     jdksavdecc_timestamp_in_milliseconds m_acquire_in_progress_time;
 
     /// If we are locked by a controller, then this contains the controller's
-    /// entity id which
-    /// locked us
+    /// entity id which locked us
     jdksavdecc_eui64 m_locked_by_controller_entity_id;
 
     /// If we are locked by a controller, then this contains the timestamp of
-    /// when the lock first
-    /// ocurred
+    /// when the lock first ocurred
     jdksavdecc_timestamp_in_milliseconds m_locked_time;
 
     /// This contains the unordered list of controller entity id's that are
-    /// currently registered
-    /// via the register for unsolicited notifications command. The entity id is
-    /// FF:FF:FF:FF:FF:FF:FF:FF
-    /// If the the slot is not in use
+    /// currently registered via the register for unsolicited notifications
+    /// command. The entity id is FF:FF:FF:FF:FF:FF:FF:FF If the the slot is not
+    /// in use
     jdksavdecc_eui64 m_registered_controllers_entity_id
         [JDKSAVDECC_ENTITY_MAX_REGISTERED_CONTROLLERS];
 
@@ -353,10 +351,12 @@ class Entity : public Handler
 
     /// This is the timestamp of the last command that we sent to another entity
     jdksavdecc_timestamp_in_milliseconds m_last_sent_command_time;
+
     /// This is the entity id that was the target of the last command that we
     /// sent
     jdksavdecc_eui64 m_last_sent_command_target_entity_id;
-    /// THis is the command_type of the last command that we sent to another
+
+    /// This is the command_type of the last command that we sent to another
     /// entity
     uint16_t m_last_sent_command_type;
 };

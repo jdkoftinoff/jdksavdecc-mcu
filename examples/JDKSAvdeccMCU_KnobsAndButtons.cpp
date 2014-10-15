@@ -22,9 +22,9 @@ jdksavdecc_eui48 my_mac = {{0x70, 0xb3, 0xd5, 0xed, 0xcf, 0xf0}};
 
 #if JDKSAVDECCMCU_ENABLE_RAWSOCKETWIZNET == 1
 RawSocketWizNet rawnet( my_mac,
-                         JDKSAVDECC_AVTP_ETHERTYPE,
-                         &jdksavdecc_multicast_adp_acmp ); // For embedded
-                                                           // systems
+                        JDKSAVDECC_AVTP_ETHERTYPE,
+                        &jdksavdecc_multicast_adp_acmp ); // For embedded
+                                                          // systems
 #elif JDKSAVDECCMCU_ENABLE_RAWSOCKETMACOSX
 RawSocketMacOSX rawnet( "en0",
                         JDKSAVDECC_AVTP_ETHERTYPE,
