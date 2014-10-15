@@ -58,6 +58,17 @@ class FixedBuffer
         }
     }
 
+    void putEUI48(
+        uint8_t v0, uint8_t v1, uint8_t v2, uint8_t v3, uint8_t v4, uint8_t v5 )
+    {
+        m_buf[m_length++] = v0;
+        m_buf[m_length++] = v1;
+        m_buf[m_length++] = v2;
+        m_buf[m_length++] = v3;
+        m_buf[m_length++] = v4;
+        m_buf[m_length++] = v5;
+    }
+
     void putEUI48()
     {
         for ( uint16_t i = 0; i < 6; ++i )
@@ -72,6 +83,25 @@ class FixedBuffer
         {
             m_buf[m_length++] = 0;
         }
+    }
+
+    void putEUI64( uint8_t v0,
+                   uint8_t v1,
+                   uint8_t v2,
+                   uint8_t v3,
+                   uint8_t v4,
+                   uint8_t v5,
+                   uint8_t v6,
+                   uint8_t v7 )
+    {
+        m_buf[m_length++] = v0;
+        m_buf[m_length++] = v1;
+        m_buf[m_length++] = v2;
+        m_buf[m_length++] = v3;
+        m_buf[m_length++] = v4;
+        m_buf[m_length++] = v5;
+        m_buf[m_length++] = v6;
+        m_buf[m_length++] = v7;
     }
 
     void putEUI64( jdksavdecc_eui64 const &val )
