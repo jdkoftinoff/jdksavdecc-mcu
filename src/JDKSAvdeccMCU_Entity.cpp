@@ -297,29 +297,23 @@ uint8_t Entity::receivedAEMCommand( jdksavdecc_aecpdu_aem const &aem,
         if ( response_status == JDKSAVDECC_AEM_STATUS_SUCCESS
              && m_entity_state )
         {
-            uint16_t descriptor_type
-                = jdksavdecc_aem_command_set_control_get_descriptor_type(
-                    pdu.getBuf(), JDKSAVDECC_FRAME_HEADER_LEN );
             uint16_t descriptor_index
                 = jdksavdecc_aem_command_set_control_get_descriptor_index(
                     pdu.getBuf(), JDKSAVDECC_FRAME_HEADER_LEN );
 
             response_status = m_entity_state->receiveSetControlCommand(
-                aem, pdu, descriptor_type, descriptor_index );
+                aem, pdu, descriptor_index );
         }
         break;
     case JDKSAVDECC_AEM_COMMAND_GET_CONTROL:
         if ( m_entity_state )
         {
-            uint16_t descriptor_type
-                = jdksavdecc_aem_command_get_control_get_descriptor_type(
-                    pdu.getBuf(), JDKSAVDECC_FRAME_HEADER_LEN );
             uint16_t descriptor_index
                 = jdksavdecc_aem_command_get_control_get_descriptor_index(
                     pdu.getBuf(), JDKSAVDECC_FRAME_HEADER_LEN );
 
             response_status = m_entity_state->receiveGetControlCommand(
-                aem, pdu, descriptor_type, descriptor_index );
+                aem, pdu, descriptor_index );
         }
         break;
     case JDKSAVDECC_AEM_COMMAND_REGISTER_UNSOLICITED_NOTIFICATION:
