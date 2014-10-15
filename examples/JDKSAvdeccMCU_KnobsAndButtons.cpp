@@ -85,6 +85,15 @@ class MyEntityState : public EntityState
                             REFRESH_TIME,
                             &m_buttons_storage )
     {
+        // Set up the I/O pins for 3 knobs, 5 buttons, and 2 LED's
+        pinMode( 9, OUTPUT );
+        pinMode( 2, INPUT_PULLUP );
+        pinMode( 3, INPUT_PULLUP );
+        pinMode( 4, INPUT_PULLUP );
+        pinMode( 5, INPUT_PULLUP );
+        pinMode( 6, INPUT_PULLUP );
+        pinMode( A4, OUTPUT );
+        pinMode( A5, OUTPUT );
     }
 
     virtual void addToHandlerGroup( HandlerGroup &group )
@@ -120,6 +129,88 @@ class MyEntityState : public EntityState
         }
     }
 
+    virtual uint8_t readDescriptorEntity( jdksavdecc_aecpdu_aem const &aem,
+                                          Frame &pdu,
+                                          uint16_t configuration_index,
+                                          uint16_t descriptor_type,
+                                          uint16_t descriptor_index )
+    {
+        uint8_t status = JDKSAVDECC_AEM_STATUS_BAD_ARGUMENTS;
+
+        if ( configuration_index == 0 && descriptor_index == 0 )
+        {
+            pdu.setLength(
+                JDKSAVDECC_FRAME_HEADER_LEN
+                + JDKSAVDECC_AEM_COMMAND_READ_DESCRIPTOR_COMMAND_OFFSET_DESCRIPTOR_TYPE );
+            pdu.putDoublet( JDKSAVDECC_DESCRIPTOR_ENTITY );
+
+            // descriptor_index
+            pdu.putDoublet( 0 );
+
+            // entity_id
+            pdu.putEUI64( m_controller_entity.getEntityID() );
+
+            // entity_model_id
+            pdu.putEUI64( adp_manager.getEntityModelID() );
+
+            // entity_capabilities
+            pdu.putQuadlet( JDKSAVDECC_ADP_ENTITY_CAPABILITY_AEM_SUPPORTED );
+
+            // talker_stream_sources
+            pdu.putDoublet( 0 );
+
+            // talker_capabilities
+            pdu.putDoublet( 0 );
+
+            // listener_stream_sources
+            pdu.putDoublet( 0 );
+
+            // listener_stream_sinks
+            pdu.putDoublet( 0 );
+
+            // listener_capabilities
+            pdu.putDoublet( 0 );
+
+            // controller_capabilities
+            pdu.putQuadlet( JDKSAVDECC_ADP_CONTROLLER_CAPABILITY_IMPLEMENTED );
+
+            // available_index
+            pdu.putQuadlet( adp_manager.getAvailableIndex() );
+
+            // association_id = 0
+            pdu.putEUI64();
+
+            // entity_name
+            pdu.putAvdeccString( "JDKSAvdecc-MCU" );
+
+            // vendor_name_string
+            pdu.putDoublet( JDKSAVDECC_NO_STRING );
+
+            // model_name_string
+            pdu.putDoublet( JDKSAVDECC_NO_STRING );
+
+            // firmware_version
+            pdu.putAvdeccString( "V3.0" );
+
+            // group_name
+            pdu.putAvdeccString();
+
+            // serial_number
+            pdu.putAvdeccString( "12345678" );
+
+            // configurations_count
+            pdu.putDoublet( 1 );
+
+            // current_configuration
+            pdu.putDoublet( 0 );
+
+            m_controller_entity.sendResponses( false, false, pdu );
+            status = JDKSAVDECC_AEM_STATUS_SUCCESS;
+        }
+
+        return status;
+    }
+
   private:
     ControllerEntity m_controller_entity;
 
@@ -147,15 +238,6 @@ HandlerGroupWithSize<16> all_handlers( rawnet );
 
 void setup()
 {
-    // Set up the I/O pins for 3 knobs, 5 buttons, and 2 LED's
-    pinMode( 9, OUTPUT );
-    pinMode( 2, INPUT_PULLUP );
-    pinMode( 3, INPUT_PULLUP );
-    pinMode( 4, INPUT_PULLUP );
-    pinMode( 5, INPUT_PULLUP );
-    pinMode( 6, INPUT_PULLUP );
-    pinMode( A4, OUTPUT );
-    pinMode( A5, OUTPUT );
 
     // Initialize the serial port for debug logs
     Serial.begin( 9600 );

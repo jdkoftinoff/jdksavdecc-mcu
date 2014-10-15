@@ -62,7 +62,10 @@ class EntityState : public Handler
     /// code
     virtual uint8_t
         receiveReadDescriptorCommand( jdksavdecc_aecpdu_aem const &aem,
-                                      Frame &pdu );
+                                      Frame &pdu,
+                                      uint16_t configuration_index,
+                                      uint16_t descriptor_type,
+                                      uint16_t descriptor_index );
 
     /// The pdu contains a valid Set Configuration Command
     /// Fill in the response in place in the pdu and return an AECP AEM status
@@ -82,62 +85,90 @@ class EntityState : public Handler
     /// Fill in the response in place in the pdu and return an AECP AEM status
     /// code
     virtual uint8_t receiveSetNameCommand( jdksavdecc_aecpdu_aem const &aem,
-                                           Frame &pdu );
+                                           Frame &pdu,
+                                           uint16_t configuration_index,
+                                           uint16_t descriptor_type,
+                                           uint16_t descriptor_index );
 
     /// The pdu contains a valid Get Name Command
     /// Fill in the response in place in the pdu and return an AECP AEM status
     /// code
     virtual uint8_t receiveGetNameCommand( jdksavdecc_aecpdu_aem const &aem,
-                                           Frame &pdu );
+                                           Frame &pdu,
+                                           uint16_t configuration_index,
+                                           uint16_t descriptor_type,
+                                           uint16_t descriptor_index );
 
     /// The pdu contains a valid Set Control Command
     /// Fill in the response in place in the pdu and return an AECP AEM status
     /// code
     virtual uint8_t receiveSetControlCommand( jdksavdecc_aecpdu_aem const &aem,
-                                              Frame &pdu );
+                                              Frame &pdu,
+                                              uint16_t descriptor_type,
+                                              uint16_t descriptor_index );
 
     /// The pdu contains a valid Get Control Command
     /// Fill in the response in place in the pdu and return an AECP AEM status
     /// code
     virtual uint8_t receiveGetControlCommand( jdksavdecc_aecpdu_aem const &aem,
-                                              Frame &pdu );
+                                              Frame &pdu,
+                                              uint16_t descriptor_type,
+                                              uint16_t descriptor_index );
 
     /// The pdu contains a valid Read Entity Descriptor command
     /// Fill in the response in place in the pdu and return an AECP AEM status
     /// code
     virtual uint8_t readDescriptorEntity( jdksavdecc_aecpdu_aem const &aem,
-                                          Frame &pdu );
+                                          Frame &pdu,
+                                          uint16_t configuration_index,
+                                          uint16_t descriptor_type,
+                                          uint16_t descriptor_index );
 
     /// The pdu contains a valid Read Configuration Descriptor command
     /// Fill in the response in place in the pdu and return an AECP AEM status
     /// code
     virtual uint8_t
         readDescriptorConfiguration( jdksavdecc_aecpdu_aem const &aem,
-                                     Frame &pdu );
+                                     Frame &pdu,
+                                     uint16_t configuration_index,
+                                     uint16_t descriptor_type,
+                                     uint16_t descriptor_index );
 
     /// The pdu contains a valid Read Control Descriptor command
     /// Fill in the response in place in the pdu and return an AECP AEM status
     /// code
     virtual uint8_t readDescriptorControl( jdksavdecc_aecpdu_aem const &aem,
-                                           Frame &pdu );
+                                           Frame &pdu,
+                                           uint16_t configuration_index,
+                                           uint16_t descriptor_type,
+                                           uint16_t descriptor_index );
 
     /// The pdu contains a valid Read Locale Descriptor command
     /// Fill in the response in place in the pdu and return an AECP AEM status
     /// code
     virtual uint8_t readDescriptorLocale( jdksavdecc_aecpdu_aem const &aem,
-                                          Frame &pdu );
+                                          Frame &pdu,
+                                          uint16_t configuration_index,
+                                          uint16_t descriptor_type,
+                                          uint16_t descriptor_index );
 
     /// The pdu contains a valid Read Strings Descriptor command
     /// Fill in the response in place in the pdu and return an AECP AEM status
     /// code
     virtual uint8_t readDescriptorStrings( jdksavdecc_aecpdu_aem const &aem,
-                                           Frame &pdu );
+                                           Frame &pdu,
+                                           uint16_t configuration_index,
+                                           uint16_t descriptor_type,
+                                           uint16_t descriptor_index );
 
     /// The pdu contains a valid Read Memory Descriptor command
     /// Fill in the response in place in the pdu and return an AECP AEM status
     /// code
     virtual uint8_t readDescriptorMemory( jdksavdecc_aecpdu_aem const &aem,
-                                          Frame &pdu );
+                                          Frame &pdu,
+                                          uint16_t configuration_index,
+                                          uint16_t descriptor_type,
+                                          uint16_t descriptor_index );
 
     /// The pdu contains a valid Read Address Access TLV command
     /// Fill in the response in place in the pdu and return an AECP AA status

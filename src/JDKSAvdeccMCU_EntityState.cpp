@@ -58,12 +58,21 @@ uint8_t EntityState::receiveLockEntityCommand( const jdksavdecc_aecpdu_aem &aem,
 
 uint8_t
     EntityState::receiveReadDescriptorCommand( const jdksavdecc_aecpdu_aem &aem,
-                                               Frame &pdu )
+                                               Frame &pdu,
+                                               uint16_t configuration_index,
+                                               uint16_t descriptor_type,
+                                               uint16_t descriptor_index )
 {
-    (void)aem;
-    (void)pdu;
+    uint8_t status = JDKSAVDECC_AECP_STATUS_NOT_IMPLEMENTED;
 
-    return JDKSAVDECC_AECP_STATUS_NOT_IMPLEMENTED;
+    switch ( descriptor_type )
+    {
+    case JDKSAVDECC_DESCRIPTOR_ENTITY:
+        status = readDescriptorEntity(
+            aem, pdu, configuration_index, descriptor_type, descriptor_index );
+        break;
+    }
+    return status;
 }
 
 uint8_t EntityState::receiveSetConfigurationCommand(
@@ -85,92 +94,148 @@ uint8_t EntityState::receiveGetConfigurationCommand(
 }
 
 uint8_t EntityState::receiveSetNameCommand( const jdksavdecc_aecpdu_aem &aem,
-                                            Frame &pdu )
+                                            Frame &pdu,
+                                            uint16_t configuration_index,
+                                            uint16_t descriptor_type,
+                                            uint16_t descriptor_index )
 {
     (void)aem;
     (void)pdu;
+    (void)configuration_index;
+    (void)descriptor_type;
+    (void)descriptor_index;
 
     return JDKSAVDECC_AECP_STATUS_NOT_IMPLEMENTED;
 }
 
 uint8_t EntityState::receiveGetNameCommand( const jdksavdecc_aecpdu_aem &aem,
-                                            Frame &pdu )
+                                            Frame &pdu,
+                                            uint16_t configuration_index,
+                                            uint16_t descriptor_type,
+                                            uint16_t descriptor_index )
 {
     (void)aem;
     (void)pdu;
+    (void)configuration_index;
+    (void)descriptor_type;
+    (void)descriptor_index;
 
     return JDKSAVDECC_AECP_STATUS_NOT_IMPLEMENTED;
 }
 
 uint8_t EntityState::receiveSetControlCommand( const jdksavdecc_aecpdu_aem &aem,
-                                               Frame &pdu )
+                                               Frame &pdu,
+                                               uint16_t descriptor_type,
+                                               uint16_t descriptor_index )
 {
     (void)aem;
     (void)pdu;
+    (void)descriptor_type;
+    (void)descriptor_index;
 
     return JDKSAVDECC_AECP_STATUS_NOT_IMPLEMENTED;
 }
 
 uint8_t EntityState::receiveGetControlCommand( const jdksavdecc_aecpdu_aem &aem,
-                                               Frame &pdu )
+                                               Frame &pdu,
+                                               uint16_t descriptor_type,
+                                               uint16_t descriptor_index )
 {
     (void)aem;
     (void)pdu;
+    (void)descriptor_type;
+    (void)descriptor_index;
 
     return JDKSAVDECC_AECP_STATUS_NOT_IMPLEMENTED;
 }
 
 uint8_t EntityState::readDescriptorEntity( const jdksavdecc_aecpdu_aem &aem,
-                                           Frame &pdu )
+                                           Frame &pdu,
+                                           uint16_t configuration_index,
+                                           uint16_t descriptor_type,
+                                           uint16_t descriptor_index )
 {
     (void)aem;
     (void)pdu;
+    (void)configuration_index;
+    (void)descriptor_type;
+    (void)descriptor_index;
 
     return JDKSAVDECC_AECP_STATUS_NOT_IMPLEMENTED;
 }
 
 uint8_t
     EntityState::readDescriptorConfiguration( const jdksavdecc_aecpdu_aem &aem,
-                                              Frame &pdu )
+                                              Frame &pdu,
+                                              uint16_t configuration_index,
+                                              uint16_t descriptor_type,
+                                              uint16_t descriptor_index )
 {
     (void)aem;
     (void)pdu;
+    (void)configuration_index;
+    (void)descriptor_type;
+    (void)descriptor_index;
 
     return JDKSAVDECC_AECP_STATUS_NOT_IMPLEMENTED;
 }
 
 uint8_t EntityState::readDescriptorControl( const jdksavdecc_aecpdu_aem &aem,
-                                            Frame &pdu )
+                                            Frame &pdu,
+                                            uint16_t configuration_index,
+                                            uint16_t descriptor_type,
+                                            uint16_t descriptor_index )
 {
     (void)aem;
     (void)pdu;
+    (void)configuration_index;
+    (void)descriptor_type;
+    (void)descriptor_index;
 
     return JDKSAVDECC_AECP_STATUS_NOT_IMPLEMENTED;
 }
 
 uint8_t EntityState::readDescriptorLocale( const jdksavdecc_aecpdu_aem &aem,
-                                           Frame &pdu )
+                                           Frame &pdu,
+                                           uint16_t configuration_index,
+                                           uint16_t descriptor_type,
+                                           uint16_t descriptor_index )
 {
     (void)aem;
     (void)pdu;
+    (void)configuration_index;
+    (void)descriptor_type;
+    (void)descriptor_index;
 
     return JDKSAVDECC_AECP_STATUS_NOT_IMPLEMENTED;
 }
 
 uint8_t EntityState::readDescriptorStrings( const jdksavdecc_aecpdu_aem &aem,
-                                            Frame &pdu )
+                                            Frame &pdu,
+                                            uint16_t configuration_index,
+                                            uint16_t descriptor_type,
+                                            uint16_t descriptor_index )
 {
     (void)aem;
     (void)pdu;
+    (void)configuration_index;
+    (void)descriptor_type;
+    (void)descriptor_index;
 
     return JDKSAVDECC_AECP_STATUS_NOT_IMPLEMENTED;
 }
 
 uint8_t EntityState::readDescriptorMemory( const jdksavdecc_aecpdu_aem &aem,
-                                           Frame &pdu )
+                                           Frame &pdu,
+                                           uint16_t configuration_index,
+                                           uint16_t descriptor_type,
+                                           uint16_t descriptor_index )
 {
     (void)aem;
     (void)pdu;
+    (void)configuration_index;
+    (void)descriptor_type;
+    (void)descriptor_index;
 
     return JDKSAVDECC_AECP_STATUS_NOT_IMPLEMENTED;
 }

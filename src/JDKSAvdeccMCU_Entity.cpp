@@ -211,8 +211,22 @@ uint8_t Entity::receivedAEMCommand( jdksavdecc_aecpdu_aem const &aem,
     case JDKSAVDECC_AEM_COMMAND_READ_DESCRIPTOR:
         if ( m_entity_state )
         {
-            response_status
-                = m_entity_state->receiveReadDescriptorCommand( aem, pdu );
+            uint16_t configuration_index
+                = jdksavdecc_aem_command_read_descriptor_get_configuration_index(
+                    pdu.getBuf(), JDKSAVDECC_FRAME_HEADER_LEN );
+            uint16_t descriptor_type
+                = jdksavdecc_aem_command_read_descriptor_get_descriptor_type(
+                    pdu.getBuf(), JDKSAVDECC_FRAME_HEADER_LEN );
+            uint16_t descriptor_index
+                = jdksavdecc_aem_command_read_descriptor_get_descriptor_index(
+                    pdu.getBuf(), JDKSAVDECC_FRAME_HEADER_LEN );
+
+            response_status = m_entity_state->receiveReadDescriptorCommand(
+                aem,
+                pdu,
+                configuration_index,
+                descriptor_type,
+                descriptor_index );
         }
         break;
     case JDKSAVDECC_AEM_COMMAND_SET_CONFIGURATION:
@@ -238,13 +252,43 @@ uint8_t Entity::receivedAEMCommand( jdksavdecc_aecpdu_aem const &aem,
         if ( response_status == JDKSAVDECC_AEM_STATUS_SUCCESS
              && m_entity_state )
         {
-            response_status = m_entity_state->receiveSetNameCommand( aem, pdu );
+            uint16_t configuration_index
+                = jdksavdecc_aem_command_set_name_get_configuration_index(
+                    pdu.getBuf(), JDKSAVDECC_FRAME_HEADER_LEN );
+            uint16_t descriptor_type
+                = jdksavdecc_aem_command_set_name_get_descriptor_type(
+                    pdu.getBuf(), JDKSAVDECC_FRAME_HEADER_LEN );
+            uint16_t descriptor_index
+                = jdksavdecc_aem_command_set_name_get_descriptor_index(
+                    pdu.getBuf(), JDKSAVDECC_FRAME_HEADER_LEN );
+
+            response_status
+                = m_entity_state->receiveSetNameCommand( aem,
+                                                         pdu,
+                                                         configuration_index,
+                                                         descriptor_type,
+                                                         descriptor_index );
         }
         break;
     case JDKSAVDECC_AEM_COMMAND_GET_NAME:
         if ( m_entity_state )
         {
-            response_status = m_entity_state->receiveGetNameCommand( aem, pdu );
+            uint16_t configuration_index
+                = jdksavdecc_aem_command_get_name_get_configuration_index(
+                    pdu.getBuf(), JDKSAVDECC_FRAME_HEADER_LEN );
+            uint16_t descriptor_type
+                = jdksavdecc_aem_command_get_name_get_descriptor_type(
+                    pdu.getBuf(), JDKSAVDECC_FRAME_HEADER_LEN );
+            uint16_t descriptor_index
+                = jdksavdecc_aem_command_get_name_get_descriptor_index(
+                    pdu.getBuf(), JDKSAVDECC_FRAME_HEADER_LEN );
+
+            response_status
+                = m_entity_state->receiveGetNameCommand( aem,
+                                                         pdu,
+                                                         configuration_index,
+                                                         descriptor_type,
+                                                         descriptor_index );
         }
         break;
     case JDKSAVDECC_AEM_COMMAND_SET_CONTROL:
@@ -253,15 +297,29 @@ uint8_t Entity::receivedAEMCommand( jdksavdecc_aecpdu_aem const &aem,
         if ( response_status == JDKSAVDECC_AEM_STATUS_SUCCESS
              && m_entity_state )
         {
-            response_status
-                = m_entity_state->receiveSetControlCommand( aem, pdu );
+            uint16_t descriptor_type
+                = jdksavdecc_aem_command_set_control_get_descriptor_type(
+                    pdu.getBuf(), JDKSAVDECC_FRAME_HEADER_LEN );
+            uint16_t descriptor_index
+                = jdksavdecc_aem_command_set_control_get_descriptor_index(
+                    pdu.getBuf(), JDKSAVDECC_FRAME_HEADER_LEN );
+
+            response_status = m_entity_state->receiveSetControlCommand(
+                aem, pdu, descriptor_type, descriptor_index );
         }
         break;
     case JDKSAVDECC_AEM_COMMAND_GET_CONTROL:
         if ( m_entity_state )
         {
-            response_status
-                = m_entity_state->receiveGetControlCommand( aem, pdu );
+            uint16_t descriptor_type
+                = jdksavdecc_aem_command_get_control_get_descriptor_type(
+                    pdu.getBuf(), JDKSAVDECC_FRAME_HEADER_LEN );
+            uint16_t descriptor_index
+                = jdksavdecc_aem_command_get_control_get_descriptor_index(
+                    pdu.getBuf(), JDKSAVDECC_FRAME_HEADER_LEN );
+
+            response_status = m_entity_state->receiveGetControlCommand(
+                aem, pdu, descriptor_type, descriptor_index );
         }
         break;
     case JDKSAVDECC_AEM_COMMAND_REGISTER_UNSOLICITED_NOTIFICATION:
