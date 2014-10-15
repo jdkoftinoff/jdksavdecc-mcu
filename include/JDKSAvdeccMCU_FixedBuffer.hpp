@@ -58,6 +58,22 @@ class FixedBuffer
         }
     }
 
+    void putEUI48()
+    {
+        for ( uint16_t i = 0; i < 6; ++i )
+        {
+            m_buf[m_length++] = 0;
+        }
+    }
+
+    void putEUI64()
+    {
+        for ( uint16_t i = 0; i < 8; ++i )
+        {
+            m_buf[m_length++] = 0;
+        }
+    }
+
     void putEUI64( jdksavdecc_eui64 const &val )
     {
         for ( uint16_t i = 0; i < 8; ++i )
@@ -65,6 +81,36 @@ class FixedBuffer
             m_buf[m_length++] = val.value[i];
         }
     }
+
+    void putAvdeccString( jdksavdecc_string const &val )
+    {
+        for ( uint16_t i = 0; i < sizeof( val.value ); ++i )
+        {
+            m_buf[m_length++] = val.value[i];
+        }
+    }
+
+    void putAvdeccString( const char *val )
+    {
+        bool ended = false;
+        for ( uint16_t i = 0; i < 64; ++i )
+        {
+            if ( ended )
+            {
+                m_buf[m_length++] = 0;
+            }
+            else
+            {
+                m_buf[m_length++] = val[i];
+                if ( val[i] == 0 )
+                {
+                    ended = true;
+                }
+            }
+        }
+    }
+
+    void putAvdeccString() { putZeros( 64 ); }
 
     void putOctet( uint8_t val ) { m_buf[m_length++] = val; }
 
