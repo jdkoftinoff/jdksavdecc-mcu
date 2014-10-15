@@ -1,6 +1,8 @@
-
 #if defined( __APPLE__ ) || defined( __linux__ )
 #define JDKSAVDECCMCU_ARDUINO 1
+#else
+#include <SPI.h>
+#include <Ethernet.h>
 #endif
 
 #include "JDKSAvdeccMCU_Arduino.h"
@@ -19,7 +21,7 @@ jdksavdecc_eui48 my_mac = {{0x70, 0xb3, 0xd5, 0xed, 0xcf, 0xf0}};
 /// Ethernet handler object
 
 #if JDKSAVDECCMCU_ENABLE_RAWSOCKETWIZNET == 1
-RawSocketWizeNet rawnet( my_mac,
+RawSocketWizNet rawnet( my_mac,
                          JDKSAVDECC_AVTP_ETHERTYPE,
                          &jdksavdecc_multicast_adp_acmp ); // For embedded
                                                            // systems
@@ -190,7 +192,7 @@ void setup()
     all_handlers.add( &button3 );
     all_handlers.add( &button4 );
     all_handlers.add( &button5 );
-    //  all_handlers.Add( &my_entity );
+    all_handlers.add( &my_entity );
 }
 
 void jdksavdeccmcu_debug_log( const char *str, uint16_t v )
@@ -236,6 +238,7 @@ void loop()
 }
 
 #ifndef __AVR__
+
 int main( int argc, char **argv )
 {
     (void)argc;

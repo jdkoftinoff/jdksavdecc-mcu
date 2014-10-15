@@ -37,7 +37,7 @@
 
 #include "Arduino.h"
 #include "Ethernet.h"
-#include "SPI.h"
+#include <SPI.h>
 
 #elif JDKSAVDECCMCU_ARDUINO == 1 && JDKSAVDECCMCU_BARE_METAL == 0
 

@@ -40,7 +40,7 @@
 namespace JDKSAvdeccMCU
 {
 
-class RawSocketWizNet : public RawSocketBase
+class RawSocketWizNet : public RawSocket
 {
   public:
     RawSocketWizNet( jdksavdecc_eui48 const &mac_address,
@@ -65,15 +65,15 @@ class RawSocketWizNet : public RawSocketBase
         return millis();
     }
 
-    virtual bool recvFrame( FrameBase *frame );
+    virtual bool recvFrame( Frame *frame );
 
-    virtual bool sendFrame( FrameBase const &frame,
+    virtual bool sendFrame( Frame const &frame,
                             uint8_t const *data1,
                             uint16_t len1,
                             uint8_t const *data2,
                             uint16_t len2 );
 
-    virtual bool sendReplyFrame( FrameBase &frame,
+    virtual bool sendReplyFrame( Frame &frame,
                                  uint8_t const *data1,
                                  uint16_t len1,
                                  uint8_t const *data2,
@@ -98,7 +98,7 @@ class RawSocketWizNet : public RawSocketBase
   private:
     jdksavdecc_eui48 m_mac_address;
     uint16_t m_ethertype;
-    const jdksavdecc_eui48 m_multicast;
+    jdksavdecc_eui48 m_multicast;
 };
 }
 
