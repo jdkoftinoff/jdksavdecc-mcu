@@ -132,9 +132,9 @@ class MyEntityState : public EntityState
     virtual uint8_t readDescriptorEntity( jdksavdecc_aecpdu_aem const &aem,
                                           Frame &pdu,
                                           uint16_t configuration_index,
-                                          uint16_t descriptor_type,
                                           uint16_t descriptor_index )
     {
+        (void)aem;
         uint8_t status = JDKSAVDECC_AEM_STATUS_BAD_ARGUMENTS;
 
         if ( configuration_index == 0 && descriptor_index == 0 )
@@ -142,6 +142,8 @@ class MyEntityState : public EntityState
             pdu.setLength(
                 JDKSAVDECC_FRAME_HEADER_LEN
                 + JDKSAVDECC_AEM_COMMAND_READ_DESCRIPTOR_COMMAND_OFFSET_DESCRIPTOR_TYPE );
+
+            // descriptor_type
             pdu.putDoublet( JDKSAVDECC_DESCRIPTOR_ENTITY );
 
             // descriptor_index
@@ -211,6 +213,230 @@ class MyEntityState : public EntityState
         return status;
     }
 
+    virtual uint8_t
+        readDescriptorConfiguration( const jdksavdecc_aecpdu_aem &aem,
+                                     Frame &pdu,
+                                     uint16_t configuration_index,
+                                     uint16_t descriptor_index )
+    {
+        uint8_t status = JDKSAVDECC_AEM_STATUS_BAD_ARGUMENTS;
+        (void)aem;
+
+        if ( configuration_index == 0 && descriptor_index == 0 )
+        {
+            pdu.setLength(
+                JDKSAVDECC_FRAME_HEADER_LEN
+                + JDKSAVDECC_AEM_COMMAND_READ_DESCRIPTOR_COMMAND_OFFSET_DESCRIPTOR_TYPE );
+
+            // descriptor_type
+            pdu.putDoublet( JDKSAVDECC_DESCRIPTOR_ENTITY );
+
+            // descriptor_index
+            pdu.putDoublet( 0 );
+
+            // object_name
+            pdu.putAvdeccString();
+
+            // localized_description
+            pdu.putDoublet( JDKSAVDECC_NO_STRING );
+
+            // descriptor_counts_count
+            pdu.putDoublet( 1 );
+
+            // descriptor_counts_offset
+            pdu.putDoublet( 74 );
+
+            // first descriptor list is control
+            pdu.putDoublet( JDKSAVDECC_DESCRIPTOR_CONTROL );
+
+            // first descriptor list has 2 descriptors
+            pdu.putDoublet( 2 );
+
+            m_controller_entity.sendResponses( false, false, pdu );
+            status = JDKSAVDECC_AEM_STATUS_SUCCESS;
+        }
+        return status;
+    }
+
+    virtual uint8_t readDescriptorControl( const jdksavdecc_aecpdu_aem &aem,
+                                           Frame &pdu,
+                                           uint16_t configuration_index,
+                                           uint16_t descriptor_index )
+    {
+        uint8_t status = JDKSAVDECC_AEM_STATUS_BAD_ARGUMENTS;
+        (void)aem;
+
+        if ( configuration_index == 0 && descriptor_index < 2 )
+        {
+            pdu.setLength(
+                JDKSAVDECC_FRAME_HEADER_LEN
+                + JDKSAVDECC_AEM_COMMAND_READ_DESCRIPTOR_COMMAND_OFFSET_DESCRIPTOR_TYPE );
+
+            // descriptor_type
+            pdu.putDoublet( JDKSAVDECC_DESCRIPTOR_ENTITY );
+
+            // descriptor_index
+            pdu.putDoublet( descriptor_index );
+
+            // object_name
+            pdu.putAvdeccString();
+
+            // localized_description
+            pdu.putDoublet( JDKSAVDECC_NO_STRING );
+
+            // block_latency
+            pdu.putQuadlet( 0 );
+
+            // control_latency
+            pdu.putQuadlet( 50000 );
+
+            // control_domain
+            pdu.putDoublet( 0 );
+
+            if ( descriptor_index == 0 )
+            {
+                // control_value_type
+                pdu.putDoublet( JDKSAVDECC_CONTROL_VALUE_ARRAY_UINT16 );
+
+                // control_type
+                pdu.putEUI64( 0x70, 0xb3, 0xd5, 0xed, 0xcf, 0x00, 0x00, 0x00 );
+            }
+            if ( descriptor_index == 1 )
+            {
+                // control_value_type
+                pdu.putDoublet( JDKSAVDECC_CONTROL_VALUE_ARRAY_UINT8 );
+
+                // control_type
+                pdu.putEUI64( 0x70, 0xb3, 0xd5, 0xed, 0xcf, 0x00, 0x00, 0x01 );
+            }
+
+            // reset_time
+            pdu.putQuadlet( 0 );
+
+            // values_offset
+            pdu.putDoublet( JDKSAVDECC_DESCRIPTOR_CONTROL_LEN );
+
+            if ( descriptor_index == 0 )
+            {
+                // number_of_values
+                pdu.putDoublet( 3 );
+            }
+
+            if ( descriptor_index == 1 )
+            {
+                // number_of_values
+                pdu.putDoublet( 5 );
+            }
+
+            // signal_type
+            pdu.putDoublet( JDKSAVDECC_DESCRIPTOR_ENTITY );
+
+            // signal_index
+            pdu.putDoublet( 0 );
+
+            // signal_output
+            pdu.putDoublet( 0 );
+
+            if ( descriptor_index == 0 )
+            {
+                // minimum
+                pdu.putDoublet( 0 );
+
+                // maximium
+                pdu.putDoublet( 0x1fff );
+
+                // step
+                pdu.putDoublet( 0x80 );
+
+                // default
+                pdu.putDoublet( 0 );
+
+                // unit multiplier 10^0
+                pdu.putOctet( 0 );
+
+                // unit code (unitless)
+                pdu.putOctet( JDKSAVDECC_AEM_UNIT_UNITLESS );
+
+                // string
+                pdu.putDoublet( JDKSAVDECC_NO_STRING );
+
+                // current values
+                for ( uint8_t i = 0; i < 3; ++i )
+                {
+                    pdu.putDoublet( m_knobs_storage.getDoublet( i ) );
+                }
+            }
+            if ( descriptor_index == 1 )
+            {
+                // minimum
+                pdu.putOctet( 0 );
+
+                // maximium
+                pdu.putOctet( 0xff );
+
+                // step
+                pdu.putOctet( 0x80 );
+
+                // default
+                pdu.putOctet( 0 );
+
+                // unit multiplier 10^0
+                pdu.putOctet( 0 );
+
+                // unit code (unitless)
+                pdu.putOctet( JDKSAVDECC_AEM_UNIT_UNITLESS );
+
+                // string
+                pdu.putDoublet( JDKSAVDECC_NO_STRING );
+
+                // current values
+                for ( uint8_t i = 0; i < 3; ++i )
+                {
+                    pdu.putOctet( m_buttons_storage.getOctet( i ) );
+                }
+            }
+            m_controller_entity.sendResponses( false, false, pdu );
+            status = JDKSAVDECC_AEM_STATUS_SUCCESS;
+        }
+        return status;
+    }
+
+    virtual uint8_t receiveGetControlCommand( const jdksavdecc_aecpdu_aem &aem,
+                                              Frame &pdu,
+                                              uint16_t descriptor_index )
+    {
+        uint8_t status = JDKSAVDECC_AEM_STATUS_BAD_ARGUMENTS;
+        (void)aem;
+
+        if ( descriptor_index < 2 )
+        {
+            pdu.setLength( JDKSAVDECC_FRAME_HEADER_LEN
+                           + JDKSAVDECC_AEM_COMMAND_GET_CONTROL_COMMAND_LEN );
+
+            if ( descriptor_index == 0 )
+            {
+                // current values
+                for ( uint8_t i = 0; i < 3; ++i )
+                {
+                    pdu.putDoublet( m_knobs_storage.getDoublet( i ) );
+                }
+            }
+
+            if ( descriptor_index == 1 )
+            {
+                // current values
+                for ( uint8_t i = 0; i < 3; ++i )
+                {
+                    pdu.putOctet( m_buttons_storage.getOctet( i ) );
+                }
+            }
+
+            m_controller_entity.sendResponses( false, false, pdu );
+            status = JDKSAVDECC_AEM_STATUS_SUCCESS;
+        }
+        return status;
+    }
+
   private:
     ControllerEntity m_controller_entity;
 
@@ -238,9 +464,6 @@ HandlerGroupWithSize<16> all_handlers( rawnet );
 
 void setup()
 {
-
-    // Initialize the serial port for debug logs
-    Serial.begin( 9600 );
 
     // Initialize the ethernet chip
     rawnet.initialize();
@@ -272,10 +495,6 @@ void jdksavdeccmcu_debug_log( const char *str, uint16_t v )
         memcpy(
             pdu.getBuf( JDKSAVDECC_FRAME_HEADER_SA_OFFSET ), my_mac.value, 6 );
         RawSocket::multiSendFrame( pdu );
-    }
-    else
-    {
-        Serial.println( " error " );
     }
 }
 
