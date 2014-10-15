@@ -37,6 +37,7 @@
 #include "JDKSAvdeccMCU_Helpers.hpp"
 #include "JDKSAvdeccMCU_Entity.hpp"
 #include "JDKSAvdeccMCU_ControllerEntity.hpp"
+#include "JDKSAvdeccMCU_ControlValueHolder.hpp"
 
 namespace JDKSAvdeccMCU
 {
@@ -50,8 +51,7 @@ class ControlSender : public Handler
                    jdksavdecc_eui48 const &target_mac_address,
                    uint16_t target_descriptor_index,
                    jdksavdecc_timestamp_in_milliseconds update_rate_in_millis,
-                   uint16_t value_length,
-                   uint8_t *value_storage );
+                   ControlValueHolder *holder );
 
     /// Send the SET_CONTROL message if it is time to
     virtual void tick();
@@ -59,23 +59,12 @@ class ControlSender : public Handler
     /// Handle incoming PDU
     virtual bool receivedPDU( Frame &frame );
 
-    /// Set a one byte value. If it actually changed, then force Tick to send
-    /// ASAP
-    void setValueOctet( uint8_t val );
-
-    /// Set a doublet value. If it actually changed, then force Tick to send
-    /// ASAP
-    void setValueDoublet( uint16_t val );
-
-    /// Set a quadlet value. If it actually changed, then force Tick to send
-    /// ASAP
-    void setValueQuadlet( uint32_t val );
-
     /// Formulate the ADPDU and send it. Returns true if the message was
     /// actually sent.
     bool sendSetControl( bool wait_for_ack = false );
 
     ControllerEntity &getControllerEntity() { return m_controller_entity; }
+
     RawSocket &getRawSocket() { return m_controller_entity.getRawSocket(); }
 
     jdksavdecc_eui64 const &getEntityID() const
@@ -87,10 +76,15 @@ class ControlSender : public Handler
     {
         return m_target_entity_id;
     }
+
     jdksavdecc_eui48 const &getTargetMACAddress() const
     {
         return m_target_mac_address;
     }
+
+    ControlValueHolder *getHolder() { return m_holder; }
+
+    ControlValueHolder const *getHolder() const { return m_holder; }
 
   protected:
     ControllerEntity &m_controller_entity;
@@ -99,32 +93,6 @@ class ControlSender : public Handler
     uint16_t m_target_descriptor_index;
     jdksavdecc_timestamp_in_milliseconds m_update_rate_in_millis;
     jdksavdecc_timestamp_in_milliseconds m_last_send_time_in_millis;
-    uint16_t m_value_length;
-    uint8_t *m_value;
-};
-
-template <size_t StorageSize>
-class ControlSenderWithStorage : public ControlSender
-{
-  public:
-    ControlSenderWithStorage(
-        ControllerEntity &controller_entity,
-        jdksavdecc_eui64 const &target_entity_id,
-        jdksavdecc_eui48 const &target_mac_address,
-        uint16_t target_descriptor_index,
-        jdksavdecc_timestamp_in_milliseconds update_rate_in_millis )
-        : ControlSender( controller_entity,
-                         target_entity_id,
-                         target_mac_address,
-                         target_descriptor_index,
-                         update_rate_in_millis,
-                         StorageSize,
-                         m_value_storage )
-    {
-        memset( m_value_storage, 0, StorageSize );
-    }
-
-  private:
-    uint8_t m_value_storage[StorageSize];
+    ControlValueHolder *m_holder;
 };
 }

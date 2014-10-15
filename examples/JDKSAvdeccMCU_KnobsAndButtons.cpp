@@ -72,61 +72,26 @@ class MyEntityState : public EntityState
         : m_controller_entity( net, adp_manager, this )
         , m_update_rate_in_millis( 50 )
         , m_last_update_time( 0 )
-        , m_knob1( m_controller_entity,
-                   target_entity_id,
-                   target_mac_address,
-                   0x0000,
-                   REFRESH_TIME )
-        , m_knob2( m_controller_entity,
-                   target_entity_id,
-                   target_mac_address,
-                   0x0001,
-                   REFRESH_TIME )
-        , m_knob3( m_controller_entity,
-                   target_entity_id,
-                   target_mac_address,
-                   0x0002,
-                   REFRESH_TIME )
-        , m_button1( m_controller_entity,
-                     target_entity_id,
-                     target_mac_address,
-                     0x0003,
-                     REFRESH_TIME )
-        , m_button2( m_controller_entity,
-                     target_entity_id,
-                     target_mac_address,
-                     0x0004,
-                     REFRESH_TIME )
-        , m_button3( m_controller_entity,
-                     target_entity_id,
-                     target_mac_address,
-                     0x0005,
-                     REFRESH_TIME )
-        , m_button4( m_controller_entity,
-                     target_entity_id,
-                     target_mac_address,
-                     0x0006,
-                     REFRESH_TIME )
-        , m_button5( m_controller_entity,
-                     target_entity_id,
-                     target_mac_address,
-                     0x0007,
-                     REFRESH_TIME )
+        , m_knobs_sender( m_controller_entity,
+                          target_entity_id,
+                          target_mac_address,
+                          0x0000,
+                          REFRESH_TIME,
+                          &m_knobs_storage )
+        , m_buttons_sender( m_controller_entity,
+                            target_entity_id,
+                            target_mac_address,
+                            0x0001,
+                            REFRESH_TIME,
+                            &m_buttons_storage )
     {
     }
 
     virtual void addToHandlerGroup( HandlerGroup &group )
     {
         group.add( this );
-        group.add( &m_knob1 );
-        group.add( &m_knob2 );
-        group.add( &m_knob3 );
-        group.add( &m_knob3 );
-        group.add( &m_button1 );
-        group.add( &m_button2 );
-        group.add( &m_button3 );
-        group.add( &m_button4 );
-        group.add( &m_button5 );
+        group.add( &m_knobs_sender );
+        group.add( &m_buttons_sender );
         group.add( &m_controller_entity );
     }
 
@@ -139,18 +104,16 @@ class MyEntityState : public EntityState
         {
             m_last_update_time = time_in_millis;
 
-            m_knob1.setValueDoublet(
-                analogRead( 0 ) ); // A/D values range from 0 to 0x3ff
-            m_knob2.setValueDoublet( analogRead( 1 ) );
-            m_knob3.setValueDoublet( analogRead( 2 ) );
+            for ( uint8_t i = 0; m_knobs_storage.getNumItems(); ++i )
+            {
+                m_knobs_storage.setDoublet( analogRead( i ), i );
+            }
 
-            m_button1.setValueOctet(
-                digitalRead( 2 ) ? 0x00 : 0xff ); // DLI reads true when not
-                                                  // pressed, reverse logic
-            m_button2.setValueOctet( digitalRead( 3 ) ? 0x00 : 0xff );
-            m_button3.setValueOctet( digitalRead( 4 ) ? 0x00 : 0xff );
-            m_button4.setValueOctet( digitalRead( 5 ) ? 0x00 : 0xff );
-            m_button5.setValueOctet( digitalRead( 6 ) ? 0x00 : 0xff );
+            for ( uint8_t i = 0; m_buttons_storage.getNumItems(); ++i )
+            {
+                m_buttons_storage.setDoublet(
+                    digitalRead( i + 2 ) ? 0x00 : 0xff, i );
+            }
 
             digitalWrite( A5, !digitalRead( 2 ) );
             digitalWrite( A4, !digitalRead( 3 ) );
@@ -166,29 +129,15 @@ class MyEntityState : public EntityState
     /// The time that the last update happened
     uint32_t m_last_update_time;
 
-    /// The mapping of Knob 1 to control descriptor 0x0000. 2 byte payload
-    ControlSenderWithStorage<2> m_knob1;
+    /// The mapping of Knob 1,2,3 to control descriptor 0x0000. 6 byte payload,
+    /// one doublet each
+    ControlValueHolderWithStorage<uint16_t, 3> m_knobs_storage;
+    ControlSender m_knobs_sender;
 
-    /// The mapping of Knob 2 to control descriptor 0x0001. 2 byte payload
-    ControlSenderWithStorage<2> m_knob2;
-
-    /// The mapping of Knob 2 to control descriptor 0x0002. 2 byte payload
-    ControlSenderWithStorage<2> m_knob3;
-
-    /// The mapping of Button 1 to control descriptor 0x0003. 1 byte payload
-    ControlSenderWithStorage<1> m_button1;
-
-    /// The mapping of Button 2 to control descriptor 0x0004. 1 byte payload
-    ControlSenderWithStorage<1> m_button2;
-
-    /// The mapping of Button 3 to control descriptor 0x0005. 1 byte payload
-    ControlSenderWithStorage<1> m_button3;
-
-    /// The mapping of Button 3 to control descriptor 0x0006. 1 byte payload
-    ControlSenderWithStorage<1> m_button4;
-
-    /// The mapping of Button 3 to control descriptor 0x0007. 1 byte payload
-    ControlSenderWithStorage<1> m_button5;
+    /// The mapping of Button 1 to control descriptor 0x0001. 5 byte payload,
+    /// one octet each
+    ControlValueHolderWithStorage<uint8_t, 5> m_buttons_storage;
+    ControlSender m_buttons_sender;
 };
 
 MyEntityState my_entity_state( rawnet, adp_manager );

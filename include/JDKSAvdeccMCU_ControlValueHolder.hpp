@@ -39,7 +39,7 @@
 namespace JDKSAvdeccMCU
 {
 
-class ControlValueHolder : private FixedBuffer
+class ControlValueHolder : public FixedBuffer
 {
   public:
     ControlValueHolder( uint8_t *buf,

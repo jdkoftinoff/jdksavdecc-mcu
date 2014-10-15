@@ -41,64 +41,24 @@ ControlSender::ControlSender(
     jdksavdecc_eui48 const &target_mac_address,
     uint16_t target_descriptor_index,
     jdksavdecc_timestamp_in_milliseconds update_rate_in_millis,
-    uint16_t value_length,
-    uint8_t *value_storage )
+    ControlValueHolder *holder )
     : m_controller_entity( controller_entity )
     , m_target_entity_id( target_entity_id )
     , m_target_mac_address( target_mac_address )
     , m_target_descriptor_index( target_descriptor_index )
     , m_update_rate_in_millis( update_rate_in_millis )
     , m_last_send_time_in_millis( 0 )
-    , m_value_length( value_length )
-    , m_value( value_storage )
+    , m_holder( holder )
 {
-}
-
-void ControlSender::setValueOctet( uint8_t val )
-{
-    if ( val != m_value[0] )
-    {
-        m_last_send_time_in_millis -= m_update_rate_in_millis;
-        m_value[0] = val;
-    }
-}
-
-/// Set a doublet value. If it actually changed, then force Tick to send ASAP
-void ControlSender::setValueDoublet( uint16_t val )
-{
-    if ( ( ( ( val >> 8 ) & 0xff ) != m_value[0] )
-         || ( ( ( val >> 0 ) & 0xff ) != m_value[1] ) )
-    {
-        m_last_send_time_in_millis -= m_update_rate_in_millis;
-        m_value[0] = ( val >> 8 ) & 0xff;
-        m_value[1] = ( val >> 0 ) & 0xff;
-    }
-}
-
-/// Set a quadlet value. If it actually changed, then force Tick to send ASAP
-void ControlSender::setValueQuadlet( uint32_t val )
-{
-    if ( ( ( ( val >> 24 ) & 0xff ) != m_value[0] )
-         || ( ( ( val >> 16 ) & 0xff ) != m_value[1] )
-         || ( ( ( val >> 8 ) & 0xff ) != m_value[2] )
-         || ( ( ( val >> 0 ) & 0xff ) != m_value[3] ) )
-    {
-
-        m_last_send_time_in_millis -= m_update_rate_in_millis;
-        m_value[0] = ( val >> 24 ) & 0xff;
-        m_value[1] = ( val >> 16 ) & 0xff;
-        m_value[2] = ( val >> 8 ) & 0xff;
-        m_value[3] = ( val >> 0 ) & 0xff;
-    }
 }
 
 void ControlSender::tick()
 {
     jdksavdecc_timestamp_in_milliseconds time_in_millis
         = getRawSocket().getTimeInMilliseconds();
-    if ( wasTimeOutHit( time_in_millis,
-                        m_last_send_time_in_millis,
-                        m_update_rate_in_millis ) )
+    if ( m_holder->isDirty() || wasTimeOutHit( time_in_millis,
+                                               m_last_send_time_in_millis,
+                                               m_update_rate_in_millis ) )
     {
         sendSetControl();
         m_last_send_time_in_millis = time_in_millis;
@@ -124,8 +84,8 @@ bool ControlSender::sendSetControl( bool wait_for_ack )
                                            wait_for_ack,
                                            pdufragment.getBuf(),
                                            pdufragment.getLength(),
-                                           m_value,
-                                           m_value_length );
+                                           m_holder->getBuf(),
+                                           m_holder->getLength() );
         r = true;
     }
     return r;
