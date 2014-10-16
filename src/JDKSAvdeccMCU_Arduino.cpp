@@ -24,8 +24,8 @@ int analogRead( uint8_t pin )
 void analogReference( uint8_t mode ) { (void)mode; }
 void analogWrite( uint8_t, int ) {}
 
-unsigned long millis( void ) { return getTimeInMilliseconds(); }
-unsigned long micros( void ) { return getTimeInMilliseconds() * 1000; }
+  unsigned long millis( void ) { return JDKSAvdeccMCU::getTimeInMilliseconds(); }
+unsigned long micros( void ) { return JDKSAvdeccMCU::getTimeInMilliseconds() * 1000; }
 void delay( unsigned int t ) { usleep( t * 1000 ); }
 void delayMicroseconds( unsigned int us ) { usleep( us ); }
 unsigned long pulseIn( uint8_t pin, uint8_t state, unsigned long timeout )
