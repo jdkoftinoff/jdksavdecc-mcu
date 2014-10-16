@@ -105,7 +105,7 @@ RawSocketLinux::RawSocketLinux( const char *device,
         }
         if ( multicast_to_join )
         {
-            joinMulticast( self, *multicast_to_join );
+            joinMulticast( *multicast_to_join );
         }
         setNonblocking();
     }
