@@ -61,6 +61,11 @@ class HandlerGroup : public Handler
         return ( m_num_items + additional ) >= m_max_items;
     }
 
+    bool canPut( uint16_t additional = 1 ) const
+    {
+        return ( m_num_items + additional ) <= m_max_items;
+    }
+
     uint32_t getRxCount() const { return m_rx_count; }
 
     uint32_t getHandledCount() const { return m_handled_count; }
