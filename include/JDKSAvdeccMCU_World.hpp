@@ -119,6 +119,8 @@ inline jdksavdecc_timestamp_in_milliseconds getTimeInMilliseconds()
 #include <sys/time.h>
 #include <iostream>
 #include <iomanip>
+namespace JDKSAvdeccMCU
+{
 inline jdksavdecc_timestamp_in_milliseconds getTimeInMilliseconds()
 {
     timeval tv;
@@ -127,14 +129,19 @@ inline jdksavdecc_timestamp_in_milliseconds getTimeInMilliseconds()
     return jdksavdecc_timestamp_in_milliseconds( tv.tv_usec / 1000 )
            + jdksavdecc_timestamp_in_milliseconds( tv.tv_sec * 1000 );
 }
+}
+
 #elif defined( _WIN32 )
 #include <vector>
 #include <memory>
 #include <iostream>
 #include <iomanip>
+namespace JDKSAvdeccMCU
+{
 inline jdksavdecc_timestamp_in_milliseconds getTimeInMilliseconds()
 {
     return jdksavdecc_timestamp_in_milliseconds( GetTickCount() );
+}
 }
 #endif
 
