@@ -59,6 +59,7 @@ void ControlSender::tick( jdksavdecc_timestamp_in_milliseconds time_in_millis )
                                                m_update_rate_in_millis ) )
     {
         sendSetControl();
+        m_holder->clearDirty();
         m_last_send_time_in_millis = time_in_millis;
     }
 }
