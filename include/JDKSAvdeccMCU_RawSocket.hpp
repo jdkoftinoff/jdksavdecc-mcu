@@ -43,11 +43,11 @@ class RawSocket
 {
   public:
 #if defined( _WIN32 )
-    typedef SOCKET filedescriptor_t;
-    static const filedescriptor_t bad_filedescriptor = INVALID_HANDLE;
+    typedef SOCKET filedescriptor_type;
+    static const filedescriptor_type bad_filedescriptor = INVALID_HANDLE;
 #else
-    typedef int filedescriptor_t;
-    static const filedescriptor_t bad_filedescriptor = -1;
+    typedef int filedescriptor_type;
+    static const filedescriptor_type bad_filedescriptor = -1;
 #endif
 
     RawSocket() { net[num_rawsockets++] = this; }
@@ -85,7 +85,7 @@ class RawSocket
     /**
     * Get the file descriptor
     */
-    virtual filedescriptor_t getFd() const = 0;
+    virtual filedescriptor_type getFd() const = 0;
 
     /**
      * Get the MAC address of the ethernet port

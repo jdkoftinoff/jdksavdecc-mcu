@@ -88,7 +88,7 @@ class RawSocketWizNet : public RawSocket
 
     virtual void setNonblocking() {}
 
-    virtual filedescriptor_t getFd() const { return 0; }
+    virtual filedescriptor_type getFd() const { return 0; }
 
     virtual jdksavdecc_eui48 const &getMACAddress() const
     {

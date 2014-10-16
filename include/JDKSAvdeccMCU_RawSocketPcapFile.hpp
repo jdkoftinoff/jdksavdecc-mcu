@@ -71,7 +71,7 @@ class RawSocketPcapFile : public RawSocket
 
     virtual void setNonblocking();
 
-    virtual filedescriptor_t getFd() const;
+    virtual filedescriptor_type getFd() const;
 
     virtual jdksavdecc_eui48 const &getMACAddress() const;
 };

@@ -39,21 +39,26 @@ namespace JDKSAvdeccMCU
 class RawSocketLinux : public RawSocket
 {
   public:
-    RawSocketLinux();
+    RawSocketLinux( const char *device,
+                    uint16_t ethertype,
+                    const jdksavdecc_eui48 *multicast_to_join = 0 );
 
-    virtual ~RawSocketLinux() {}
+    virtual ~RawSocketLinux();
 
-    virtual jdksavdecc_timestamp_in_milliseconds getTimeInMilliseconds();
+    virtual jdksavdecc_timestamp_in_milliseconds getTimeInMilliseconds()
+    {
+        return JDKSAvdeccMCU::getTimeInMilliseconds();
+    }
 
-    virtual bool recvFrame( FrameBase *frame );
+    virtual bool recvFrame( Frame *frame );
 
-    virtual bool sendFrame( FrameBase const &frame,
+    virtual bool sendFrame( Frame const &frame,
                             uint8_t const *data1,
                             uint16_t len1,
                             uint8_t const *data2,
                             uint16_t len2 );
 
-    virtual bool sendReplyFrame( FrameBase &frame,
+    virtual bool sendReplyFrame( Frame &frame,
                                  uint8_t const *data1,
                                  uint16_t len1,
                                  uint8_t const *data2,
@@ -63,9 +68,22 @@ class RawSocketLinux : public RawSocket
 
     virtual void setNonblocking();
 
-    virtual filedescriptor_t getFd() const;
+    virtual filedescriptor_type getFd() const { return m_fd; }
 
-    virtual jdksavdecc_eui48 const &getMACAddress() const;
+    virtual jdksavdecc_eui48 const &getMACAddress() const
+    {
+        return m_mac_address;
+    }
+
+    virtual void initialize();
+
+  private:
+    filedescriptor_type m_fd;
+    const char *m_device;
+    int m_interface_id;
+    jdksavdecc_eui48 m_mac_address;
+    jdksavdecc_eui48 m_default_dest_mac_address;
+    uint16_t m_ethertype;
 };
 }
 #endif
