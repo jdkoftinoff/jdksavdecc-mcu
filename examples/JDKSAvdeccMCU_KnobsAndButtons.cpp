@@ -213,6 +213,79 @@ class MyEntityState : public EntityState
         return status;
     }
 
+    virtual uint8_t readDescriptorAvbInterface(
+            const jdksavdecc_aecpdu_aem &aem,
+            Frame &pdu,
+            uint16_t configuration_index,
+            uint16_t descriptor_index )
+    {
+        uint8_t status = JDKSAVDECC_AEM_STATUS_BAD_ARGUMENTS;
+        (void)aem;
+
+        if ( configuration_index == 0 && descriptor_index == 0 )
+        {
+            pdu.setLength(
+                JDKSAVDECC_FRAME_HEADER_LEN
+                + JDKSAVDECC_AEM_COMMAND_READ_DESCRIPTOR_COMMAND_OFFSET_DESCRIPTOR_TYPE );
+
+            // descriptor_type
+            pdu.putDoublet( JDKSAVDECC_DESCRIPTOR_AVB_INTERFACE );
+
+            // descriptor_index
+            pdu.putDoublet( 0 );
+
+            // object_name
+            pdu.putAvdeccString();
+
+            // localized_description
+            pdu.putDoublet(JDKSAVDECC_NO_STRING);
+
+            // mac_address
+            pdu.putEUI48( m_controller_entity.getRawSocket().getMACAddress() );
+
+            // interface_flags
+            pdu.putDoublet( 0 );
+
+            // clock_identity
+            pdu.putEUI64();
+
+            // priority1
+            pdu.putOctet(0xff);
+
+            // clock_class
+            pdu.putOctet(0xff);
+
+            // offset_scaled_log_variance
+            pdu.putDoublet(0);
+
+            // clock_accuracy
+            pdu.putOctet(0);
+
+            // priority2
+            pdu.putOctet(0xff);
+
+            // domain_number
+            pdu.putOctet(0);
+
+            // log_sync_interval
+            pdu.putOctet(0);
+
+            // log_announce_interval
+            pdu.putOctet(0);
+
+            // log_pdelay_interval
+            pdu.putOctet(0);
+
+            // port_number
+            pdu.putOctet(0);
+
+            m_controller_entity.sendResponses( false, false, pdu );
+            status = JDKSAVDECC_AEM_STATUS_SUCCESS;
+        }
+        return status;
+
+    }
+
     virtual uint8_t
         readDescriptorConfiguration( const jdksavdecc_aecpdu_aem &aem,
                                      Frame &pdu,
