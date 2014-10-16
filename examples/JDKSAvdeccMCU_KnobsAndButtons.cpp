@@ -55,21 +55,18 @@ jdksavdecc_eui64 target_entity_id
 /// 70:b3:d5:ed:cf:f1
 jdksavdecc_eui48 target_mac_address = {{0x70, 0xb3, 0xd5, 0xed, 0xcf, 0xf1}};
 
-/// The ADP manager is told about the entity id, model_id, entity capabilities,
-/// controller capabilities, and valid time in
-/// seconds
-ADPManager adp_manager( rawnet,
-                        my_entity_id,
-                        my_entity_model_id,
-                        JDKSAVDECC_ADP_ENTITY_CAPABILITY_AEM_SUPPORTED,
-                        JDKSAVDECC_ADP_CONTROLLER_CAPABILITY_IMPLEMENTED,
-                        20 );
-
-class MyEntityState : public EntityState
+class KnobsAndButtonsController : public EntityState
 {
   public:
-    MyEntityState( ADPManager &adp_manager )
-        : m_controller_entity( adp_manager, this )
+    KnobsAndButtonsController( jdksavdecc_eui64 const &entity_id,
+                               jdksavdecc_eui64 const &entity_model_id )
+        : m_adp_manager( rawnet,
+                         entity_id,
+                         entity_model_id,
+                         JDKSAVDECC_ADP_ENTITY_CAPABILITY_AEM_SUPPORTED,
+                         JDKSAVDECC_ADP_CONTROLLER_CAPABILITY_IMPLEMENTED,
+                         50 )
+        , m_controller_entity( m_adp_manager, this )
         , m_update_rate_in_millis( 50 )
         , m_last_update_time( 0 )
         , m_knobs_sender( m_controller_entity,
@@ -98,10 +95,11 @@ class MyEntityState : public EntityState
 
     virtual void addToHandlerGroup( HandlerGroup &group )
     {
-        group.add( this );
+        group.add( &m_adp_manager );
         group.add( &m_knobs_sender );
         group.add( &m_buttons_sender );
         group.add( &m_controller_entity );
+        group.add( this );
     }
 
     virtual void tick( jdksavdecc_timestamp_in_milliseconds time_in_millis )
@@ -138,14 +136,14 @@ class MyEntityState : public EntityState
             status = fillDescriptorEntity(
                 pdu,
                 m_controller_entity.getEntityID(),
-                adp_manager.getEntityModelID(),
+                m_adp_manager.getEntityModelID(),
                 JDKSAVDECC_ADP_ENTITY_CAPABILITY_AEM_SUPPORTED,
                 0,
                 0,
                 0,
                 0,
                 JDKSAVDECC_ADP_CONTROLLER_CAPABILITY_IMPLEMENTED,
-                adp_manager.getAvailableIndex(),
+                m_adp_manager.getAvailableIndex(),
                 "JDKSAvdecc-MCU",
                 JDKSAVDECC_NO_STRING,
                 JDKSAVDECC_NO_STRING,
@@ -320,13 +318,13 @@ class MyEntityState : public EntityState
             if ( descriptor_index == 0 )
             {
                 // number_of_values
-                pdu.putDoublet( 3 );
+                pdu.putDoublet( m_knobs_storage.getNumItems() );
             }
 
             if ( descriptor_index == 1 )
             {
                 // number_of_values
-                pdu.putDoublet( 5 );
+                pdu.putDoublet( m_buttons_storage.getNumItems() );
             }
 
             // signal_type
@@ -362,7 +360,7 @@ class MyEntityState : public EntityState
                 pdu.putDoublet( JDKSAVDECC_NO_STRING );
 
                 // current values
-                for ( uint8_t i = 0; i < 3; ++i )
+                for ( uint8_t i = 0; i < m_knobs_storage.getNumItems(); ++i )
                 {
                     pdu.putDoublet( m_knobs_storage.getDoublet( i ) );
                 }
@@ -391,7 +389,7 @@ class MyEntityState : public EntityState
                 pdu.putDoublet( JDKSAVDECC_NO_STRING );
 
                 // current values
-                for ( uint8_t i = 0; i < 3; ++i )
+                for ( uint8_t i = 0; i < m_buttons_storage.getNumItems(); ++i )
                 {
                     pdu.putOctet( m_buttons_storage.getOctet( i ) );
                 }
@@ -415,7 +413,7 @@ class MyEntityState : public EntityState
             if ( descriptor_index == 0 )
             {
                 // current values
-                for ( uint8_t i = 0; i < 3; ++i )
+                for ( uint8_t i = 0; i < m_knobs_storage.getNumItems(); ++i )
                 {
                     pdu.putDoublet( m_knobs_storage.getDoublet( i ) );
                 }
@@ -424,7 +422,7 @@ class MyEntityState : public EntityState
             if ( descriptor_index == 1 )
             {
                 // current values
-                for ( uint8_t i = 0; i < 3; ++i )
+                for ( uint8_t i = 0; i < m_buttons_storage.getNumItems(); ++i )
                 {
                     pdu.putOctet( m_buttons_storage.getOctet( i ) );
                 }
@@ -437,6 +435,11 @@ class MyEntityState : public EntityState
     }
 
   private:
+    /// The ADP manager is told about the entity id, model_id, entity
+    /// capabilities, controller capabilities, and valid time in
+    /// seconds
+    ADPManager m_adp_manager;
+
     ControllerEntity m_controller_entity;
 
     /// The update rate in milliseconds
@@ -456,7 +459,7 @@ class MyEntityState : public EntityState
     ControlSender m_buttons_sender;
 };
 
-MyEntityState my_entity_state( adp_manager );
+KnobsAndButtonsController my_entity_state( my_entity_id, my_entity_model_id );
 
 /// Create a HandlerGroup which can manage up to 16 handlers
 HandlerGroupWithSize<16> all_handlers;
@@ -469,7 +472,6 @@ void setup()
 
     // Put all the handlers into the HandlerGroup
 
-    adp_manager.addToHandlerGroup( all_handlers );
     my_entity_state.addToHandlerGroup( all_handlers );
 }
 
