@@ -25,12 +25,17 @@ RawSocketWizNet rawnet( my_mac,
                         JDKSAVDECC_AVTP_ETHERTYPE,
                         &jdksavdecc_multicast_adp_acmp ); // For embedded
                                                           // systems
-#elif JDKSAVDECCMCU_ENABLE_RAWSOCKETMACOSX
+#elif JDKSAVDECCMCU_ENABLE_RAWSOCKETLINUX == 1
+RawSocketLinux rawnet( "en0",
+                        JDKSAVDECC_AVTP_ETHERTYPE,
+                        &jdksavdecc_multicast_adp_acmp ); // For non-embedded
+                                                          // systems
+#elif JDKSAVDECCMCU_ENABLE_RAWSOCKETMACOSX == 1
 RawSocketMacOSX rawnet( "en0",
                         JDKSAVDECC_AVTP_ETHERTYPE,
                         &jdksavdecc_multicast_adp_acmp ); // For non-embedded
                                                           // systems
-#elif JDKSAVDECCMCU_ENABLE_RAWSOCKETPCAPFILE
+#elif JDKSAVDECCMCU_ENABLE_RAWSOCKETPCAPFILE == 1
 RawSocketPcapFile rawnet( JDKSAVDECC_AVTP_ETHERTYPE,
                           "input.pcap",
                           "output.pcap",
