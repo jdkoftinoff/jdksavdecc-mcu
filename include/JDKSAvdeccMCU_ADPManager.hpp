@@ -51,7 +51,7 @@ class ADPManager : public Handler
                 uint16_t valid_time_in_seconds );
 
     /// Send the ENTITY_AVAILABLE message if it is time to
-    virtual void tick();
+    virtual void tick( jdksavdecc_timestamp_in_milliseconds timestamp );
 
     /// Handle any incoming ADPDU. Return true if handled
     virtual bool receivedPDU( Frame &frame );

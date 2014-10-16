@@ -35,13 +35,24 @@
 namespace JDKSAvdeccMCU
 {
 
-HandlerGroup::HandlerGroup( RawSocket &net, Handler **item_storage )
-    : m_net( net )
-    , m_num_items( 0 )
+HandlerGroup::HandlerGroup( Handler **item_storage, uint16_t max_items )
+    : m_num_items( 0 )
+    , m_max_items( max_items )
     , m_item( item_storage )
     , m_rx_count( 0 )
     , m_handled_count( 0 )
 {
+}
+
+bool HandlerGroup::add( Handler *v )
+{
+    bool r = false;
+    if ( m_num_items < m_max_items )
+    {
+        m_item[m_num_items++] = v;
+        r = true;
+    }
+    return r;
 }
 
 // Poll the NetIO object for an incoming frame. If it is multicast, or m
@@ -50,7 +61,7 @@ bool HandlerGroup::pollNet()
     bool r = false;
     FrameWithSize<JDKSAVDECC_AECP_FRAME_MAX_SIZE> aecp_frame;
     // Try receive data
-    if ( m_net.recvFrame( &aecp_frame ) )
+    if ( RawSocket::multiRecvFrame( &aecp_frame ) )
     {
         // Make sure we read DA,SA,Ethertype
         if ( aecp_frame.getLength() > JDKSAVDECC_FRAME_HEADER_LEN )
@@ -71,12 +82,12 @@ bool HandlerGroup::pollNet()
 
 /// Send Tick() messages to all encapsulated Handlers
 /// and poll incoming network for PDU's and dispatch them
-void HandlerGroup::tick()
+void HandlerGroup::tick( jdksavdecc_timestamp_in_milliseconds time_in_millis )
 {
     pollNet();
     for ( uint16_t i = 0; i < m_num_items; ++i )
     {
-        m_item[i]->tick();
+        m_item[i]->tick( time_in_millis );
     }
 }
 

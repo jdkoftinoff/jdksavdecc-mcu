@@ -54,7 +54,7 @@ class ControlSender : public Handler
                    ControlValueHolder *holder );
 
     /// Send the SET_CONTROL message if it is time to
-    virtual void tick();
+    virtual void tick( jdksavdecc_timestamp_in_milliseconds time_in_millis );
 
     /// Handle incoming PDU
     virtual bool receivedPDU( Frame &frame );

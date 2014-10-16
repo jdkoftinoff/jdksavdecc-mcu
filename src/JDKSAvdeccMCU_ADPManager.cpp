@@ -53,10 +53,8 @@ ADPManager::ADPManager( RawSocket &net,
 {
 }
 
-void ADPManager::tick()
+void ADPManager::tick( jdksavdecc_timestamp_in_milliseconds time_in_millis )
 {
-    jdksavdecc_timestamp_in_milliseconds time_in_millis;
-    time_in_millis = m_net.getTimeInMilliseconds();
     if ( wasTimeOutHit( time_in_millis,
                         m_last_send_time_in_millis,
                         ( m_valid_time_in_seconds * ( 1000 / 4 ) ) ) )

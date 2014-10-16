@@ -68,8 +68,8 @@ ADPManager adp_manager( rawnet,
 class MyEntityState : public EntityState
 {
   public:
-    MyEntityState( RawSocket &net, ADPManager &adp_manager )
-        : m_controller_entity( net, adp_manager, this )
+    MyEntityState( ADPManager &adp_manager )
+        : m_controller_entity( adp_manager, this )
         , m_update_rate_in_millis( 50 )
         , m_last_update_time( 0 )
         , m_knobs_sender( m_controller_entity,
@@ -104,11 +104,8 @@ class MyEntityState : public EntityState
         group.add( &m_controller_entity );
     }
 
-    virtual void tick()
+    virtual void tick( jdksavdecc_timestamp_in_milliseconds time_in_millis )
     {
-        jdksavdecc_timestamp_in_milliseconds time_in_millis
-            = rawnet.getTimeInMilliseconds();
-
         if ( time_in_millis > m_last_update_time + m_update_rate_in_millis )
         {
             m_last_update_time = time_in_millis;
@@ -129,116 +126,60 @@ class MyEntityState : public EntityState
         }
     }
 
-    virtual uint8_t readDescriptorEntity( jdksavdecc_aecpdu_aem const &aem,
-                                          Frame &pdu,
+    virtual uint8_t readDescriptorEntity( Frame &pdu,
                                           uint16_t configuration_index,
                                           uint16_t descriptor_index )
     {
-        (void)aem;
         uint8_t status = JDKSAVDECC_AEM_STATUS_BAD_ARGUMENTS;
 
         if ( configuration_index == 0 && descriptor_index == 0 )
         {
-            pdu.setLength(
-                JDKSAVDECC_FRAME_HEADER_LEN
-                + JDKSAVDECC_AEM_COMMAND_READ_DESCRIPTOR_COMMAND_OFFSET_DESCRIPTOR_TYPE );
+            status = fillDescriptorEntity(
+                pdu,
+                m_controller_entity.getEntityID(),
+                adp_manager.getEntityModelID(),
+                JDKSAVDECC_ADP_ENTITY_CAPABILITY_AEM_SUPPORTED,
+                0,
+                0,
+                0,
+                0,
+                JDKSAVDECC_ADP_CONTROLLER_CAPABILITY_IMPLEMENTED,
+                adp_manager.getAvailableIndex(),
+                "JDKSAvdecc-MCU",
+                JDKSAVDECC_NO_STRING,
+                JDKSAVDECC_NO_STRING,
+                "V2.0",
+                "",
+                "12345678",
+                1,
+                0 );
 
-            // descriptor_type
-            pdu.putDoublet( JDKSAVDECC_DESCRIPTOR_ENTITY );
-
-            // descriptor_index
-            pdu.putDoublet( 0 );
-
-            // entity_id
-            pdu.putEUI64( m_controller_entity.getEntityID() );
-
-            // entity_model_id
-            pdu.putEUI64( adp_manager.getEntityModelID() );
-
-            // entity_capabilities
-            pdu.putQuadlet( JDKSAVDECC_ADP_ENTITY_CAPABILITY_AEM_SUPPORTED );
-
-            // talker_stream_sources
-            pdu.putDoublet( 0 );
-
-            // talker_capabilities
-            pdu.putDoublet( 0 );
-
-            // listener_stream_sources
-            pdu.putDoublet( 0 );
-
-            // listener_stream_sinks
-            pdu.putDoublet( 0 );
-
-            // listener_capabilities
-            pdu.putDoublet( 0 );
-
-            // controller_capabilities
-            pdu.putQuadlet( JDKSAVDECC_ADP_CONTROLLER_CAPABILITY_IMPLEMENTED );
-
-            // available_index
-            pdu.putQuadlet( adp_manager.getAvailableIndex() );
-
-            // association_id = 0
-            pdu.putEUI64();
-
-            // entity_name
-            pdu.putAvdeccString( "JDKSAvdecc-MCU" );
-
-            // vendor_name_string
-            pdu.putDoublet( JDKSAVDECC_NO_STRING );
-
-            // model_name_string
-            pdu.putDoublet( JDKSAVDECC_NO_STRING );
-
-            // firmware_version
-            pdu.putAvdeccString( "V3.0" );
-
-            // group_name
-            pdu.putAvdeccString();
-
-            // serial_number
-            pdu.putAvdeccString( "12345678" );
-
-            // configurations_count
-            pdu.putDoublet( 1 );
-
-            // current_configuration
-            pdu.putDoublet( 0 );
-
-            m_controller_entity.sendResponses( false, false, pdu );
-            status = JDKSAVDECC_AEM_STATUS_SUCCESS;
+            if ( status == JDKSAVDECC_AEM_STATUS_SUCCESS )
+            {
+                m_controller_entity.sendResponses( false, false, pdu );
+            }
         }
 
         return status;
     }
 
-    virtual uint8_t readDescriptorAvbInterface(
-            const jdksavdecc_aecpdu_aem &aem,
-            Frame &pdu,
-            uint16_t configuration_index,
-            uint16_t descriptor_index )
+    virtual uint8_t readDescriptorAvbInterface( Frame &pdu,
+                                                uint16_t configuration_index,
+                                                uint16_t descriptor_index )
     {
         uint8_t status = JDKSAVDECC_AEM_STATUS_BAD_ARGUMENTS;
-        (void)aem;
 
         if ( configuration_index == 0 && descriptor_index == 0 )
         {
             pdu.setLength(
                 JDKSAVDECC_FRAME_HEADER_LEN
-                + JDKSAVDECC_AEM_COMMAND_READ_DESCRIPTOR_COMMAND_OFFSET_DESCRIPTOR_TYPE );
-
-            // descriptor_type
-            pdu.putDoublet( JDKSAVDECC_DESCRIPTOR_AVB_INTERFACE );
-
-            // descriptor_index
-            pdu.putDoublet( 0 );
+                + JDKSAVDECC_AEM_COMMAND_READ_DESCRIPTOR_COMMAND_LEN );
 
             // object_name
             pdu.putAvdeccString();
 
             // localized_description
-            pdu.putDoublet(JDKSAVDECC_NO_STRING);
+            pdu.putDoublet( JDKSAVDECC_NO_STRING );
 
             // mac_address
             pdu.putEUI48( m_controller_entity.getRawSocket().getMACAddress() );
@@ -250,62 +191,52 @@ class MyEntityState : public EntityState
             pdu.putEUI64();
 
             // priority1
-            pdu.putOctet(0xff);
+            pdu.putOctet( 0xff );
 
             // clock_class
-            pdu.putOctet(0xff);
+            pdu.putOctet( 0xff );
 
             // offset_scaled_log_variance
-            pdu.putDoublet(0);
+            pdu.putDoublet( 0 );
 
             // clock_accuracy
-            pdu.putOctet(0);
+            pdu.putOctet( 0 );
 
             // priority2
-            pdu.putOctet(0xff);
+            pdu.putOctet( 0xff );
 
             // domain_number
-            pdu.putOctet(0);
+            pdu.putOctet( 0 );
 
             // log_sync_interval
-            pdu.putOctet(0);
+            pdu.putOctet( 0 );
 
             // log_announce_interval
-            pdu.putOctet(0);
+            pdu.putOctet( 0 );
 
             // log_pdelay_interval
-            pdu.putOctet(0);
+            pdu.putOctet( 0 );
 
             // port_number
-            pdu.putOctet(0);
+            pdu.putOctet( 0 );
 
             m_controller_entity.sendResponses( false, false, pdu );
             status = JDKSAVDECC_AEM_STATUS_SUCCESS;
         }
         return status;
-
     }
 
-    virtual uint8_t
-        readDescriptorConfiguration( const jdksavdecc_aecpdu_aem &aem,
-                                     Frame &pdu,
-                                     uint16_t configuration_index,
-                                     uint16_t descriptor_index )
+    virtual uint8_t readDescriptorConfiguration( Frame &pdu,
+                                                 uint16_t configuration_index,
+                                                 uint16_t descriptor_index )
     {
         uint8_t status = JDKSAVDECC_AEM_STATUS_BAD_ARGUMENTS;
-        (void)aem;
 
         if ( configuration_index == 0 && descriptor_index == 0 )
         {
             pdu.setLength(
                 JDKSAVDECC_FRAME_HEADER_LEN
-                + JDKSAVDECC_AEM_COMMAND_READ_DESCRIPTOR_COMMAND_OFFSET_DESCRIPTOR_TYPE );
-
-            // descriptor_type
-            pdu.putDoublet( JDKSAVDECC_DESCRIPTOR_ENTITY );
-
-            // descriptor_index
-            pdu.putDoublet( 0 );
+                + JDKSAVDECC_AEM_COMMAND_READ_DESCRIPTOR_COMMAND_LEN );
 
             // object_name
             pdu.putAvdeccString();
@@ -314,15 +245,19 @@ class MyEntityState : public EntityState
             pdu.putDoublet( JDKSAVDECC_NO_STRING );
 
             // descriptor_counts_count
-            pdu.putDoublet( 1 );
+            pdu.putDoublet( 2 );
 
             // descriptor_counts_offset
-            pdu.putDoublet( 74 );
+            pdu.putDoublet( JDKSAVDECC_DESCRIPTOR_CONFIGURATION_LEN );
 
-            // first descriptor list is control
+            // descriptor type
+            pdu.putDoublet( JDKSAVDECC_DESCRIPTOR_AVB_INTERFACE );
+            // descriptor count
+            pdu.putDoublet( 1 );
+
+            // descriptor type
             pdu.putDoublet( JDKSAVDECC_DESCRIPTOR_CONTROL );
-
-            // first descriptor list has 2 descriptors
+            // descriptor count
             pdu.putDoublet( 2 );
 
             m_controller_entity.sendResponses( false, false, pdu );
@@ -331,25 +266,17 @@ class MyEntityState : public EntityState
         return status;
     }
 
-    virtual uint8_t readDescriptorControl( const jdksavdecc_aecpdu_aem &aem,
-                                           Frame &pdu,
+    virtual uint8_t readDescriptorControl( Frame &pdu,
                                            uint16_t configuration_index,
                                            uint16_t descriptor_index )
     {
         uint8_t status = JDKSAVDECC_AEM_STATUS_BAD_ARGUMENTS;
-        (void)aem;
 
         if ( configuration_index == 0 && descriptor_index < 2 )
         {
             pdu.setLength(
                 JDKSAVDECC_FRAME_HEADER_LEN
-                + JDKSAVDECC_AEM_COMMAND_READ_DESCRIPTOR_COMMAND_OFFSET_DESCRIPTOR_TYPE );
-
-            // descriptor_type
-            pdu.putDoublet( JDKSAVDECC_DESCRIPTOR_ENTITY );
-
-            // descriptor_index
-            pdu.putDoublet( descriptor_index );
+                + JDKSAVDECC_AEM_COMMAND_READ_DESCRIPTOR_COMMAND_LEN );
 
             // object_name
             pdu.putAvdeccString();
@@ -474,12 +401,10 @@ class MyEntityState : public EntityState
         return status;
     }
 
-    virtual uint8_t receiveGetControlCommand( const jdksavdecc_aecpdu_aem &aem,
-                                              Frame &pdu,
+    virtual uint8_t receiveGetControlCommand( Frame &pdu,
                                               uint16_t descriptor_index )
     {
         uint8_t status = JDKSAVDECC_AEM_STATUS_BAD_ARGUMENTS;
-        (void)aem;
 
         if ( descriptor_index < 2 )
         {
@@ -530,10 +455,10 @@ class MyEntityState : public EntityState
     ControlSender m_buttons_sender;
 };
 
-MyEntityState my_entity_state( rawnet, adp_manager );
+MyEntityState my_entity_state( adp_manager );
 
 /// Create a HandlerGroup which can manage up to 16 handlers
-HandlerGroupWithSize<16> all_handlers( rawnet );
+HandlerGroupWithSize<16> all_handlers;
 
 void setup()
 {
@@ -551,7 +476,7 @@ void jdksavdeccmcu_debug_log( const char *str, uint16_t v )
 {
     static uint16_t debug_sequence_id = 0;
     char txt[64];
-    FrameWithSize<256> pdu;
+    FrameWithSize<192> pdu;
     uint16_t r;
     sprintf( txt, "%s %u", str, (unsigned)v );
     r = jdksavdecc_jdks_log_control_generate( &my_entity_id,
@@ -575,10 +500,11 @@ void loop()
 {
     static jdksavdecc_timestamp_in_milliseconds last_second = 0;
     // Get the current time in milliseconds
-    jdksavdecc_timestamp_in_milliseconds cur_time = millis();
+    jdksavdecc_timestamp_in_milliseconds cur_time
+        = RawSocket::multiGetTimeInMilliseconds();
 
     // Tell all the handlers to do their periodic jobs
-    all_handlers.tick();
+    all_handlers.tick( cur_time );
     if ( cur_time / 1000 != last_second )
     {
         last_second = cur_time / 1000;

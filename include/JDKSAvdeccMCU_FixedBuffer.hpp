@@ -48,6 +48,11 @@ class FixedBuffer
     {
     }
 
+    bool isFull( uint16_t additional = 0 ) const
+    {
+        return ( m_length + additional ) >= m_max_length;
+    }
+
     uint16_t getMaxLength() const { return m_max_length; }
 
     void putEUI48( jdksavdecc_eui48 const &val )

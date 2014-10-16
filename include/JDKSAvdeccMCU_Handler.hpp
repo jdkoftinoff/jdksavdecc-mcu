@@ -46,7 +46,7 @@ class Handler
     virtual ~Handler();
 
     /// Notification of time passage
-    virtual void tick();
+    virtual void tick( jdksavdecc_timestamp_in_milliseconds timestamp );
 
     /// Notification of received raw PDU. Return true if PDU is handled
     virtual bool receivedPDU( Frame &frame );

@@ -45,10 +45,8 @@ namespace JDKSAvdeccMCU
 class ControllerEntity : public Entity
 {
   public:
-    ControllerEntity( RawSocket &net,
-                      ADPManager &adp_manager,
-                      EntityState *entity_state )
-        : Entity( net, adp_manager, entity_state )
+    ControllerEntity( ADPManager &adp_manager, EntityState *entity_state )
+        : Entity( adp_manager, entity_state )
     {
     }
 

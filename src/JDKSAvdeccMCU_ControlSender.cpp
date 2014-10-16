@@ -52,10 +52,8 @@ ControlSender::ControlSender(
 {
 }
 
-void ControlSender::tick()
+void ControlSender::tick( jdksavdecc_timestamp_in_milliseconds time_in_millis )
 {
-    jdksavdecc_timestamp_in_milliseconds time_in_millis
-        = getRawSocket().getTimeInMilliseconds();
     if ( m_holder->isDirty() || wasTimeOutHit( time_in_millis,
                                                m_last_send_time_in_millis,
                                                m_update_rate_in_millis ) )

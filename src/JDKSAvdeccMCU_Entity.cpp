@@ -37,9 +37,7 @@
 namespace JDKSAvdeccMCU
 {
 
-Entity::Entity( RawSocket &net,
-                ADPManager &adp_manager,
-                EntityState *entity_state )
+Entity::Entity( ADPManager &adp_manager, EntityState *entity_state )
     : m_adp_manager( adp_manager )
     , m_outgoing_sequence_id( 0 )
     , m_acquire_in_progress_time( 0 )
@@ -62,13 +60,9 @@ Entity::Entity( RawSocket &net,
     }
 }
 
-void Entity::tick()
+void Entity::tick( jdksavdecc_timestamp_in_milliseconds time_in_millis )
 {
-    jdksavdecc_timestamp_in_milliseconds time_in_millis;
     uint16_t cmd = m_last_sent_command_type;
-
-    time_in_millis = getRawSocket().getTimeInMilliseconds();
-
     // If we are locked, then time out the lock
     if ( jdksavdecc_eui64_is_set( m_locked_by_controller_entity_id ) )
     {
@@ -222,11 +216,7 @@ uint8_t Entity::receivedAEMCommand( jdksavdecc_aecpdu_aem const &aem,
                     pdu.getBuf(), JDKSAVDECC_FRAME_HEADER_LEN );
 
             response_status = m_entity_state->receiveReadDescriptorCommand(
-                aem,
-                pdu,
-                configuration_index,
-                descriptor_type,
-                descriptor_index );
+                pdu, configuration_index, descriptor_type, descriptor_index );
         }
         break;
     case JDKSAVDECC_AEM_COMMAND_SET_CONFIGURATION:
@@ -236,14 +226,14 @@ uint8_t Entity::receivedAEMCommand( jdksavdecc_aecpdu_aem const &aem,
              && m_entity_state )
         {
             response_status
-                = m_entity_state->receiveSetConfigurationCommand( aem, pdu );
+                = m_entity_state->receiveSetConfigurationCommand( pdu );
         }
         break;
     case JDKSAVDECC_AEM_COMMAND_GET_CONFIGURATION:
         if ( m_entity_state )
         {
             response_status
-                = m_entity_state->receiveGetConfigurationCommand( aem, pdu );
+                = m_entity_state->receiveGetConfigurationCommand( pdu );
         }
         break;
     case JDKSAVDECC_AEM_COMMAND_SET_NAME:
@@ -262,12 +252,8 @@ uint8_t Entity::receivedAEMCommand( jdksavdecc_aecpdu_aem const &aem,
                 = jdksavdecc_aem_command_set_name_get_descriptor_index(
                     pdu.getBuf(), JDKSAVDECC_FRAME_HEADER_LEN );
 
-            response_status
-                = m_entity_state->receiveSetNameCommand( aem,
-                                                         pdu,
-                                                         configuration_index,
-                                                         descriptor_type,
-                                                         descriptor_index );
+            response_status = m_entity_state->receiveSetNameCommand(
+                pdu, configuration_index, descriptor_type, descriptor_index );
         }
         break;
     case JDKSAVDECC_AEM_COMMAND_GET_NAME:
@@ -283,12 +269,8 @@ uint8_t Entity::receivedAEMCommand( jdksavdecc_aecpdu_aem const &aem,
                 = jdksavdecc_aem_command_get_name_get_descriptor_index(
                     pdu.getBuf(), JDKSAVDECC_FRAME_HEADER_LEN );
 
-            response_status
-                = m_entity_state->receiveGetNameCommand( aem,
-                                                         pdu,
-                                                         configuration_index,
-                                                         descriptor_type,
-                                                         descriptor_index );
+            response_status = m_entity_state->receiveGetNameCommand(
+                pdu, configuration_index, descriptor_type, descriptor_index );
         }
         break;
     case JDKSAVDECC_AEM_COMMAND_SET_CONTROL:
@@ -302,7 +284,7 @@ uint8_t Entity::receivedAEMCommand( jdksavdecc_aecpdu_aem const &aem,
                     pdu.getBuf(), JDKSAVDECC_FRAME_HEADER_LEN );
 
             response_status = m_entity_state->receiveSetControlCommand(
-                aem, pdu, descriptor_index );
+                pdu, descriptor_index );
         }
         break;
     case JDKSAVDECC_AEM_COMMAND_GET_CONTROL:
@@ -313,7 +295,7 @@ uint8_t Entity::receivedAEMCommand( jdksavdecc_aecpdu_aem const &aem,
                     pdu.getBuf(), JDKSAVDECC_FRAME_HEADER_LEN );
 
             response_status = m_entity_state->receiveGetControlCommand(
-                aem, pdu, descriptor_index );
+                pdu, descriptor_index );
         }
         break;
     case JDKSAVDECC_AEM_COMMAND_REGISTER_UNSOLICITED_NOTIFICATION:
@@ -420,7 +402,6 @@ uint8_t Entity::receivedAACommand( jdksavdecc_aecp_aa const &aa, Frame &pdu )
                 if ( m_entity_state )
                 {
                     aa_status = m_entity_state->receiveAARead(
-                        aa,
                         tlv_address,
                         tlv_length,
                         p + JDKSAVDECC_AECPDU_AA_TLV_LEN );
@@ -430,7 +411,6 @@ uint8_t Entity::receivedAACommand( jdksavdecc_aecp_aa const &aa, Frame &pdu )
                 if ( m_entity_state )
                 {
                     aa_status = m_entity_state->receiveAAWrite(
-                        aa,
                         tlv_address,
                         tlv_length,
                         p + JDKSAVDECC_AECPDU_AA_TLV_LEN );
@@ -440,7 +420,6 @@ uint8_t Entity::receivedAACommand( jdksavdecc_aecp_aa const &aa, Frame &pdu )
                 if ( m_entity_state )
                 {
                     aa_status = m_entity_state->receiveAAExecute(
-                        aa,
                         tlv_address,
                         tlv_length,
                         p + JDKSAVDECC_AECPDU_AA_TLV_LEN );

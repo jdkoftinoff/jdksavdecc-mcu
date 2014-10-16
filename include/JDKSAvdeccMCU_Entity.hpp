@@ -48,12 +48,10 @@ class EntityState;
 class Entity : public Handler
 {
   public:
-    Entity( RawSocket &net,
-            ADPManager &adp_manager,
-            EntityState *entity_state );
+    Entity( ADPManager &adp_manager, EntityState *entity_state );
 
     /// Run periodic state machines (from Handler)
-    virtual void tick();
+    virtual void tick( jdksavdecc_timestamp_in_milliseconds time_in_millis );
 
     /// Handle received AECPDU's (from Handler)
     virtual bool receivedPDU( Frame &frame );

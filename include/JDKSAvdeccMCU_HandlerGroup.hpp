@@ -44,19 +44,25 @@ namespace JDKSAvdeccMCU
 class HandlerGroup : public Handler
 {
   protected:
-    RawSocket &m_net;
     uint16_t m_num_items;
+    uint16_t m_max_items;
     Handler **m_item;
     uint32_t m_rx_count;
     uint32_t m_handled_count;
 
   public:
-    HandlerGroup( RawSocket &net, Handler **item_storage );
+    HandlerGroup( Handler **item_storage, uint16_t max_items );
 
     /// Add a handler to the list
-    void add( Handler *v ) { m_item[m_num_items++] = v; }
+    bool add( Handler *v );
+
+    bool isFull( uint16_t additional = 0 ) const
+    {
+        return ( m_num_items + additional ) >= m_max_items;
+    }
 
     uint32_t getRxCount() const { return m_rx_count; }
+
     uint32_t getHandledCount() const { return m_handled_count; }
 
     /// Poll the NetIO object for an incoming frame.
@@ -64,7 +70,7 @@ class HandlerGroup : public Handler
 
     /// Send Tick() messages to all encapsulated Handlers
     /// and poll incoming network for PDU's and dispatch them
-    virtual void tick();
+    virtual void tick( jdksavdecc_timestamp_in_milliseconds timestamp );
 
     /// Send ReceivedPDU message to each handler until one returns true.
     virtual bool receivedPDU( Frame &frame );
@@ -80,8 +86,6 @@ class HandlerGroupWithSize : public HandlerGroup
     Handler *m_item_storage[MaxItems];
 
   public:
-    HandlerGroupWithSize( RawSocket &net ) : HandlerGroup( net, m_item_storage )
-    {
-    }
+    HandlerGroupWithSize() : HandlerGroup( m_item_storage, MaxItems ) {}
 };
 }
