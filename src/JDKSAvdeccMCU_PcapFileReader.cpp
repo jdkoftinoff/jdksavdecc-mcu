@@ -32,6 +32,7 @@
 #include "JDKSAvdeccMCU_World.hpp"
 
 #if JDKSAVDECCMCU_ENABLE_PCAPFILE == 1
+#include <stdexcept>
 
 #include "JDKSAvdeccMCU_PcapFileReader.hpp"
 
@@ -52,7 +53,7 @@ PcapFileReader::PcapFileReader( std::string const &filename )
     }
 
     pcap_hdr_t header;
-    if ( std::fread( &header, sizeof( header ), 1, m_file.get() ) != 1 )
+    if ( fread( &header, sizeof( header ), 1, m_file.get() ) != 1 )
     {
         throw std::runtime_error(
             std::string( "Error reading pcap file header: " ) + filename );
@@ -80,14 +81,14 @@ bool PcapFileReader::ReadPacket( uint64_t *timestamp_in_microseconds,
                                  PcapFilePacket &results )
 {
     pcaprec_hdr_t packet_header;
-    if ( std::feof( m_file.get() ) )
+    if ( feof( m_file.get() ) )
     {
         return false;
     }
-    if ( std::fread( &packet_header, sizeof( packet_header ), 1, m_file.get() )
+    if ( fread( &packet_header, sizeof( packet_header ), 1, m_file.get() )
          != 1 )
     {
-        if ( std::feof( m_file.get() ) )
+        if ( feof( m_file.get() ) )
         {
             return false;
         }
@@ -119,7 +120,7 @@ bool PcapFileReader::ReadPacket( uint64_t *timestamp_in_microseconds,
                                  + ( packet_header.ts_usec );
 
     results.resize( (size_t)packet_header.incl_len );
-    if ( std::fread( &results[0], results.size(), 1, m_file.get() ) != 1 )
+    if ( fread( &results[0], results.size(), 1, m_file.get() ) != 1 )
     {
         throw std::runtime_error(
             std::string( "Error reading pcap file packet data from: " )
