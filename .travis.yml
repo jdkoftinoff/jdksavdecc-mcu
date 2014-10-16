@@ -5,7 +5,7 @@ compiler:
   - clang
 
 before_script:
-  - ./configure
+  - ./configure --defines=JDKSAVDECCMCU_ARDUINO=1
 
 script:
   - make && make check
