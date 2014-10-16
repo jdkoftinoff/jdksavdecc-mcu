@@ -106,7 +106,8 @@ class MyEntityState : public EntityState
 
     virtual void tick( jdksavdecc_timestamp_in_milliseconds time_in_millis )
     {
-        if ( time_in_millis > m_last_update_time + m_update_rate_in_millis )
+        if ( wasTimeOutHit(
+                 time_in_millis, m_last_update_time, m_update_rate_in_millis ) )
         {
             m_last_update_time = time_in_millis;
 
