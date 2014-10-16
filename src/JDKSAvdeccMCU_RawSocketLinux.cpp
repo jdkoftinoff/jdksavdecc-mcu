@@ -44,6 +44,8 @@
 #include <linux/if_packet.h>
 #include <linux/if_ether.h>
 #include <arpa/inet.h>
+#include <net/if.h>
+
 
 namespace JDKSAvdeccMCU
 {
@@ -135,7 +137,7 @@ bool RawSocketLinux::recvFrame( Frame *frame )
 
         if ( len >= 0 )
         {
-            frame->setLength( buf_len );
+            frame->setLength( len );
             r = true;
         }
         else
@@ -156,6 +158,7 @@ bool RawSocketLinux::sendFrame( const Frame &frame,
 
     if ( m_fd != bad_filedescriptor )
     {
+        ssize_t sent_len = -1;
         /// fully formed ethernet frame buffer
         uint8_t buffer[ETH_FRAME_LEN];
 
@@ -172,7 +175,7 @@ bool RawSocketLinux::sendFrame( const Frame &frame,
             memcpy( &buffer[buffer_length], data1, len1 );
             buffer_length += len1;
         }
-        if ( data2 != 0 && len > 0 )
+        if ( data2 != 0 && len2 > 0 )
         {
             if ( buffer_length + len2 > ETH_FRAME_LEN )
             {
@@ -184,9 +187,6 @@ bool RawSocketLinux::sendFrame( const Frame &frame,
 
         /// ptr to the ethernet header in buffer
         unsigned char *etherhead = buffer;
-
-        /// ptr to the payload of the ethernet header in buffer
-        unsigned char *data = buffer + 14;
 
         /// representation of ethernet header as ethhdr structure
         struct ethhdr *eh = (struct ethhdr *)etherhead;
@@ -201,7 +201,7 @@ bool RawSocketLinux::sendFrame( const Frame &frame,
         socket_address.sll_hatype = 1; /*ARPHRD_ETHER; */
         socket_address.sll_pkttype = PACKET_OTHERHOST;
         socket_address.sll_halen = ETH_ALEN;
-        memcpy( socket_address.sll_addr, m_mac_address, ETH_ALEN );
+        memcpy( socket_address.sll_addr, &m_mac_address.value[0], ETH_ALEN );
         socket_address.sll_addr[6] = 0x00;
         socket_address.sll_addr[7] = 0x00;
 
@@ -217,7 +217,7 @@ bool RawSocketLinux::sendFrame( const Frame &frame,
 
         // Set the src address of the frame to match our real ethernet MAC
         // address
-        memcpy( &eh->h_src[0], &m_mac_address.value[0], ETH_ALEN );
+        memcpy( &eh->h_source[0], &m_mac_address.value[0], ETH_ALEN );
 
         // Set the ethertype of the frame to match our real ethernet MAC address
         eh->h_proto = htons( m_ethertype );
@@ -251,6 +251,8 @@ bool RawSocketLinux::sendReplyFrame( Frame &frame,
 
     if ( m_fd != bad_filedescriptor )
     {
+        ssize_t sent_len=-1;
+
         /// fully formed ethernet frame buffer
         uint8_t buffer[ETH_FRAME_LEN];
 
@@ -267,7 +269,7 @@ bool RawSocketLinux::sendReplyFrame( Frame &frame,
             memcpy( &buffer[buffer_length], data1, len1 );
             buffer_length += len1;
         }
-        if ( data2 != 0 && len > 0 )
+        if ( data2 != 0 && len2 > 0 )
         {
             if ( buffer_length + len2 > ETH_FRAME_LEN )
             {
@@ -279,9 +281,6 @@ bool RawSocketLinux::sendReplyFrame( Frame &frame,
 
         /// ptr to the ethernet header in buffer
         unsigned char *etherhead = buffer;
-
-        /// ptr to the payload of the ethernet header in buffer
-        unsigned char *data = buffer + 14;
 
         /// representation of ethernet header as ethhdr structure
         struct ethhdr *eh = (struct ethhdr *)etherhead;
@@ -296,19 +295,19 @@ bool RawSocketLinux::sendReplyFrame( Frame &frame,
         socket_address.sll_hatype = 1; /*ARPHRD_ETHER; */
         socket_address.sll_pkttype = PACKET_OTHERHOST;
         socket_address.sll_halen = ETH_ALEN;
-        memcpy( socket_address.sll_addr, m_mac_address, ETH_ALEN );
+        memcpy( socket_address.sll_addr, &m_mac_address.value[0], ETH_ALEN );
         socket_address.sll_addr[6] = 0x00;
         socket_address.sll_addr[7] = 0x00;
 
         // set the destination address to what the source was
-        memcpy( &eh->h_dest[0], &eh->h_src[0], ETH_ALEN );
+        memcpy( &eh->h_dest[0], &eh->h_source[0], ETH_ALEN );
 
         // make sure it was not a multicast
         eh->h_dest[0] &= 0xfe;
 
         // Set the src address of the frame to match our real ethernet MAC
         // address
-        memcpy( &eh->h_src[0], &m_mac_address.value[0], ETH_ALEN );
+        memcpy( &eh->h_source[0], &m_mac_address.value[0], ETH_ALEN );
 
         // Set the ethertype of the frame to match our real ethernet MAC address
         eh->h_proto = htons( m_ethertype );
@@ -337,8 +336,7 @@ bool RawSocketLinux::joinMulticast( const jdksavdecc_eui48 &multicast_mac )
     bool r = false;
     struct packet_mreq mreq;
     struct sockaddr_ll saddr;
-    if ( multicast_mac )
-    {
+
         ::memset( &saddr, 0, sizeof( saddr ) );
         saddr.sll_family = AF_PACKET;
         saddr.sll_ifindex = m_interface_id;
@@ -369,7 +367,7 @@ bool RawSocketLinux::joinMulticast( const jdksavdecc_eui48 &multicast_mac )
         {
             r = false;
         }
-    }
+
     return r;
 }
 
