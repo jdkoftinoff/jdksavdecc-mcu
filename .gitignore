@@ -11,3 +11,12 @@
 *.lai
 *.la
 *.a
+
+latex/
+html/
+xcode/jdksavdecc-mcu/build
+xcode/jdksavdecc-mcu/DerivedData
+jdksavdeccmcu-arduino
+//*.xcuserdata/
+xcuserdata
+
