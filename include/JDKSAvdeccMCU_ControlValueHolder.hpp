@@ -97,23 +97,34 @@ class ControlValueHolder : public FixedBuffer
 
     void setValueOctet( uint8_t v, uint8_t item = 0 )
     {
-        setOctet( v, item * sizeof( uint8_t ) );
+        if ( getOctet( item * sizeof( uint8_t ) ) != v )
+        {
+            setOctet( v, item * sizeof( uint8_t ) );
+            m_dirty = true;
+        }
     }
 
     void setValueDoublet( uint16_t v, uint8_t item = 0 )
     {
-        setDoublet( v, item * sizeof( uint16_t ) );
+        if ( getDoublet( item * sizeof( uint16_t ) ) != v )
+        {
+            setDoublet( v, item * sizeof( uint16_t ) );
+            m_dirty = true;
+        }
     }
 
     void setValueQuadlet( uint32_t v, uint8_t item = 0 )
     {
-        setQuadlet( v, item * sizeof( uint32_t ) );
+        if ( getQuadlet( item * sizeof( uint32_t ) ) != v )
+        {
+            setQuadlet( v, item * sizeof( uint32_t ) );
+            m_dirty = true;
+        }
     }
 
     template <typename T>
     void setValueAs( T v, uint8_t item = 0 )
     {
-        m_dirty = true;
         switch ( m_value_length )
         {
         case 1:
@@ -154,8 +165,11 @@ class ControlValueHolder : public FixedBuffer
 
     void setValue( void const *v )
     {
-        memcpy( m_buf, v, m_value_length * m_num_items );
-        m_dirty = true;
+        if ( memcmp( m_buf, v, m_value_length ) != 0 )
+        {
+            memcpy( m_buf, v, m_value_length * m_num_items );
+            m_dirty = true;
+        }
     }
 
   protected:
