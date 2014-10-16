@@ -77,9 +77,9 @@ class PcapFile
     PcapFile( std::string const &filename, const char *mode )
     {
 #if defined( _WIN32 )
-        std::fopen_s( &m_f, filename.c_str(), mode );
+        fopen_s( &m_f, filename.c_str(), mode );
 #else
-        m_f = std::fopen( filename.c_str(), mode );
+        m_f = fopen( filename.c_str(), mode );
 #endif
     }
 
