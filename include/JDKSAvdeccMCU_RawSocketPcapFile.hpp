@@ -31,9 +31,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "JDKSAvdeccMCU_PcapFileReader.hpp"
 #include "JDKSAvdeccMCU_PcapFileWriter.hpp"
 
+#if JDKSAVDECCMCU_ENABLE_RAWSOCKETPCAPFILE && JDKSAVDECCMCU_ENABLE_PCAPFILE
 namespace JDKSAvdeccMCU
 {
-
 class RawSocketPcapFile : public RawSocket
 {
     uint16_t m_ethertype;
@@ -73,6 +73,7 @@ class RawSocketPcapFile : public RawSocket
 
     virtual filedescriptor_type getFd() const;
 
-    virtual jdksavdecc_eui48 const &getMACAddress() const;
+    virtual const jdksavdecc_eui48 &getMACAddress() const;
 };
 }
+#endif

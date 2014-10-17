@@ -32,9 +32,49 @@
 #include "JDKSAvdeccMCU_World.hpp"
 #include "JDKSAvdeccMCU_RawSocketPcapFile.hpp"
 
-#if JDKSAVDECCMCU_ENABLE_RAWSOCKETPCAPFILE
+#if JDKSAVDECCMCU_ENABLE_RAWSOCKETPCAPFILE && JDKSAVDECCMCU_ENABLE_PCAPFILE
 namespace JDKSAvdeccMCU
 {
+
+RawSocketPcapFile::RawSocketPcapFile( uint16_t ethertype,
+                                      const char *input_file,
+                                      const char *output_file )
+{
+}
+
+RawSocketPcapFile::~RawSocketPcapFile() {}
+
+jdksavdecc_timestamp_in_milliseconds RawSocketPcapFile::getTimeInMilliseconds()
+{
+}
+
+bool RawSocketPcapFile::recvFrame( Frame *frame ) {}
+
+bool RawSocketPcapFile::sendFrame( const Frame &frame,
+                                   const uint8_t *data1,
+                                   uint16_t len1,
+                                   const uint8_t *data2,
+                                   uint16_t len2 )
+{
+}
+
+bool RawSocketPcapFile::sendReplyFrame( Frame &frame,
+                                        const uint8_t *data1,
+                                        uint16_t len1,
+                                        const uint8_t *data2,
+                                        uint16_t len2 )
+{
+}
+
+bool RawSocketPcapFile::joinMulticast( const jdksavdecc_eui48 &multicast_mac )
+{
+}
+
+void RawSocketPcapFile::setNonblocking() {}
+
+RawSocket::filedescriptor_type RawSocketPcapFile::getFd() const {}
+
+const jdksavdecc_eui48 &RawSocketPcapFile::getMACAddress() const {}
 }
 
 #else

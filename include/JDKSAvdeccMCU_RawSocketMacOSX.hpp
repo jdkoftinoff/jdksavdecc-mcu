@@ -33,7 +33,7 @@
 #include "JDKSAvdeccMCU_World.hpp"
 #include "JDKSAvdeccMCU_RawSocket.hpp"
 
-#if JDKSAVDECCMCU_ENABLE_RAWSOCKETMACOSX
+#if defined( __APPLE__ ) && JDKSAVDECCMCU_ENABLE_RAWSOCKETMACOSX
 
 namespace JDKSAvdeccMCU
 {
