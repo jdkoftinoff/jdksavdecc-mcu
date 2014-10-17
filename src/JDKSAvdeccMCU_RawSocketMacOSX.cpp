@@ -162,14 +162,14 @@ RawSocketMacOSX::RawSocketMacOSX( const char *device,
                 {
                     // fprintf( stderr, "unable to get MAC address for interface
                     // '%s'\n", interface_name );
-                    r = -1;
+                    r = bad_filedescriptor;
                 }
                 else
                 {
                     /* enable ether protocol filter */
                     joinMulticast( *multicast_to_join );
                     r = pcap_fileno( p );
-                    if ( m_fd == -1 )
+                    if ( m_fd == bad_filedescriptor )
                     {
                         // fprintf( stderr, "Unable to get pcap fd\n" );
                         r = bad_filedescriptor;
