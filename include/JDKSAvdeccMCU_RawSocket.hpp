@@ -93,12 +93,14 @@ class RawSocket
     virtual jdksavdecc_eui48 const &getMACAddress() const = 0;
 
     /**
+     * Get the device's name
+     */
+    virtual const char *getDeviceName() const { return "Raw"; }
+
+    /**
      * Ask the first ethernet port for the current time in milliseconds
      */
-    static jdksavdecc_timestamp_in_milliseconds multiGetTimeInMilliseconds()
-    {
-        return net[0]->getTimeInMilliseconds();
-    }
+    static jdksavdecc_timestamp_in_milliseconds multiGetTimeInMilliseconds();
 
     /**
      * @brief multiRecvFrame Poll all ethernet ports for a received ethernet

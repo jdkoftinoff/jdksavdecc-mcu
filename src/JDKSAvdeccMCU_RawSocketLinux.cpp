@@ -32,7 +32,6 @@
 #include "JDKSAvdeccMCU_World.hpp"
 #include "JDKSAvdeccMCU_RawSocketLinux.hpp"
 
-
 #if defined( __linux__ ) && JDKSAVDECCMCU_ENABLE_RAWSOCKETLINUX
 #include <fcntl.h>
 #include <signal.h>
@@ -45,7 +44,6 @@
 #include <linux/if_ether.h>
 #include <arpa/inet.h>
 #include <net/if.h>
-
 
 namespace JDKSAvdeccMCU
 {
@@ -251,7 +249,7 @@ bool RawSocketLinux::sendReplyFrame( Frame &frame,
 
     if ( m_fd != bad_filedescriptor )
     {
-        ssize_t sent_len=-1;
+        ssize_t sent_len = -1;
 
         /// fully formed ethernet frame buffer
         uint8_t buffer[ETH_FRAME_LEN];
@@ -337,36 +335,36 @@ bool RawSocketLinux::joinMulticast( const jdksavdecc_eui48 &multicast_mac )
     struct packet_mreq mreq;
     struct sockaddr_ll saddr;
 
-        ::memset( &saddr, 0, sizeof( saddr ) );
-        saddr.sll_family = AF_PACKET;
-        saddr.sll_ifindex = m_interface_id;
-        saddr.sll_pkttype = PACKET_MULTICAST;
-        saddr.sll_protocol = htons( m_ethertype );
-        if ( ::bind( m_fd, (struct sockaddr *)&saddr, sizeof( saddr ) ) >= 0 )
-        {
-            ::memset( &mreq, 0, sizeof( mreq ) );
-            mreq.mr_ifindex = m_interface_id;
-            mreq.mr_type = PACKET_MR_MULTICAST;
-            mreq.mr_alen = ETH_ALEN;
-            memcpy( &mreq.mr_address[0], &multicast_mac.value[0], ETH_ALEN );
+    ::memset( &saddr, 0, sizeof( saddr ) );
+    saddr.sll_family = AF_PACKET;
+    saddr.sll_ifindex = m_interface_id;
+    saddr.sll_pkttype = PACKET_MULTICAST;
+    saddr.sll_protocol = htons( m_ethertype );
+    if ( ::bind( m_fd, (struct sockaddr *)&saddr, sizeof( saddr ) ) >= 0 )
+    {
+        ::memset( &mreq, 0, sizeof( mreq ) );
+        mreq.mr_ifindex = m_interface_id;
+        mreq.mr_type = PACKET_MR_MULTICAST;
+        mreq.mr_alen = ETH_ALEN;
+        memcpy( &mreq.mr_address[0], &multicast_mac.value[0], ETH_ALEN );
 
-            if ( ::setsockopt( m_fd,
-                               SOL_PACKET,
-                               PACKET_ADD_MEMBERSHIP,
-                               &mreq,
-                               sizeof( mreq ) ) >= 0 )
-            {
-                r = true;
-            }
-            else
-            {
-                r = false;
-            }
+        if ( ::setsockopt( m_fd,
+                           SOL_PACKET,
+                           PACKET_ADD_MEMBERSHIP,
+                           &mreq,
+                           sizeof( mreq ) ) >= 0 )
+        {
+            r = true;
         }
         else
         {
             r = false;
         }
+    }
+    else
+    {
+        r = false;
+    }
 
     return r;
 }

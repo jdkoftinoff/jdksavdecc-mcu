@@ -42,9 +42,12 @@ uint16_t RawSocket::last_recv_socket = 0;
 bool RawSocket::multiRecvFrame( Frame *frame )
 {
     bool r = false;
-    if ( net[last_recv_socket]->recvFrame( frame ) )
+    if ( last_recv_socket < num_rawsockets )
     {
-        r = true;
+        if ( net[last_recv_socket]->recvFrame( frame ) )
+        {
+            r = true;
+        }
     }
     last_recv_socket = ( last_recv_socket + 1 ) % num_rawsockets;
     return r;
@@ -86,5 +89,17 @@ bool RawSocket::multiSendReplyFrame( Frame &frame,
         }
     }
     return true;
+}
+
+jdksavdecc_timestamp_in_milliseconds RawSocket::multiGetTimeInMilliseconds()
+{
+    if ( num_rawsockets > 0 )
+    {
+        return net[0]->getTimeInMilliseconds();
+    }
+    else
+    {
+        return JDKSAvdeccMCU::getTimeInMilliseconds();
+    }
 }
 }

@@ -75,6 +75,8 @@ class RawSocketLinux : public RawSocket
         return m_mac_address;
     }
 
+    virtual const char *getDeviceName() const { return m_device; }
+
     virtual void initialize();
 
   private:
