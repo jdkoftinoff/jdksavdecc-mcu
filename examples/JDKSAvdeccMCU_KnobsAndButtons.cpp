@@ -27,9 +27,9 @@ RawSocketWizNet rawnet( my_mac,
                                                           // systems
 #elif JDKSAVDECCMCU_ENABLE_RAWSOCKETLINUX == 1
 RawSocketLinux rawnet( "en0",
-                        JDKSAVDECC_AVTP_ETHERTYPE,
-                        &jdksavdecc_multicast_adp_acmp ); // For non-embedded
-                                                          // systems
+                       JDKSAVDECC_AVTP_ETHERTYPE,
+                       &jdksavdecc_multicast_adp_acmp ); // For non-embedded
+                                                         // systems
 #elif JDKSAVDECCMCU_ENABLE_RAWSOCKETMACOSX == 1
 RawSocketMacOSX rawnet( "en0",
                         JDKSAVDECC_AVTP_ETHERTYPE,
