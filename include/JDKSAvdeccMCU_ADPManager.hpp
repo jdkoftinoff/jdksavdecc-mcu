@@ -56,6 +56,20 @@ class ADPManager : public Handler
     /// Handle any incoming ADPDU. Return true if handled
     virtual bool receivedPDU( Frame &frame );
 
+    virtual void receivedEntityAvailable(
+        jdksavdecc_adpdu_common_control_header const &header, Frame &frame )
+    {
+        (void)frame;
+        (void)header;
+    }
+
+    virtual void receivedEntityDeparting(
+        jdksavdecc_adpdu_common_control_header const &header, Frame &frame )
+    {
+        (void)frame;
+        (void)header;
+    }
+
     /// Formulate the ADPDU and send it
     void sendADP();
     RawSocket &getRawSocket() { return m_net; }

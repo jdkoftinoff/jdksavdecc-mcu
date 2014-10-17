@@ -122,6 +122,7 @@ bool ADPManager::receivedPDU( Frame &frame )
     if ( jdksavdecc_adpdu_common_control_header_read(
              &header, p, JDKSAVDECC_FRAME_HEADER_LEN, frame.getLength() ) > 0 )
     {
+        r = true;
         if ( header.message_type
              == JDKSAVDECC_ADP_MESSAGE_TYPE_ENTITY_DISCOVER )
         {
@@ -132,6 +133,16 @@ bool ADPManager::receivedPDU( Frame &frame )
                 m_last_send_time_in_millis
                     -= ( m_valid_time_in_seconds * ( 1000 / 4 ) );
             }
+        }
+        else if ( header.message_type
+                  == JDKSAVDECC_ADP_MESSAGE_TYPE_ENTITY_AVAILABLE )
+        {
+            receivedEntityAvailable( header, frame );
+        }
+        else if ( header.message_type
+                  == JDKSAVDECC_ADP_MESSAGE_TYPE_ENTITY_DEPARTING )
+        {
+            receivedEntityDeparting( header, frame );
         }
     }
     return r;
