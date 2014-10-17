@@ -104,8 +104,7 @@ void PcapFileWriter::WritePacket( uint64_t time_in_micros,
         pktheader.ts_usec = uint32_t( time_in_micros % 1000000 );
         pktheader.incl_len = uint32_t( packet.size() );
         pktheader.orig_len = pktheader.incl_len;
-        if ( fwrite( &pktheader, sizeof( pktheader ), 1, m_file.get() )
-             != 1 )
+        if ( fwrite( &pktheader, sizeof( pktheader ), 1, m_file.get() ) != 1 )
         {
             throw std::runtime_error(
                 std::string( "Error writing to pcap file: " ) + m_filename );
@@ -164,8 +163,8 @@ void PcapFileWriter::WritePacket( uint64_t packet_time_in_micros,
         throw std::runtime_error( std::string( "Error writing to pcap file: " )
                                   + m_filename );
     }
-    if ( fwrite(
-             &packet_payload[0], packet_payload.size(), 1, m_file.get() ) != 1 )
+    if ( fwrite( &packet_payload[0], packet_payload.size(), 1, m_file.get() )
+         != 1 )
     {
         throw std::runtime_error( std::string( "Error writing to pcap file: " )
                                   + m_filename );

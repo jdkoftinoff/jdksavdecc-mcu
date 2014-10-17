@@ -448,6 +448,8 @@ uint8_t Entity::receivedAACommand( jdksavdecc_aecp_aa const &aa, Frame &pdu )
 uint8_t Entity::receivedACMPMessage( const jdksavdecc_acmpdu &acmpdu,
                                      Frame &pdu )
 {
+    (void)acmpdu;
+    (void)pdu;
     return JDKSAVDECC_ACMP_STATUS_NOT_SUPPORTED;
 }
 
