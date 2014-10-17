@@ -99,7 +99,7 @@ jdksavdecc_timestamp_in_milliseconds RawSocket::multiGetTimeInMilliseconds()
     }
     else
     {
-        return JDKSAvdeccMCU::getTimeInMilliseconds();
+        return ::JDKSAvdeccMCU::getTimeInMilliseconds();
     }
 }
 }

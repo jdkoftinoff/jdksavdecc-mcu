@@ -109,9 +109,12 @@ namespace JDKSAvdeccMCU
 #if defined( __AVR__ )
 #include <SPI.h>
 
+namespace JDKSAvdeccMCU
+{
 inline jdksavdecc_timestamp_in_milliseconds getTimeInMilliseconds()
 {
     return millis();
+}
 }
 #elif defined( __APPLE__ ) || defined( __linux__ )
 #include <vector>
