@@ -135,10 +135,16 @@ inline jdksavdecc_timestamp_in_milliseconds getTimeInMilliseconds()
 }
 
 #elif defined( _WIN32 )
+#include <winsock2.h>
+#include <WS2tcpip.h>
+#include <Windows.h>
 #include <vector>
 #include <memory>
 #include <iostream>
 #include <iomanip>
+
+#pragma comment(lib, "Ws2_32.lib")
+
 namespace JDKSAvdeccMCU
 {
 inline jdksavdecc_timestamp_in_milliseconds getTimeInMilliseconds()

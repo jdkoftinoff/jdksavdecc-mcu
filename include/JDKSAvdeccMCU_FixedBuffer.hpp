@@ -196,7 +196,7 @@ class FixedBuffer
         }
     }
 
-    void setOctet( uint16_t val, uint8_t pos ) { m_buf[pos] = val; }
+    void setOctet( uint8_t val, uint16_t pos ) { m_buf[pos] = val; }
 
     uint8_t getOctet( uint16_t pos ) const { return m_buf[pos]; }
 

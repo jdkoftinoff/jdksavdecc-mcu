@@ -44,7 +44,7 @@ class RawSocket
   public:
 #if defined( _WIN32 )
     typedef SOCKET filedescriptor_type;
-    static const filedescriptor_type bad_filedescriptor = INVALID_HANDLE;
+    static const filedescriptor_type bad_filedescriptor = INVALID_SOCKET;
 #else
     typedef int filedescriptor_type;
     static const filedescriptor_type bad_filedescriptor = -1;

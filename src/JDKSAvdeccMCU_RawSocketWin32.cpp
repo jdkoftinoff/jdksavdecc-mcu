@@ -43,8 +43,6 @@
 
 namespace JDKSAvdeccMCU
 {
-namespace JDKSAvdeccMCU
-{
 static pcap_if_t *rawsocket_win32_raw_alldevs = 0;
 
 static void rawsocket_win32_raw_cleanup();
@@ -174,7 +172,7 @@ RawSocketWin32::RawSocketWin32( const char *device,
                             {
                                 // fprintf( stderr, "Error in malloc for
                                 // GetAdaptersInfo\n" );
-                                r = bad_filedescriptor
+                                r = bad_filedescriptor;
                             }
                         }
                         break;
@@ -192,7 +190,7 @@ RawSocketWin32::RawSocketWin32( const char *device,
                     /* enable ether protocol filter */
                     joinMulticast( *multicast_to_join );
                     r = pcap_fileno( p );
-                    if ( m_fd == r = bad_filedescriptor )
+                    if ( m_fd == bad_filedescriptor )
                     {
                         // fprintf( stderr, "Unable to get pcap fd\n" );
                         r = bad_filedescriptor;
@@ -225,7 +223,7 @@ RawSocketWin32::~RawSocketWin32()
 {
     if ( m_fd != bad_filedescriptor )
     {
-        close( m_fd );
+        _close( m_fd );
         m_fd = bad_filedescriptor;
     }
 
@@ -391,7 +389,7 @@ bool RawSocketWin32::joinMulticast( const jdksavdecc_eui48 &multicast_mac )
     /* TODO: add multicast address to pcap filter here if multicast_mac is set
      */
     (void)multicast_mac;
-    snprintf( filter, sizeof( filter ), "ether proto 0x%04x", m_ethertype );
+    sprintf_s( filter, "ether proto 0x%04x", m_ethertype );
 
     if ( pcap_compile( p, &fcode, filter, 1, 0xffffffff ) < 0 )
     {
@@ -418,15 +416,15 @@ bool RawSocketWin32::joinMulticast( const jdksavdecc_eui48 &multicast_mac )
 
 void RawSocketWin32::setNonblocking()
 {
-    int val;
-    int flags;
-    val = ::fcntl( m_fd, F_GETFL, 0 );
-    flags = O_NONBLOCK;
-    val |= flags;
-    ::fcntl( m_fd, F_SETFL, val );
+    u_long mode = 1;
+    if (ioctlsocket(m_fd, FIONBIO, &mode) != NO_ERROR)
+    {
+        //fprintf(stderr, "fcntl F_SETFL O_NONBLOCK failed\n");
+    }
 }
 
 void RawSocketWin32::initialize() { rawsocket_win32_initialize(); }
+
 }
 
 #else
