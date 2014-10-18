@@ -329,7 +329,8 @@ uint8_t Entity::validatePermissions( jdksavdecc_aecpdu_aem const &aem )
     // Check to see that it matches the current owner, if any
     // First, check if there is an owner (acquired)
     bool has_owner;
-    has_owner = (jdksavdecc_eui64_is_set( m_acquired_by_controller_entity_id ) !=0);
+    has_owner = ( jdksavdecc_eui64_is_set( m_acquired_by_controller_entity_id )
+                  != 0 );
 
     // if we have an owner and it isn't the controller that sent us the request
     // then fail
@@ -662,12 +663,13 @@ uint8_t Entity::receiveAcquireEntityCommand( jdksavdecc_aecpdu_aem const &aem,
 
     bool controller_id_matches_current_owner;
     controller_id_matches_current_owner
-        = (jdksavdecc_eui64_compare( &m_acquired_by_controller_entity_id,
-                                    &aem.aecpdu_header.controller_entity_id ) == 0);
+        = ( jdksavdecc_eui64_compare( &m_acquired_by_controller_entity_id,
+                                      &aem.aecpdu_header.controller_entity_id )
+            == 0 );
 
     bool has_current_owner;
-    has_current_owner
-        = (jdksavdecc_eui64_is_set(m_acquired_by_controller_entity_id) != 0);
+    has_current_owner = ( jdksavdecc_eui64_is_set(
+                              m_acquired_by_controller_entity_id ) != 0 );
 
     // First, make sure this is entity level:
     if ( jdksavdecc_aem_command_acquire_entity_get_descriptor_index(

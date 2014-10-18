@@ -417,14 +417,13 @@ bool RawSocketWin32::joinMulticast( const jdksavdecc_eui48 &multicast_mac )
 void RawSocketWin32::setNonblocking()
 {
     u_long mode = 1;
-    if (ioctlsocket(m_fd, FIONBIO, &mode) != NO_ERROR)
+    if ( ioctlsocket( m_fd, FIONBIO, &mode ) != NO_ERROR )
     {
-        //fprintf(stderr, "fcntl F_SETFL O_NONBLOCK failed\n");
+        // fprintf(stderr, "fcntl F_SETFL O_NONBLOCK failed\n");
     }
 }
 
 void RawSocketWin32::initialize() { rawsocket_win32_initialize(); }
-
 }
 
 #else

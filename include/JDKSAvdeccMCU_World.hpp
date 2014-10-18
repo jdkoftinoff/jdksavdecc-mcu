@@ -143,7 +143,7 @@ inline jdksavdecc_timestamp_in_milliseconds getTimeInMilliseconds()
 #include <iostream>
 #include <iomanip>
 
-#pragma comment(lib, "Ws2_32.lib")
+#pragma comment( lib, "Ws2_32.lib" )
 
 namespace JDKSAvdeccMCU
 {
