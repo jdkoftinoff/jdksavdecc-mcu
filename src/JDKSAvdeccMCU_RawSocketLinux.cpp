@@ -220,6 +220,15 @@ bool RawSocketLinux::sendFrame( const Frame &frame,
         // Set the ethertype of the frame to match our real ethernet MAC address
         eh->h_proto = htons( m_ethertype );
 
+        // pad the buffer with zeros to fill in the minimum payload size
+        if ( buffer_length < JDKSAVDECCMCU_RAWSOCKET_MIN_FRAME_LENGTH )
+        {
+            memset( &buffer[buffer_length],
+                    0,
+                    JDKSAVDECCMCU_RAWSOCKET_MIN_FRAME_LENGTH - buffer_length );
+            buffer_length = JDKSAVDECCMCU_RAWSOCKET_MIN_FRAME_LENGTH;
+        }
+
         do
         {
             sent_len = sendto( m_fd,

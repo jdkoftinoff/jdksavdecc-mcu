@@ -123,6 +123,7 @@ bool RawSocketWizNet::sendFrame( Frame const &frame,
 {
     uint8_t try_count = 0;
     bool done = false;
+    uint16_t total_sent = 0;
     // Try up to 3 times to send
     while ( !done && try_count < 3 )
     {
@@ -136,17 +137,38 @@ bool RawSocketWizNet::sendFrame( Frame const &frame,
 
         // Send the data chunk
         W5100.send_data_processing( 0, frame.getBuf(), frame.getLength() );
+        total_sent += frame.getLength();
 
         // If there is a data1 chunk then send it
         if ( data1 != 0 && len1 > 0 )
         {
             W5100.send_data_processing( 0, (uint8_t *)data1, len1 );
+            total_sent += len1;
         }
 
         // If there is a data2 chunk then send it
         if ( data2 != 0 && len2 > 0 )
         {
             W5100.send_data_processing( 0, (uint8_t *)data2, len2 );
+            total_sent += len2;
+        }
+
+        // Pad small messages up to the minimum payload length of 64
+        {
+            uint8_t zeros[8];
+            memset( zeros, 0, sizeof( zeros ) );
+
+            while ( total_sent < JDKSAVDECCMCU_RAWSOCKET_MIN_FRAME_LENGTH )
+            {
+                uint16_t todo = JDKSAVDECCMCU_RAWSOCKET_MIN_FRAME_LENGTH
+                                - total_sent;
+                if ( todo > sizeof( zeros ) )
+                {
+                    todo = sizeof( zeros );
+                }
+                W5100.send_data_processing( 0, zeros, todo );
+                total_sent += todo;
+            }
         }
 
         // Tell W5100 to send the raw ethernet frame now

@@ -292,6 +292,14 @@ bool RawSocketMacOSX::sendFrame( const Frame &frame,
         h_proto[0] = ( m_ethertype >> 8 ) & 0xff;
         h_proto[1] = ( m_ethertype >> 0 ) & 0xff;
 
+        // pad the buffer with zeros to fill in the minimum payload size
+        if ( buffer_length < JDKSAVDECCMCU_RAWSOCKET_MIN_FRAME_LENGTH )
+        {
+            memset( &buffer[buffer_length],
+                    0,
+                    JDKSAVDECCMCU_RAWSOCKET_MIN_FRAME_LENGTH - buffer_length );
+            buffer_length = JDKSAVDECCMCU_RAWSOCKET_MIN_FRAME_LENGTH;
+        }
         r = pcap_sendpacket( pcap, buffer, buffer_length ) == 0 ? true : false;
     }
 
@@ -352,6 +360,15 @@ bool RawSocketMacOSX::sendReplyFrame( Frame &frame,
         // Set the ethertype of the frame to match our real ethernet MAC address
         h_proto[0] = ( m_ethertype >> 8 ) & 0xff;
         h_proto[1] = ( m_ethertype >> 0 ) & 0xff;
+
+        // pad the buffer with zeros to fill in the minimum payload size
+        if ( buffer_length < JDKSAVDECCMCU_RAWSOCKET_MIN_FRAME_LENGTH )
+        {
+            memset( &buffer[buffer_length],
+                    0,
+                    JDKSAVDECCMCU_RAWSOCKET_MIN_FRAME_LENGTH - buffer_length );
+            buffer_length = JDKSAVDECCMCU_RAWSOCKET_MIN_FRAME_LENGTH;
+        }
 
         r = pcap_sendpacket( pcap, buffer, buffer_length ) == 0 ? true : false;
     }
