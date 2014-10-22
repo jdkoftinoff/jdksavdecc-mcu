@@ -101,7 +101,7 @@ RawSocketMacOSX::RawSocketMacOSX( const char *device,
     {
         // fprintf( stderr, "pcap open error on interface '%s': %s\n",
         // interface_name, errbuf );
-        r = bad_filedescriptor;
+        m_fd = bad_filedescriptor;
         return;
     }
     else
@@ -167,16 +167,15 @@ RawSocketMacOSX::RawSocketMacOSX( const char *device,
                 else
                 {
                     /* enable ether protocol filter */
-                    joinMulticast( *multicast_to_join );
+                    if ( multicast_to_join )
+                    {
+                        joinMulticast( *multicast_to_join );
+                    }
                     r = pcap_fileno( p );
-                    if ( m_fd == bad_filedescriptor )
+                    if ( r == bad_filedescriptor )
                     {
                         // fprintf( stderr, "Unable to get pcap fd\n" );
                         r = bad_filedescriptor;
-                    }
-                    else
-                    {
-                        r = m_fd;
                     }
                 }
             }
