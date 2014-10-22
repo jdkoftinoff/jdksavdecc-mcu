@@ -32,6 +32,8 @@
 #include "JDKSAvdeccMCU_World.hpp"
 #include "JDKSAvdeccMCU_ControlValueHolder.hpp"
 
+const char *jdksavdeccmcu_controlvalueholder_file = __FILE__;
+
 namespace JDKSAvdeccMCU
 {
 }

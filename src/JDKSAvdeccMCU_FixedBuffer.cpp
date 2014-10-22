@@ -32,3 +32,5 @@
 #include "JDKSAvdeccMCU_World.hpp"
 
 #include "JDKSAvdeccMCU_FixedBuffer.hpp"
+
+const char *jdksavdeccmcu_fixedbuffer_file = __FILE__;
