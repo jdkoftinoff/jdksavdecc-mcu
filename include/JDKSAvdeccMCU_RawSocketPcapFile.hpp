@@ -39,15 +39,28 @@ class RawSocketPcapFile : public RawSocket
     uint16_t m_ethertype;
     jdksavdecc_eui48 m_my_mac;
     jdksavdecc_eui48 m_default_dest_mac;
+    jdksavdecc_eui48 m_join_multicast;
+    PcapFileReader m_pcap_file_reader;
+    PcapFileWriter m_pcap_file_writer;
+    jdksavdecc_timestamp_in_milliseconds m_current_time;
+    jdksavdecc_timestamp_in_milliseconds m_time_granularity_in_ms;
+    FrameWithSize<1500> m_next_incoming_frame;
+
+    RawSocketPcapFile( RawSocketPcapFile const &other );
 
   public:
     /**
     *  Open a raw socket connected to the specified interface name and join the
     *  specified multicast address
     */
-    RawSocketPcapFile( uint16_t ethertype,
-                       const char *input_file,
-                       const char *output_file );
+    RawSocketPcapFile(
+        uint16_t ethertype,
+        jdksavdecc_eui48 my_mac,
+        jdksavdecc_eui48 default_dest_mac,
+        jdksavdecc_eui48 *join_multicast,
+        const std::string &input_file,
+        const std::string &output_file,
+        jdksavdecc_timestamp_in_milliseconds time_granularity_in_ms );
 
     ~RawSocketPcapFile();
 
@@ -74,6 +87,9 @@ class RawSocketPcapFile : public RawSocket
     virtual filedescriptor_type getFd() const;
 
     virtual const jdksavdecc_eui48 &getMACAddress() const;
+
+  private:
+    bool readNextIncomingFrame();
 };
 }
 #endif
