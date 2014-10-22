@@ -454,7 +454,7 @@ class KnobsAndButtonsController : public EntityState
     uint32_t m_update_rate_in_millis;
 
     /// The time that the last update happened
-    uint32_t m_last_update_time;
+    jdksavdecc_timestamp_in_milliseconds m_last_update_time;
 
     /// The mapping of Knob 1,2,3 to control descriptor 0x0000. 6 byte payload,
     /// one doublet each

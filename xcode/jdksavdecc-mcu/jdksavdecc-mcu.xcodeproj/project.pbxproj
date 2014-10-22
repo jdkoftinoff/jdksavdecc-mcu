@@ -105,11 +105,35 @@
 		BF1617DB19EC2BF700CD64A2 /* jdksavdecc_print.c in Sources */ = {isa = PBXBuildFile; fileRef = BF1617C619EC2BF700CD64A2 /* jdksavdecc_print.c */; };
 		BF1617DC19EC2BF700CD64A2 /* jdksavdecc_util.c in Sources */ = {isa = PBXBuildFile; fileRef = BF1617C719EC2BF700CD64A2 /* jdksavdecc_util.c */; };
 		BF1617DD19EC2BF700CD64A2 /* jdksavdecc.c in Sources */ = {isa = PBXBuildFile; fileRef = BF1617C819EC2BF700CD64A2 /* jdksavdecc.c */; };
+		BF185EB519F81C49007728C3 /* JDKSAvdeccMCU_KnobsAndButtons.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BF185EA919F81C10007728C3 /* JDKSAvdeccMCU_KnobsAndButtons.cpp */; };
+		BF185EB619F81C4F007728C3 /* libjdksavdecc-mcu.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BF16170719EC2B4C00CD64A2 /* libjdksavdecc-mcu.a */; };
 		BFC034BD19F08CBA009A41FF /* JDKSAvdeccMCU_EntityState.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BFC034BC19F08CBA009A41FF /* JDKSAvdeccMCU_EntityState.cpp */; };
 		BFC034BF19F08CCD009A41FF /* JDKSAvdeccMCU_EntityState.hpp in Headers */ = {isa = PBXBuildFile; fileRef = BFC034BE19F08CCD009A41FF /* JDKSAvdeccMCU_EntityState.hpp */; };
 		BFDF9A2B19EC6D7900E72732 /* JDKSAvdeccMCU_FixedBuffer.hpp in Headers */ = {isa = PBXBuildFile; fileRef = BFDF9A2A19EC6D7900E72732 /* JDKSAvdeccMCU_FixedBuffer.hpp */; };
 		BFDF9A2D19EC6D8500E72732 /* JDKSAvdeccMCU_FixedBuffer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BFDF9A2C19EC6D8500E72732 /* JDKSAvdeccMCU_FixedBuffer.cpp */; };
 /* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		BF185EB719F81C57007728C3 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = BF1616FF19EC2B4C00CD64A2 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = BF16170619EC2B4C00CD64A2;
+			remoteInfo = "jdksavdecc-mcu";
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		BF185EAC19F81C3B007728C3 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = /usr/share/man/man1/;
+			dstSubfolderSpec = 0;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 1;
+		};
+/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		BF0DCB3019F80F7E008C4455 /* JDKSAvdeccMCU_ArduinoFakeImpl.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = JDKSAvdeccMCU_ArduinoFakeImpl.h; path = ../../include/JDKSAvdeccMCU_ArduinoFakeImpl.h; sourceTree = "<group>"; };
@@ -211,6 +235,9 @@
 		BF1617C619EC2BF700CD64A2 /* jdksavdecc_print.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = jdksavdecc_print.c; path = "../../jdksavdecc-c/src/jdksavdecc_print.c"; sourceTree = "<group>"; };
 		BF1617C719EC2BF700CD64A2 /* jdksavdecc_util.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = jdksavdecc_util.c; path = "../../jdksavdecc-c/src/jdksavdecc_util.c"; sourceTree = "<group>"; };
 		BF1617C819EC2BF700CD64A2 /* jdksavdecc.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = jdksavdecc.c; path = "../../jdksavdecc-c/src/jdksavdecc.c"; sourceTree = "<group>"; };
+		BF185EA919F81C10007728C3 /* JDKSAvdeccMCU_KnobsAndButtons.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = JDKSAvdeccMCU_KnobsAndButtons.cpp; path = ../../examples/JDKSAvdeccMCU_KnobsAndButtons.cpp; sourceTree = "<group>"; };
+		BF185EAE19F81C3B007728C3 /* KnobsAndButtons */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = KnobsAndButtons; sourceTree = BUILT_PRODUCTS_DIR; };
+		BF185EB019F81C3B007728C3 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 		BFC034BC19F08CBA009A41FF /* JDKSAvdeccMCU_EntityState.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = JDKSAvdeccMCU_EntityState.cpp; path = ../../src/JDKSAvdeccMCU_EntityState.cpp; sourceTree = "<group>"; };
 		BFC034BE19F08CCD009A41FF /* JDKSAvdeccMCU_EntityState.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = JDKSAvdeccMCU_EntityState.hpp; path = ../../include/JDKSAvdeccMCU_EntityState.hpp; sourceTree = "<group>"; };
 		BFDF9A2A19EC6D7900E72732 /* JDKSAvdeccMCU_FixedBuffer.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; lineEnding = 0; name = JDKSAvdeccMCU_FixedBuffer.hpp; path = ../../include/JDKSAvdeccMCU_FixedBuffer.hpp; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.cpp; };
@@ -225,14 +252,24 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		BF185EAB19F81C3B007728C3 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				BF185EB619F81C4F007728C3 /* libjdksavdecc-mcu.a in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
 		BF1616FE19EC2B4C00CD64A2 = {
 			isa = PBXGroup;
 			children = (
+				BF185EA819F81BF8007728C3 /* Examples */,
 				BF16176C19EC2BD600CD64A2 /* jdksavdecc-c */,
 				BF16171519EC2B9E00CD64A2 /* Sources */,
+				BF185EAF19F81C3B007728C3 /* KnobsAndButtons */,
 				BF16170819EC2B4C00CD64A2 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -241,6 +278,7 @@
 			isa = PBXGroup;
 			children = (
 				BF16170719EC2B4C00CD64A2 /* libjdksavdecc-mcu.a */,
+				BF185EAE19F81C3B007728C3 /* KnobsAndButtons */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -361,6 +399,22 @@
 			name = "jdksavdecc-c";
 			sourceTree = "<group>";
 		};
+		BF185EA819F81BF8007728C3 /* Examples */ = {
+			isa = PBXGroup;
+			children = (
+				BF185EA919F81C10007728C3 /* JDKSAvdeccMCU_KnobsAndButtons.cpp */,
+			);
+			name = Examples;
+			sourceTree = "<group>";
+		};
+		BF185EAF19F81C3B007728C3 /* KnobsAndButtons */ = {
+			isa = PBXGroup;
+			children = (
+				BF185EB019F81C3B007728C3 /* main.cpp */,
+			);
+			path = KnobsAndButtons;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXHeadersBuildPhase section */
@@ -454,6 +508,24 @@
 			productReference = BF16170719EC2B4C00CD64A2 /* libjdksavdecc-mcu.a */;
 			productType = "com.apple.product-type.library.static";
 		};
+		BF185EAD19F81C3B007728C3 /* KnobsAndButtons */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = BF185EB219F81C3B007728C3 /* Build configuration list for PBXNativeTarget "KnobsAndButtons" */;
+			buildPhases = (
+				BF185EAA19F81C3B007728C3 /* Sources */,
+				BF185EAB19F81C3B007728C3 /* Frameworks */,
+				BF185EAC19F81C3B007728C3 /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				BF185EB819F81C57007728C3 /* PBXTargetDependency */,
+			);
+			name = KnobsAndButtons;
+			productName = KnobsAndButtons;
+			productReference = BF185EAE19F81C3B007728C3 /* KnobsAndButtons */;
+			productType = "com.apple.product-type.tool";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -465,6 +537,9 @@
 				TargetAttributes = {
 					BF16170619EC2B4C00CD64A2 = {
 						CreatedOnToolsVersion = 6.0.1;
+					};
+					BF185EAD19F81C3B007728C3 = {
+						CreatedOnToolsVersion = 6.1;
 					};
 				};
 			};
@@ -481,6 +556,7 @@
 			projectRoot = "";
 			targets = (
 				BF16170619EC2B4C00CD64A2 /* jdksavdecc-mcu */,
+				BF185EAD19F81C3B007728C3 /* KnobsAndButtons */,
 			);
 		};
 /* End PBXProject section */
@@ -532,7 +608,23 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		BF185EAA19F81C3B007728C3 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				BF185EB519F81C49007728C3 /* JDKSAvdeccMCU_KnobsAndButtons.cpp in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		BF185EB819F81C57007728C3 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = BF16170619EC2B4C00CD64A2 /* jdksavdecc-mcu */;
+			targetProxy = BF185EB719F81C57007728C3 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
 		BF16171019EC2B4C00CD64A2 /* Debug */ = {
@@ -635,6 +727,24 @@
 			};
 			name = Release;
 		};
+		BF185EB319F81C3B007728C3 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		BF185EB419F81C3B007728C3 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -655,6 +765,14 @@
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
+		};
+		BF185EB219F81C3B007728C3 /* Build configuration list for PBXNativeTarget "KnobsAndButtons" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				BF185EB319F81C3B007728C3 /* Debug */,
+				BF185EB419F81C3B007728C3 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
 		};
 /* End XCConfigurationList section */
 	};

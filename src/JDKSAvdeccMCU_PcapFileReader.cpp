@@ -46,32 +46,29 @@ PcapFileReader::PcapFileReader( std::string const &filename )
     , m_seen_first_timestamp( false )
     , m_first_timestamp_in_microseconds( 0 )
 {
-    if ( !m_file.get() )
+    if ( m_file.get() )
     {
-        throw std::runtime_error( std::string( "Error opening pcap file: " )
-                                  + filename );
-    }
+        pcap_hdr_t header;
+        if ( fread( &header, sizeof( header ), 1, m_file.get() ) != 1 )
+        {
+            throw std::runtime_error(
+                std::string( "Error reading pcap file header: " ) + filename );
+        }
 
-    pcap_hdr_t header;
-    if ( fread( &header, sizeof( header ), 1, m_file.get() ) != 1 )
-    {
-        throw std::runtime_error(
-            std::string( "Error reading pcap file header: " ) + filename );
-    }
-
-    if ( header.magic_number == 0xa1b2c3d4 )
-    {
-        m_swap = false;
-    }
-    else if ( header.magic_number == 0xd4c3b2a1 )
-    {
-        m_swap = true;
-    }
-    else
-    {
-        throw std::runtime_error(
-            std::string( "Error pcap file header is incompatible: " )
-            + filename );
+        if ( header.magic_number == 0xa1b2c3d4 )
+        {
+            m_swap = false;
+        }
+        else if ( header.magic_number == 0xd4c3b2a1 )
+        {
+            m_swap = true;
+        }
+        else
+        {
+            throw std::runtime_error(
+                std::string( "Error pcap file header is incompatible: " )
+                + filename );
+        }
     }
 }
 
@@ -80,60 +77,65 @@ PcapFileReader::~PcapFileReader() {}
 bool PcapFileReader::ReadPacket( uint64_t *timestamp_in_microseconds,
                                  PcapFilePacket &results )
 {
+    bool r = false;
     pcaprec_hdr_t packet_header;
-    if ( feof( m_file.get() ) )
-    {
-        return false;
-    }
-    if ( fread( &packet_header, sizeof( packet_header ), 1, m_file.get() )
-         != 1 )
+    if ( m_file.get() != 0 )
     {
         if ( feof( m_file.get() ) )
         {
             return false;
         }
-        else
+        if ( fread( &packet_header, sizeof( packet_header ), 1, m_file.get() )
+             != 1 )
+        {
+            if ( feof( m_file.get() ) )
+            {
+                return false;
+            }
+            else
+            {
+                throw std::runtime_error(
+                    std::string( "Error reading pcap file packet from: " )
+                    + m_filename );
+            }
+        }
+
+        /* swap bytes if necessary */
+        if ( m_swap )
+        {
+            packet_header.incl_len = PcapFileSwap( packet_header.incl_len );
+            packet_header.orig_len = PcapFileSwap( packet_header.orig_len );
+            packet_header.ts_sec = PcapFileSwap( packet_header.ts_sec );
+            packet_header.ts_usec = PcapFileSwap( packet_header.ts_usec );
+        }
+
+        /* read the payload */
+        if ( packet_header.incl_len > 32768 )
         {
             throw std::runtime_error(
-                std::string( "Error reading pcap file packet from: " )
+                std::string( "Error reading packet from: " ) + m_filename );
+        }
+
+        *timestamp_in_microseconds = ( packet_header.ts_sec * 1000000 )
+                                     + ( packet_header.ts_usec );
+
+        results.resize( (size_t)packet_header.incl_len );
+        if ( fread( &results[0], results.size(), 1, m_file.get() ) != 1 )
+        {
+            throw std::runtime_error(
+                std::string( "Error reading pcap file packet data from: " )
                 + m_filename );
         }
+        if ( !m_seen_first_timestamp )
+        {
+            m_seen_first_timestamp = true;
+            m_first_timestamp_in_microseconds = *timestamp_in_microseconds;
+        }
+        *timestamp_in_microseconds = *timestamp_in_microseconds
+                                     - m_first_timestamp_in_microseconds;
+        r = true;
     }
-
-    /* swap bytes if necessary */
-    if ( m_swap )
-    {
-        packet_header.incl_len = PcapFileSwap( packet_header.incl_len );
-        packet_header.orig_len = PcapFileSwap( packet_header.orig_len );
-        packet_header.ts_sec = PcapFileSwap( packet_header.ts_sec );
-        packet_header.ts_usec = PcapFileSwap( packet_header.ts_usec );
-    }
-
-    /* read the payload */
-    if ( packet_header.incl_len > 32768 )
-    {
-        throw std::runtime_error( std::string( "Error reading packet from: " )
-                                  + m_filename );
-    }
-
-    *timestamp_in_microseconds = ( packet_header.ts_sec * 1000000 )
-                                 + ( packet_header.ts_usec );
-
-    results.resize( (size_t)packet_header.incl_len );
-    if ( fread( &results[0], results.size(), 1, m_file.get() ) != 1 )
-    {
-        throw std::runtime_error(
-            std::string( "Error reading pcap file packet data from: " )
-            + m_filename );
-    }
-    if ( !m_seen_first_timestamp )
-    {
-        m_seen_first_timestamp = true;
-        m_first_timestamp_in_microseconds = *timestamp_in_microseconds;
-    }
-    *timestamp_in_microseconds = *timestamp_in_microseconds
-                                 - m_first_timestamp_in_microseconds;
-    return true;
+    return r;
 }
 
 bool PcapFileReader::ReadPacket( uint64_t *timestamp_in_microseconds,
