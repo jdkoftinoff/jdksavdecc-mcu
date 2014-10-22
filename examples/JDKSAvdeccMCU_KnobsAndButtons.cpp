@@ -1,5 +1,6 @@
 #if defined( __APPLE__ ) || defined( __linux__ )
 #define JDKSAVDECCMCU_ARDUINO 1
+#define JDKSAVDDECC_ARDUINO_FAKE_IMPL 1
 #else
 #include <SPI.h>
 #include <Ethernet.h>
@@ -21,25 +22,30 @@ jdksavdecc_eui48 my_mac = {{0x70, 0xb3, 0xd5, 0xed, 0xcf, 0xf0}};
 /// Ethernet handler object
 
 #if JDKSAVDECCMCU_ENABLE_RAWSOCKETWIZNET == 1
+// for embedded systems using the WizNet ethernet chip
 RawSocketWizNet rawnet( my_mac,
                         JDKSAVDECC_AVTP_ETHERTYPE,
-                        &jdksavdecc_multicast_adp_acmp ); // For embedded
-                                                          // systems
-#elif JDKSAVDECCMCU_ENABLE_RAWSOCKETLINUX == 1
-RawSocketLinux rawnet( "en0",
-                       JDKSAVDECC_AVTP_ETHERTYPE,
-                       &jdksavdecc_multicast_adp_acmp ); // For non-embedded
-                                                         // systems
-#elif JDKSAVDECCMCU_ENABLE_RAWSOCKETMACOSX == 1
-RawSocketMacOSX rawnet( "en0",
-                        JDKSAVDECC_AVTP_ETHERTYPE,
-                        &jdksavdecc_multicast_adp_acmp ); // For non-embedded
-                                                          // systems
+                        &jdksavdecc_multicast_adp_acmp );
 #elif JDKSAVDECCMCU_ENABLE_RAWSOCKETPCAPFILE == 1
+// for unit tests using pcap files for input and output
 RawSocketPcapFile rawnet( JDKSAVDECC_AVTP_ETHERTYPE,
+                          my_mac,
+                          jdksavdecc_multicast_adp_acmp,
+                          &jdksavdecc_multicast_adp_acmp,
                           "input.pcap",
                           "output.pcap",
-                          &jdksavdecc_multicast_adp_acmp );
+                          50 );
+#elif JDKSAVDECCMCU_ENABLE_RAWSOCKETLINUX == 1
+// for Raw sockets on linux
+RawSocketLinux rawnet( "en0",
+                       JDKSAVDECC_AVTP_ETHERTYPE,
+                       &jdksavdecc_multicast_adp_acmp );
+#elif JDKSAVDECCMCU_ENABLE_RAWSOCKETMACOSX == 1
+
+// for Raw sockets on Mac OSX
+RawSocketMacOSX rawnet( "en0",
+                        JDKSAVDECC_AVTP_ETHERTYPE,
+                        &jdksavdecc_multicast_adp_acmp );
 #endif
 
 /// This AVDECC Entity is based on the mac address (insert ff ff)
