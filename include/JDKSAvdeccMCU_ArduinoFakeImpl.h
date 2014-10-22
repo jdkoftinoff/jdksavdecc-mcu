@@ -1,3 +1,5 @@
+#pragma once
+
 #include "JDKSAvdeccMCU_Arduino.hpp"
 
 #if JDKSAVDECCMCU_ARDUINO == 1 && JDKSAVDECCMCU_BARE_METAL == 0

@@ -254,4 +254,6 @@ class Serial_
 };
 extern Serial_ Serial;
 
+#include "JDKSAvdeccMCU_ArduinoFakeImpl.h"
+
 #endif
