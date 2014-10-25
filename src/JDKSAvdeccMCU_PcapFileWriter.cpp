@@ -137,10 +137,12 @@ void PcapFileWriter::WritePacket( uint64_t packet_time_in_micros,
     pktheader.ts_usec = uint32_t( packet_time_in_micros % 1000000 );
     pktheader.incl_len = int( packet_payload.size() + 14 );
     pktheader.orig_len = pktheader.incl_len;
-    if ( fwrite( &pktheader, sizeof( pktheader ), 1, m_file.get() ) != 1 )
+    ssize_t n;
+    n = fwrite( &pktheader, sizeof( pktheader ), 1, m_file.get() );
+    if ( n != 1 )
     {
         throw std::runtime_error( std::string( "Error writing to pcap file: " )
-                                  + m_filename );
+                                  + m_filename + " " + strerror( errno ) );
     }
     if ( fwrite( da, 6, 1, m_file.get() ) != 1 )
     {

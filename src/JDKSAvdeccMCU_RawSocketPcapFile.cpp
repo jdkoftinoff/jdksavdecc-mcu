@@ -112,8 +112,8 @@ bool RawSocketPcapFile::sendFrame( const Frame &frame,
         da = m_default_dest_mac;
     }
     PcapFilePacket packet;
-    packet.resize( frame.getLength() + len1 + len2
-                   - JDKSAVDECC_FRAME_HEADER_LEN );
+    packet.reserve( frame.getLength() + len1 + len2
+                    - JDKSAVDECC_FRAME_HEADER_LEN );
     for ( size_t i = JDKSAVDECC_FRAME_HEADER_LEN; i < frame.getLength(); ++i )
     {
         packet.push_back( frame.getOctet( i ) );
