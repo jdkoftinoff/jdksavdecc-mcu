@@ -107,6 +107,7 @@
 		BF1617DD19EC2BF700CD64A2 /* jdksavdecc.c in Sources */ = {isa = PBXBuildFile; fileRef = BF1617C819EC2BF700CD64A2 /* jdksavdecc.c */; };
 		BF185EB519F81C49007728C3 /* JDKSAvdeccMCU_KnobsAndButtons.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BF185EA919F81C10007728C3 /* JDKSAvdeccMCU_KnobsAndButtons.cpp */; };
 		BF185EB619F81C4F007728C3 /* libjdksavdecc-mcu.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BF16170719EC2B4C00CD64A2 /* libjdksavdecc-mcu.a */; };
+		BF8A584419FCB6AA00107E1D /* JDKSAvdeccMCU_MDNSRegister.hpp in Headers */ = {isa = PBXBuildFile; fileRef = BF8A584319FCB6AA00107E1D /* JDKSAvdeccMCU_MDNSRegister.hpp */; };
 		BFC034BD19F08CBA009A41FF /* JDKSAvdeccMCU_EntityState.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BFC034BC19F08CBA009A41FF /* JDKSAvdeccMCU_EntityState.cpp */; };
 		BFC034BF19F08CCD009A41FF /* JDKSAvdeccMCU_EntityState.hpp in Headers */ = {isa = PBXBuildFile; fileRef = BFC034BE19F08CCD009A41FF /* JDKSAvdeccMCU_EntityState.hpp */; };
 		BFDF9A2B19EC6D7900E72732 /* JDKSAvdeccMCU_FixedBuffer.hpp in Headers */ = {isa = PBXBuildFile; fileRef = BFDF9A2A19EC6D7900E72732 /* JDKSAvdeccMCU_FixedBuffer.hpp */; };
@@ -238,6 +239,7 @@
 		BF185EA919F81C10007728C3 /* JDKSAvdeccMCU_KnobsAndButtons.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = JDKSAvdeccMCU_KnobsAndButtons.cpp; path = ../../examples/JDKSAvdeccMCU_KnobsAndButtons.cpp; sourceTree = "<group>"; };
 		BF185EAE19F81C3B007728C3 /* KnobsAndButtons */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = KnobsAndButtons; sourceTree = BUILT_PRODUCTS_DIR; };
 		BF185EB019F81C3B007728C3 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
+		BF8A584319FCB6AA00107E1D /* JDKSAvdeccMCU_MDNSRegister.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = JDKSAvdeccMCU_MDNSRegister.hpp; path = ../../include/JDKSAvdeccMCU_MDNSRegister.hpp; sourceTree = "<group>"; };
 		BFC034BC19F08CBA009A41FF /* JDKSAvdeccMCU_EntityState.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = JDKSAvdeccMCU_EntityState.cpp; path = ../../src/JDKSAvdeccMCU_EntityState.cpp; sourceTree = "<group>"; };
 		BFC034BE19F08CCD009A41FF /* JDKSAvdeccMCU_EntityState.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = JDKSAvdeccMCU_EntityState.hpp; path = ../../include/JDKSAvdeccMCU_EntityState.hpp; sourceTree = "<group>"; };
 		BFDF9A2A19EC6D7900E72732 /* JDKSAvdeccMCU_FixedBuffer.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; lineEnding = 0; name = JDKSAvdeccMCU_FixedBuffer.hpp; path = ../../include/JDKSAvdeccMCU_FixedBuffer.hpp; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.cpp; };
@@ -313,6 +315,7 @@
 				BF16172119EC2BB100CD64A2 /* JDKSAvdeccMCU_HandlerGroup.hpp */,
 				BF16172219EC2BB100CD64A2 /* JDKSAvdeccMCU_Helpers.hpp */,
 				BF16172319EC2BB100CD64A2 /* JDKSAvdeccMCU_IntelGalileo.hpp */,
+				BF8A584319FCB6AA00107E1D /* JDKSAvdeccMCU_MDNSRegister.hpp */,
 				BF16175119EC2BBF00CD64A2 /* JDKSAvdeccMCU_PcapFile.cpp */,
 				BF16172419EC2BB100CD64A2 /* JDKSAvdeccMCU_PcapFile.hpp */,
 				BF16175219EC2BBF00CD64A2 /* JDKSAvdeccMCU_PcapFileReader.cpp */,
@@ -423,6 +426,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				BF16179819EC2BE700CD64A2 /* jdksavdecc_aecp_hdcp_apm.h in Headers */,
+				BF8A584419FCB6AA00107E1D /* JDKSAvdeccMCU_MDNSRegister.hpp in Headers */,
 				BF1617A019EC2BE700CD64A2 /* jdksavdecc_app.h in Headers */,
 				BF1617A119EC2BE700CD64A2 /* jdksavdecc_avr.h in Headers */,
 				BF16174519EC2BB100CD64A2 /* JDKSAvdeccMCU_RawSocketWizNet.hpp in Headers */,
@@ -773,6 +777,7 @@
 				BF185EB419F81C3B007728C3 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
