@@ -66,6 +66,15 @@ jdksavdecc_eui48 target_mac_address = {{0x70, 0xb3, 0xd5, 0xed, 0xcf, 0xf1}};
 class KnobsAndButtonsController : public EntityState
 {
   public:
+    enum
+    {
+        CONTROL_LOG_DESCRIPTOR = 0,
+        CONTROL_IDENTIFY_DESCRIPTOR,
+        CONTROL_KNOBS_VALUE_DESCRIPTOR,
+        CONTROL_BUTTONS_VALUE_DESCRIPTOR,
+        NUM_CONTROL_DESCRIPTORS
+    };
+
     KnobsAndButtonsController( jdksavdecc_eui64 const &entity_id,
                                jdksavdecc_eui64 const &entity_model_id )
         : m_adp_manager( rawnet,
@@ -161,10 +170,7 @@ class KnobsAndButtonsController : public EntityState
                 1,
                 0 );
 
-            if ( status == JDKSAVDECC_AEM_STATUS_SUCCESS )
-            {
-                m_controller_entity.sendResponses( false, false, pdu );
-            }
+            m_controller_entity.sendResponses( false, false, status, pdu );
         }
 
         return status;
@@ -227,8 +233,8 @@ class KnobsAndButtonsController : public EntityState
             // port_number
             pdu.putOctet( 0 );
 
-            m_controller_entity.sendResponses( false, false, pdu );
             status = JDKSAVDECC_AEM_STATUS_SUCCESS;
+            m_controller_entity.sendResponses( false, false, status, pdu );
         }
         return status;
     }
@@ -265,10 +271,10 @@ class KnobsAndButtonsController : public EntityState
             // descriptor type
             pdu.putDoublet( JDKSAVDECC_DESCRIPTOR_CONTROL );
             // descriptor count
-            pdu.putDoublet( 2 );
+            pdu.putDoublet( NUM_CONTROL_DESCRIPTORS );
 
-            m_controller_entity.sendResponses( false, false, pdu );
             status = JDKSAVDECC_AEM_STATUS_SUCCESS;
+            m_controller_entity.sendResponses( false, false, status, pdu );
         }
         return status;
     }
@@ -277,9 +283,10 @@ class KnobsAndButtonsController : public EntityState
                                            uint16_t configuration_index,
                                            uint16_t descriptor_index )
     {
-        uint8_t status = JDKSAVDECC_AEM_STATUS_BAD_ARGUMENTS;
+        uint8_t status = JDKSAVDECC_AEM_STATUS_NO_SUCH_DESCRIPTOR;
 
-        if ( configuration_index == 0 && descriptor_index < 2 )
+        if ( configuration_index == 0
+             && descriptor_index < NUM_CONTROL_DESCRIPTORS )
         {
             pdu.setLength(
                 JDKSAVDECC_FRAME_HEADER_LEN
@@ -300,21 +307,43 @@ class KnobsAndButtonsController : public EntityState
             // control_domain
             pdu.putDoublet( 0 );
 
-            if ( descriptor_index == 0 )
+            switch ( descriptor_index )
+            {
+            case CONTROL_LOG_DESCRIPTOR:
+            {
+                // TODO: put jdks log descriptor details here
+                status = JDKSAVDECC_AEM_STATUS_ENTITY_MISBEHAVING;
+                break;
+            }
+            case CONTROL_IDENTIFY_DESCRIPTOR:
+            {
+                // TODO: put identiy descriptor details here
+                status = JDKSAVDECC_AEM_STATUS_ENTITY_MISBEHAVING;
+                break;
+            }
+            case CONTROL_KNOBS_VALUE_DESCRIPTOR:
             {
                 // control_value_type
                 pdu.putDoublet( JDKSAVDECC_CONTROL_VALUE_ARRAY_UINT16 );
 
                 // control_type
                 pdu.putEUI64( 0x70, 0xb3, 0xd5, 0xed, 0xcf, 0x00, 0x00, 0x00 );
+                status = JDKSAVDECC_AEM_STATUS_SUCCESS;
+                break;
             }
-            if ( descriptor_index == 1 )
+            case CONTROL_BUTTONS_VALUE_DESCRIPTOR:
             {
                 // control_value_type
                 pdu.putDoublet( JDKSAVDECC_CONTROL_VALUE_ARRAY_UINT8 );
 
                 // control_type
                 pdu.putEUI64( 0x70, 0xb3, 0xd5, 0xed, 0xcf, 0x00, 0x00, 0x01 );
+                status = JDKSAVDECC_AEM_STATUS_SUCCESS;
+                break;
+            }
+            default:
+                status = JDKSAVDECC_AEM_STATUS_ENTITY_MISBEHAVING;
+                break;
             }
 
             // reset_time
@@ -323,16 +352,34 @@ class KnobsAndButtonsController : public EntityState
             // values_offset
             pdu.putDoublet( JDKSAVDECC_DESCRIPTOR_CONTROL_LEN );
 
-            if ( descriptor_index == 0 )
+            switch ( descriptor_index )
+            {
+            case CONTROL_LOG_DESCRIPTOR:
+            {
+                // TODO: put jdks log descriptor details here
+                status = JDKSAVDECC_AEM_STATUS_ENTITY_MISBEHAVING;
+                break;
+            }
+            case CONTROL_IDENTIFY_DESCRIPTOR:
+            {
+                // TODO: put identiy descriptor details here
+                status = JDKSAVDECC_AEM_STATUS_ENTITY_MISBEHAVING;
+                break;
+            }
+            case CONTROL_KNOBS_VALUE_DESCRIPTOR:
             {
                 // number_of_values
                 pdu.putDoublet( m_knobs_storage.getNumItems() );
+                break;
             }
-
-            if ( descriptor_index == 1 )
+            case CONTROL_BUTTONS_VALUE_DESCRIPTOR:
             {
                 // number_of_values
                 pdu.putDoublet( m_buttons_storage.getNumItems() );
+                break;
+            }
+            default:
+                break;
             }
 
             // signal_type
@@ -344,7 +391,21 @@ class KnobsAndButtonsController : public EntityState
             // signal_output
             pdu.putDoublet( 0 );
 
-            if ( descriptor_index == 0 )
+            switch ( descriptor_index )
+            {
+            case CONTROL_LOG_DESCRIPTOR:
+            {
+                // TODO: put jdks log descriptor details here
+                status = JDKSAVDECC_AEM_STATUS_ENTITY_MISBEHAVING;
+                break;
+            }
+            case CONTROL_IDENTIFY_DESCRIPTOR:
+            {
+                // TODO: put identiy descriptor details here
+                status = JDKSAVDECC_AEM_STATUS_ENTITY_MISBEHAVING;
+                break;
+            }
+            case CONTROL_KNOBS_VALUE_DESCRIPTOR:
             {
                 // minimum
                 pdu.putDoublet( 0 );
@@ -372,8 +433,9 @@ class KnobsAndButtonsController : public EntityState
                 {
                     pdu.putDoublet( m_knobs_storage.getDoublet( i ) );
                 }
+                break;
             }
-            if ( descriptor_index == 1 )
+            case CONTROL_BUTTONS_VALUE_DESCRIPTOR:
             {
                 // minimum
                 pdu.putOctet( 0 );
@@ -401,9 +463,13 @@ class KnobsAndButtonsController : public EntityState
                 {
                     pdu.putOctet( m_buttons_storage.getOctet( i ) );
                 }
+                break;
             }
-            m_controller_entity.sendResponses( false, false, pdu );
-            status = JDKSAVDECC_AEM_STATUS_SUCCESS;
+            default:
+                break;
+            }
+
+            m_controller_entity.sendResponses( false, false, status, pdu );
         }
         return status;
     }
@@ -411,33 +477,53 @@ class KnobsAndButtonsController : public EntityState
     virtual uint8_t receiveGetControlCommand( Frame &pdu,
                                               uint16_t descriptor_index )
     {
-        uint8_t status = JDKSAVDECC_AEM_STATUS_BAD_ARGUMENTS;
+        uint8_t status = JDKSAVDECC_AEM_STATUS_NO_SUCH_DESCRIPTOR;
 
-        if ( descriptor_index < 2 )
+        if ( descriptor_index < NUM_CONTROL_DESCRIPTORS )
         {
             pdu.setLength( JDKSAVDECC_FRAME_HEADER_LEN
                            + JDKSAVDECC_AEM_COMMAND_GET_CONTROL_COMMAND_LEN );
 
-            if ( descriptor_index == 0 )
+            switch ( descriptor_index )
+            {
+            case CONTROL_LOG_DESCRIPTOR:
+            {
+                // TODO: fill in response for jdks_log entity
+                status = JDKSAVDECC_AEM_STATUS_ENTITY_MISBEHAVING;
+                break;
+            }
+            case CONTROL_IDENTIFY_DESCRIPTOR:
+            {
+                // TODO: fill in response for jdks_log entity
+                status = JDKSAVDECC_AEM_STATUS_ENTITY_MISBEHAVING;
+                break;
+            }
+            case CONTROL_KNOBS_VALUE_DESCRIPTOR:
             {
                 // current values
                 for ( uint8_t i = 0; i < m_knobs_storage.getNumItems(); ++i )
                 {
                     pdu.putDoublet( m_knobs_storage.getDoublet( i ) );
                 }
-            }
+                status = JDKSAVDECC_AEM_STATUS_SUCCESS;
 
-            if ( descriptor_index == 1 )
+                break;
+            }
+            case CONTROL_BUTTONS_VALUE_DESCRIPTOR:
             {
                 // current values
                 for ( uint8_t i = 0; i < m_buttons_storage.getNumItems(); ++i )
                 {
                     pdu.putOctet( m_buttons_storage.getOctet( i ) );
                 }
+                status = JDKSAVDECC_AEM_STATUS_SUCCESS;
+                break;
             }
-
-            m_controller_entity.sendResponses( false, false, pdu );
-            status = JDKSAVDECC_AEM_STATUS_SUCCESS;
+            default:
+                status = JDKSAVDECC_AEM_STATUS_ENTITY_MISBEHAVING;
+                break;
+            }
+            m_controller_entity.sendResponses( false, false, status, pdu );
         }
         return status;
     }
@@ -456,13 +542,15 @@ class KnobsAndButtonsController : public EntityState
     /// The time that the last update happened
     jdksavdecc_timestamp_in_milliseconds m_last_update_time;
 
-    /// The mapping of Knob 1,2,3 to control descriptor 0x0000. 6 byte payload,
-    /// one doublet each
+    /// The mapping of Knob 1,2,3 to control descriptor
+    /// CONTROL_KNOBS_VALUE_DESCRIPTOR.
+    /// 6 byte payload, one doublet each
     ControlValueHolderWithStorage<uint16_t, 3> m_knobs_storage;
     ControlSender m_knobs_sender;
 
-    /// The mapping of Button 1 to control descriptor 0x0001. 5 byte payload,
-    /// one octet each
+    /// The mapping of Button 1 to control descriptor
+    /// CONTROL_BUTTONS_VALUE_DESCRIPTOR.
+    /// 5 byte payload, one octet each
     ControlValueHolderWithStorage<uint8_t, 5> m_buttons_storage;
     ControlSender m_buttons_sender;
 };
@@ -491,7 +579,7 @@ void jdksavdeccmcu_debug_log( const char *str, uint16_t v )
     uint16_t r;
     sprintf( txt, "%s %u", str, (unsigned)v );
     r = jdksavdecc_jdks_log_control_generate( &my_entity_id,
-                                              8, // Control index 8
+                                              0, // Control index 0
                                               &debug_sequence_id,
                                               JDKSAVDECC_JDKS_LOG_INFO,
                                               0,
