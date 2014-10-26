@@ -74,6 +74,13 @@ void Entity::tick( jdksavdecc_timestamp_in_milliseconds time_in_millis )
         }
     }
 
+    // TODO: if acquire is in progress more than 250 ms then
+    // expire that one, update the new owner entity id and send
+    // an acquire entity response message to the new owner
+
+    // TODO: Send acquire in progress every 120 ms while we are
+    // m_acquire_in_progress_by_controller_entity_id
+
     // Check to see if we had a command in flight that timed out
     if ( cmd != JDKSAVDECC_AEM_COMMAND_EXPANSION
          && wasTimeOutHit( time_in_millis,
@@ -318,6 +325,7 @@ uint8_t Entity::receivedAEMCommand( jdksavdecc_aecpdu_aem const &aem,
     sendResponses( false,
                    command_is_set_something
                    && response_status == JDKSAVDECC_AECP_STATUS_SUCCESS,
+                   response_status,
                    pdu );
 
     return response_status;
@@ -441,7 +449,7 @@ uint8_t Entity::receivedAACommand( jdksavdecc_aecp_aa const &aa, Frame &pdu )
                   JDKSAVDECC_FRAME_HEADER_LEN + 2 );
 
     // Only send responses to the requesting controller
-    sendResponses( false, false, pdu );
+    sendResponses( false, false, aa_status, pdu );
 
     return aa_status;
 }
@@ -456,6 +464,7 @@ uint8_t Entity::receivedACMPMessage( const jdksavdecc_acmpdu &acmpdu,
 
 void Entity::sendResponses( bool internally_generated,
                             bool send_to_registered_controllers,
+                            uint8_t aecp_status_code,
                             Frame &pdu,
                             uint8_t const *additional_data1,
                             uint16_t additional_data_length1,
@@ -466,6 +475,9 @@ void Entity::sendResponses( bool internally_generated,
     // the controller entity id
     jdksavdecc_eui64 original_controller_id;
     jdksavdecc_eui64_init( &original_controller_id );
+
+    pdu.setOctet( ( ( pdu.getOctet( 2 ) & 0xf8 ) | ( aecp_status_code << 3 ) ),
+                  2 );
 
     if ( !internally_generated )
     {
@@ -648,6 +660,7 @@ void Entity::sendUnsolicitedResponses( uint16_t aem_command_type,
 
     sendResponses( true,
                    true,
+                   JDKSAVDECC_AECP_STATUS_SUCCESS,
                    pdu,
                    additional_data1,
                    additional_data_length1,
@@ -686,6 +699,7 @@ uint8_t Entity::receiveAcquireEntityCommand( jdksavdecc_aecpdu_aem const &aem,
             // This is a request to release.  A release only works if the
             // requesting controller is the current owner, or there is no
             // current owner
+
             if ( ( has_current_owner && controller_id_matches_current_owner )
                  || !has_current_owner )
             {
@@ -703,27 +717,46 @@ uint8_t Entity::receiveAcquireEntityCommand( jdksavdecc_aecpdu_aem const &aem,
         {
             // This is a request to acquire. Are we already acquired by the same
             // controller or are we not yet acquired?
-            if ( !has_current_owner
-                 || ( has_current_owner
-                      && controller_id_matches_current_owner ) )
+
+            if ( ( has_current_owner && controller_id_matches_current_owner )
+                 || ( !has_current_owner ) )
             {
                 // Yes, success.
                 status = JDKSAVDECC_AEM_STATUS_SUCCESS;
             }
             else
             {
-                // Okay, someone else owns us. Send a CONTROLLER_AVAILABLE
-                // message to the controller that
-                // currently owns us to make sure he is still around.
-                sendControllerAvailable( m_acquired_by_controller_entity_id,
-                                         m_acquired_by_controller_mac_address );
-                // Keep track of when this happened
-                m_acquire_in_progress_time
-                    = getRawSocket().getTimeInMilliseconds();
-                // Return IN_PROGRESS, the real response will be coming either
-                // when the owning controller responds, or
-                // if it times out.
-                status = JDKSAVDECC_AEM_STATUS_IN_PROGRESS;
+                // Are we already in progress of acquiring from a second
+                // controller?
+                if ( jdksavdecc_eui64_is_set(
+                         m_acquire_in_progress_by_controller_entity_id ) )
+                {
+                    // yes, we we are already waiting for a dispute between 2
+                    // controllers.
+                    // return that we are acquired
+                    status = JDKSAVDECC_AEM_STATUS_ENTITY_ACQUIRED;
+                }
+                else
+                {
+                    // Okay, someone else owns us, and we are not currently in
+                    // progress of validating that controllers available status.
+                    // Send a CONTROLLER_AVAILABLE message to the controller
+                    // that currently owns us to make sure he is still around.
+
+                    sendControllerAvailable(
+                        m_acquired_by_controller_entity_id,
+                        m_acquired_by_controller_mac_address );
+
+                    // Keep track of when this happened
+                    m_acquire_in_progress_time
+                        = getRawSocket().getTimeInMilliseconds();
+
+                    // Return IN_PROGRESS, the real response will be coming
+                    // either
+                    // when the owning controller responds, or
+                    // if it times out.
+                    status = JDKSAVDECC_AEM_STATUS_IN_PROGRESS;
+                }
             }
         }
     }

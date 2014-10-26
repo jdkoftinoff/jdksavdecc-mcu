@@ -112,6 +112,7 @@ class Entity : public Handler
     /// responses to all other subscribed controllers
     void sendResponses( bool internally_generated,
                         bool send_to_registered_controllers,
+                        uint8_t aecp_status_code,
                         Frame &pdu,
                         uint8_t const *additional_data1 = 0,
                         uint16_t additional_data_length1 = 0,

@@ -164,7 +164,7 @@ uint8_t EntityState::readDescriptorEntity( Frame &pdu,
     (void)configuration_index;
     (void)descriptor_index;
 
-    return JDKSAVDECC_AECP_STATUS_NOT_IMPLEMENTED;
+    return JDKSAVDECC_AEM_STATUS_NO_SUCH_DESCRIPTOR;
 }
 
 uint8_t EntityState::readDescriptorAvbInterface( Frame &pdu,
@@ -175,7 +175,7 @@ uint8_t EntityState::readDescriptorAvbInterface( Frame &pdu,
     (void)configuration_index;
     (void)descriptor_index;
 
-    return JDKSAVDECC_AECP_STATUS_NOT_IMPLEMENTED;
+    return JDKSAVDECC_AEM_STATUS_NO_SUCH_DESCRIPTOR;
 }
 
 uint8_t EntityState::readDescriptorConfiguration( Frame &pdu,
@@ -186,7 +186,7 @@ uint8_t EntityState::readDescriptorConfiguration( Frame &pdu,
     (void)configuration_index;
     (void)descriptor_index;
 
-    return JDKSAVDECC_AECP_STATUS_NOT_IMPLEMENTED;
+    return JDKSAVDECC_AEM_STATUS_NO_SUCH_DESCRIPTOR;
 }
 
 uint8_t EntityState::readDescriptorControl( Frame &pdu,
@@ -197,7 +197,7 @@ uint8_t EntityState::readDescriptorControl( Frame &pdu,
     (void)configuration_index;
     (void)descriptor_index;
 
-    return JDKSAVDECC_AECP_STATUS_NOT_IMPLEMENTED;
+    return JDKSAVDECC_AEM_STATUS_NO_SUCH_DESCRIPTOR;
 }
 
 uint8_t EntityState::readDescriptorLocale( Frame &pdu,
@@ -208,7 +208,7 @@ uint8_t EntityState::readDescriptorLocale( Frame &pdu,
     (void)configuration_index;
     (void)descriptor_index;
 
-    return JDKSAVDECC_AECP_STATUS_NOT_IMPLEMENTED;
+    return JDKSAVDECC_AEM_STATUS_NO_SUCH_DESCRIPTOR;
 }
 
 uint8_t EntityState::readDescriptorStrings( Frame &pdu,
@@ -219,7 +219,7 @@ uint8_t EntityState::readDescriptorStrings( Frame &pdu,
     (void)configuration_index;
     (void)descriptor_index;
 
-    return JDKSAVDECC_AECP_STATUS_NOT_IMPLEMENTED;
+    return JDKSAVDECC_AEM_STATUS_NO_SUCH_DESCRIPTOR;
 }
 
 uint8_t EntityState::readDescriptorMemoryObject( Frame &pdu,
@@ -230,7 +230,7 @@ uint8_t EntityState::readDescriptorMemoryObject( Frame &pdu,
     (void)configuration_index;
     (void)descriptor_index;
 
-    return JDKSAVDECC_AECP_STATUS_NOT_IMPLEMENTED;
+    return JDKSAVDECC_AEM_STATUS_NO_SUCH_DESCRIPTOR;
 }
 
 uint8_t EntityState::receiveAARead( uint32_t virtual_base_address,
