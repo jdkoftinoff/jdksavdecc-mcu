@@ -204,6 +204,12 @@
     <ClInclude Include="..\..\..\include\JDKSAvdeccMCU_World.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\include\JDKSAvdeccMCU_ArduinoFakeImpl.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\JDKSAvdeccMCU_MDNSRegister.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\jdksavdecc-c\src\jdksavdecc.c">
@@ -267,9 +273,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\JDKSAvdeccMCU_ADPManager.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\JDKSAvdeccMCU_Arduino.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\JDKSAvdeccMCU_ControllerEntity.cpp">
