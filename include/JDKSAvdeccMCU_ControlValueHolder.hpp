@@ -44,7 +44,7 @@ class ControlValueHolder : public FixedBuffer
   public:
     ControlValueHolder( uint8_t *buf,
                         uint16_t value_length,
-                        uint8_t num_items = 1 )
+                        uint16_t num_items = 1 )
         : FixedBuffer( buf, value_length * num_items )
         , m_value_length( value_length )
         , m_num_items( num_items )
@@ -57,9 +57,9 @@ class ControlValueHolder : public FixedBuffer
     bool isDirty() const { return m_dirty; }
     void clearDirty() { m_dirty = false; }
 
-    uint8_t getValueLength() const { return m_value_length; }
+    uint16_t getValueLength() const { return m_value_length; }
 
-    uint8_t getNumItems() const { return m_num_items; }
+    uint16_t getNumItems() const { return m_num_items; }
 
     uint8_t getValueOctet( uint8_t item = 0 ) const
     {
@@ -174,7 +174,7 @@ class ControlValueHolder : public FixedBuffer
 
   protected:
     uint16_t m_value_length;
-    uint8_t m_num_items;
+    uint16_t m_num_items;
     bool m_dirty;
 };
 
