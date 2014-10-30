@@ -31,27 +31,16 @@
 #pragma once
 
 #include "JDKSAvdeccMCU_World.hpp"
-#include "JDKSAvdeccMCU_RawSocket.hpp"
-#include "JDKSAvdeccMCU_Frame.hpp"
-#include "JDKSAvdeccMCU_Handler.hpp"
-#include "JDKSAvdeccMCU_Helpers.hpp"
-#include "JDKSAvdeccMCU_Entity.hpp"
-#include "JDKSAvdeccMCU_ControllerEntity.hpp"
-#include "JDKSAvdeccMCU_ControlValueHolder.hpp"
 
 namespace JDKSAvdeccMCU
 {
 
-class ControlSender : public Handler
+class ControlSenderIdentify : public Handler
 {
   public:
-    /// Construct the SetControlSender object
-    ControlSender( ControllerEntity &controller_entity,
-                   jdksavdecc_eui64 const &target_entity_id,
-                   jdksavdecc_eui48 const &target_mac_address,
-                   uint16_t target_descriptor_index,
-                   jdksavdecc_timestamp_in_milliseconds update_rate_in_millis,
-                   ControlValueHolder *holder );
+    /// Construct the ControlSenderIdentify object
+    ControlSenderIdentify( ControllerEntity &controller_entity,
+                           ControlValueHolder *holder );
 
     /// Send the SET_CONTROL message if it is time to
     virtual void tick( jdksavdecc_timestamp_in_milliseconds time_in_millis );
@@ -59,8 +48,7 @@ class ControlSender : public Handler
     /// Handle incoming PDU
     virtual bool receivedPDU( Frame &frame );
 
-    /// Formulate the AECPU set control for and send it. Returns true if the
-    /// message was
+    /// Formulate the ADPDU and send it. Returns true if the message was
     /// actually sent.
     bool sendSetControl( bool wait_for_ack = false );
 

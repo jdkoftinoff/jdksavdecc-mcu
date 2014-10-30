@@ -31,6 +31,7 @@
 #pragma once
 
 #include "JDKSAvdeccMCU_World.hpp"
+
 #include "JDKSAvdeccMCU_RawSocket.hpp"
 #include "JDKSAvdeccMCU_Frame.hpp"
 #include "JDKSAvdeccMCU_Handler.hpp"
@@ -42,58 +43,47 @@
 namespace JDKSAvdeccMCU
 {
 
-class ControlSender : public Handler
+class Control : public Handler
 {
   public:
     /// Construct the SetControlSender object
-    ControlSender( ControllerEntity &controller_entity,
-                   jdksavdecc_eui64 const &target_entity_id,
-                   jdksavdecc_eui48 const &target_mac_address,
-                   uint16_t target_descriptor_index,
-                   jdksavdecc_timestamp_in_milliseconds update_rate_in_millis,
-                   ControlValueHolder *holder );
+    Control( Entity &entity,
+             uint16_t descriptor_index,
+             jdksavdecc_eui64 control_type,
+             uint16_t control_value_type,
+             ControlValueHolder *holder );
 
-    /// Send the SET_CONTROL message if it is time to
     virtual void tick( jdksavdecc_timestamp_in_milliseconds time_in_millis );
 
-    /// Handle incoming PDU
     virtual bool receivedPDU( Frame &frame );
 
-    /// Formulate the AECPU set control for and send it. Returns true if the
-    /// message was
-    /// actually sent.
-    bool sendSetControl( bool wait_for_ack = false );
+    virtual uint8_t formControlValueMetaData( Frame &pdu );
 
-    ControllerEntity &getControllerEntity() { return m_controller_entity; }
+    virtual uint8_t formControlPayload( Frame &pdu );
 
-    RawSocket &getRawSocket() { return m_controller_entity.getRawSocket(); }
+    virtual uint8_t validateSetControlCommand( Frame &pdu );
 
-    jdksavdecc_eui64 const &getEntityID() const
-    {
-        return m_controller_entity.getEntityID();
-    }
+    virtual uint8_t formSetControlResponse( Frame &pdu );
 
-    jdksavdecc_eui64 const &getTargetEntityID() const
-    {
-        return m_target_entity_id;
-    }
+    virtual uint8_t formGetControlCommand( Frame &pdu );
 
-    jdksavdecc_eui48 const &getTargetMACAddress() const
-    {
-        return m_target_mac_address;
-    }
+    virtual uint8_t formGetControlResponse( Frame &pdu );
 
-    ControlValueHolder *getHolder() { return m_holder; }
+    virtual uint8_t readControlDescriptor( Frame &pdu );
 
-    ControlValueHolder const *getHolder() const { return m_holder; }
+    Entity &getEntity() { return m_entity; }
+
+    Entity const &getEntity() const { return m_entity; }
+
+    ControlValueHolder *getControlValueHolder() { return m_holder; }
+
+    ControlValueHolder const *getControlValueHolder() const { return m_holder; }
 
   protected:
-    ControllerEntity &m_controller_entity;
-    jdksavdecc_eui64 m_target_entity_id;
-    jdksavdecc_eui48 m_target_mac_address;
-    uint16_t m_target_descriptor_index;
-    jdksavdecc_timestamp_in_milliseconds m_update_rate_in_millis;
-    jdksavdecc_timestamp_in_milliseconds m_last_send_time_in_millis;
+    Entity &m_entity;
+    uint16_t m_descriptor_index;
+    jdksavdecc_eui64 m_control_type;
+    uint16_t m_control_value_type;
     ControlValueHolder *m_holder;
 };
 }

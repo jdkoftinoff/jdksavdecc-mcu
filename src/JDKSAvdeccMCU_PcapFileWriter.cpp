@@ -141,11 +141,11 @@ void PcapFileWriter::WritePacket( uint64_t packet_time_in_micros,
     n = fwrite( &pktheader, sizeof( pktheader ), 1, m_file.get() );
     if ( n != 1 )
     {
-#if defined(_MSC_VER)
+#if defined( _MSC_VER )
         char errbuf[1024];
-        strerror_s(errbuf,errno);
+        strerror_s( errbuf, errno );
         throw std::runtime_error( std::string( "Error writing to pcap file: " )
-            + m_filename + " " + errbuf );
+                                  + m_filename + " " + errbuf );
 #else
         throw std::runtime_error( std::string( "Error writing to pcap file: " )
                                   + m_filename + " " + strerror( errno ) );

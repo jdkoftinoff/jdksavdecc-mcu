@@ -131,14 +131,17 @@ class KnobsAndButtonsController : public EntityState
                 m_knobs_storage.setDoublet( analogRead( i ), i );
             }
 
-            for ( uint8_t i = 0; m_buttons_storage.getNumItems(); ++i )
-            {
-                m_buttons_storage.setDoublet(
-                    digitalRead( i + 2 ) ? 0x00 : 0xff, i );
-            }
+            uint8_t first_button = digitalRead( 2 ) ? 0x00 : 0xff;
+            m_buttons_storage.setDoublet( first_button, 0 );
 
-            digitalWrite( A5, !digitalRead( 2 ) );
-            digitalWrite( A4, !digitalRead( 3 ) );
+            uint8_t second_button = digitalRead( 2 ) ? 0x00 : 0xff;
+            m_buttons_storage.setDoublet( second_button, 1 );
+
+            // both buttons together trigger a IDENTIFY request
+            if ( first_button == 0xff && second_button == 0xff )
+            {
+                m_identify_storage.setOctet( 0xff, 0 );
+            }
         }
     }
 
@@ -279,6 +282,271 @@ class KnobsAndButtonsController : public EntityState
         return status;
     }
 
+    uint8_t fillDescriptorControlJdksLog( Frame &pdu,
+                                          uint16_t configuration_index,
+                                          uint16_t descriptor_index )
+    {
+        (void)configuration_index;
+        (void)descriptor_index;
+
+        // object_name
+        pdu.putAvdeccString();
+
+        // localized_description
+        pdu.putDoublet( JDKSAVDECC_NO_STRING );
+
+        // block_latency
+        pdu.putQuadlet( 0 );
+
+        // control_latency
+        pdu.putQuadlet( 50000 );
+
+        // control_domain
+        pdu.putDoublet( 0 );
+
+        // TODO: put jdks log descriptor details here
+
+        // reset_time
+        pdu.putQuadlet( 0 );
+
+        // values_offset
+        pdu.putDoublet( JDKSAVDECC_DESCRIPTOR_CONTROL_LEN );
+
+        // number_of_values
+        pdu.putDoublet( 1 );
+
+        // signal_type
+        pdu.putDoublet( JDKSAVDECC_DESCRIPTOR_ENTITY );
+
+        // signal_index
+        pdu.putDoublet( 0 );
+
+        // signal_output
+        pdu.putDoublet( 0 );
+
+        // TODO: Blob info
+
+        return JDKSAVDECC_AEM_STATUS_ENTITY_MISBEHAVING;
+    }
+
+    uint8_t fillDescriptorControlIdentify( Frame &pdu,
+                                           uint16_t configuration_index,
+                                           uint16_t descriptor_index )
+    {
+        (void)configuration_index;
+        (void)descriptor_index;
+
+        // object_name
+        pdu.putAvdeccString();
+
+        // localized_description
+        pdu.putDoublet( JDKSAVDECC_NO_STRING );
+
+        // block_latency
+        pdu.putQuadlet( 0 );
+
+        // control_latency
+        pdu.putQuadlet( 50000 );
+
+        // control_domain
+        pdu.putDoublet( 0 );
+
+        // reset_time
+        pdu.putQuadlet( 0 );
+
+        // values_offset
+        pdu.putDoublet( JDKSAVDECC_DESCRIPTOR_CONTROL_LEN );
+
+        // number_of_values
+        pdu.putDoublet( 1 );
+
+        // signal_type
+        pdu.putDoublet( JDKSAVDECC_DESCRIPTOR_ENTITY );
+
+        // signal_index
+        pdu.putDoublet( 0 );
+
+        // signal_output
+        pdu.putDoublet( 0 );
+
+        // minimum
+        pdu.putOctet( 0 );
+
+        // maximium
+        pdu.putOctet( 0xff );
+
+        // step
+        pdu.putOctet( 0xff );
+
+        // default
+        pdu.putOctet( 0 );
+
+        // unit multiplier 10^0
+        pdu.putOctet( 0 );
+
+        // unit code (unitless)
+        pdu.putOctet( JDKSAVDECC_AEM_UNIT_UNITLESS );
+
+        // string
+        pdu.putDoublet( JDKSAVDECC_NO_STRING );
+
+        // value
+        pdu.putOctet( m_identify_storage.getValueOctet() );
+
+        return JDKSAVDECC_AEM_STATUS_ENTITY_MISBEHAVING;
+    }
+
+    uint8_t fillDescriptorControlKnobsValue( Frame &pdu,
+                                             uint16_t configuration_index,
+                                             uint16_t descriptor_index )
+    {
+        (void)configuration_index;
+        (void)descriptor_index;
+
+        // object_name
+        pdu.putAvdeccString();
+
+        // localized_description
+        pdu.putDoublet( JDKSAVDECC_NO_STRING );
+
+        // block_latency
+        pdu.putQuadlet( 0 );
+
+        // control_latency
+        pdu.putQuadlet( 50000 );
+
+        // control_domain
+        pdu.putDoublet( 0 );
+
+        // control_value_type
+        pdu.putDoublet( JDKSAVDECC_CONTROL_VALUE_ARRAY_UINT16 );
+
+        // control_type
+        pdu.putEUI64( 0x70, 0xb3, 0xd5, 0xed, 0xcf, 0x00, 0x00, 0x00 );
+
+        // reset_time
+        pdu.putQuadlet( 0 );
+
+        // values_offset
+        pdu.putDoublet( JDKSAVDECC_DESCRIPTOR_CONTROL_LEN );
+
+        // number_of_values
+        pdu.putDoublet( m_knobs_storage.getNumItems() );
+
+        // signal_type
+        pdu.putDoublet( JDKSAVDECC_DESCRIPTOR_ENTITY );
+
+        // signal_index
+        pdu.putDoublet( 0 );
+
+        // signal_output
+        pdu.putDoublet( 0 );
+
+        // minimum
+        pdu.putDoublet( 0 );
+
+        // maximium
+        pdu.putDoublet( 0x1fff );
+
+        // step
+        pdu.putDoublet( 0x80 );
+
+        // default
+        pdu.putDoublet( 0 );
+
+        // unit multiplier 10^0
+        pdu.putOctet( 0 );
+
+        // unit code (unitless)
+        pdu.putOctet( JDKSAVDECC_AEM_UNIT_UNITLESS );
+
+        // string
+        pdu.putDoublet( JDKSAVDECC_NO_STRING );
+
+        // current values
+        for ( uint8_t i = 0; i < m_knobs_storage.getNumItems(); ++i )
+        {
+            pdu.putDoublet( m_knobs_storage.getValueDoublet( i ) );
+        }
+        return JDKSAVDECC_AEM_STATUS_SUCCESS;
+    }
+
+    uint8_t fillDescriptorControlButtonsValue( Frame &pdu,
+                                               uint16_t configuration_index,
+                                               uint16_t descriptor_index )
+    {
+        (void)configuration_index;
+        (void)descriptor_index;
+
+        // object_name
+        pdu.putAvdeccString();
+
+        // localized_description
+        pdu.putDoublet( JDKSAVDECC_NO_STRING );
+
+        // block_latency
+        pdu.putQuadlet( 0 );
+
+        // control_latency
+        pdu.putQuadlet( 50000 );
+
+        // control_domain
+        pdu.putDoublet( 0 );
+
+        // control_value_type
+        pdu.putDoublet( JDKSAVDECC_CONTROL_VALUE_ARRAY_UINT8 );
+
+        // control_type
+        pdu.putEUI64( 0x70, 0xb3, 0xd5, 0xed, 0xcf, 0x00, 0x00, 0x01 );
+
+        // reset_time
+        pdu.putQuadlet( 0 );
+
+        // values_offset
+        pdu.putDoublet( JDKSAVDECC_DESCRIPTOR_CONTROL_LEN );
+
+        // number_of_values
+        pdu.putDoublet( m_buttons_storage.getNumItems() );
+
+        // signal_type
+        pdu.putDoublet( JDKSAVDECC_DESCRIPTOR_ENTITY );
+
+        // signal_index
+        pdu.putDoublet( 0 );
+
+        // signal_output
+        pdu.putDoublet( 0 );
+
+        // minimum
+        pdu.putOctet( 0 );
+
+        // maximium
+        pdu.putOctet( 0xff );
+
+        // step
+        pdu.putOctet( 0xff );
+
+        // default
+        pdu.putOctet( 0 );
+
+        // unit multiplier 10^0
+        pdu.putOctet( 0 );
+
+        // unit code (unitless)
+        pdu.putOctet( JDKSAVDECC_AEM_UNIT_UNITLESS );
+
+        // string
+        pdu.putDoublet( JDKSAVDECC_NO_STRING );
+
+        // current values
+        for ( uint8_t i = 0; i < m_buttons_storage.getNumItems(); ++i )
+        {
+            pdu.putOctet( m_buttons_storage.getValueOctet( i ) );
+        }
+
+        return JDKSAVDECC_AEM_STATUS_SUCCESS;
+    }
+
     virtual uint8_t readDescriptorControl( Frame &pdu,
                                            uint16_t configuration_index,
                                            uint16_t descriptor_index )
@@ -292,180 +560,26 @@ class KnobsAndButtonsController : public EntityState
                 JDKSAVDECC_FRAME_HEADER_LEN
                 + JDKSAVDECC_AEM_COMMAND_READ_DESCRIPTOR_COMMAND_LEN );
 
-            // object_name
-            pdu.putAvdeccString();
-
-            // localized_description
-            pdu.putDoublet( JDKSAVDECC_NO_STRING );
-
-            // block_latency
-            pdu.putQuadlet( 0 );
-
-            // control_latency
-            pdu.putQuadlet( 50000 );
-
-            // control_domain
-            pdu.putDoublet( 0 );
-
             switch ( descriptor_index )
             {
             case CONTROL_LOG_DESCRIPTOR:
-            {
-                // TODO: put jdks log descriptor details here
-                status = JDKSAVDECC_AEM_STATUS_ENTITY_MISBEHAVING;
+                status = fillDescriptorControlJdksLog(
+                    pdu, configuration_index, descriptor_index );
                 break;
-            }
             case CONTROL_IDENTIFY_DESCRIPTOR:
-            {
-                // TODO: put identiy descriptor details here
-                status = JDKSAVDECC_AEM_STATUS_ENTITY_MISBEHAVING;
+                status = fillDescriptorControlIdentify(
+                    pdu, configuration_index, descriptor_index );
                 break;
-            }
             case CONTROL_KNOBS_VALUE_DESCRIPTOR:
-            {
-                // control_value_type
-                pdu.putDoublet( JDKSAVDECC_CONTROL_VALUE_ARRAY_UINT16 );
-
-                // control_type
-                pdu.putEUI64( 0x70, 0xb3, 0xd5, 0xed, 0xcf, 0x00, 0x00, 0x00 );
-                status = JDKSAVDECC_AEM_STATUS_SUCCESS;
+                status = fillDescriptorControlKnobsValue(
+                    pdu, configuration_index, descriptor_index );
                 break;
-            }
             case CONTROL_BUTTONS_VALUE_DESCRIPTOR:
-            {
-                // control_value_type
-                pdu.putDoublet( JDKSAVDECC_CONTROL_VALUE_ARRAY_UINT8 );
-
-                // control_type
-                pdu.putEUI64( 0x70, 0xb3, 0xd5, 0xed, 0xcf, 0x00, 0x00, 0x01 );
-                status = JDKSAVDECC_AEM_STATUS_SUCCESS;
+                status = fillDescriptorControlButtonsValue(
+                    pdu, configuration_index, descriptor_index );
                 break;
-            }
             default:
                 status = JDKSAVDECC_AEM_STATUS_ENTITY_MISBEHAVING;
-                break;
-            }
-
-            // reset_time
-            pdu.putQuadlet( 0 );
-
-            // values_offset
-            pdu.putDoublet( JDKSAVDECC_DESCRIPTOR_CONTROL_LEN );
-
-            switch ( descriptor_index )
-            {
-            case CONTROL_LOG_DESCRIPTOR:
-            {
-                // TODO: put jdks log descriptor details here
-                status = JDKSAVDECC_AEM_STATUS_ENTITY_MISBEHAVING;
-                break;
-            }
-            case CONTROL_IDENTIFY_DESCRIPTOR:
-            {
-                // TODO: put identiy descriptor details here
-                status = JDKSAVDECC_AEM_STATUS_ENTITY_MISBEHAVING;
-                break;
-            }
-            case CONTROL_KNOBS_VALUE_DESCRIPTOR:
-            {
-                // number_of_values
-                pdu.putDoublet( m_knobs_storage.getNumItems() );
-                break;
-            }
-            case CONTROL_BUTTONS_VALUE_DESCRIPTOR:
-            {
-                // number_of_values
-                pdu.putDoublet( m_buttons_storage.getNumItems() );
-                break;
-            }
-            default:
-                break;
-            }
-
-            // signal_type
-            pdu.putDoublet( JDKSAVDECC_DESCRIPTOR_ENTITY );
-
-            // signal_index
-            pdu.putDoublet( 0 );
-
-            // signal_output
-            pdu.putDoublet( 0 );
-
-            switch ( descriptor_index )
-            {
-            case CONTROL_LOG_DESCRIPTOR:
-            {
-                // TODO: put jdks log descriptor details here
-                status = JDKSAVDECC_AEM_STATUS_ENTITY_MISBEHAVING;
-                break;
-            }
-            case CONTROL_IDENTIFY_DESCRIPTOR:
-            {
-                // TODO: put identiy descriptor details here
-                status = JDKSAVDECC_AEM_STATUS_ENTITY_MISBEHAVING;
-                break;
-            }
-            case CONTROL_KNOBS_VALUE_DESCRIPTOR:
-            {
-                // minimum
-                pdu.putDoublet( 0 );
-
-                // maximium
-                pdu.putDoublet( 0x1fff );
-
-                // step
-                pdu.putDoublet( 0x80 );
-
-                // default
-                pdu.putDoublet( 0 );
-
-                // unit multiplier 10^0
-                pdu.putOctet( 0 );
-
-                // unit code (unitless)
-                pdu.putOctet( JDKSAVDECC_AEM_UNIT_UNITLESS );
-
-                // string
-                pdu.putDoublet( JDKSAVDECC_NO_STRING );
-
-                // current values
-                for ( uint8_t i = 0; i < m_knobs_storage.getNumItems(); ++i )
-                {
-                    pdu.putDoublet( m_knobs_storage.getDoublet( i ) );
-                }
-                break;
-            }
-            case CONTROL_BUTTONS_VALUE_DESCRIPTOR:
-            {
-                // minimum
-                pdu.putOctet( 0 );
-
-                // maximium
-                pdu.putOctet( 0xff );
-
-                // step
-                pdu.putOctet( 0x80 );
-
-                // default
-                pdu.putOctet( 0 );
-
-                // unit multiplier 10^0
-                pdu.putOctet( 0 );
-
-                // unit code (unitless)
-                pdu.putOctet( JDKSAVDECC_AEM_UNIT_UNITLESS );
-
-                // string
-                pdu.putDoublet( JDKSAVDECC_NO_STRING );
-
-                // current values
-                for ( uint8_t i = 0; i < m_buttons_storage.getNumItems(); ++i )
-                {
-                    pdu.putOctet( m_buttons_storage.getOctet( i ) );
-                }
-                break;
-            }
-            default:
                 break;
             }
 
@@ -503,7 +617,7 @@ class KnobsAndButtonsController : public EntityState
                 // current values
                 for ( uint8_t i = 0; i < m_knobs_storage.getNumItems(); ++i )
                 {
-                    pdu.putDoublet( m_knobs_storage.getDoublet( i ) );
+                    pdu.putDoublet( m_knobs_storage.getValueDoublet( i ) );
                 }
                 status = JDKSAVDECC_AEM_STATUS_SUCCESS;
 
@@ -514,7 +628,7 @@ class KnobsAndButtonsController : public EntityState
                 // current values
                 for ( uint8_t i = 0; i < m_buttons_storage.getNumItems(); ++i )
                 {
-                    pdu.putOctet( m_buttons_storage.getOctet( i ) );
+                    pdu.putOctet( m_buttons_storage.getValueOctet( i ) );
                 }
                 status = JDKSAVDECC_AEM_STATUS_SUCCESS;
                 break;
@@ -541,6 +655,10 @@ class KnobsAndButtonsController : public EntityState
 
     /// The time that the last update happened
     jdksavdecc_timestamp_in_milliseconds m_last_update_time;
+
+    /// The storage for the identify control value
+    ControlValueHolderWithStorage<uint8_t, 1> m_identify_storage;
+    // TODO: ControlSenderIdentify m_identify_sender;
 
     /// The mapping of Knob 1,2,3 to control descriptor
     /// CONTROL_KNOBS_VALUE_DESCRIPTOR.
