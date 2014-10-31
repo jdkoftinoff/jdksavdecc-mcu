@@ -31,57 +31,27 @@
 #pragma once
 
 #include "JDKSAvdeccMCU_World.hpp"
+#include "JDKSAvdeccMCU_Control.hpp"
 
 namespace JDKSAvdeccMCU
 {
 
-class ControlSenderIdentify : public Handler
+class ControlIdentify : public Control
 {
   public:
     /// Construct the ControlSenderIdentify object
-    ControlSenderIdentify( ControllerEntity &controller_entity,
-                           ControlValueHolder *holder );
+    ControlIdentify( ControllerEntity &controller_entity, 
+                     uint16_t descriptor_index,
+                     ControlValueHolder *holder,
+                     void ( *received_wink_callback )( uint16_t descriptor_index, uint8_t value )
+                     );
 
     /// Send the SET_CONTROL message if it is time to
     virtual void tick( jdksavdecc_timestamp_in_milliseconds time_in_millis );
 
-    /// Handle incoming PDU
-    virtual bool receivedPDU( Frame &frame );
-
-    /// Formulate the ADPDU and send it. Returns true if the message was
-    /// actually sent.
-    bool sendSetControl( bool wait_for_ack = false );
-
-    ControllerEntity &getControllerEntity() { return m_controller_entity; }
-
-    RawSocket &getRawSocket() { return m_controller_entity.getRawSocket(); }
-
-    jdksavdecc_eui64 const &getEntityID() const
-    {
-        return m_controller_entity.getEntityID();
-    }
-
-    jdksavdecc_eui64 const &getTargetEntityID() const
-    {
-        return m_target_entity_id;
-    }
-
-    jdksavdecc_eui48 const &getTargetMACAddress() const
-    {
-        return m_target_mac_address;
-    }
-
-    ControlValueHolder *getHolder() { return m_holder; }
-
-    ControlValueHolder const *getHolder() const { return m_holder; }
-
   protected:
-    ControllerEntity &m_controller_entity;
-    jdksavdecc_eui64 m_target_entity_id;
-    jdksavdecc_eui48 m_target_mac_address;
-    uint16_t m_target_descriptor_index;
-    jdksavdecc_timestamp_in_milliseconds m_update_rate_in_millis;
-    jdksavdecc_timestamp_in_milliseconds m_last_send_time_in_millis;
-    ControlValueHolder *m_holder;
+    uint8_t m_send_countdown;
+    jdksavdecc_timestamp_in_milliseconds m_time_of_last_sent_unsolicited_msg;
+    void ( *m_received_wink_callback )( uint16_t descriptor_index, uint8_t value );
 };
 }

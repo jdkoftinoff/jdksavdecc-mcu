@@ -30,69 +30,30 @@
 */
 
 #include "JDKSAvdeccMCU_World.hpp"
-#include "JDKSAvdeccMCU_ControlSender.hpp"
+#include "JDKSAvdeccMCU_ControlIdentify.hpp"
 
 namespace JDKSAvdeccMCU
 {
-
-ControlSender::ControlSender(
-    ControllerEntity &controller_entity,
-    jdksavdecc_eui64 const &target_entity_id,
-    jdksavdecc_eui48 const &target_mac_address,
-    uint16_t target_descriptor_index,
-    jdksavdecc_timestamp_in_milliseconds update_rate_in_millis,
-    ControlValueHolder *holder )
-    : m_controller_entity( controller_entity )
-    , m_target_entity_id( target_entity_id )
-    , m_target_mac_address( target_mac_address )
-    , m_target_descriptor_index( target_descriptor_index )
-    , m_update_rate_in_millis( update_rate_in_millis )
-    , m_last_send_time_in_millis( 0 )
-    , m_holder( holder )
-{
+    
+ControlIdentify::ControlIdentify( ControllerEntity &controller_entity,
+                                  uint16_t descriptor_index,
+                                  ControlValueHolder *holder,
+                                  void ( *received_wink_callback )( uint16_t descriptor_index, uint8_t value ) )
+        : Control(
+              controller_entity,
+              descriptor_index, 
+              eui64FromUint64( JDKSAVDECC_AEM_CONTROL_TYPE_IDENTIFY ), 
+              JDKSAVDECC_CONTROL_VALUE_LINEAR_UINT8, 
+              holder )
+        , m_send_countdown(0)
+        , m_time_of_last_sent_unsolicited_msg(0)
+        , m_received_wink_callback( received_wink_callback )
+{        
 }
 
-void ControlSender::tick( jdksavdecc_timestamp_in_milliseconds time_in_millis )
+void ControlIdentify::tick(jdksavdecc_timestamp_in_milliseconds time_in_millis )
 {
-    if ( m_holder->isDirty() || wasTimeOutHit( time_in_millis,
-                                               m_last_send_time_in_millis,
-                                               m_update_rate_in_millis ) )
-    {
-        sendSetControl();
-        m_holder->clearDirty();
-        m_last_send_time_in_millis = time_in_millis;
-    }
+    // TODO: send 3 unsolicited messages when value changes state from 0 to 0xff
 }
 
-bool ControlSender::sendSetControl( bool wait_for_ack )
-{
-    bool r = false;
-    // If we are told to wait for an ACK, then we have to wait until we can send
-    // a command that can be tracked
-    if ( ( !wait_for_ack )
-         || ( wait_for_ack && m_controller_entity.canSendCommand() ) )
-    {
-        FrameWithSize<4> pdufragment;
-
-        pdufragment.putDoublet( JDKSAVDECC_DESCRIPTOR_CONTROL );
-        pdufragment.putDoublet( m_target_descriptor_index );
-
-        getControllerEntity().sendCommand( m_target_entity_id,
-                                           m_target_mac_address,
-                                           JDKSAVDECC_AEM_COMMAND_SET_CONTROL,
-                                           wait_for_ack,
-                                           pdufragment.getBuf(),
-                                           pdufragment.getLength(),
-                                           m_holder->getBuf(),
-                                           m_holder->getLength() );
-        r = true;
-    }
-    return r;
-}
-
-bool ControlSender::receivedPDU( Frame &frame )
-{
-    (void)frame;
-    return false;
-}
 }
