@@ -40,11 +40,11 @@ class ControlIdentify : public Control
 {
   public:
     /// Construct the ControlSenderIdentify object
-    ControlIdentify( ControllerEntity &controller_entity, 
+    ControlIdentify( ControllerEntity &controller_entity,
                      uint16_t descriptor_index,
                      ControlValueHolder *holder,
-                     void ( *received_wink_callback )( uint16_t descriptor_index, uint8_t value )
-                     );
+                     void ( *received_wink_callback )(
+                         uint16_t descriptor_index, uint8_t value ) );
 
     /// Send the SET_CONTROL message if it is time to
     virtual void tick( jdksavdecc_timestamp_in_milliseconds time_in_millis );
@@ -52,6 +52,7 @@ class ControlIdentify : public Control
   protected:
     uint8_t m_send_countdown;
     jdksavdecc_timestamp_in_milliseconds m_time_of_last_sent_unsolicited_msg;
-    void ( *m_received_wink_callback )( uint16_t descriptor_index, uint8_t value );
+    void ( *m_received_wink_callback )( uint16_t descriptor_index,
+                                        uint8_t value );
 };
 }

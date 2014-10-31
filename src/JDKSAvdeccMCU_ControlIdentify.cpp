@@ -34,26 +34,27 @@
 
 namespace JDKSAvdeccMCU
 {
-    
-ControlIdentify::ControlIdentify( ControllerEntity &controller_entity,
-                                  uint16_t descriptor_index,
-                                  ControlValueHolder *holder,
-                                  void ( *received_wink_callback )( uint16_t descriptor_index, uint8_t value ) )
-        : Control(
-              controller_entity,
-              descriptor_index, 
-              eui64FromUint64( JDKSAVDECC_AEM_CONTROL_TYPE_IDENTIFY ), 
-              JDKSAVDECC_CONTROL_VALUE_LINEAR_UINT8, 
-              holder )
-        , m_send_countdown(0)
-        , m_time_of_last_sent_unsolicited_msg(0)
-        , m_received_wink_callback( received_wink_callback )
-{        
+
+ControlIdentify::ControlIdentify(
+    ControllerEntity &controller_entity,
+    uint16_t descriptor_index,
+    ControlValueHolder *holder,
+    void ( *received_wink_callback )( uint16_t descriptor_index,
+                                      uint8_t value ) )
+    : Control( controller_entity,
+               descriptor_index,
+               eui64FromUint64( JDKSAVDECC_AEM_CONTROL_TYPE_IDENTIFY ),
+               JDKSAVDECC_CONTROL_VALUE_LINEAR_UINT8,
+               holder )
+    , m_send_countdown( 0 )
+    , m_time_of_last_sent_unsolicited_msg( 0 )
+    , m_received_wink_callback( received_wink_callback )
+{
 }
 
-void ControlIdentify::tick(jdksavdecc_timestamp_in_milliseconds time_in_millis )
+void
+    ControlIdentify::tick( jdksavdecc_timestamp_in_milliseconds time_in_millis )
 {
     // TODO: send 3 unsolicited messages when value changes state from 0 to 0xff
 }
-
 }

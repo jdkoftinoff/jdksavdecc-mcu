@@ -36,17 +36,17 @@
 namespace JDKSAvdeccMCU
 {
 
-inline jdksavdecc_eui64 eui64FromUint64(uint64_t v)
+inline jdksavdecc_eui64 eui64FromUint64( uint64_t v )
 {
     jdksavdecc_eui64 eui;
-    jdksavdecc_eui64_init_from_uint64(&eui, v);
+    jdksavdecc_eui64_init_from_uint64( &eui, v );
     return eui;
 }
 
-inline jdksavdecc_eui48 eui48FromUint64(uint64_t v)
+inline jdksavdecc_eui48 eui48FromUint64( uint64_t v )
 {
     jdksavdecc_eui48 eui;
-    jdksavdecc_eui48_init_from_uint64(&eui, v);
+    jdksavdecc_eui48_init_from_uint64( &eui, v );
     return eui;
 }
 

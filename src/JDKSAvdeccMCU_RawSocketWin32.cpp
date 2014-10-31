@@ -188,9 +188,9 @@ RawSocketWin32::RawSocketWin32( const char *device,
                 else
                 {
                     /* enable ether protocol filter */
-                    if (multicast_to_join)
+                    if ( multicast_to_join )
                     {
-                        joinMulticast(*multicast_to_join);
+                        joinMulticast( *multicast_to_join );
                     }
                     r = pcap_fileno( p );
                     if ( m_fd == bad_filedescriptor )
