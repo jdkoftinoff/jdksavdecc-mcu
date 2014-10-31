@@ -36,6 +36,20 @@
 namespace JDKSAvdeccMCU
 {
 
+inline jdksavdecc_eui64 eui64FromUint64(uint64_t v)
+{
+    jdksavdecc_eui64 eui;
+    jdksavdecc_eui64_init_from_uint64(&eui, v);
+    return eui;
+}
+
+inline jdksavdecc_eui48 eui48FromUint64(uint64_t v)
+{
+    jdksavdecc_eui48 eui;
+    jdksavdecc_eui48_init_from_uint64(&eui, v);
+    return eui;
+}
+
 inline bool wasTimeOutHit( jdksavdecc_timestamp_in_milliseconds cur_time,
                            jdksavdecc_timestamp_in_milliseconds last_time_done,
                            jdksavdecc_timestamp_in_milliseconds timeout )
