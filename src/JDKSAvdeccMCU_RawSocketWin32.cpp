@@ -183,7 +183,7 @@ RawSocketWin32::RawSocketWin32( const char *device,
                 {
                     // fprintf( stderr, "unable to get MAC address for interface
                     // '%s'\n", interface_name );
-                    r = r = bad_filedescriptor;
+                    r = bad_filedescriptor;
                 }
                 else
                 {
