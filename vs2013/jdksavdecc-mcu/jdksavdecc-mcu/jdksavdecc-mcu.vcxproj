@@ -84,6 +84,8 @@
     <ClInclude Include="..\..\..\include\JDKSAvdeccMCU_Arduino.h" />
     <ClInclude Include="..\..\..\include\JDKSAvdeccMCU_Arduino.hpp" />
     <ClInclude Include="..\..\..\include\JDKSAvdeccMCU_ArduinoFakeImpl.h" />
+    <ClInclude Include="..\..\..\include\JDKSAvdeccMCU_Control.hpp" />
+    <ClInclude Include="..\..\..\include\JDKSAvdeccMCU_ControlIdentify.hpp" />
     <ClInclude Include="..\..\..\include\JDKSAvdeccMCU_ControllerEntity.hpp" />
     <ClInclude Include="..\..\..\include\JDKSAvdeccMCU_ControlReceiver.hpp" />
     <ClInclude Include="..\..\..\include\JDKSAvdeccMCU_ControlSender.hpp" />
@@ -166,6 +168,8 @@
     <ClCompile Include="..\..\..\jdksavdecc-c\src\jdksavdecc_print.c" />
     <ClCompile Include="..\..\..\jdksavdecc-c\src\jdksavdecc_util.c" />
     <ClCompile Include="..\..\..\src\JDKSAvdeccMCU_ADPManager.cpp" />
+    <ClCompile Include="..\..\..\src\JDKSAvdeccMCU_Control.cpp" />
+    <ClCompile Include="..\..\..\src\JDKSAvdeccMCU_ControlIdentify.cpp" />
     <ClCompile Include="..\..\..\src\JDKSAvdeccMCU_ControllerEntity.cpp" />
     <ClCompile Include="..\..\..\src\JDKSAvdeccMCU_ControlSender.cpp" />
     <ClCompile Include="..\..\..\src\JDKSAvdeccMCU_ControlValueHolder.cpp" />

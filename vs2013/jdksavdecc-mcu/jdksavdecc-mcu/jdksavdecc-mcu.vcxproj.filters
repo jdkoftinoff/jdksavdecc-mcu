@@ -210,6 +210,12 @@
     <ClInclude Include="..\..\..\include\JDKSAvdeccMCU_MDNSRegister.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\include\JDKSAvdeccMCU_Control.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\JDKSAvdeccMCU_ControlIdentify.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\jdksavdecc-c\src\jdksavdecc.c">
@@ -327,6 +333,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\JDKSAvdeccMCU_RawSocketWizNet.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\JDKSAvdeccMCU_Control.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\JDKSAvdeccMCU_ControlIdentify.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
