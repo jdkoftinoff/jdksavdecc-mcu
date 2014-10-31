@@ -8,6 +8,10 @@
 
 /* Begin PBXBuildFile section */
 		BF0DCB3119F80F7E008C4455 /* JDKSAvdeccMCU_ArduinoFakeImpl.h in Headers */ = {isa = PBXBuildFile; fileRef = BF0DCB3019F80F7E008C4455 /* JDKSAvdeccMCU_ArduinoFakeImpl.h */; };
+		BF1604E01A02A9770067D241 /* JDKSAvdeccMCU_Control.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BF1604DE1A02A9770067D241 /* JDKSAvdeccMCU_Control.cpp */; };
+		BF1604E11A02A9770067D241 /* JDKSAvdeccMCU_ControlIdentify.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BF1604DF1A02A9770067D241 /* JDKSAvdeccMCU_ControlIdentify.cpp */; };
+		BF1604E41A02AA410067D241 /* JDKSAvdeccMCU_Control.hpp in Headers */ = {isa = PBXBuildFile; fileRef = BF1604E21A02AA410067D241 /* JDKSAvdeccMCU_Control.hpp */; };
+		BF1604E51A02AA410067D241 /* JDKSAvdeccMCU_ControlIdentify.hpp in Headers */ = {isa = PBXBuildFile; fileRef = BF1604E31A02AA410067D241 /* JDKSAvdeccMCU_ControlIdentify.hpp */; };
 		BF16172F19EC2BB100CD64A2 /* JDKSAvdeccMCU_ADPManager.hpp in Headers */ = {isa = PBXBuildFile; fileRef = BF16171619EC2BB100CD64A2 /* JDKSAvdeccMCU_ADPManager.hpp */; };
 		BF16173019EC2BB100CD64A2 /* JDKSAvdeccMCU_Arduino.h in Headers */ = {isa = PBXBuildFile; fileRef = BF16171719EC2BB100CD64A2 /* JDKSAvdeccMCU_Arduino.h */; };
 		BF16173119EC2BB100CD64A2 /* JDKSAvdeccMCU_Arduino.hpp in Headers */ = {isa = PBXBuildFile; fileRef = BF16171819EC2BB100CD64A2 /* JDKSAvdeccMCU_Arduino.hpp */; };
@@ -138,6 +142,10 @@
 
 /* Begin PBXFileReference section */
 		BF0DCB3019F80F7E008C4455 /* JDKSAvdeccMCU_ArduinoFakeImpl.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = JDKSAvdeccMCU_ArduinoFakeImpl.h; path = ../../include/JDKSAvdeccMCU_ArduinoFakeImpl.h; sourceTree = "<group>"; };
+		BF1604DE1A02A9770067D241 /* JDKSAvdeccMCU_Control.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = JDKSAvdeccMCU_Control.cpp; path = ../../src/JDKSAvdeccMCU_Control.cpp; sourceTree = "<group>"; };
+		BF1604DF1A02A9770067D241 /* JDKSAvdeccMCU_ControlIdentify.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = JDKSAvdeccMCU_ControlIdentify.cpp; path = ../../src/JDKSAvdeccMCU_ControlIdentify.cpp; sourceTree = "<group>"; };
+		BF1604E21A02AA410067D241 /* JDKSAvdeccMCU_Control.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = JDKSAvdeccMCU_Control.hpp; path = ../../include/JDKSAvdeccMCU_Control.hpp; sourceTree = "<group>"; };
+		BF1604E31A02AA410067D241 /* JDKSAvdeccMCU_ControlIdentify.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = JDKSAvdeccMCU_ControlIdentify.hpp; path = ../../include/JDKSAvdeccMCU_ControlIdentify.hpp; sourceTree = "<group>"; };
 		BF16170719EC2B4C00CD64A2 /* libjdksavdecc-mcu.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libjdksavdecc-mcu.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		BF16171619EC2BB100CD64A2 /* JDKSAvdeccMCU_ADPManager.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = JDKSAvdeccMCU_ADPManager.hpp; path = ../../include/JDKSAvdeccMCU_ADPManager.hpp; sourceTree = "<group>"; };
 		BF16171719EC2BB100CD64A2 /* JDKSAvdeccMCU_Arduino.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = JDKSAvdeccMCU_Arduino.h; path = ../../include/JDKSAvdeccMCU_Arduino.h; sourceTree = "<group>"; };
@@ -293,6 +301,10 @@
 				BF16171719EC2BB100CD64A2 /* JDKSAvdeccMCU_Arduino.h */,
 				BF16171819EC2BB100CD64A2 /* JDKSAvdeccMCU_Arduino.hpp */,
 				BF0DCB3019F80F7E008C4455 /* JDKSAvdeccMCU_ArduinoFakeImpl.h */,
+				BF1604DE1A02A9770067D241 /* JDKSAvdeccMCU_Control.cpp */,
+				BF1604E21A02AA410067D241 /* JDKSAvdeccMCU_Control.hpp */,
+				BF1604DF1A02A9770067D241 /* JDKSAvdeccMCU_ControlIdentify.cpp */,
+				BF1604E31A02AA410067D241 /* JDKSAvdeccMCU_ControlIdentify.hpp */,
 				BF16174A19EC2BBF00CD64A2 /* JDKSAvdeccMCU_ControllerEntity.cpp */,
 				BF16171919EC2BB100CD64A2 /* JDKSAvdeccMCU_ControllerEntity.hpp */,
 				BF16171A19EC2BB100CD64A2 /* JDKSAvdeccMCU_ControlReceiver.hpp */,
@@ -428,10 +440,12 @@
 				BF16179819EC2BE700CD64A2 /* jdksavdecc_aecp_hdcp_apm.h in Headers */,
 				BF8A584419FCB6AA00107E1D /* JDKSAvdeccMCU_MDNSRegister.hpp in Headers */,
 				BF1617A019EC2BE700CD64A2 /* jdksavdecc_app.h in Headers */,
+				BF1604E41A02AA410067D241 /* JDKSAvdeccMCU_Control.hpp in Headers */,
 				BF1617A119EC2BE700CD64A2 /* jdksavdecc_avr.h in Headers */,
 				BF16174519EC2BB100CD64A2 /* JDKSAvdeccMCU_RawSocketWizNet.hpp in Headers */,
 				BF16179F19EC2BE700CD64A2 /* jdksavdecc_app_print.h in Headers */,
 				BF16173619EC2BB100CD64A2 /* JDKSAvdeccMCU_EEPromStorage.hpp in Headers */,
+				BF1604E51A02AA410067D241 /* JDKSAvdeccMCU_ControlIdentify.hpp in Headers */,
 				BF16173F19EC2BB100CD64A2 /* JDKSAvdeccMCU_PcapFileWriter.hpp in Headers */,
 				BF16179219EC2BE700CD64A2 /* jdksavdecc_acmp.h in Headers */,
 				BF16173919EC2BB100CD64A2 /* JDKSAvdeccMCU_Handler.hpp in Headers */,
@@ -598,11 +612,13 @@
 				BF1617CD19EC2BF700CD64A2 /* jdksavdecc_aem_print.c in Sources */,
 				BF1617D319EC2BF700CD64A2 /* jdksavdecc_entity_model.c in Sources */,
 				BF1617CA19EC2BF700CD64A2 /* jdksavdecc_adp_print.c in Sources */,
+				BF1604E11A02A9770067D241 /* JDKSAvdeccMCU_ControlIdentify.cpp in Sources */,
 				BF1617D519EC2BF700CD64A2 /* jdksavdecc_jdks.c in Sources */,
 				BF16176319EC2BBF00CD64A2 /* JDKSAvdeccMCU_PcapFile.cpp in Sources */,
 				BF16176219EC2BBF00CD64A2 /* JDKSAvdeccMCU_HandlerGroup.cpp in Sources */,
 				BF1617DC19EC2BF700CD64A2 /* jdksavdecc_util.c in Sources */,
 				BF1617DD19EC2BF700CD64A2 /* jdksavdecc.c in Sources */,
+				BF1604E01A02A9770067D241 /* JDKSAvdeccMCU_Control.cpp in Sources */,
 				BF1617CB19EC2BF700CD64A2 /* jdksavdecc_aecp_print.c in Sources */,
 				BF1617D019EC2BF700CD64A2 /* jdksavdecc_control.c in Sources */,
 				BF16175E19EC2BBF00CD64A2 /* JDKSAvdeccMCU_ControlValueHolder.cpp in Sources */,
