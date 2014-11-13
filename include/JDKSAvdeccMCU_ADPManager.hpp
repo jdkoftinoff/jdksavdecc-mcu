@@ -39,6 +39,17 @@
 namespace JDKSAvdeccMCU
 {
 
+/**
+ * @brief The ADPManager class
+ *
+ * ADPManager isA Handler which effectively implements the ADP Advertise Entity
+ * State Machine functionality and Advertise Interface State Machine
+ * functionality as defined in IEEE Std 1722.1-2013 Clause 6.2.4 and Clause
+ * 6.2.5
+ *
+ * The ADPManager may be inherited in order to support the Discovery State
+ * Machine as defined in Clause 6.2.6
+ */
 class ADPManager : public Handler
 {
   public:
