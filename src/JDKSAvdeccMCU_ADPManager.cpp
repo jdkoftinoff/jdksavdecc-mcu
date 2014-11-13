@@ -41,24 +41,45 @@ ADPManager::ADPManager( RawSocket &net,
                         jdksavdecc_eui64 const &entity_model_id,
                         uint32_t entity_capabilities,
                         uint32_t controller_capabilities,
-                        uint16_t valid_time_in_seconds )
+                        uint16_t valid_time_in_seconds,
+                        uint16_t talker_stream_sources,
+                        uint16_t talker_capabilities,
+                        uint16_t listener_stream_sinks,
+                        uint16_t listener_capabilities )
     : m_net( net )
     , m_entity_id( entity_id )
     , m_entity_model_id( entity_model_id )
     , m_entity_capabilities( entity_capabilities )
     , m_controller_capabilities( controller_capabilities )
     , m_valid_time_in_seconds( valid_time_in_seconds )
+    , m_talker_stream_sources( talker_stream_sources )
+    , m_talker_capabilities( talker_capabilities )
+    , m_listener_stream_sinks( listener_stream_sinks )
+    , m_listener_capabilities( listener_capabilities )
     , m_available_index( 0 )
     , m_last_send_time_in_millis( 0 )
+    , m_trigger_send_time( 0 )
+    , m_trigger_send( false )
 {
+    jdksavdecc_eui64_init( &m_gptp_grandmaster_id );
 }
 
 void ADPManager::tick( jdksavdecc_timestamp_in_milliseconds time_in_millis )
 {
-    if ( wasTimeOutHit( time_in_millis,
-                        m_last_send_time_in_millis,
-                        ( m_valid_time_in_seconds * ( 1000 / 4 ) ) ) )
+    // figure out if it is a scheduled time to send
+    bool timeouthit
+        = wasTimeOutHit( time_in_millis,
+                         m_last_send_time_in_millis,
+                         ( m_valid_time_in_seconds * ( 1000 / 4 ) ) );
+
+    // figure out if we were triggered to send
+    bool triggered
+        = m_trigger_send
+          && wasTimeOutHit( time_in_millis, m_trigger_send_time, 1000 );
+
+    if ( triggered || timeouthit )
     {
+        m_trigger_send = false;
         sendADP();
         m_last_send_time_in_millis = time_in_millis;
     }
@@ -68,42 +89,40 @@ void ADPManager::sendADP()
 {
     jdksavdecc_eui48 adp_multicast_addr = JDKSAVDECC_MULTICAST_ADP_ACMP;
 
-    FrameWithSize<82> adp(
-        0,
-        adp_multicast_addr,
-        m_net.getMACAddress(),
-        JDKSAVDECC_AVTP_ETHERTYPE ); // DA, SA, EtherType, ADPDU = 82 bytes
+    // DA, SA, EtherType, ADPDU = 82 bytes
+    FrameWithSize<82> adp( 0,
+                           adp_multicast_addr,
+                           m_net.getMACAddress(),
+                           JDKSAVDECC_AVTP_ETHERTYPE );
 
     // avtpdu common control header
-    adp.putOctet( 0x80 + JDKSAVDECC_SUBTYPE_ADP ); // cd=1, subtype=0x7a (ADP)
-    adp.putOctet(
-        0x00
-        + JDKSAVDECC_ADP_MESSAGE_TYPE_ENTITY_AVAILABLE ); // sv=0, version=0,
-                                                          // message_type =
-                                                          // ENTITY_AVAILABLE
-    adp.putOctet( ( m_valid_time_in_seconds / 2 )
-                  << 3 ); // valid_time is in 2 second steps. top 3 bits of
-                          // control_data_length is 0
-    adp.putOctet(
-        JDKSAVDECC_ADPDU_LEN
-        - JDKSAVDECC_COMMON_CONTROL_HEADER_LEN ); // control_data_length field
-                                                  // is 56 - See 1722.1 Clause
-                                                  // 6.2.1.7
+    // cd=1, subtype=0x7a (ADP)
+    adp.putOctet( 0x80 + JDKSAVDECC_SUBTYPE_ADP );
+
+    // sv=0, version=0, message_type = ENTITY_AVAILABLE
+    adp.putOctet( 0x00 + JDKSAVDECC_ADP_MESSAGE_TYPE_ENTITY_AVAILABLE );
+
+    // valid_time is in 2 second steps. top 3 bits of control_data_length is 0
+    adp.putOctet( ( m_valid_time_in_seconds / 2 ) << 3 );
+
+    // control_data_length field is 56 - See 1722.1 Clause 6.2.1.7
+    adp.putOctet( JDKSAVDECC_ADPDU_LEN - JDKSAVDECC_COMMON_CONTROL_HEADER_LEN );
+
     adp.putEUI64( m_entity_id );
     adp.putEUI64( m_entity_model_id );
     adp.putQuadlet( m_entity_capabilities );
 
-    adp.putDoublet( 0 ); // talker stream sources
-    adp.putDoublet( 0 ); // talker_capabilities
+    adp.putDoublet( m_talker_stream_sources );
+    adp.putDoublet( m_talker_capabilities );
 
-    adp.putDoublet( 0 ); // listener stream sinks
-    adp.putDoublet( 0 ); // listener_capabilities
+    adp.putDoublet( m_listener_stream_sinks );
+    adp.putDoublet( m_listener_capabilities );
 
-    adp.putQuadlet( m_controller_capabilities ); // controller_capabilities
+    adp.putQuadlet( m_controller_capabilities );
 
-    adp.putQuadlet( m_available_index ); // available_index
+    adp.putQuadlet( m_available_index );
 
-    adp.putOctlet( 0 ); // gptp_grandmaster_id
+    adp.putEUI64( m_gptp_grandmaster_id );
 
     // gptp_domain_number reserved0, identify_control_index, interface_index
     // association_id, reserved1
@@ -112,6 +131,32 @@ void ADPManager::sendADP()
 
     m_net.sendFrame( adp );
     m_available_index++;
+}
+
+void ADPManager::triggerSend()
+{
+    jdksavdecc_timestamp_in_milliseconds t = m_net.getTimeInMilliseconds();
+
+    // were we already triggered to send?
+    if ( m_trigger_send )
+    {
+        // Yes, Do nothing, wait for it.
+    }
+    else
+    {
+        // No, schedule a send in one second
+        m_trigger_send = true;
+        m_trigger_send_time = t;
+    }
+}
+
+void ADPManager::setGPTPGrandMasterID( const jdksavdecc_eui64 &new_gm )
+{
+    if ( jdksavdecc_eui64_compare( &m_gptp_grandmaster_id, &new_gm ) != 0 )
+    {
+        m_gptp_grandmaster_id = new_gm;
+        triggerSend();
+    }
 }
 
 bool ADPManager::receivedPDU( Frame &frame )
