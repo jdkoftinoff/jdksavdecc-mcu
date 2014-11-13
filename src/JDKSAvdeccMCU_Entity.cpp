@@ -517,7 +517,7 @@ void Entity::sendResponses( bool internally_generated,
             // FF:FF:FF:FF:FF:FF:FF:FF
 
             if ( jdksavdecc_eui64_is_set(
-                     m_registered_controllers_entity_id[i] ) )
+                    m_registered_controllers_entity_id[i] ) )
             {
                 // and don't send the original requesting controller a double
                 // response
@@ -729,7 +729,7 @@ uint8_t Entity::receiveAcquireEntityCommand( jdksavdecc_aecpdu_aem const &aem,
                 // Are we already in progress of acquiring from a second
                 // controller?
                 if ( jdksavdecc_eui64_is_set(
-                         m_acquire_in_progress_by_controller_entity_id ) )
+                        m_acquire_in_progress_by_controller_entity_id ) )
                 {
                     // yes, we we are already waiting for a dispute between 2
                     // controllers.

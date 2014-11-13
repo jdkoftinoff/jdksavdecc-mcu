@@ -48,7 +48,10 @@ Control::Control( Entity &entity,
 {
 }
 
-void Control::tick( jdksavdecc_timestamp_in_milliseconds time_in_millis ) {}
+void Control::tick( jdksavdecc_timestamp_in_milliseconds time_in_millis )
+{
+    (void)time_in_millis;
+}
 
 bool Control::receivedPDU( Frame &frame )
 {

@@ -330,9 +330,8 @@ inline bool isACMPInvolvingTarget( jdksavdecc_acmpdu const &acmpdu,
     bool r = false;
 
     if ( jdksavdecc_eui64_compare( &acmpdu.controller_entity_id, &entity_id )
-         == 0
-         || jdksavdecc_eui64_compare( &acmpdu.talker_entity_id, &entity_id )
-            == 0
+         == 0 || jdksavdecc_eui64_compare( &acmpdu.talker_entity_id,
+                                           &entity_id ) == 0
          || jdksavdecc_eui64_compare( &acmpdu.listener_entity_id, &entity_id )
             == 0 )
     {
