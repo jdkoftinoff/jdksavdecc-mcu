@@ -1,6 +1,8 @@
 cmake_minimum_required (VERSION 2.8)
 set(PROJECT jdksavdecc-mcu)
 
+set(LIBS ${LIBS} jdksavdecc-c)
+
 include_directories( "include" "../jdksavdecc-c/include" )
 
 file(GLOB PROJECT_INCLUDES "jdkavdecc-c/include/*.h" "jdkavdecc-c/include/*.hpp" "include/*.hpp" "include/tests/*.hpp" "include/*.h" "include/tests/*.h" )
