@@ -1,7 +1,7 @@
 cmake_minimum_required (VERSION 2.8)
 set(PROJECT jdksavdecc-mcu)
 
-include_directories( "include" "jdksavdecc-c/include" )
+include_directories( "include" "../jdksavdecc-c/include" )
 
 file(GLOB PROJECT_INCLUDES "jdkavdecc-c/include/*.h" "jdkavdecc-c/include/*.hpp" "include/*.hpp" "include/tests/*.hpp" "include/*.h" "include/tests/*.h" )
 file(GLOB PROJECT_SRC "src/*.c" "src/test/*.c" "src/*.cpp" "src/test/*.cpp" "jdksavdecc-c/src/*.c" "jdksavdecc-c/src/*.cpp" "jdkavdecc-c/include/*.h" "jdkavdecc-c/include/*.hpp" )
