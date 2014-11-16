@@ -65,6 +65,7 @@ uint8_t Control::formControlValueMetaData( Frame &pdu )
     uint8_t status = JDKSAVDECC_AEM_STATUS_ENTITY_MISBEHAVING;
 
     // TODO: Fill in meta data for the control descriptor
+    (void)pdu;
 
     switch ( m_control_value_type )
     {
@@ -133,6 +134,7 @@ uint8_t Control::validateSetControlCommand( Frame &pdu )
     uint8_t status = JDKSAVDECC_AEM_STATUS_ENTITY_MISBEHAVING;
 
     // TODO: validate the value in a set control command
+    (void)pdu;
 
     switch ( m_control_value_type )
     {
