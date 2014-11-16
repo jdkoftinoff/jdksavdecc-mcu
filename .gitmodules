@@ -1,0 +1,4 @@
+[submodule "jdksavdecc-c"]
+	path = jdksavdecc-c
+	url = ../jdksavdecc-c.git
+	branch = master
