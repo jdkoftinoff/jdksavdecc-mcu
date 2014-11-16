@@ -1,10 +1,12 @@
-#if defined( __APPLE__ ) || defined( __linux__ )
+#if defined( __APPLE__ ) || defined( __linux__ ) || defined(_WIN32)
 #define JDKSAVDECCMCU_ARDUINO 1
 #define JDKSAVDDECC_ARDUINO_FAKE_IMPL 1
 #else
 #include <SPI.h>
 #include <Ethernet.h>
 #endif
+
+#if !defined(_WIN32)
 
 #include "JDKSAvdeccMCU_Arduino.h"
 
@@ -728,6 +730,11 @@ void loop()
         jdksavdeccmcu_debug_log( "Time from KnobsAndButtons is:", last_second );
     }
 }
+#else
+
+void setup() {}
+void loop() {}
+#endif
 
 #ifndef __AVR__
 int main( int argc, char **argv )
