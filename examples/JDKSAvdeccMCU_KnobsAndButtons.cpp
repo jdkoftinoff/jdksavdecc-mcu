@@ -30,7 +30,7 @@ RawSocketWizNet
 RawSocketPcapFile rawnet( JDKSAVDECC_AVTP_ETHERTYPE,
                           my_mac,
                           jdksavdecc_multicast_adp_acmp,
-                          &jdksavdecc_multicast_adp_acmp,
+                          jdksavdecc_multicast_adp_acmp,
                           "input.pcap",
                           "output.pcap",
                           50 );

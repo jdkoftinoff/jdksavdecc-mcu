@@ -69,6 +69,8 @@ class Eui48 : public jdksavdecc_eui48
         jdksavdecc_eui48_copy( this, other );
         return *this;
     }
+
+    bool isSet() const { return jdksavdecc_eui48_is_set( *this ); }
 };
 
 class Eui64 : public jdksavdecc_eui64
@@ -114,6 +116,8 @@ class Eui64 : public jdksavdecc_eui64
         jdksavdecc_eui64_copy( this, other );
         return *this;
     }
+
+    bool isSet() const { return jdksavdecc_eui64_is_set( *this ); }
 };
 
 inline void Eui48_set( Eui48 const &v, void *buf, size_t pos )

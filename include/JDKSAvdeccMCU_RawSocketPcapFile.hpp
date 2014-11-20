@@ -57,7 +57,7 @@ class RawSocketPcapFile : public RawSocket
         uint16_t ethertype,
         Eui48 my_mac,
         Eui48 default_dest_mac,
-        Eui48 *join_multicast,
+        Eui48 join_multicast,
         const std::string &input_file,
         const std::string &output_file,
         jdksavdecc_timestamp_in_milliseconds time_granularity_in_ms );

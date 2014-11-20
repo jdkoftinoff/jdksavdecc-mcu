@@ -41,23 +41,19 @@ RawSocketPcapFile::RawSocketPcapFile(
     uint16_t ethertype,
     Eui48 my_mac,
     Eui48 default_dest_mac,
-    Eui48 *join_multicast,
+    Eui48 join_multicast,
     const std::string &input_file,
     const std::string &output_file,
     jdksavdecc_timestamp_in_milliseconds time_granularity_in_ms )
     : m_ethertype( ethertype )
     , m_my_mac( my_mac )
     , m_default_dest_mac( default_dest_mac )
+    , m_join_multicast( join_multicast )
     , m_pcap_file_reader( input_file )
     , m_pcap_file_writer( output_file )
     , m_current_time( 0 )
     , m_time_granularity_in_ms( time_granularity_in_ms )
 {
-    if ( join_multicast )
-    {
-        m_join_multicast = *join_multicast;
-    }
-
     if ( readNextIncomingFrame() )
     {
         m_current_time = m_next_incoming_frame.getTimeInMilliseconds();

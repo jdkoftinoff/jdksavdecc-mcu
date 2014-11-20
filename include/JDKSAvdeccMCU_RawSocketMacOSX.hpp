@@ -42,7 +42,7 @@ class RawSocketMacOSX : public RawSocket
   public:
     RawSocketMacOSX( const char *interface_name,
                      uint16_t ethertype,
-                     const Eui48 *multicast_to_join = 0 );
+                     const Eui48 &multicast_to_join );
 
     virtual ~RawSocketMacOSX();
 
