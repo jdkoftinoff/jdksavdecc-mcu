@@ -58,9 +58,8 @@ bool isAEMForTarget( jdksavdecc_aecpdu_aem const &aem,
 
 /// Test to see if AECPDU AEM message is a response for the specified controller
 /// entity
-bool
-    isAEMForController( jdksavdecc_aecpdu_aem const &aem,
-                        Eui64 const &expected_controller_entity_id );
+bool isAEMForController( jdksavdecc_aecpdu_aem const &aem,
+                         Eui64 const &expected_controller_entity_id );
 
 /// Twiddle the header bytes to convert this message from AEM_COMMAND to
 /// AEM_RESPONSE in place with the new status code, and the new
@@ -141,9 +140,8 @@ inline bool isAEMForTarget( jdksavdecc_aecpdu_aem const &aem,
     {
         // Yes
         // Is it for me?
-        if ( Eui64_compare(
-                 expected_target_entity_id,
-                 aem.aecpdu_header.header.target_entity_id ) == 0 )
+        if ( Eui64_compare( expected_target_entity_id,
+                            aem.aecpdu_header.header.target_entity_id ) == 0 )
         {
             r = true;
         }
@@ -151,9 +149,8 @@ inline bool isAEMForTarget( jdksavdecc_aecpdu_aem const &aem,
     return r;
 }
 
-inline bool
-    isAEMForController( jdksavdecc_aecpdu_aem const &aem,
-                        Eui64 const &expected_controller_entity_id )
+inline bool isAEMForController( jdksavdecc_aecpdu_aem const &aem,
+                                Eui64 const &expected_controller_entity_id )
 {
     bool r = false;
     // Is it an AEM_RESPONSE?
@@ -163,8 +160,7 @@ inline bool
         // Yes
         // Is it for me?
         if ( Eui64_compare( expected_controller_entity_id,
-                                       aem.aecpdu_header.controller_entity_id )
-             == 0 )
+                            aem.aecpdu_header.controller_entity_id ) == 0 )
         {
             r = true;
         }
@@ -230,9 +226,8 @@ inline bool isAAForTarget( jdksavdecc_aecp_aa const &aa,
     {
         // Yes
         // Is it for me?
-        if ( Eui64_compare(
-                 expected_target_entity_id,
-                 aa.aecpdu_header.header.target_entity_id ) == 0 )
+        if ( Eui64_compare( expected_target_entity_id,
+                            aa.aecpdu_header.header.target_entity_id ) == 0 )
         {
             r = true;
         }
@@ -240,9 +235,8 @@ inline bool isAAForTarget( jdksavdecc_aecp_aa const &aa,
     return r;
 }
 
-inline bool
-    isAAForController( jdksavdecc_aecp_aa const &aa,
-                       Eui64 const &expected_controller_entity_id )
+inline bool isAAForController( jdksavdecc_aecp_aa const &aa,
+                               Eui64 const &expected_controller_entity_id )
 {
     bool r = false;
 
@@ -253,7 +247,7 @@ inline bool
         // Yes
         // Is it for me?
         if ( Eui64_compare( expected_controller_entity_id,
-                                       aa.controller_entity_id ) == 0 )
+                            aa.controller_entity_id ) == 0 )
         {
             r = true;
         }
@@ -316,11 +310,9 @@ inline bool isACMPInvolvingTarget( jdksavdecc_acmpdu const &acmpdu,
 {
     bool r = false;
 
-    if ( Eui64_compare( acmpdu.controller_entity_id, entity_id )
-         == 0 || Eui64_compare( acmpdu.talker_entity_id,
-                                           entity_id ) == 0
-         || Eui64_compare( acmpdu.listener_entity_id, entity_id )
-            == 0 )
+    if ( Eui64_compare( acmpdu.controller_entity_id, entity_id ) == 0
+         || Eui64_compare( acmpdu.talker_entity_id, entity_id ) == 0
+         || Eui64_compare( acmpdu.listener_entity_id, entity_id ) == 0 )
     {
         r = true;
     }

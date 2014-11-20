@@ -149,10 +149,7 @@ class ADPManager : public Handler
      * this entity as defined by IEEE Std 1722.1-2013 Clause 6.2.1.9
      * @return The Entity's entity_model_id as a Eui64
      */
-    Eui64 const &getEntityModelID() const
-    {
-        return m_entity_model_id;
-    }
+    Eui64 const &getEntityModelID() const { return m_entity_model_id; }
 
     /**
      * @brief getEntityCapabilities is called to get the Entity's

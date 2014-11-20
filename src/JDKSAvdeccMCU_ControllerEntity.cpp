@@ -94,9 +94,8 @@ bool ControllerEntity::receivedAEMResponse( jdksavdecc_aecpdu_aem const &aem,
     if ( !unsolicited )
     {
         // First, is it from the entity we sent the command to?
-        if ( Eui64_compare(
-                 m_last_sent_command_target_entity_id,
-                 aem.aecpdu_header.header.target_entity_id ) == 0 )
+        if ( Eui64_compare( m_last_sent_command_target_entity_id,
+                            aem.aecpdu_header.header.target_entity_id ) == 0 )
         {
             // yes, does the command type match?
             if ( actual_command_type == m_last_sent_command_type )
@@ -252,11 +251,10 @@ bool ControllerEntity::receiveGetControlResponse(
     return false;
 }
 
-uint8_t ControllerEntity::receiveControlValue(
-    Eui64 const &target_entity_id,
-    uint16_t target_descriptor_index,
-    uint8_t const *control_value,
-    uint16_t control_value_len )
+uint8_t ControllerEntity::receiveControlValue( Eui64 const &target_entity_id,
+                                               uint16_t target_descriptor_index,
+                                               uint8_t const *control_value,
+                                               uint16_t control_value_len )
 {
     (void)target_entity_id;
     (void)target_descriptor_index;

@@ -92,8 +92,7 @@ class ControllerEntity : public Entity
         jdksavdecc_uint32_set( flags, additional1, 0 ); // offset 12 in Figure
                                                         // 7.35, and Table 7.128
                                                         // for flags
-        Eui64_set(
-            getEntityID(), additional1, 4 ); // offset 16 in Figure 7.35
+        Eui64_set( getEntityID(), additional1, 4 ); // offset 16 in Figure 7.35
         jdksavdecc_uint16_set( JDKSAVDECC_DESCRIPTOR_ENTITY,
                                additional1,
                                12 );                 // offset 24 in Figure 7.35
@@ -256,9 +255,8 @@ class ControllerEntity : public Entity
 
     // Formulate and send an REGISTER_UNSOLICITED_NOTIFICATION command to a
     // target entity
-    void sendRegisterUnsolicitedNotification(
-        Eui64 const &target_entity_id,
-        Eui48 const &target_mac_address )
+    void sendRegisterUnsolicitedNotification( Eui64 const &target_entity_id,
+                                              Eui48 const &target_mac_address )
     {
         sendCommand( target_entity_id,
                      target_mac_address,
@@ -272,9 +270,9 @@ class ControllerEntity : public Entity
 
     // Formulate and send a DEREGISTER_UNSOLICITED_NOTIFICATION command to a
     // target entity
-    void sendDeRegisterUnsolicitedNotification(
-        Eui64 const &target_entity_id,
-        Eui48 const &target_mac_address )
+    void
+        sendDeRegisterUnsolicitedNotification( Eui64 const &target_entity_id,
+                                               Eui48 const &target_mac_address )
     {
         sendCommand( target_entity_id,
                      target_mac_address,
@@ -289,11 +287,10 @@ class ControllerEntity : public Entity
     // Notification that a new control value was received from the target
     // entity, either because of a solicited or unsolicited SET_CONTROL response
     // or a GET_CONTROL response
-    virtual uint8_t
-        receiveControlValue( Eui64 const &target_entity_id,
-                             uint16_t target_descriptor_index,
-                             uint8_t const *control_value,
-                             uint16_t control_value_len );
+    virtual uint8_t receiveControlValue( Eui64 const &target_entity_id,
+                                         uint16_t target_descriptor_index,
+                                         uint8_t const *control_value,
+                                         uint16_t control_value_len );
 
     // Formulate and send a GET_CONTROL command to a target entity
     void sendGetControl( Eui64 const &target_entity_id,

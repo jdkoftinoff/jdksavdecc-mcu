@@ -37,131 +37,110 @@ namespace JDKSAvdeccMCU
 
 class Eui48 : public jdksavdecc_eui48
 {
-public:
-    Eui48()
-    {
-        jdksavdecc_eui48_init(this);
-    }
+  public:
+    Eui48() { jdksavdecc_eui48_init( this ); }
 
     Eui48( jdksavdecc_eui48 const &other )
     {
-        jdksavdecc_eui48_copy(this,&other);
+        jdksavdecc_eui48_copy( this, &other );
     }
 
-    Eui48( uint64_t v )
-    {
-        jdksavdecc_eui48_init_from_uint64(this,v);
-    }
+    Eui48( uint64_t v ) { jdksavdecc_eui48_init_from_uint64( this, v ); }
 
-    Eui48( const char *s )
-    {
-        jdksavdecc_eui48_init_from_cstr(this,s);
-    }
+    Eui48( const char *s ) { jdksavdecc_eui48_init_from_cstr( this, s ); }
 
     Eui48( std::string const &s )
     {
-        jdksavdecc_eui48_init_from_cstr(this,s.c_str());
+        jdksavdecc_eui48_init_from_cstr( this, s.c_str() );
     }
 
-    Eui48 const &operator = ( Eui48 const *other )
+    Eui48 const &operator=( Eui48 const *other )
     {
-        jdksavdecc_eui48_copy(this,other);
+        jdksavdecc_eui48_copy( this, other );
         return *this;
     }
-
 };
 
 class Eui64 : public jdksavdecc_eui64
 {
-public:
-    Eui64()
-    {
-        jdksavdecc_eui64_init(this);
-    }
+  public:
+    Eui64() { jdksavdecc_eui64_init( this ); }
 
     Eui64( jdksavdecc_eui64 const &other )
     {
-        jdksavdecc_eui64_copy(this,&other);
+        jdksavdecc_eui64_copy( this, &other );
     }
 
-    Eui64( uint64_t v )
-    {
-        jdksavdecc_eui64_init_from_uint64(this,v);
-    }
+    Eui64( uint64_t v ) { jdksavdecc_eui64_init_from_uint64( this, v ); }
 
-    Eui64( const char *s )
-    {
-        jdksavdecc_eui64_init_from_cstr(this,s);
-    }
+    Eui64( const char *s ) { jdksavdecc_eui64_init_from_cstr( this, s ); }
 
     Eui64( std::string const &s )
     {
-        jdksavdecc_eui64_init_from_cstr(this,s.c_str());
+        jdksavdecc_eui64_init_from_cstr( this, s.c_str() );
     }
 
-    Eui64 const &operator = ( Eui64 const *other )
+    Eui64 const &operator=( Eui64 const *other )
     {
-        jdksavdecc_eui64_copy(this,other);
+        jdksavdecc_eui64_copy( this, other );
         return *this;
     }
 };
 
 inline void Eui48_set( Eui48 const &v, void *buf, size_t pos )
 {
-    jdksavdecc_eui48_set(v,buf,pos);
+    jdksavdecc_eui48_set( v, buf, pos );
 }
 
 inline Eui48 Eui48_get( void *buf, size_t pos )
 {
-    Eui48 v( jdksavdecc_eui48_get(buf,pos) );
+    Eui48 v( jdksavdecc_eui48_get( buf, pos ) );
     return v;
 }
 
 inline void Eui64_set( Eui64 const &v, void *buf, size_t pos )
 {
-    jdksavdecc_eui64_set(v,buf,pos);
+    jdksavdecc_eui64_set( v, buf, pos );
 }
 
 inline Eui64 Eui64_get( void *buf, size_t pos )
 {
-    Eui64 v( jdksavdecc_eui64_get(buf,pos) );
+    Eui64 v( jdksavdecc_eui64_get( buf, pos ) );
     return v;
 }
 
 inline int Eui48_compare( Eui48 const &lhs, Eui48 const &rhs )
 {
-    return jdksavdecc_eui48_compare(&lhs,&rhs);
+    return jdksavdecc_eui48_compare( &lhs, &rhs );
 }
 
 inline int Eui64_compare( Eui64 const &lhs, Eui64 const &rhs )
 {
-    return jdksavdecc_eui64_compare(&lhs,&rhs);
+    return jdksavdecc_eui64_compare( &lhs, &rhs );
 }
 
 inline bool Eui48_is_set( Eui48 const &v )
 {
-    return jdksavdecc_eui48_is_set(v);
+    return jdksavdecc_eui48_is_set( v );
 }
 
 inline bool Eui48_is_unset( Eui48 const &v )
 {
-    return jdksavdecc_eui48_is_unset(v);
+    return jdksavdecc_eui48_is_unset( v );
 }
-
 
 inline bool Eui64_is_set( Eui64 const &v )
 {
-    return jdksavdecc_eui64_is_set(v);
+    return jdksavdecc_eui64_is_set( v );
 }
 
 inline bool Eui64_is_unset( Eui64 const &v )
 {
-    return jdksavdecc_eui64_is_unset(v);
+    return jdksavdecc_eui64_is_unset( v );
 }
 
 inline bool Eui64_is_zero( Eui64 const &v )
 {
-    return jdksavdecc_eui64_is_zero(v);
+    return jdksavdecc_eui64_is_zero( v );
 }
-
 }

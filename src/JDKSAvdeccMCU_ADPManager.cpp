@@ -171,8 +171,8 @@ bool ADPManager::receivedPDU( Frame &frame )
         if ( header.message_type
              == JDKSAVDECC_ADP_MESSAGE_TYPE_ENTITY_DISCOVER )
         {
-            if ( Eui64_compare( header.entity_id, m_entity_id )
-                 == 0 || Eui64_is_unset( header.entity_id )
+            if ( Eui64_compare( header.entity_id, m_entity_id ) == 0
+                 || Eui64_is_unset( header.entity_id )
                  || Eui64_is_zero( header.entity_id ) )
             {
                 m_last_send_time_in_millis

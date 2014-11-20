@@ -122,7 +122,7 @@ class KnobsAndButtonsController : public EntityState
     virtual void tick( jdksavdecc_timestamp_in_milliseconds time_in_millis )
     {
         if ( wasTimeOutHit(
-                time_in_millis, m_last_update_time, m_update_rate_in_millis ) )
+                 time_in_millis, m_last_update_time, m_update_rate_in_millis ) )
         {
             m_last_update_time = time_in_millis;
 
@@ -553,8 +553,8 @@ class KnobsAndButtonsController : public EntityState
     {
         uint8_t status = JDKSAVDECC_AEM_STATUS_NO_SUCH_DESCRIPTOR;
 
-        if ( configuration_index == 0 && descriptor_index
-                                         < NUM_CONTROL_DESCRIPTORS )
+        if ( configuration_index == 0
+             && descriptor_index < NUM_CONTROL_DESCRIPTORS )
         {
             pdu.setLength(
                 JDKSAVDECC_FRAME_HEADER_LEN

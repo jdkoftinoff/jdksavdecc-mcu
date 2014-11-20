@@ -73,15 +73,9 @@ class ControlSender : public Handler
         return m_controller_entity.getEntityID();
     }
 
-    Eui64 const &getTargetEntityID() const
-    {
-        return m_target_entity_id;
-    }
+    Eui64 const &getTargetEntityID() const { return m_target_entity_id; }
 
-    Eui48 const &getTargetMACAddress() const
-    {
-        return m_target_mac_address;
-    }
+    Eui48 const &getTargetMACAddress() const { return m_target_mac_address; }
 
     ControlValueHolder *getHolder() { return m_holder; }
 

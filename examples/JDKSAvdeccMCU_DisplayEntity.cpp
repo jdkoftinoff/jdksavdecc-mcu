@@ -193,7 +193,7 @@ void display_callback( int ErrCode, unsigned char Errorbyte )
         digitalWrite( 9, LOW );  // turn the LED off by making the voltage LOW
         delay( 400 );            // wait
     }
-    asm volatile( "  jmp 0" ); // restart
+    asm volatile( "  jmp 0" );   // restart
 }
 
 void setup()

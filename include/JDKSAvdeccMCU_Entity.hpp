@@ -68,10 +68,7 @@ class Entity : public Handler
     RawSocket &getRawSocket() { return m_adp_manager.getRawSocket(); }
 
     /// Get the Entity ID
-    Eui64 const &getEntityID() const
-    {
-        return m_adp_manager.getEntityID();
-    }
+    Eui64 const &getEntityID() const { return m_adp_manager.getEntityID(); }
 
     /// Check to make sure the command is allowed or disallowed due to acquire
     /// or locking
@@ -147,9 +144,8 @@ class Entity : public Handler
                                            Frame &pdu );
 
     // Formulate and send a CONTROLLER_AVAILABLE command to a target controller
-    void sendControllerAvailable(
-        Eui64 const &target_controller_entity_id,
-        Eui48 const &target_mac_address )
+    void sendControllerAvailable( Eui64 const &target_controller_entity_id,
+                                  Eui48 const &target_mac_address )
     {
         sendCommand( target_controller_entity_id,
                      target_mac_address,

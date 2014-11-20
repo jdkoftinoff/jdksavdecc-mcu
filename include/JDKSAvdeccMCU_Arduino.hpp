@@ -83,10 +83,9 @@ void yield( void );
 #define constrain( amt, low, high )                                            \
     ( ( amt ) < ( low ) ? ( low )                                              \
                         : ( ( amt ) > ( high ) ? ( high ) : ( amt ) ) )
-#define round( x )                                                             \
-    ( ( x ) >= 0 ? ( long )( ( x ) + 0.5 ) : ( long )( ( x ) - 0.5 ) )
-#define radians( deg ) ( ( deg ) * DEG_TO_RAD )
-#define degrees( rad ) ( ( rad ) * RAD_TO_DEG )
+#define round( x ) ( ( x ) >= 0 ? (long)( (x)+0.5 ) : (long)( (x)-0.5 ) )
+#define radians( deg ) ( (deg)*DEG_TO_RAD )
+#define degrees( rad ) ( (rad)*RAD_TO_DEG )
 #define sq( x ) ( ( x ) * ( x ) )
 
 #define interrupts()
@@ -94,9 +93,9 @@ void yield( void );
 
 #define clockCyclesPerMicrosecond() ( F_CPU / 1000000L )
 #define clockCyclesToMicroseconds( a ) ( ( a ) / clockCyclesPerMicrosecond() )
-#define microsecondsToClockCycles( a ) ( ( a ) * clockCyclesPerMicrosecond() )
+#define microsecondsToClockCycles( a ) ( (a)*clockCyclesPerMicrosecond() )
 
-#define lowByte( w ) ( ( uint8_t )( ( w ) & 0xff ) )
+#define lowByte( w ) ( ( uint8_t )( (w)&0xff ) )
 #define highByte( w ) ( ( uint8_t )( ( w ) >> 8 ) )
 
 #define bitRead( value, bit ) ( ( ( value ) >> ( bit ) ) & 0x01 )
@@ -182,7 +181,7 @@ void noTone( uint8_t _pin );
 
 #define NUM_DIGITAL_PINS 70
 #define NUM_ANALOG_INPUTS 16
-#define analogInputToDigitalPin( p ) ( ( p < 16 ) ? ( p ) + 54 : -1 )
+#define analogInputToDigitalPin( p ) ( ( p < 16 ) ? (p)+54 : -1 )
 #define digitalPinHasPWM( p )                                                  \
     ( ( ( p ) >= 2 && ( p ) <= 13 ) || ( ( p ) >= 44 && ( p ) <= 46 ) )
 
