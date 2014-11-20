@@ -29,30 +29,10 @@
   POSSIBILITY OF SUCH DAMAGE.
 */
 #pragma once
+
 #include "JDKSAvdeccMCU_World.hpp"
-#include "JDKSAvdeccMCU_ADPManager.hpp"
-#include "JDKSAvdeccMCU_ControlReceiver.hpp"
-#include "JDKSAvdeccMCU_ControlSender.hpp"
-#include "JDKSAvdeccMCU_ControlValueHolder.hpp"
-#include "JDKSAvdeccMCU_ControllerEntity.hpp"
-#include "JDKSAvdeccMCU_EEPromStorage.hpp"
-#include "JDKSAvdeccMCU_Entity.hpp"
-#include "JDKSAvdeccMCU_Frame.hpp"
-#include "JDKSAvdeccMCU_Handler.hpp"
-#include "JDKSAvdeccMCU_HandlerGroup.hpp"
-#include "JDKSAvdeccMCU_Helpers.hpp"
-#include "JDKSAvdeccMCU_PcapFile.hpp"
-#include "JDKSAvdeccMCU_PcapFileReader.hpp"
-#include "JDKSAvdeccMCU_PcapFileWriter.hpp"
-#include "JDKSAvdeccMCU_RawSocket.hpp"
-#include "JDKSAvdeccMCU_RawSocketPcapFile.hpp"
-#include "JDKSAvdeccMCU_RawSocketMacOSX.hpp"
-#include "JDKSAvdeccMCU_RawSocketWin32.hpp"
-#include "JDKSAvdeccMCU_RawSocketLinux.hpp"
-#include "JDKSAvdeccMCU_RawSocketWizNet.hpp"
-#include "JDKSAvdeccMCU_MDNSRegister.hpp"
-#include "JDKSAvdeccMCU_App.hpp"
-#include "JDKSAvdeccMCU_Apc.hpp"
-#include "JDKSAvdeccMCU_Aps.hpp"
 
+namespace JDKSAvdeccMCU
+{
 
+}
