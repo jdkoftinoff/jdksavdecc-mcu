@@ -54,5 +54,3 @@
 #include "JDKSAvdeccMCU_App.hpp"
 #include "JDKSAvdeccMCU_Apc.hpp"
 #include "JDKSAvdeccMCU_Aps.hpp"
-
-
