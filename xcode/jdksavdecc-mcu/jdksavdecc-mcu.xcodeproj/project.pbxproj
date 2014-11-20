@@ -116,6 +116,7 @@
 		BFC034BF19F08CCD009A41FF /* JDKSAvdeccMCU_EntityState.hpp in Headers */ = {isa = PBXBuildFile; fileRef = BFC034BE19F08CCD009A41FF /* JDKSAvdeccMCU_EntityState.hpp */; };
 		BFDF9A2B19EC6D7900E72732 /* JDKSAvdeccMCU_FixedBuffer.hpp in Headers */ = {isa = PBXBuildFile; fileRef = BFDF9A2A19EC6D7900E72732 /* JDKSAvdeccMCU_FixedBuffer.hpp */; };
 		BFDF9A2D19EC6D8500E72732 /* JDKSAvdeccMCU_FixedBuffer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BFDF9A2C19EC6D8500E72732 /* JDKSAvdeccMCU_FixedBuffer.cpp */; };
+		BFF541811A1DB9E4004A6F42 /* JDKSAvdeccMCU_Eui.hpp in Headers */ = {isa = PBXBuildFile; fileRef = BFF541801A1DB9E4004A6F42 /* JDKSAvdeccMCU_Eui.hpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -252,6 +253,7 @@
 		BFC034BE19F08CCD009A41FF /* JDKSAvdeccMCU_EntityState.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = JDKSAvdeccMCU_EntityState.hpp; path = ../../include/JDKSAvdeccMCU_EntityState.hpp; sourceTree = "<group>"; };
 		BFDF9A2A19EC6D7900E72732 /* JDKSAvdeccMCU_FixedBuffer.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; lineEnding = 0; name = JDKSAvdeccMCU_FixedBuffer.hpp; path = ../../include/JDKSAvdeccMCU_FixedBuffer.hpp; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.cpp; };
 		BFDF9A2C19EC6D8500E72732 /* JDKSAvdeccMCU_FixedBuffer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = JDKSAvdeccMCU_FixedBuffer.cpp; path = ../../src/JDKSAvdeccMCU_FixedBuffer.cpp; sourceTree = "<group>"; };
+		BFF541801A1DB9E4004A6F42 /* JDKSAvdeccMCU_Eui.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = JDKSAvdeccMCU_Eui.hpp; path = ../../include/JDKSAvdeccMCU_Eui.hpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -318,6 +320,7 @@
 				BF16171E19EC2BB100CD64A2 /* JDKSAvdeccMCU_Entity.hpp */,
 				BFC034BC19F08CBA009A41FF /* JDKSAvdeccMCU_EntityState.cpp */,
 				BFC034BE19F08CCD009A41FF /* JDKSAvdeccMCU_EntityState.hpp */,
+				BFF541801A1DB9E4004A6F42 /* JDKSAvdeccMCU_Eui.hpp */,
 				BFDF9A2C19EC6D8500E72732 /* JDKSAvdeccMCU_FixedBuffer.cpp */,
 				BFDF9A2A19EC6D7900E72732 /* JDKSAvdeccMCU_FixedBuffer.hpp */,
 				BF16171F19EC2BB100CD64A2 /* JDKSAvdeccMCU_Frame.hpp */,
@@ -487,6 +490,7 @@
 				BFDF9A2B19EC6D7900E72732 /* JDKSAvdeccMCU_FixedBuffer.hpp in Headers */,
 				BF1617AB19EC2BE700CD64A2 /* jdksavdecc_msinttypes.h in Headers */,
 				BF16173B19EC2BB100CD64A2 /* JDKSAvdeccMCU_Helpers.hpp in Headers */,
+				BFF541811A1DB9E4004A6F42 /* JDKSAvdeccMCU_Eui.hpp in Headers */,
 				BF1617A719EC2BE700CD64A2 /* jdksavdecc_jdks.h in Headers */,
 				BF1617A319EC2BE700CD64A2 /* jdksavdecc_descriptor_storage_gen.h in Headers */,
 				BF16173419EC2BB100CD64A2 /* JDKSAvdeccMCU_ControlSender.hpp in Headers */,
