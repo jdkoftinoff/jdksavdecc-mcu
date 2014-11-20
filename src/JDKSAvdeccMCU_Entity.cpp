@@ -47,16 +47,17 @@ Entity::Entity( ADPManager &adp_manager, EntityState *entity_state )
     , m_entity_state( entity_state )
 {
     // clear info on sent command state
-    jdksavdecc_eui64_init( &m_last_sent_command_target_entity_id );
+    m_last_sent_command_target_entity_id = Eui64();
     // clear info on acquired state
-    jdksavdecc_eui64_init( &m_acquired_by_controller_entity_id );
-    jdksavdecc_eui64_init( &m_acquire_in_progress_by_controller_entity_id );
-    jdksavdecc_eui64_init( &m_locked_by_controller_entity_id );
-    jdksavdecc_eui48_init( &m_acquired_by_controller_mac_address );
+    m_acquired_by_controller_entity_id = Eui64();
+    m_acquire_in_progress_by_controller_entity_id = Eui64();
+    m_locked_by_controller_entity_id = Eui64();
+    m_acquired_by_controller_mac_address = Eui48();
+
     for ( uint8_t i = 0; i < JDKSAVDECC_ENTITY_MAX_REGISTERED_CONTROLLERS; ++i )
     {
-        jdksavdecc_eui64_init( &m_registered_controllers_entity_id[i] );
-        jdksavdecc_eui48_init( &m_registered_controllers_mac_address[i] );
+        m_registered_controllers_entity_id[i] = Eui64();
+        m_registered_controllers_mac_address[i] = Eui48();
     }
 }
 
@@ -64,13 +65,13 @@ void Entity::tick( jdksavdecc_timestamp_in_milliseconds time_in_millis )
 {
     uint16_t cmd = m_last_sent_command_type;
     // If we are locked, then time out the lock
-    if ( jdksavdecc_eui64_is_set( m_locked_by_controller_entity_id ) )
+    if ( Eui64_is_set( m_locked_by_controller_entity_id ) )
     {
         if ( wasTimeOutHit( time_in_millis,
                             m_locked_time,
                             JDKSAVDECC_AEM_LOCK_TIMEOUT_MS ) )
         {
-            jdksavdecc_eui64_init( &m_locked_by_controller_entity_id );
+            m_locked_by_controller_entity_id = Eui64();
         }
     }
 
@@ -99,7 +100,7 @@ void Entity::tick( jdksavdecc_timestamp_in_milliseconds time_in_millis )
             m_acquired_by_controller_entity_id
                 = m_acquire_in_progress_by_controller_entity_id;
             // Also clear any lock that may have been there
-            jdksavdecc_eui64_init( &m_locked_by_controller_entity_id );
+            m_locked_by_controller_entity_id = Eui64();
             // TODO: Formulate and send reply to the new controller
         }
         else
@@ -112,7 +113,7 @@ void Entity::tick( jdksavdecc_timestamp_in_milliseconds time_in_millis )
     }
 }
 
-void Entity::commandTimedOut( jdksavdecc_eui64 const &target_entity_id,
+void Entity::commandTimedOut( Eui64 const &target_entity_id,
                               uint16_t command_type,
                               uint16_t sequence_id )
 {
@@ -337,15 +338,15 @@ uint8_t Entity::validatePermissions( jdksavdecc_aecpdu_aem const &aem )
     // Check to see that it matches the current owner, if any
     // First, check if there is an owner (acquired)
     bool has_owner;
-    has_owner = ( jdksavdecc_eui64_is_set( m_acquired_by_controller_entity_id )
+    has_owner = ( Eui64_is_set( m_acquired_by_controller_entity_id )
                   != 0 );
 
     // if we have an owner and it isn't the controller that sent us the request
     // then fail
     if ( has_owner )
     {
-        if ( jdksavdecc_eui64_compare( &m_acquired_by_controller_entity_id,
-                                       &aem.aecpdu_header.controller_entity_id )
+        if ( Eui64_compare( m_acquired_by_controller_entity_id,
+                                       aem.aecpdu_header.controller_entity_id )
              != 0 )
         {
             // not our controller.
@@ -360,13 +361,13 @@ uint8_t Entity::validatePermissions( jdksavdecc_aecpdu_aem const &aem )
     else
     {
         // We don't have an owner, so check to see if we are locked
-        if ( jdksavdecc_eui64_is_set( m_locked_by_controller_entity_id ) )
+        if ( Eui64_is_set( m_locked_by_controller_entity_id ) )
         {
             // Yes, we are locked. Are we locked by the controller that sent us
             // the message?
-            if ( jdksavdecc_eui64_compare(
-                     &m_locked_by_controller_entity_id,
-                     &aem.aecpdu_header.controller_entity_id ) != 0 )
+            if ( Eui64_compare(
+                     m_locked_by_controller_entity_id,
+                     aem.aecpdu_header.controller_entity_id ) != 0 )
             {
                 // not our controller
                 response_status = JDKSAVDECC_AEM_STATUS_ENTITY_LOCKED;
@@ -473,8 +474,9 @@ void Entity::sendResponses( bool internally_generated,
 {
     // buf already contains the requestor's mac address and controller. Capture
     // the controller entity id
-    jdksavdecc_eui64 original_controller_id;
-    jdksavdecc_eui64_init( &original_controller_id );
+    Eui64 original_controller_id;
+
+    original_controller_id = Eui64();
 
     pdu.setOctet( ( ( pdu.getOctet( 2 ) & 0xf8 ) | ( aecp_status_code << 3 ) ),
                   2 );
@@ -484,7 +486,7 @@ void Entity::sendResponses( bool internally_generated,
         // The message is not internally generated, it is a response to a real
         // request
         // extract the actually requested controller entity id from the frame.
-        jdksavdecc_eui64_get(
+        Eui64_get(
             pdu.getBuf(),
             JDKSAVDECC_FRAME_HEADER_LEN
             + JDKSAVDECC_AECPDU_COMMON_OFFSET_CONTROLLER_ENTITY_ID );
@@ -516,23 +518,23 @@ void Entity::sendResponses( bool internally_generated,
             // We only care about controllers with entity_id !=
             // FF:FF:FF:FF:FF:FF:FF:FF
 
-            if ( jdksavdecc_eui64_is_set(
+            if ( Eui64_is_set(
                     m_registered_controllers_entity_id[i] ) )
             {
                 // and don't send the original requesting controller a double
                 // response
-                if ( jdksavdecc_eui64_compare(
-                         &original_controller_id,
-                         &m_registered_controllers_entity_id[i] ) != 0 )
+                if ( Eui64_compare(
+                         original_controller_id,
+                         m_registered_controllers_entity_id[i] ) != 0 )
                 {
                     // Set the controller_entity_id in the frame
-                    jdksavdecc_eui64_set(
+                    Eui64_set(
                         m_registered_controllers_entity_id[i],
                         pdu.getBuf(),
                         JDKSAVDECC_FRAME_HEADER_LEN
                         + JDKSAVDECC_AECPDU_COMMON_OFFSET_CONTROLLER_ENTITY_ID );
                     // Set the destination mac address
-                    jdksavdecc_eui48_set(
+                    Eui48_set(
                         m_registered_controllers_mac_address[i],
                         pdu.getBuf(),
                         0 );
@@ -548,8 +550,8 @@ void Entity::sendResponses( bool internally_generated,
     }
 }
 
-void Entity::sendCommand( jdksavdecc_eui64 const &target_entity_id,
-                          jdksavdecc_eui48 const &target_mac_address,
+void Entity::sendCommand( Eui64 const &target_entity_id,
+                          Eui48 const &target_mac_address,
                           uint16_t aem_command_type,
                           bool track_for_ack,
                           uint8_t const *additional_data1,
@@ -676,12 +678,12 @@ uint8_t Entity::receiveAcquireEntityCommand( jdksavdecc_aecpdu_aem const &aem,
 
     bool controller_id_matches_current_owner;
     controller_id_matches_current_owner
-        = ( jdksavdecc_eui64_compare( &m_acquired_by_controller_entity_id,
-                                      &aem.aecpdu_header.controller_entity_id )
+        = ( Eui64_compare( m_acquired_by_controller_entity_id,
+                                      aem.aecpdu_header.controller_entity_id )
             == 0 );
 
     bool has_current_owner;
-    has_current_owner = ( jdksavdecc_eui64_is_set(
+    has_current_owner = ( Eui64_is_set(
                               m_acquired_by_controller_entity_id ) != 0 );
 
     // First, make sure this is entity level:
@@ -704,7 +706,7 @@ uint8_t Entity::receiveAcquireEntityCommand( jdksavdecc_aecpdu_aem const &aem,
                  || !has_current_owner )
             {
                 // clear current acquire state
-                jdksavdecc_eui64_init( &m_acquired_by_controller_entity_id );
+                m_acquired_by_controller_entity_id = Eui64();
                 status = JDKSAVDECC_AEM_STATUS_SUCCESS;
             }
             else
@@ -728,7 +730,7 @@ uint8_t Entity::receiveAcquireEntityCommand( jdksavdecc_aecpdu_aem const &aem,
             {
                 // Are we already in progress of acquiring from a second
                 // controller?
-                if ( jdksavdecc_eui64_is_set(
+                if ( Eui64_is_set(
                         m_acquire_in_progress_by_controller_entity_id ) )
                 {
                     // yes, we we are already waiting for a dispute between 2
@@ -806,7 +808,7 @@ bool Entity::receiveControllerAvailableResponse(
     // TODO: Send a failed message to the controller that was attempting to
     // acquire me
     // cancel any acquire in progress
-    jdksavdecc_eui64_init( &m_acquire_in_progress_by_controller_entity_id );
+    m_acquire_in_progress_by_controller_entity_id = Eui64();
     return false;
 }
 

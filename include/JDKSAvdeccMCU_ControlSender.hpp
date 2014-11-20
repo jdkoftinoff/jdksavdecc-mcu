@@ -47,8 +47,8 @@ class ControlSender : public Handler
   public:
     /// Construct the SetControlSender object
     ControlSender( ControllerEntity &controller_entity,
-                   jdksavdecc_eui64 const &target_entity_id,
-                   jdksavdecc_eui48 const &target_mac_address,
+                   Eui64 const &target_entity_id,
+                   Eui48 const &target_mac_address,
                    uint16_t target_descriptor_index,
                    jdksavdecc_timestamp_in_milliseconds update_rate_in_millis,
                    ControlValueHolder *holder );
@@ -68,17 +68,17 @@ class ControlSender : public Handler
 
     RawSocket &getRawSocket() { return m_controller_entity.getRawSocket(); }
 
-    jdksavdecc_eui64 const &getEntityID() const
+    Eui64 const &getEntityID() const
     {
         return m_controller_entity.getEntityID();
     }
 
-    jdksavdecc_eui64 const &getTargetEntityID() const
+    Eui64 const &getTargetEntityID() const
     {
         return m_target_entity_id;
     }
 
-    jdksavdecc_eui48 const &getTargetMACAddress() const
+    Eui48 const &getTargetMACAddress() const
     {
         return m_target_mac_address;
     }
@@ -89,8 +89,8 @@ class ControlSender : public Handler
 
   protected:
     ControllerEntity &m_controller_entity;
-    jdksavdecc_eui64 m_target_entity_id;
-    jdksavdecc_eui48 m_target_mac_address;
+    Eui64 m_target_entity_id;
+    Eui48 m_target_mac_address;
     uint16_t m_target_descriptor_index;
     jdksavdecc_timestamp_in_milliseconds m_update_rate_in_millis;
     jdksavdecc_timestamp_in_milliseconds m_last_send_time_in_millis;

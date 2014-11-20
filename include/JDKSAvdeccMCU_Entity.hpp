@@ -57,7 +57,7 @@ class Entity : public Handler
     virtual bool receivedPDU( Frame &frame );
 
     /// Notification that a command to a target entity timed out
-    virtual void commandTimedOut( jdksavdecc_eui64 const &target_entity_id,
+    virtual void commandTimedOut( Eui64 const &target_entity_id,
                                   uint16_t command_type,
                                   uint16_t sequence_id );
 
@@ -68,7 +68,7 @@ class Entity : public Handler
     RawSocket &getRawSocket() { return m_adp_manager.getRawSocket(); }
 
     /// Get the Entity ID
-    jdksavdecc_eui64 const &getEntityID() const
+    Eui64 const &getEntityID() const
     {
         return m_adp_manager.getEntityID();
     }
@@ -99,8 +99,8 @@ class Entity : public Handler
         return m_last_sent_command_type != JDKSAVDECC_AEM_COMMAND_EXPANSION;
     }
 
-    void sendCommand( jdksavdecc_eui64 const &target_entity_id,
-                      jdksavdecc_eui48 const &target_mac_address,
+    void sendCommand( Eui64 const &target_entity_id,
+                      Eui48 const &target_mac_address,
                       uint16_t aem_command_type,
                       bool track_for_ack = true,
                       uint8_t const *additional_data1 = 0,
@@ -148,8 +148,8 @@ class Entity : public Handler
 
     // Formulate and send a CONTROLLER_AVAILABLE command to a target controller
     void sendControllerAvailable(
-        jdksavdecc_eui64 const &target_controller_entity_id,
-        jdksavdecc_eui48 const &target_mac_address )
+        Eui64 const &target_controller_entity_id,
+        Eui48 const &target_mac_address )
     {
         sendCommand( target_controller_entity_id,
                      target_mac_address,
@@ -209,16 +209,16 @@ class Entity : public Handler
     /// If we are acquired by a controller, then this is set to the controller's
     /// entity id.
     /// If we are not acquired, then this will be FF:FF:FF:FF:FF:FF:FF:FF
-    jdksavdecc_eui64 m_acquired_by_controller_entity_id;
+    Eui64 m_acquired_by_controller_entity_id;
 
     /// If we are acquired by a controller, then this is the MAC address of the
     /// controller
-    jdksavdecc_eui48 m_acquired_by_controller_mac_address;
+    Eui48 m_acquired_by_controller_mac_address;
 
     /// If we are acquired by one controller and another controller is trying to
     /// acquire this entity, then this contains the new controller's entity_id
     /// during the controller available negotiation mechanism
-    jdksavdecc_eui64 m_acquire_in_progress_by_controller_entity_id;
+    Eui64 m_acquire_in_progress_by_controller_entity_id;
 
     /// If we are currently interrogating a controller with a controller
     /// available, then this is the timestamp of when we started the controller
@@ -227,7 +227,7 @@ class Entity : public Handler
 
     /// If we are locked by a controller, then this contains the controller's
     /// entity id which locked us
-    jdksavdecc_eui64 m_locked_by_controller_entity_id;
+    Eui64 m_locked_by_controller_entity_id;
 
     /// If we are locked by a controller, then this contains the timestamp of
     /// when the lock first ocurred
@@ -237,12 +237,12 @@ class Entity : public Handler
     /// currently registered via the register for unsolicited notifications
     /// command. The entity id is FF:FF:FF:FF:FF:FF:FF:FF If the the slot is not
     /// in use
-    jdksavdecc_eui64 m_registered_controllers_entity_id
+    Eui64 m_registered_controllers_entity_id
         [JDKSAVDECC_ENTITY_MAX_REGISTERED_CONTROLLERS];
 
     /// This contains the associated MAC address of the controller's that are
     /// currently registered
-    jdksavdecc_eui48 m_registered_controllers_mac_address
+    Eui48 m_registered_controllers_mac_address
         [JDKSAVDECC_ENTITY_MAX_REGISTERED_CONTROLLERS];
 
     /// This is the timestamp of the last command that we sent to another entity
@@ -250,7 +250,7 @@ class Entity : public Handler
 
     /// This is the entity id that was the target of the last command that we
     /// sent
-    jdksavdecc_eui64 m_last_sent_command_target_entity_id;
+    Eui64 m_last_sent_command_target_entity_id;
 
     /// This is the command_type of the last command that we sent to another
     /// entity

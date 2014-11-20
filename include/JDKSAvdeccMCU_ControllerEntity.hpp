@@ -58,8 +58,8 @@ class ControllerEntity : public Entity
     bool receivedAEMResponse( jdksavdecc_aecpdu_aem const &aem, Frame &pdu );
 
     // Formulate and send a ACQUIRE_ENTITY command to a target entity
-    void sendAcquireEntity( jdksavdecc_eui64 const &target_entity_id,
-                            jdksavdecc_eui48 const &target_mac_address,
+    void sendAcquireEntity( Eui64 const &target_entity_id,
+                            Eui48 const &target_mac_address,
                             uint32_t flags )
     {
         uint8_t additional1[16];
@@ -84,15 +84,15 @@ class ControllerEntity : public Entity
                                                Frame &pdu );
 
     // Formulate and send a LOCK_ENTITY command to a target entity
-    void sendLockEntity( jdksavdecc_eui64 const &target_entity_id,
-                         jdksavdecc_eui48 const &target_mac_address,
+    void sendLockEntity( Eui64 const &target_entity_id,
+                         Eui48 const &target_mac_address,
                          uint32_t flags )
     {
         uint8_t additional1[16];
         jdksavdecc_uint32_set( flags, additional1, 0 ); // offset 12 in Figure
                                                         // 7.35, and Table 7.128
                                                         // for flags
-        jdksavdecc_eui64_set(
+        Eui64_set(
             getEntityID(), additional1, 4 ); // offset 16 in Figure 7.35
         jdksavdecc_uint16_set( JDKSAVDECC_DESCRIPTOR_ENTITY,
                                additional1,
@@ -110,8 +110,8 @@ class ControllerEntity : public Entity
                                             Frame &pdu );
 
     // Formulate and send an ENTITY_AVAILABLE command to a target entity
-    void sendEntityAvailable( jdksavdecc_eui64 const &target_entity_id,
-                              jdksavdecc_eui48 const &target_mac_address )
+    void sendEntityAvailable( Eui64 const &target_entity_id,
+                              Eui48 const &target_mac_address )
     {
         sendCommand( target_entity_id,
                      target_mac_address,
@@ -123,8 +123,8 @@ class ControllerEntity : public Entity
                                         Frame &pdu );
 
     // Formulate and send a READ_DESCRIPTOR command to a target entity
-    void sendReadDescriptor( jdksavdecc_eui64 const &target_entity_id,
-                             jdksavdecc_eui48 const &target_mac_address,
+    void sendReadDescriptor( Eui64 const &target_entity_id,
+                             Eui48 const &target_mac_address,
                              uint16_t configuration_index,
                              uint16_t descriptor_type,
                              uint16_t descriptor_index )
@@ -150,8 +150,8 @@ class ControllerEntity : public Entity
                                        Frame &pdu );
 
     // Formulate and send a SET_CONFIGURATION command to a target entity
-    void sendSetConfiguration( jdksavdecc_eui64 const &target_entity_id,
-                               jdksavdecc_eui48 const &target_mac_address,
+    void sendSetConfiguration( Eui64 const &target_entity_id,
+                               Eui48 const &target_mac_address,
                                uint16_t configuration_index )
     {
         uint8_t additional1[4];
@@ -170,8 +170,8 @@ class ControllerEntity : public Entity
                                          Frame &pdu );
 
     // Formulate and send a GET_CONFIGURATION command to a target entity
-    void sendGetConfiguration( jdksavdecc_eui64 const &target_entity_id,
-                               jdksavdecc_eui48 const &target_mac_address )
+    void sendGetConfiguration( Eui64 const &target_entity_id,
+                               Eui48 const &target_mac_address )
     {
         sendCommand( target_entity_id,
                      target_mac_address,
@@ -183,8 +183,8 @@ class ControllerEntity : public Entity
                                          Frame &pdu );
 
     // Formulate and send a SET_NAME command to a target entity
-    void sendSetName( jdksavdecc_eui64 const &target_entity_id,
-                      jdksavdecc_eui48 const &target_mac_address,
+    void sendSetName( Eui64 const &target_entity_id,
+                      Eui48 const &target_mac_address,
                       uint16_t target_descriptor_type,
                       uint16_t target_descriptor_index,
                       uint16_t name_index,
@@ -210,8 +210,8 @@ class ControllerEntity : public Entity
                                          Frame &pdu );
 
     // Formulate and send a GET_NAME command to a target entity
-    void sendGetName( jdksavdecc_eui64 const &target_entity_id,
-                      jdksavdecc_eui48 const &target_mac_address,
+    void sendGetName( Eui64 const &target_entity_id,
+                      Eui48 const &target_mac_address,
                       uint16_t target_descriptor_type,
                       uint16_t target_descriptor_index,
                       uint16_t name_index,
@@ -231,8 +231,8 @@ class ControllerEntity : public Entity
                                          Frame &pdu );
 
     // Formulate and send a SET_CONTROL command to a target entity
-    void sendSetControl( jdksavdecc_eui64 const &target_entity_id,
-                         jdksavdecc_eui48 const &target_mac_address,
+    void sendSetControl( Eui64 const &target_entity_id,
+                         Eui48 const &target_mac_address,
                          uint16_t target_descriptor_index,
                          uint8_t *control_value,
                          uint16_t control_value_len,
@@ -257,8 +257,8 @@ class ControllerEntity : public Entity
     // Formulate and send an REGISTER_UNSOLICITED_NOTIFICATION command to a
     // target entity
     void sendRegisterUnsolicitedNotification(
-        jdksavdecc_eui64 const &target_entity_id,
-        jdksavdecc_eui48 const &target_mac_address )
+        Eui64 const &target_entity_id,
+        Eui48 const &target_mac_address )
     {
         sendCommand( target_entity_id,
                      target_mac_address,
@@ -273,8 +273,8 @@ class ControllerEntity : public Entity
     // Formulate and send a DEREGISTER_UNSOLICITED_NOTIFICATION command to a
     // target entity
     void sendDeRegisterUnsolicitedNotification(
-        jdksavdecc_eui64 const &target_entity_id,
-        jdksavdecc_eui48 const &target_mac_address )
+        Eui64 const &target_entity_id,
+        Eui48 const &target_mac_address )
     {
         sendCommand( target_entity_id,
                      target_mac_address,
@@ -290,14 +290,14 @@ class ControllerEntity : public Entity
     // entity, either because of a solicited or unsolicited SET_CONTROL response
     // or a GET_CONTROL response
     virtual uint8_t
-        receiveControlValue( jdksavdecc_eui64 const &target_entity_id,
+        receiveControlValue( Eui64 const &target_entity_id,
                              uint16_t target_descriptor_index,
                              uint8_t const *control_value,
                              uint16_t control_value_len );
 
     // Formulate and send a GET_CONTROL command to a target entity
-    void sendGetControl( jdksavdecc_eui64 const &target_entity_id,
-                         jdksavdecc_eui48 const &target_mac_address,
+    void sendGetControl( Eui64 const &target_entity_id,
+                         Eui48 const &target_mac_address,
                          uint16_t target_descriptor_index )
     {
         uint8_t additional1[4];

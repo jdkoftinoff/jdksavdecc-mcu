@@ -32,6 +32,7 @@
 
 #include "JDKSAvdeccMCU_World.hpp"
 #include "JDKSAvdeccMCU_RawSocket.hpp"
+#include "JDKSAvdeccMCU_Helpers.hpp"
 #include "JDKSAvdeccMCU_Frame.hpp"
 
 #include "JDKSAvdeccMCU_Handler.hpp"
@@ -75,8 +76,8 @@ class ADPManager : public Handler
      * 1722.1-2013 Clause 6.2.1.14
      */
     ADPManager( RawSocket &net,
-                jdksavdecc_eui64 const &entity_id,
-                jdksavdecc_eui64 const &entity_model_id,
+                Eui64 const &entity_id,
+                Eui64 const &entity_model_id,
                 uint32_t entity_capabilities,
                 uint32_t controller_capabilities,
                 uint16_t valid_time_in_seconds,
@@ -139,16 +140,16 @@ class ADPManager : public Handler
     /**
      * @brief getEntityID is called to get the AVDECC Entity's entity_id as
      * defined by IEEE Std 1722.1-2013 Clause 6.2.1.8
-     * @return The Entity's entity_id as a jdksavdecc_eui64
+     * @return The Entity's entity_id as a Eui64
      */
-    jdksavdecc_eui64 const &getEntityID() const { return m_entity_id; }
+    Eui64 const &getEntityID() const { return m_entity_id; }
 
     /**
      * @brief getEntityModelID is called to get the AVDECC Enity Model ID for
      * this entity as defined by IEEE Std 1722.1-2013 Clause 6.2.1.9
-     * @return The Entity's entity_model_id as a jdksavdecc_eui64
+     * @return The Entity's entity_model_id as a Eui64
      */
-    jdksavdecc_eui64 const &getEntityModelID() const
+    Eui64 const &getEntityModelID() const
     {
         return m_entity_model_id;
     }
@@ -187,12 +188,12 @@ class ADPManager : public Handler
 
     void triggerSend();
 
-    void setGPTPGrandMasterID( jdksavdecc_eui64 const &new_gm );
+    void setGPTPGrandMasterID( Eui64 const &new_gm );
 
   protected:
     RawSocket &m_net;
-    jdksavdecc_eui64 m_entity_id;
-    jdksavdecc_eui64 m_entity_model_id;
+    Eui64 m_entity_id;
+    Eui64 m_entity_model_id;
     uint32_t m_entity_capabilities;
     uint32_t m_controller_capabilities;
     uint16_t m_valid_time_in_seconds;
@@ -204,6 +205,6 @@ class ADPManager : public Handler
     jdksavdecc_timestamp_in_milliseconds m_last_send_time_in_millis;
     jdksavdecc_timestamp_in_milliseconds m_trigger_send_time;
     bool m_trigger_send;
-    jdksavdecc_eui64 m_gptp_grandmaster_id;
+    Eui64 m_gptp_grandmaster_id;
 };
 }

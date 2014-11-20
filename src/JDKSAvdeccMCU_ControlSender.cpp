@@ -37,8 +37,8 @@ namespace JDKSAvdeccMCU
 
 ControlSender::ControlSender(
     ControllerEntity &controller_entity,
-    jdksavdecc_eui64 const &target_entity_id,
-    jdksavdecc_eui48 const &target_mac_address,
+    Eui64 const &target_entity_id,
+    Eui48 const &target_mac_address,
     uint16_t target_descriptor_index,
     jdksavdecc_timestamp_in_milliseconds update_rate_in_millis,
     ControlValueHolder *holder )
