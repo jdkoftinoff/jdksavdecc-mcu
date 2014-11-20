@@ -43,18 +43,14 @@ namespace JDKSAvdeccMCU
 class RawSocketWizNet : public RawSocket
 {
   public:
-    RawSocketWizNet( jdksavdecc_eui48 const &mac_address,
+    RawSocketWizNet( Eui48 const &mac_address,
                      uint16_t ethertype,
-                     const jdksavdecc_eui48 *multicast_to_join = 0 )
+                     const Eui48 *multicast_to_join = 0 )
         : m_mac_address( mac_address ), m_ethertype( ethertype )
     {
         if ( multicast_to_join )
         {
             m_multicast = *multicast_to_join;
-        }
-        else
-        {
-            jdksavdecc_eui48_init( &m_multicast );
         }
     }
 
@@ -81,7 +77,7 @@ class RawSocketWizNet : public RawSocket
 
     virtual void initialize();
 
-    virtual bool joinMulticast( const jdksavdecc_eui48 &multicast_mac )
+    virtual bool joinMulticast( const Eui48 &multicast_mac )
     {
         m_multicast = multicast_mac;
     }
@@ -90,15 +86,12 @@ class RawSocketWizNet : public RawSocket
 
     virtual filedescriptor_type getFd() const { return 0; }
 
-    virtual jdksavdecc_eui48 const &getMACAddress() const
-    {
-        return m_mac_address;
-    }
+    virtual Eui48 const &getMACAddress() const { return m_mac_address; }
 
   private:
-    jdksavdecc_eui48 m_mac_address;
+    Eui48 m_mac_address;
     uint16_t m_ethertype;
-    jdksavdecc_eui48 m_multicast;
+    Eui48 m_multicast;
 };
 }
 

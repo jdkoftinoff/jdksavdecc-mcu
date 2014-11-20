@@ -77,7 +77,7 @@ static void rawsocket_macosx_initialize()
 
 RawSocketMacOSX::RawSocketMacOSX( const char *device,
                                   uint16_t ethertype,
-                                  const jdksavdecc_eui48 *multicast_to_join )
+                                  const Eui48 *multicast_to_join )
     : m_fd( bad_filedescriptor ), m_device( device ), m_ethertype( ethertype )
 {
     filedescriptor_type r = -1;
@@ -88,10 +88,6 @@ RawSocketMacOSX::RawSocketMacOSX( const char *device,
     if ( multicast_to_join )
     {
         m_default_dest_mac_address = *multicast_to_join;
-    }
-    else
-    {
-        jdksavdecc_eui48_zero( &m_default_dest_mac_address );
     }
 
     p = pcap_open_live( device, 65536, 1, 1, errbuf );
@@ -375,7 +371,7 @@ bool RawSocketMacOSX::sendReplyFrame( Frame &frame,
     return r;
 }
 
-bool RawSocketMacOSX::joinMulticast( const jdksavdecc_eui48 &multicast_mac )
+bool RawSocketMacOSX::joinMulticast( const Eui48 &multicast_mac )
 {
     bool r = false;
     struct bpf_program fcode;

@@ -66,8 +66,7 @@ class ControllerEntity : public Entity
         jdksavdecc_uint32_set( flags, additional1, 0 ); // offset 12 in Figure
                                                         // 7.34, and Table 7.127
                                                         // for flags
-        jdksavdecc_eui64_set(
-            getEntityID(), additional1, 4 ); // offset 16 in Figure 7.34
+        Eui64_set( getEntityID(), additional1, 4 ); // offset 16 in Figure 7.34
         jdksavdecc_uint16_set( JDKSAVDECC_DESCRIPTOR_ENTITY,
                                additional1,
                                12 );                 // offset 24 in Figure 7.34

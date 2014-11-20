@@ -47,7 +47,7 @@ class ControlReceiver : public Handler
   public:
     /// Construct the ControlReceiver object
     ControlReceiver( RawSocket &net,
-                     jdksavdecc_eui64 const &entity_id,
+                     Eui64 const &entity_id,
                      uint16_t descriptor_index_offset = 0 )
         : m_net( net )
         , m_entity_id( entity_id )
@@ -180,11 +180,11 @@ class ControlReceiver : public Handler
     }
 
     /// Get the enitity ID that we are handling
-    jdksavdecc_eui64 const &getEntityID() const { return m_entity_id; }
+    Eui64 const &getEntityID() const { return m_entity_id; }
 
   protected:
     RawSocket &m_net;
-    jdksavdecc_eui64 const &m_entity_id;
+    Eui64 const &m_entity_id;
     uint16_t m_descriptor_index_offset;
     uint16_t m_num_descriptors;
     ControlValueHolder *m_values[MaxDescriptors];

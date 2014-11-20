@@ -56,5 +56,6 @@ void
     ControlIdentify::tick( jdksavdecc_timestamp_in_milliseconds time_in_millis )
 {
     // TODO: send 3 unsolicited messages when value changes state from 0 to 0xff
+    (void)time_in_millis;
 }
 }

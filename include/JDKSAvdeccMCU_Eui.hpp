@@ -40,6 +40,16 @@ class Eui48 : public jdksavdecc_eui48
   public:
     Eui48() { jdksavdecc_eui48_init( this ); }
 
+    Eui48( uint8_t a, uint8_t b, uint8_t c, uint8_t d, uint8_t e, uint8_t f )
+    {
+        value[0] = a;
+        value[1] = b;
+        value[2] = c;
+        value[3] = d;
+        value[4] = e;
+        value[5] = f;
+    }
+
     Eui48( jdksavdecc_eui48 const &other )
     {
         jdksavdecc_eui48_copy( this, &other );
@@ -65,6 +75,25 @@ class Eui64 : public jdksavdecc_eui64
 {
   public:
     Eui64() { jdksavdecc_eui64_init( this ); }
+
+    Eui64( uint8_t a,
+           uint8_t b,
+           uint8_t c,
+           uint8_t d,
+           uint8_t e,
+           uint8_t f,
+           uint8_t g,
+           uint8_t h )
+    {
+        value[0] = a;
+        value[1] = b;
+        value[2] = c;
+        value[3] = d;
+        value[4] = e;
+        value[5] = f;
+        value[6] = g;
+        value[7] = h;
+    }
 
     Eui64( jdksavdecc_eui64 const &other )
     {

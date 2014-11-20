@@ -65,7 +65,7 @@ void RawSocketLinux::initialize() { rawsocket_linux_initialize(); }
 
 RawSocketLinux::RawSocketLinux( const char *device,
                                 uint16_t ethertype,
-                                const jdksavdecc_eui48 *multicast_to_join )
+                                const Eui48 *multicast_to_join )
     : m_fd( bad_filedescriptor ), m_device( device ), m_ethertype( ethertype )
 {
     initialize();
@@ -75,10 +75,6 @@ RawSocketLinux::RawSocketLinux( const char *device,
     if ( multicast_to_join )
     {
         m_default_dest_mac_address = *multicast_to_join;
-    }
-    else
-    {
-        jdksavdecc_eui48_zero( &m_default_dest_mac_address );
     }
 
     if ( m_fd != bad_filedescriptor && device != 0 )
@@ -338,7 +334,7 @@ bool RawSocketLinux::sendReplyFrame( Frame &frame,
     return r;
 }
 
-bool RawSocketLinux::joinMulticast( const jdksavdecc_eui48 &multicast_mac )
+bool RawSocketLinux::joinMulticast( const Eui48 &multicast_mac )
 {
     bool r = false;
     struct packet_mreq mreq;

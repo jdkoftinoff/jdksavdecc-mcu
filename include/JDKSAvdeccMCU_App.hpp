@@ -31,6 +31,8 @@
 #pragma once
 
 #include "JDKSAvdeccMCU_World.hpp"
+#include "jdksavdecc_app.h"
+#include <sys/socket.h>
 
 namespace JDKSAvdeccMCU
 {
