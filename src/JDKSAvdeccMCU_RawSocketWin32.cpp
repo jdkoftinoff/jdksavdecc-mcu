@@ -74,7 +74,7 @@ static void rawsocket_win32_initialize()
 
 RawSocketWin32::RawSocketWin32( const char *device,
                                 uint16_t ethertype,
-                                const jdksavdecc_eui48 *multicast_to_join )
+                                const Eui48 *multicast_to_join )
     : m_fd( bad_filedescriptor ), m_device( device ), m_ethertype( ethertype )
 {
     filedescriptor_type r = -1;
@@ -88,7 +88,7 @@ RawSocketWin32::RawSocketWin32( const char *device,
     }
     else
     {
-        jdksavdecc_eui48_zero( &m_default_dest_mac_address );
+        Eui48_zero( &m_default_dest_mac_address );
     }
 
     p = pcap_open_live( device, 65536, 1, 1, errbuf );
@@ -401,7 +401,7 @@ bool RawSocketWin32::sendReplyFrame( Frame &frame,
     return r;
 }
 
-bool RawSocketWin32::joinMulticast( const jdksavdecc_eui48 &multicast_mac )
+bool RawSocketWin32::joinMulticast( const Eui48 &multicast_mac )
 {
     bool r = false;
     struct bpf_program fcode;

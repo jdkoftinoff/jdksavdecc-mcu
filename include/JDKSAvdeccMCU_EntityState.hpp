@@ -103,8 +103,8 @@ class EntityState : public Handler
                                               uint16_t descriptor_index );
 
     uint8_t fillDescriptorEntity( Frame &pdu,
-                                  jdksavdecc_eui64 const &entity_id,
-                                  jdksavdecc_eui64 const &entity_model_id,
+                                  Eui64 const &entity_id,
+                                  Eui64 const &entity_model_id,
                                   uint32_t entity_capabilities,
                                   uint16_t talker_stream_sources,
                                   uint16_t talker_capabilities,

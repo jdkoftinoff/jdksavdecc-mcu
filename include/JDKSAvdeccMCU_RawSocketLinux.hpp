@@ -41,7 +41,7 @@ class RawSocketLinux : public RawSocket
   public:
     RawSocketLinux( const char *device,
                     uint16_t ethertype,
-                    const jdksavdecc_eui48 *multicast_to_join = 0 );
+                    Eui48 const &multicast_to_join );
 
     virtual ~RawSocketLinux();
 
@@ -64,16 +64,13 @@ class RawSocketLinux : public RawSocket
                                  uint8_t const *data2,
                                  uint16_t len2 );
 
-    virtual bool joinMulticast( const jdksavdecc_eui48 &multicast_mac );
+    virtual bool joinMulticast( const Eui48 &multicast_mac );
 
     virtual void setNonblocking();
 
     virtual filedescriptor_type getFd() const { return m_fd; }
 
-    virtual jdksavdecc_eui48 const &getMACAddress() const
-    {
-        return m_mac_address;
-    }
+    virtual Eui48 const &getMACAddress() const { return m_mac_address; }
 
     virtual const char *getDeviceName() const { return m_device; }
 
@@ -83,8 +80,8 @@ class RawSocketLinux : public RawSocket
     filedescriptor_type m_fd;
     const char *m_device;
     int m_interface_id;
-    jdksavdecc_eui48 m_mac_address;
-    jdksavdecc_eui48 m_default_dest_mac_address;
+    Eui48 m_mac_address;
+    Eui48 m_default_dest_mac_address;
     uint16_t m_ethertype;
 };
 }

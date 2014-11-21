@@ -32,6 +32,7 @@
 
 #include "JDKSAvdeccMCU_World.hpp"
 #include "JDKSAvdeccMCU_FixedBuffer.hpp"
+#include "JDKSAvdeccMCU_Frame.hpp"
 
 namespace JDKSAvdeccMCU
 {
@@ -45,8 +46,8 @@ class Frame : public FixedBuffer
     Frame( jdksavdecc_timestamp_in_milliseconds time_in_ms,
            uint8_t *buf,
            uint16_t len,
-           jdksavdecc_eui48 const &dest_mac,
-           jdksavdecc_eui48 const &src_mac,
+           Eui48 const &dest_mac,
+           Eui48 const &src_mac,
            uint16_t ethertype )
         : FixedBuffer( buf, len ), m_time_in_ms( time_in_ms )
     {
@@ -62,22 +63,22 @@ class Frame : public FixedBuffer
     {
     }
 
-    jdksavdecc_eui48 getDA() const
+    Eui48 getDA() const
     {
         return getEUI48( JDKSAVDECC_FRAME_HEADER_DA_OFFSET );
     }
 
-    void setDA( jdksavdecc_eui48 const &da )
+    void setDA( Eui48 const &da )
     {
         setEUI48( da, JDKSAVDECC_FRAME_HEADER_DA_OFFSET );
     }
 
-    jdksavdecc_eui48 getSA() const
+    Eui48 getSA() const
     {
         return getEUI48( JDKSAVDECC_FRAME_HEADER_SA_OFFSET );
     }
 
-    void setSA( jdksavdecc_eui48 const &sa )
+    void setSA( Eui48 const &sa )
     {
         setEUI48( sa, JDKSAVDECC_FRAME_HEADER_SA_OFFSET );
     }
@@ -125,8 +126,8 @@ class FrameWithSize : public Frame
     }
 
     FrameWithSize( jdksavdecc_timestamp_in_milliseconds time_in_ms,
-                   jdksavdecc_eui48 const &dest_mac,
-                   jdksavdecc_eui48 const &src_mac,
+                   Eui48 const &dest_mac,
+                   Eui48 const &src_mac,
                    uint16_t ethertype )
         : Frame(
               time_in_ms, m_buf_storage, MaxSize, dest_mac, src_mac, ethertype )

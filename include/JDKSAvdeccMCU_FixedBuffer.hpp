@@ -60,7 +60,7 @@ class FixedBuffer
 
     uint16_t getMaxLength() const { return m_max_length; }
 
-    void putEUI48( jdksavdecc_eui48 const &val )
+    void putEUI48( Eui48 const &val )
     {
         for ( uint16_t i = 0; i < 6; ++i )
         {
@@ -114,7 +114,7 @@ class FixedBuffer
         m_buf[m_length++] = v7;
     }
 
-    void putEUI64( jdksavdecc_eui64 const &val )
+    void putEUI64( Eui64 const &val )
     {
         for ( uint16_t i = 0; i < 8; ++i )
         {
@@ -220,25 +220,13 @@ class FixedBuffer
         return jdksavdecc_uint32_get( m_buf, pos );
     }
 
-    void setEUI48( jdksavdecc_eui48 v, uint16_t pos )
-    {
-        jdksavdecc_eui48_set( v, m_buf, pos );
-    }
+    void setEUI48( Eui48 v, uint16_t pos ) { Eui48_set( v, m_buf, pos ); }
 
-    jdksavdecc_eui48 getEUI48( uint16_t pos ) const
-    {
-        return jdksavdecc_eui48_get( m_buf, pos );
-    }
+    Eui48 getEUI48( uint16_t pos ) const { return Eui48_get( m_buf, pos ); }
 
-    void setEUI64( jdksavdecc_eui64 v, uint16_t pos )
-    {
-        jdksavdecc_eui64_set( v, m_buf, pos );
-    }
+    void setEUI64( Eui64 v, uint16_t pos ) { Eui64_set( v, m_buf, pos ); }
 
-    jdksavdecc_eui64 getEUI64( uint16_t pos )
-    {
-        return jdksavdecc_eui64_get( m_buf, pos );
-    }
+    Eui64 getEUI64( uint16_t pos ) { return Eui64_get( m_buf, pos ); }
 
     uint8_t const *getBuf() const { return m_buf; }
     uint8_t *getBuf() { return m_buf; }

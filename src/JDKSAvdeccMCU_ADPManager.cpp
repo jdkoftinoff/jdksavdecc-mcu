@@ -37,8 +37,8 @@ namespace JDKSAvdeccMCU
 {
 
 ADPManager::ADPManager( RawSocket &net,
-                        jdksavdecc_eui64 const &entity_id,
-                        jdksavdecc_eui64 const &entity_model_id,
+                        Eui64 const &entity_id,
+                        Eui64 const &entity_model_id,
                         uint32_t entity_capabilities,
                         uint32_t controller_capabilities,
                         uint16_t valid_time_in_seconds,
@@ -60,8 +60,8 @@ ADPManager::ADPManager( RawSocket &net,
     , m_last_send_time_in_millis( 0 )
     , m_trigger_send_time( 0 )
     , m_trigger_send( false )
+    , m_gptp_grandmaster_id()
 {
-    jdksavdecc_eui64_init( &m_gptp_grandmaster_id );
 }
 
 void ADPManager::tick( jdksavdecc_timestamp_in_milliseconds time_in_millis )
@@ -87,7 +87,7 @@ void ADPManager::tick( jdksavdecc_timestamp_in_milliseconds time_in_millis )
 
 void ADPManager::sendADP()
 {
-    jdksavdecc_eui48 adp_multicast_addr = JDKSAVDECC_MULTICAST_ADP_ACMP;
+    Eui48 adp_multicast_addr = JDKSAVDECC_MULTICAST_ADP_ACMP_MAC;
 
     // DA, SA, EtherType, ADPDU = 82 bytes
     FrameWithSize<82> adp( 0,
@@ -150,9 +150,9 @@ void ADPManager::triggerSend()
     }
 }
 
-void ADPManager::setGPTPGrandMasterID( const jdksavdecc_eui64 &new_gm )
+void ADPManager::setGPTPGrandMasterID( const Eui64 &new_gm )
 {
-    if ( jdksavdecc_eui64_compare( &m_gptp_grandmaster_id, &new_gm ) != 0 )
+    if ( Eui64_compare( m_gptp_grandmaster_id, new_gm ) != 0 )
     {
         m_gptp_grandmaster_id = new_gm;
         triggerSend();
@@ -171,9 +171,9 @@ bool ADPManager::receivedPDU( Frame &frame )
         if ( header.message_type
              == JDKSAVDECC_ADP_MESSAGE_TYPE_ENTITY_DISCOVER )
         {
-            if ( jdksavdecc_eui64_compare( &header.entity_id, &m_entity_id )
-                 == 0 || jdksavdecc_eui64_is_unset( header.entity_id )
-                 || jdksavdecc_eui64_is_zero( header.entity_id ) )
+            if ( Eui64_compare( header.entity_id, m_entity_id ) == 0
+                 || Eui64_is_unset( header.entity_id )
+                 || Eui64_is_zero( header.entity_id ) )
             {
                 m_last_send_time_in_millis
                     -= ( m_valid_time_in_seconds * ( 1000 / 4 ) );

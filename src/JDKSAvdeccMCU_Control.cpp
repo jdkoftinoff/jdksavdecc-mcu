@@ -37,7 +37,7 @@ namespace JDKSAvdeccMCU
 
 Control::Control( Entity &entity,
                   uint16_t descriptor_index,
-                  jdksavdecc_eui64 control_type,
+                  Eui64 control_type,
                   uint16_t control_value_type,
                   ControlValueHolder *holder )
     : m_entity( entity )
@@ -63,7 +63,6 @@ bool Control::receivedPDU( Frame &frame )
 uint8_t Control::formControlValueMetaData( Frame &pdu )
 {
     uint8_t status = JDKSAVDECC_AEM_STATUS_ENTITY_MISBEHAVING;
-
     // TODO: Fill in meta data for the control descriptor
     (void)pdu;
 

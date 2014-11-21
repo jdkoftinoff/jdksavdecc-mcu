@@ -19,7 +19,7 @@ using namespace JDKSAvdeccMCU;
 /// JDKS reserves the MAC range from 70:b3:d5:ed:cf:f0 to 70:b3:d5:ed:cf:f7
 /// inclusive for experimental devices only
 
-jdksavdecc_eui48 my_mac = {{0x70, 0xb3, 0xd5, 0xed, 0xcf, 0xf0}};
+Eui48 my_mac = Eui48( 0x70, 0xb3, 0xd5, 0xed, 0xcf, 0xf0 );
 
 /// Ethernet handler object
 
@@ -32,7 +32,7 @@ RawSocketWizNet
 RawSocketPcapFile rawnet( JDKSAVDECC_AVTP_ETHERTYPE,
                           my_mac,
                           jdksavdecc_multicast_adp_acmp,
-                          &jdksavdecc_multicast_adp_acmp,
+                          jdksavdecc_multicast_adp_acmp,
                           "input.pcap",
                           "output.pcap",
                           50 );
@@ -48,22 +48,21 @@ RawSocketMacOSX
 #endif
 
 /// This AVDECC Entity is based on the mac address (insert ff ff)
-jdksavdecc_eui64 my_entity_id
-    = {{0x70, 0xb3, 0xd5, 0xff, 0xff, 0xed, 0xcf, 0xf0}};
+Eui64 my_entity_id = Eui64( 0x70, 0xb3, 0xd5, 0xff, 0xff, 0xed, 0xcf, 0xf0 );
 
 /// This AVDECC Entity Model ID is based on the J.D. Koftinoff Software, Ltd.
 /// assigned MAC-S (OUI36): 70:b3:d5:ed:c
-jdksavdecc_eui64 my_entity_model_id
-    = {{0x70, 0xb3, 0xd5, 0xed, 0xc0, 0x00, 0x00, 0x00}};
+Eui64 my_entity_model_id
+    = Eui64( 0x70, 0xb3, 0xd5, 0xed, 0xc0, 0x00, 0x00, 0x00 );
 
 /// All of the controls are targetting the entity of the second JDKS
 /// Experimental MAC address
-jdksavdecc_eui64 target_entity_id
-    = {{0x70, 0xb3, 0xd5, 0xff, 0xff, 0xed, 0xcf, 0xf1}};
+Eui64 target_entity_id
+    = Eui64( 0x70, 0xb3, 0xd5, 0xff, 0xff, 0xed, 0xcf, 0xf1 );
 
 /// All of the controls are targetting the second JDKS experimental MAC address
 /// 70:b3:d5:ed:cf:f1
-jdksavdecc_eui48 target_mac_address = {{0x70, 0xb3, 0xd5, 0xed, 0xcf, 0xf1}};
+Eui48 target_mac_address = Eui48( 0x70, 0xb3, 0xd5, 0xed, 0xcf, 0xf1 );
 
 class KnobsAndButtonsController : public EntityState
 {
@@ -77,8 +76,8 @@ class KnobsAndButtonsController : public EntityState
         NUM_CONTROL_DESCRIPTORS
     };
 
-    KnobsAndButtonsController( jdksavdecc_eui64 const &entity_id,
-                               jdksavdecc_eui64 const &entity_model_id )
+    KnobsAndButtonsController( Eui64 const &entity_id,
+                               Eui64 const &entity_model_id )
         : m_adp_manager( rawnet,
                          entity_id,
                          entity_model_id,
@@ -124,7 +123,7 @@ class KnobsAndButtonsController : public EntityState
     virtual void tick( jdksavdecc_timestamp_in_milliseconds time_in_millis )
     {
         if ( wasTimeOutHit(
-                time_in_millis, m_last_update_time, m_update_rate_in_millis ) )
+                 time_in_millis, m_last_update_time, m_update_rate_in_millis ) )
         {
             m_last_update_time = time_in_millis;
 
@@ -555,8 +554,8 @@ class KnobsAndButtonsController : public EntityState
     {
         uint8_t status = JDKSAVDECC_AEM_STATUS_NO_SUCH_DESCRIPTOR;
 
-        if ( configuration_index == 0 && descriptor_index
-                                         < NUM_CONTROL_DESCRIPTORS )
+        if ( configuration_index == 0
+             && descriptor_index < NUM_CONTROL_DESCRIPTORS )
         {
             pdu.setLength(
                 JDKSAVDECC_FRAME_HEADER_LEN

@@ -39,28 +39,21 @@ namespace JDKSAvdeccMCU
 
 RawSocketPcapFile::RawSocketPcapFile(
     uint16_t ethertype,
-    jdksavdecc_eui48 my_mac,
-    jdksavdecc_eui48 default_dest_mac,
-    jdksavdecc_eui48 *join_multicast,
+    Eui48 my_mac,
+    Eui48 default_dest_mac,
+    Eui48 join_multicast,
     const std::string &input_file,
     const std::string &output_file,
     jdksavdecc_timestamp_in_milliseconds time_granularity_in_ms )
     : m_ethertype( ethertype )
     , m_my_mac( my_mac )
     , m_default_dest_mac( default_dest_mac )
+    , m_join_multicast( join_multicast )
     , m_pcap_file_reader( input_file )
     , m_pcap_file_writer( output_file )
     , m_current_time( 0 )
     , m_time_granularity_in_ms( time_granularity_in_ms )
 {
-    if ( join_multicast )
-    {
-        m_join_multicast = *join_multicast;
-    }
-    else
-    {
-        jdksavdecc_eui48_init( &m_join_multicast );
-    }
     if ( readNextIncomingFrame() )
     {
         m_current_time = m_next_incoming_frame.getTimeInMilliseconds();
@@ -105,9 +98,9 @@ bool RawSocketPcapFile::sendFrame( const Frame &frame,
                                    const uint8_t *data2,
                                    uint16_t len2 )
 {
-    jdksavdecc_eui48 da = frame.getDA();
-    jdksavdecc_eui48 sa = m_my_mac;
-    if ( jdksavdecc_eui48_is_unset( da ) )
+    Eui48 da = frame.getDA();
+    Eui48 sa = m_my_mac;
+    if ( Eui48_is_unset( da ) )
     {
         da = m_default_dest_mac;
     }
@@ -144,8 +137,8 @@ bool RawSocketPcapFile::sendReplyFrame( Frame &frame,
                                         const uint8_t *data2,
                                         uint16_t len2 )
 {
-    jdksavdecc_eui48 da = frame.getSA();
-    jdksavdecc_eui48 sa = m_my_mac;
+    Eui48 da = frame.getSA();
+    Eui48 sa = m_my_mac;
     if ( da.value[0] & 0x1 )
     {
         // squash multicast
@@ -178,7 +171,7 @@ bool RawSocketPcapFile::sendReplyFrame( Frame &frame,
     return true;
 }
 
-bool RawSocketPcapFile::joinMulticast( const jdksavdecc_eui48 &multicast_mac )
+bool RawSocketPcapFile::joinMulticast( const Eui48 &multicast_mac )
 {
     m_join_multicast = multicast_mac;
 
@@ -189,10 +182,7 @@ void RawSocketPcapFile::setNonblocking() {}
 
 RawSocket::filedescriptor_type RawSocketPcapFile::getFd() const { return 0; }
 
-const jdksavdecc_eui48 &RawSocketPcapFile::getMACAddress() const
-{
-    return m_my_mac;
-}
+const Eui48 &RawSocketPcapFile::getMACAddress() const { return m_my_mac; }
 
 bool RawSocketPcapFile::readNextIncomingFrame()
 {

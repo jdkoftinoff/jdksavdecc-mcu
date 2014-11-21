@@ -49,7 +49,7 @@ class Control : public Handler
     /// Construct the SetControlSender object
     Control( Entity &entity,
              uint16_t descriptor_index,
-             jdksavdecc_eui64 control_type,
+             Eui64 control_type,
              uint16_t control_value_type,
              ControlValueHolder *holder );
 
@@ -82,7 +82,7 @@ class Control : public Handler
   protected:
     Entity &m_entity;
     uint16_t m_descriptor_index;
-    jdksavdecc_eui64 m_control_type;
+    Eui64 m_control_type;
     uint16_t m_control_value_type;
     ControlValueHolder *m_holder;
 };

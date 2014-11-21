@@ -77,7 +77,7 @@ class RawSocket
     /**
     * Attempt to join an additional multicast mac address group
     */
-    virtual bool joinMulticast( const jdksavdecc_eui48 &multicast_mac ) = 0;
+    virtual bool joinMulticast( const Eui48 &multicast_mac ) = 0;
 
     /**
     * Set the socket to non blocking mode
@@ -94,7 +94,7 @@ class RawSocket
     /**
      * Get the MAC address of the ethernet port
      */
-    virtual jdksavdecc_eui48 const &getMACAddress() const = 0;
+    virtual Eui48 const &getMACAddress() const = 0;
 
     /**
      * Get the device's name

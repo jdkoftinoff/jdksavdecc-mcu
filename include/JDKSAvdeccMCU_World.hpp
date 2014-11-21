@@ -177,3 +177,5 @@ inline jdksavdecc_timestamp_in_milliseconds getTimeInMilliseconds()
 #endif
 
 void jdksavdeccmcu_debug_log( const char *str, uint16_t v );
+
+#include "JDKSAvdeccMCU_Eui.hpp"

@@ -43,7 +43,7 @@ ControlIdentify::ControlIdentify(
                                       uint8_t value ) )
     : Control( controller_entity,
                descriptor_index,
-               eui64FromUint64( JDKSAVDECC_AEM_CONTROL_TYPE_IDENTIFY ),
+               Eui64( JDKSAVDECC_AEM_CONTROL_TYPE_IDENTIFY ),
                JDKSAVDECC_CONTROL_VALUE_LINEAR_UINT8,
                holder )
     , m_send_countdown( 0 )

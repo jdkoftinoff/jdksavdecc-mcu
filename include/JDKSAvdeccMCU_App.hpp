@@ -31,61 +31,9 @@
 #pragma once
 
 #include "JDKSAvdeccMCU_World.hpp"
-#include "JDKSAvdeccMCU_RawSocket.hpp"
-
-#if defined( __APPLE__ ) && JDKSAVDECCMCU_ENABLE_RAWSOCKETMACOSX
+#include "jdksavdecc_app.h"
+#include <sys/socket.h>
 
 namespace JDKSAvdeccMCU
 {
-class RawSocketMacOSX : public RawSocket
-{
-  public:
-    RawSocketMacOSX( const char *interface_name,
-                     uint16_t ethertype,
-                     const Eui48 &multicast_to_join );
-
-    virtual ~RawSocketMacOSX();
-
-    virtual jdksavdecc_timestamp_in_milliseconds getTimeInMilliseconds()
-    {
-        return JDKSAvdeccMCU::getTimeInMilliseconds();
-    }
-
-    virtual bool recvFrame( Frame *frame );
-
-    virtual bool sendFrame( Frame const &frame,
-                            uint8_t const *data1,
-                            uint16_t len1,
-                            uint8_t const *data2,
-                            uint16_t len2 );
-
-    virtual bool sendReplyFrame( Frame &frame,
-                                 uint8_t const *data1,
-                                 uint16_t len1,
-                                 uint8_t const *data2,
-                                 uint16_t len2 );
-
-    virtual bool joinMulticast( const Eui48 &multicast_mac );
-
-    virtual void setNonblocking();
-
-    virtual filedescriptor_type getFd() const { return m_fd; }
-
-    virtual Eui48 const &getMACAddress() const { return m_mac_address; }
-
-    virtual const char *getDeviceName() const { return m_device; }
-
-    virtual void initialize();
-
-  private:
-    filedescriptor_type m_fd;
-    const char *m_device;
-    int m_interface_id;
-    Eui48 m_mac_address;
-    Eui48 m_default_dest_mac_address;
-    uint16_t m_ethertype;
-    void *m_pcap;
-};
 }
-
-#endif
