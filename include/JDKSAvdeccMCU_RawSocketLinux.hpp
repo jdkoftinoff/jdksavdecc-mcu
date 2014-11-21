@@ -41,7 +41,7 @@ class RawSocketLinux : public RawSocket
   public:
     RawSocketLinux( const char *device,
                     uint16_t ethertype,
-                    Eui48 multicast_to_join );
+                    Eui48 const &multicast_to_join );
 
     virtual ~RawSocketLinux();
 

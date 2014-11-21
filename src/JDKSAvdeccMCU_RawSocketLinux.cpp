@@ -96,7 +96,7 @@ RawSocketLinux::RawSocketLinux( const char *device,
         {
             m_mac_address.value[i] = (uint8_t)ifr.ifr_hwaddr.sa_data[i];
         }
-        if ( multicast_to_join )
+        if ( multicast_to_join.isSet() )
         {
             joinMulticast( multicast_to_join );
         }
