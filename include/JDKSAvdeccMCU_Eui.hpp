@@ -31,6 +31,7 @@
 #pragma once
 
 #include "jdksavdecc_util.h"
+#include "jdksavdecc_print.h"
 
 namespace JDKSAvdeccMCU
 {
@@ -64,14 +65,58 @@ class Eui48 : public jdksavdecc_eui48
         jdksavdecc_eui48_init_from_cstr( this, s.c_str() );
     }
 
-    Eui48 const &operator=( Eui48 const *other )
+    Eui48 const &operator=( Eui48 const &other )
     {
-        jdksavdecc_eui48_copy( this, other );
+        jdksavdecc_eui48_copy( this, &other );
         return *this;
     }
 
+    uint64_t convertToUint64() const
+    {
+        return jdksavdecc_eui48_convert_to_uint64( this );
+    }
+
     bool isSet() const { return jdksavdecc_eui48_is_set( *this ); }
+
+    int compare( const Eui48 &other ) const
+    {
+        return jdksavdecc_eui48_compare( this, &other );
+    }
+
+    bool operator<( const Eui48 &other ) const { return compare( other ) < 0; }
+
+    bool operator<=( const Eui48 &other ) const
+    {
+        return compare( other ) <= 0;
+    }
+
+    bool operator==( const Eui48 &other ) const
+    {
+        return compare( other ) == 0;
+    }
+
+    bool operator>=( const Eui48 &other ) const
+    {
+        return compare( other ) >= 0;
+    }
+
+    bool operator>( const Eui48 &other ) const { return compare( other ) > 0; }
+
+    bool operator!=( const Eui48 &other ) const
+    {
+        return compare( other ) != 0;
+    }
 };
+
+inline std::ostream &operator<<( std::ostream &o, Eui48 const &v )
+{
+    jdksavdecc_printer p;
+    char buf[128];
+    jdksavdecc_printer_init( &p, buf, sizeof( buf ) );
+    jdksavdecc_printer_print_eui48( &p, v );
+    o << buf;
+    return o;
+}
 
 class Eui64 : public jdksavdecc_eui64
 {
@@ -111,14 +156,58 @@ class Eui64 : public jdksavdecc_eui64
         jdksavdecc_eui64_init_from_cstr( this, s.c_str() );
     }
 
-    Eui64 const &operator=( Eui64 const *other )
+    Eui64 const &operator=( Eui64 const &other )
     {
-        jdksavdecc_eui64_copy( this, other );
+        jdksavdecc_eui64_copy( this, &other );
         return *this;
     }
 
+    uint64_t convertToUint64() const
+    {
+        return jdksavdecc_eui64_convert_to_uint64( this );
+    }
+
     bool isSet() const { return jdksavdecc_eui64_is_set( *this ); }
+
+    int compare( const Eui64 &other ) const
+    {
+        return jdksavdecc_eui64_compare( this, &other );
+    }
+
+    bool operator<( const Eui64 &other ) const { return compare( other ) < 0; }
+
+    bool operator<=( const Eui64 &other ) const
+    {
+        return compare( other ) <= 0;
+    }
+
+    bool operator==( const Eui64 &other ) const
+    {
+        return compare( other ) == 0;
+    }
+
+    bool operator>=( const Eui64 &other ) const
+    {
+        return compare( other ) >= 0;
+    }
+
+    bool operator>( const Eui64 &other ) const { return compare( other ) > 0; }
+
+    bool operator!=( const Eui64 &other ) const
+    {
+        return compare( other ) != 0;
+    }
 };
+
+inline std::ostream &operator<<( std::ostream &o, Eui64 const &v )
+{
+    jdksavdecc_printer p;
+    char buf[128];
+    jdksavdecc_printer_init( &p, buf, sizeof( buf ) );
+    jdksavdecc_printer_print_eui64( &p, v );
+    o << buf;
+    return o;
+}
 
 inline void Eui48_set( Eui48 const &v, void *buf, size_t pos )
 {
