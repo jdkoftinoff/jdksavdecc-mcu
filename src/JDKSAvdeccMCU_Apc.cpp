@@ -140,20 +140,11 @@ void ApcStateMachine::executeStateAccept()
     }
 }
 
-void ApcStateMachine::gotoStateStartTransfer()
-{
+void ApcStateMachine::gotoStateStartTransfer() {}
 
-}
+void ApcStateMachine::executeStateStartTransfer() {}
 
-void ApcStateMachine::executeStateStartTransfer()
-{
-
-}
-
-void ApcStateMachine::gotoStateWaiting()
-{
-
-}
+void ApcStateMachine::gotoStateWaiting() {}
 }
 
 #endif
