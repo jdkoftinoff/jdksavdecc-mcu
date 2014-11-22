@@ -2,11 +2,10 @@ language: cpp
 
 compiler:
   - gcc
-  - clang
 
 before_script:
   - git clone https://github.com/jdkoftinoff/jdksavdecc-c.git
-  - cmake -G "Unix Makefiles" -DJDKSAVDECC_C_LOCAL=ON -DJDKSAVDECC_C_DIR=./jdksavdecc-c
+  - cmake -G "Unix Makefiles" -DJDKSAVDECC_C_LOCAL=ON
 
 script:
   - make
