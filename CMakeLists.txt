@@ -6,10 +6,10 @@ project(${PROJECT} C CXX)
 option(JDKSAVDECC_C_LOCAL "embed jdksavdecc-c from jdksavdecc-c directory" "OFF")
 
 IF(JDKSAVDECC_C_LOCAL MATCHES "ON")
-    add_subdirectory( ${JDKSAVDECC_C_DIR} )
+    add_subdirectory( jdksavdecc-c )
 ENDIF()
     
-include_directories( "include" "jdksavdecc-c" "../jdksavdecc-c/include" )
+include_directories( "include" "jdksavdecc-c/include" "../jdksavdecc-c/include" )
 
 set(LIBS ${LIBS} jdksavdecc-c)
 
