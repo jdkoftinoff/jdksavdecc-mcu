@@ -2,13 +2,12 @@ cmake_minimum_required (VERSION 2.8)
 set(PROJECT jdksavdecc-mcu)
 
 option(JDKSAVDECC_C_LOCAL "embed jdksavdecc-c from jdksavdecc-c directory" "OFF")
-option(JDKSAVDECC_C_DIR "path of jdksavdecc-c directory" "../jdksavdecc-c")
 
 IF(JDKSAVDECC_C_LOCAL MATCHES "ON")
     add_subdirectory( ${JDKSAVDECC_C_DIR} )
 ENDIF()
     
-include_directories( "include" "${JDKSAVDECC_C_DIR}/include" )
+include_directories( "include" "jdksavdecc-c" "../jdksavdecc-c/include" )
 
 set(LIBS ${LIBS} jdksavdecc-c)
 
