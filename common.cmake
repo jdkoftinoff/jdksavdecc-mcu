@@ -47,7 +47,7 @@ elseif (${CMAKE_CXX_COMPILER_ID} MATCHES "Clang")
 elseif(${CMAKE_MAKE_PROGRAM} MATCHES "(msdev|devenv|nmake|MSBuild)")
     add_definitions("/W2")
 else ()
-    message(FATAL_ERROR "Your C++ compiler does not support C++11.")
+    message("Your C++ compiler does not support C++11.")
 endif ()
 
 
