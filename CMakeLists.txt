@@ -1,18 +1,22 @@
 cmake_minimum_required (VERSION 2.8)
 set(PROJECT jdksavdecc-mcu)
 
+option(JDKSAVDECC_C_LOCAL "embed jdksavdecc-c from jdksavdecc-c directory" "OFF")
+option(JDKSAVDECC_C_DIR "path of jdksavdecc-c directory" "../jdksavdecc-c")
+
+IF(JDKSAVDECC_C_LOCAL MATCHES "ON")
+    add_subdirectory( ${JDKSAVDECC_C_DIR} )
+ENDIF()
+    
+include_directories( "include" "${JDKSAVDECC_C_DIR}/include" )
+
 set(LIBS ${LIBS} jdksavdecc-c)
 
-include_directories( "include" "../jdksavdecc-c/include" )
-
-file(GLOB PROJECT_INCLUDES "jdkavdecc-c/include/*.h" "jdkavdecc-c/include/*.hpp" "include/*.hpp" "include/tests/*.hpp" "include/*.h" "include/tests/*.h" )
-file(GLOB PROJECT_SRC "src/*.c" "src/test/*.c" "src/*.cpp" "src/test/*.cpp" "jdksavdecc-c/src/*.c" "jdksavdecc-c/src/*.cpp" "jdkavdecc-c/include/*.h" "jdkavdecc-c/include/*.hpp" )
-
-if(CMAKE_BUILD_TOOL MATCHES "(msdev|devenv|nmake|MSBuild)")
+if( WIN32 )
     include_directories($ENV{PCAP_INCLUDE})
     set(LIBS ${LIBS} wpcap)
     link_directories($ENV{PCAP_LIBRARY})
-else()
+elseif( ${CMAKE_SYSTEM_NAME} MATCHES "Darwin" )
     set(LIBS ${LIBS} pcap)
 endif()
 

@@ -5,10 +5,11 @@ compiler:
   - clang
 
 before_script:
-  - ./configure --defines=JDKSAVDECCMCU_ARDUINO=1
+  - git clone https://github.com/jdkoftinoff/jdksavdecc-c.git
+  - cmake -G "Unix Makefiles" -DJDKSAVDECC_C_LOCAL=ON -DJDKSAVDECC_C_DIR=./jdksavdecc-c
 
 script:
-  - make && make check
+  - make
 
 notifications:
   recipients:
