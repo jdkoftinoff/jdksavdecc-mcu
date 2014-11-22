@@ -6,11 +6,50 @@ option(EXAMPLES "Enable building of example programs" ON)
 option(TOOLS "Enable building of tools" ON)
 option(TOOLS_DEV "Enable building of tools-dev" ON)
 
-project (${PROJECT} C CXX)
 enable_testing()
 
 INCLUDE (CPack)
 INCLUDE (CTest)
+
+set(CMAKE_THREAD_PREFER_PTHREAD TRUE)
+FIND_PACKAGE (Threads)
+
+if(CMAKE_USE_PTHREADS_INIT)
+    if( ${CMAKE_SYSTEM_NAME} MATCHES "Linux" )
+        set(CMAKE_C_FLAGS ${CMAKE_C_FLAGS} "-pthread")
+        set(CMAKE_C_FLAGS ${CMAKE_CXX_FLAGS} "-pthread")
+        set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -pthread")
+    endif()
+endif()
+
+# Compiler-specific C++11 activation.
+if (${CMAKE_CXX_COMPILER_ID} MATCHES "GNU")
+    set(CMAKE_CXX_FLAGS                "-Wall -std=c++11")
+    set(CMAKE_CXX_FLAGS_DEBUG          "-O0 -g")
+    set(CMAKE_CXX_FLAGS_MINSIZEREL     "-Os -DNDEBUG")
+    set(CMAKE_CXX_FLAGS_RELEASE        "-O4 -DNDEBUG")
+    set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "-O2 -g")
+
+    execute_process(
+	COMMAND ${CMAKE_CXX_COMPILER} -dumpversion OUTPUT_VARIABLE GCC_VERSION)
+    if (NOT (GCC_VERSION VERSION_GREATER 4.7 OR GCC_VERSION VERSION_EQUAL 4.7))
+	message(FATAL_ERROR "${PROJECT_NAME} requires g++ 4.7 or greater.")
+    endif ()
+elseif (${CMAKE_CXX_COMPILER_ID} MATCHES "Clang")
+
+    set(CMAKE_CXX_FLAGS                "-Wall -std=c++11")
+    set(CMAKE_CXX_FLAGS_DEBUG          "-O0 -g")
+    set(CMAKE_CXX_FLAGS_MINSIZEREL     "-Os -DNDEBUG")
+    set(CMAKE_CXX_FLAGS_RELEASE        "-O4 -DNDEBUG")
+    set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "-O2 -g")
+
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libc++")
+elseif(${CMAKE_MAKE_PROGRAM} MATCHES "(msdev|devenv|nmake|MSBuild)")
+    add_definitions("/W2")
+else ()
+    message(FATAL_ERROR "Your C++ compiler does not support C++11.")
+endif ()
+
 
 if(TODO MATCHES "ON")
    add_definitions("-DTODO=1")

@@ -1,6 +1,8 @@
 cmake_minimum_required (VERSION 2.8)
 set(PROJECT jdksavdecc-mcu)
 
+project(${PROJECT} C CXX)
+
 option(JDKSAVDECC_C_LOCAL "embed jdksavdecc-c from jdksavdecc-c directory" "OFF")
 
 IF(JDKSAVDECC_C_LOCAL MATCHES "ON")
