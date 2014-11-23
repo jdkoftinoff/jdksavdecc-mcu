@@ -40,6 +40,10 @@
 #include <sys/time.h>
 #endif
 
+#if defined(__APPLE__) || defined(__linux__)
+#include <sys/socket.h>
+#endif
+
 #ifndef JDKSAVDECCMCU_BARE_METAL
 #if defined( __AVR__ )
 #define JDKSAVDECCMCU_ARDUINO 1
