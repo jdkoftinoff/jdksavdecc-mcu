@@ -108,7 +108,7 @@ class Eui48 : public jdksavdecc_eui48
     }
 };
 
-inline std::ostream &operator<<( std::ostream &o, Eui48 const &v )
+inline std::ostream &operator<<( std::ostream &o, jdksavdecc_eui48 const &v )
 {
     jdksavdecc_printer p;
     char buf[128];
@@ -199,7 +199,7 @@ class Eui64 : public jdksavdecc_eui64
     }
 };
 
-inline std::ostream &operator<<( std::ostream &o, Eui64 const &v )
+inline std::ostream &operator<<( std::ostream &o, jdksavdecc_eui64 const &v )
 {
     jdksavdecc_printer p;
     char buf[128];
@@ -209,7 +209,7 @@ inline std::ostream &operator<<( std::ostream &o, Eui64 const &v )
     return o;
 }
 
-inline void Eui48_set( Eui48 const &v, void *buf, size_t pos )
+inline void Eui48_set( jdksavdecc_eui48 const &v, void *buf, size_t pos )
 {
     jdksavdecc_eui48_set( v, buf, pos );
 }
@@ -220,7 +220,7 @@ inline Eui48 Eui48_get( void *buf, size_t pos )
     return v;
 }
 
-inline void Eui64_set( Eui64 const &v, void *buf, size_t pos )
+inline void Eui64_set( jdksavdecc_eui64 const &v, void *buf, size_t pos )
 {
     jdksavdecc_eui64_set( v, buf, pos );
 }
@@ -231,37 +231,37 @@ inline Eui64 Eui64_get( void *buf, size_t pos )
     return v;
 }
 
-inline int Eui48_compare( Eui48 const &lhs, Eui48 const &rhs )
+inline int Eui48_compare( jdksavdecc_eui48 const &lhs, jdksavdecc_eui48 const &rhs )
 {
     return jdksavdecc_eui48_compare( &lhs, &rhs );
 }
 
-inline int Eui64_compare( Eui64 const &lhs, Eui64 const &rhs )
+inline int Eui64_compare( jdksavdecc_eui64 const &lhs, jdksavdecc_eui64 const &rhs )
 {
     return jdksavdecc_eui64_compare( &lhs, &rhs );
 }
 
-inline bool Eui48_is_set( Eui48 const &v )
+inline bool Eui48_is_set( jdksavdecc_eui48 const &v )
 {
     return jdksavdecc_eui48_is_set( v ) != 0;
 }
 
-inline bool Eui48_is_unset( Eui48 const &v )
+inline bool Eui48_is_unset( jdksavdecc_eui48 const &v )
 {
     return jdksavdecc_eui48_is_unset( v ) != 0;
 }
 
-inline bool Eui64_is_set( Eui64 const &v )
+inline bool Eui64_is_set( jdksavdecc_eui64 const &v )
 {
     return jdksavdecc_eui64_is_set( v ) != 0;
 }
 
-inline bool Eui64_is_unset( Eui64 const &v )
+inline bool Eui64_is_unset( jdksavdecc_eui64 const &v )
 {
     return jdksavdecc_eui64_is_unset( v ) != 0;
 }
 
-inline bool Eui64_is_zero( Eui64 const &v )
+inline bool Eui64_is_zero( jdksavdecc_eui64 const &v )
 {
 	return jdksavdecc_eui64_is_zero(v) != 0;
 }
