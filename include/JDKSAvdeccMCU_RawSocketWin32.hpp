@@ -42,7 +42,7 @@ class RawSocketWin32 : public RawSocket
   public:
     RawSocketWin32( const char *interface_name,
                     uint16_t ethertype,
-                    const Eui48 *multicast_to_join = 0 );
+                    const Eui48 &multicast_to_join );
 
     virtual ~RawSocketWin32();
 
