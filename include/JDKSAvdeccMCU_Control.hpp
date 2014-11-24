@@ -42,7 +42,6 @@
 
 namespace JDKSAvdeccMCU
 {
-
 class Control : public Handler
 {
   public:

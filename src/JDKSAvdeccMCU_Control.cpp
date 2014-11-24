@@ -190,6 +190,33 @@ uint8_t Control::validateSetControlCommand( Frame &pdu )
     return status;
 }
 
+uint8_t Control::formSetControlResponse(Frame &pdu)
+{
+    uint8_t status = JDKSAVDECC_AEM_STATUS_ENTITY_MISBEHAVING;
+
+    // TODO: fill in control descriptor contents for SET_CONTROL response
+    (void)pdu;
+    return status;
+}
+
+uint8_t Control::formGetControlCommand(Frame &pdu)
+{
+    uint8_t status = JDKSAVDECC_AEM_STATUS_ENTITY_MISBEHAVING;
+
+    // TODO: fill in control descriptor contents for GET_CONTROL command
+    (void)pdu;
+    return status;
+}
+
+uint8_t Control::formGetControlResponse(Frame &pdu)
+{
+    uint8_t status = JDKSAVDECC_AEM_STATUS_ENTITY_MISBEHAVING;
+
+    // TODO: fill in control descriptor contents for GET_CONTROL response
+    (void)pdu;
+    return status;
+}
+
 uint8_t Control::readControlDescriptor( Frame &pdu )
 {
     uint8_t status = JDKSAVDECC_AEM_STATUS_ENTITY_MISBEHAVING;
