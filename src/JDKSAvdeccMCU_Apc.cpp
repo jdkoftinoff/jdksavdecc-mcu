@@ -32,7 +32,7 @@
 #include "JDKSAvdeccMCU_World.hpp"
 #include "JDKSAvdeccMCU_Apc.hpp"
 
-#if defined( __APPLE__ )
+#if defined( TODO )
 namespace JDKSAvdeccMCU
 {
 

@@ -34,7 +34,7 @@
 #include "JDKSAvdeccMCU_App.hpp"
 #include "JDKSAvdeccMCU_Frame.hpp"
 
-#if defined( __APPLE__ )
+#if defined( TODO )
 namespace JDKSAvdeccMCU
 {
 
