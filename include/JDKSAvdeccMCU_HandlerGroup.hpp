@@ -66,7 +66,8 @@ class HandlerGroup : public Handler
     bool add( Handler *v );
 
     ///
-    /// \brief isFull test if the handler list is full or would be given additional items
+    /// \brief isFull test if the handler list is full or would be given
+    /// additional items
     /// \param additional number of items
     /// \return true if it is or would be full
     ///

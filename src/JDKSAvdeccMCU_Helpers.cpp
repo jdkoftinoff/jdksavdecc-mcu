@@ -63,7 +63,7 @@ bool parseAEM( jdksavdecc_aecpdu_aem *aem, Frame const &rx )
 }
 
 bool isAEMForTarget( jdksavdecc_aecpdu_aem const &aem,
-                            Eui64 const &expected_target_entity_id )
+                     Eui64 const &expected_target_entity_id )
 {
     bool r = false;
     // Is it an AEM_COMMAND?
@@ -82,7 +82,7 @@ bool isAEMForTarget( jdksavdecc_aecpdu_aem const &aem,
 }
 
 bool isAEMForController( jdksavdecc_aecpdu_aem const &aem,
-                                Eui64 const &expected_controller_entity_id )
+                         Eui64 const &expected_controller_entity_id )
 {
     bool r = false;
     // Is it an AEM_RESPONSE?
@@ -148,7 +148,7 @@ bool parseAA( jdksavdecc_aecp_aa *aa, Frame const &pdu )
 }
 
 bool isAAForTarget( jdksavdecc_aecp_aa const &aa,
-                           Eui64 const &expected_target_entity_id )
+                    Eui64 const &expected_target_entity_id )
 {
     bool r = false;
 
@@ -168,7 +168,7 @@ bool isAAForTarget( jdksavdecc_aecp_aa const &aa,
 }
 
 bool isAAForController( jdksavdecc_aecp_aa const &aa,
-                               Eui64 const &expected_controller_entity_id )
+                        Eui64 const &expected_controller_entity_id )
 {
     bool r = false;
 
@@ -188,10 +188,10 @@ bool isAAForController( jdksavdecc_aecp_aa const &aa,
 }
 
 void setAAReply( uint8_t status_code,
-                        uint16_t new_length,
-                        uint8_t *buf,
-                        uint16_t pos,
-                        uint16_t len )
+                 uint16_t new_length,
+                 uint8_t *buf,
+                 uint16_t pos,
+                 uint16_t len )
 {
     if ( len > pos + 2 )
     {
@@ -238,7 +238,7 @@ bool parseACMP( jdksavdecc_acmpdu *acmpdu, Frame const &pdu )
 }
 
 bool isACMPInvolvingTarget( jdksavdecc_acmpdu const &acmpdu,
-                                   Eui64 const &entity_id )
+                            Eui64 const &entity_id )
 {
     bool r = false;
 
@@ -251,7 +251,4 @@ bool isACMPInvolvingTarget( jdksavdecc_acmpdu const &acmpdu,
 
     return r;
 }
-
-
 }
-

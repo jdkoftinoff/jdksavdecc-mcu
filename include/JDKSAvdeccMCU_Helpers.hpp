@@ -60,13 +60,14 @@ bool parseAEM( jdksavdecc_aecpdu_aem *aem, Frame const &rx );
 /// \return true if the AEM message is for the entity
 ///
 bool isAEMForTarget( jdksavdecc_aecpdu_aem const &aem,
-                            Eui64 const &expected_target_entity_id );
+                     Eui64 const &expected_target_entity_id );
 
 ///
 /// \brief isAEMForController Test if AEM message is response for a controller
 /// \param aem AECPDU AEM structure to read
 /// \param expected_controller_entity_id Controller Entity ID to test for
-/// \return true if the message is AEM response for the specified controller entity id
+/// \return true if the message is AEM response for the specified controller
+/// entity id
 ///
 bool isAEMForController( jdksavdecc_aecpdu_aem const &aem,
                          Eui64 const &expected_controller_entity_id );
@@ -125,18 +126,16 @@ void formAEMSetControl( Eui48 const &dest_mac,
                         uint16_t value_data_length,
                         uint8_t *buf );
 
-
 void setAEMReply( uint8_t status_code, uint16_t new_length, Frame &pdu );
 
 void setAAReply( uint8_t status_code,
-                        uint16_t new_length,
-                        uint8_t *buf,
-                        uint16_t pos,
-                        uint16_t len );
+                 uint16_t new_length,
+                 uint8_t *buf,
+                 uint16_t pos,
+                 uint16_t len );
 
 bool parseACMP( jdksavdecc_acmpdu *acmpdu, Frame const &pdu );
 
 bool isACMPInvolvingTarget( jdksavdecc_acmpdu const &acmpdu,
-                                   Eui64 const &entity_id );
-
+                            Eui64 const &entity_id );
 }

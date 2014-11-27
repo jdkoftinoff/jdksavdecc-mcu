@@ -231,12 +231,14 @@ inline Eui64 Eui64_get( void *buf, size_t pos )
     return v;
 }
 
-inline int Eui48_compare( jdksavdecc_eui48 const &lhs, jdksavdecc_eui48 const &rhs )
+inline int Eui48_compare( jdksavdecc_eui48 const &lhs,
+                          jdksavdecc_eui48 const &rhs )
 {
     return jdksavdecc_eui48_compare( &lhs, &rhs );
 }
 
-inline int Eui64_compare( jdksavdecc_eui64 const &lhs, jdksavdecc_eui64 const &rhs )
+inline int Eui64_compare( jdksavdecc_eui64 const &lhs,
+                          jdksavdecc_eui64 const &rhs )
 {
     return jdksavdecc_eui64_compare( &lhs, &rhs );
 }
@@ -263,6 +265,6 @@ inline bool Eui64_is_unset( jdksavdecc_eui64 const &v )
 
 inline bool Eui64_is_zero( jdksavdecc_eui64 const &v )
 {
-	return jdksavdecc_eui64_is_zero(v) != 0;
+    return jdksavdecc_eui64_is_zero( v ) != 0;
 }
 }

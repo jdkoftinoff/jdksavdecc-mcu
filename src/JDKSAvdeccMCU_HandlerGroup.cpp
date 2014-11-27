@@ -55,7 +55,6 @@ bool HandlerGroup::add( Handler *v )
     return r;
 }
 
-
 bool HandlerGroup::pollNet()
 {
     bool r = false;

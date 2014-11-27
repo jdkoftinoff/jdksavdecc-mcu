@@ -2,7 +2,8 @@
 
 #include "JDKSAvdeccMCU_Arduino.hpp"
 
-#if JDKSAVDECCMCU_ARDUINO == 1 && JDKSAVDECCMCU_BARE_METAL == 0 && !defined(_WIN32)
+#if JDKSAVDECCMCU_ARDUINO == 1 && JDKSAVDECCMCU_BARE_METAL == 0                \
+    && !defined( _WIN32 )
 
 Serial_ Serial( stdin, stdout );
 

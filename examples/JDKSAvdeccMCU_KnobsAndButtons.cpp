@@ -1,4 +1,4 @@
-#if defined( __APPLE__ ) || defined( __linux__ ) || defined(_WIN32)
+#if defined( __APPLE__ ) || defined( __linux__ ) || defined( _WIN32 )
 #define JDKSAVDECCMCU_ARDUINO 1
 #define JDKSAVDDECC_ARDUINO_FAKE_IMPL 1
 #else
@@ -6,7 +6,7 @@
 #include <Ethernet.h>
 #endif
 
-#if !defined(_WIN32)
+#if !defined( _WIN32 )
 
 #include "JDKSAvdeccMCU_Arduino.h"
 
