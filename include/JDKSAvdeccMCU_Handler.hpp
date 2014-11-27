@@ -45,12 +45,23 @@ class Handler
   public:
     virtual ~Handler();
 
-    /// Notification of time passage
+    ///
+    /// \brief tick Notification of time passage
+    /// \param timestamp the current monotonic time in milleconds
+    ///
     virtual void tick( jdksavdecc_timestamp_in_milliseconds timestamp );
 
-    /// Notification of received raw PDU. Return true if PDU is handled
+    ///
+    /// \brief receivedPDU Notification of received raw PDU. Return true if PDU is handled
+    /// \param frame reference to received Frame object
+    /// \return true if the message was handled
+    ///
     virtual bool receivedPDU( Frame &frame );
 
+    ///
+    /// \brief addToHandlerGroup Register this handler with a HandlerGroup object
+    /// \param group HandlerGroup to add to
+    ///
     virtual void addToHandlerGroup( HandlerGroup &group );
 };
 }
