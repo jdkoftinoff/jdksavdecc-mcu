@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		BF01F9FC1A2709870068F4C7 /* JDKSAvdeccMCU_Apc.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BF01F9FA1A2709870068F4C7 /* JDKSAvdeccMCU_Apc.cpp */; };
+		BF01F9FD1A2709870068F4C7 /* JDKSAvdeccMCU_Helpers.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BF01F9FB1A2709870068F4C7 /* JDKSAvdeccMCU_Helpers.cpp */; };
 		BF0DCB3119F80F7E008C4455 /* JDKSAvdeccMCU_ArduinoFakeImpl.h in Headers */ = {isa = PBXBuildFile; fileRef = BF0DCB3019F80F7E008C4455 /* JDKSAvdeccMCU_ArduinoFakeImpl.h */; };
 		BF1604E01A02A9770067D241 /* JDKSAvdeccMCU_Control.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BF1604DE1A02A9770067D241 /* JDKSAvdeccMCU_Control.cpp */; };
 		BF1604E11A02A9770067D241 /* JDKSAvdeccMCU_ControlIdentify.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BF1604DF1A02A9770067D241 /* JDKSAvdeccMCU_ControlIdentify.cpp */; };
@@ -145,6 +147,8 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		BF01F9FA1A2709870068F4C7 /* JDKSAvdeccMCU_Apc.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = JDKSAvdeccMCU_Apc.cpp; path = ../../src/JDKSAvdeccMCU_Apc.cpp; sourceTree = "<group>"; };
+		BF01F9FB1A2709870068F4C7 /* JDKSAvdeccMCU_Helpers.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = JDKSAvdeccMCU_Helpers.cpp; path = ../../src/JDKSAvdeccMCU_Helpers.cpp; sourceTree = "<group>"; };
 		BF0DCB3019F80F7E008C4455 /* JDKSAvdeccMCU_ArduinoFakeImpl.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = JDKSAvdeccMCU_ArduinoFakeImpl.h; path = ../../include/JDKSAvdeccMCU_ArduinoFakeImpl.h; sourceTree = "<group>"; };
 		BF1604DE1A02A9770067D241 /* JDKSAvdeccMCU_Control.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = JDKSAvdeccMCU_Control.cpp; path = ../../src/JDKSAvdeccMCU_Control.cpp; sourceTree = "<group>"; };
 		BF1604DF1A02A9770067D241 /* JDKSAvdeccMCU_ControlIdentify.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = JDKSAvdeccMCU_ControlIdentify.cpp; path = ../../src/JDKSAvdeccMCU_ControlIdentify.cpp; sourceTree = "<group>"; };
@@ -306,6 +310,7 @@
 			children = (
 				BF16174819EC2BBF00CD64A2 /* JDKSAvdeccMCU_ADPManager.cpp */,
 				BF16171619EC2BB100CD64A2 /* JDKSAvdeccMCU_ADPManager.hpp */,
+				BF01F9FA1A2709870068F4C7 /* JDKSAvdeccMCU_Apc.cpp */,
 				BFDECDC61A1DBAC2005ABCDE /* JDKSAvdeccMCU_Apc.hpp */,
 				BFDECDC71A1DBAC2005ABCDE /* JDKSAvdeccMCU_App.hpp */,
 				BFDECDC81A1DBAC2005ABCDE /* JDKSAvdeccMCU_Aps.hpp */,
@@ -337,6 +342,7 @@
 				BF16172019EC2BB100CD64A2 /* JDKSAvdeccMCU_Handler.hpp */,
 				BF16175019EC2BBF00CD64A2 /* JDKSAvdeccMCU_HandlerGroup.cpp */,
 				BF16172119EC2BB100CD64A2 /* JDKSAvdeccMCU_HandlerGroup.hpp */,
+				BF01F9FB1A2709870068F4C7 /* JDKSAvdeccMCU_Helpers.cpp */,
 				BF16172219EC2BB100CD64A2 /* JDKSAvdeccMCU_Helpers.hpp */,
 				BF16172319EC2BB100CD64A2 /* JDKSAvdeccMCU_IntelGalileo.hpp */,
 				BF8A584319FCB6AA00107E1D /* JDKSAvdeccMCU_MDNSRegister.hpp */,
@@ -622,6 +628,7 @@
 				BF16176A19EC2BBF00CD64A2 /* JDKSAvdeccMCU_RawSocketWin32.cpp in Sources */,
 				BF1617CE19EC2BF700CD64A2 /* jdksavdecc_app_print.c in Sources */,
 				BF1617D119EC2BF700CD64A2 /* jdksavdecc_descriptor_storage_gen.c in Sources */,
+				BF01F9FC1A2709870068F4C7 /* JDKSAvdeccMCU_Apc.cpp in Sources */,
 				BF1617CF19EC2BF700CD64A2 /* jdksavdecc_app.c in Sources */,
 				BF16176119EC2BBF00CD64A2 /* JDKSAvdeccMCU_Handler.cpp in Sources */,
 				BF1617D919EC2BF700CD64A2 /* jdksavdecc_pdu.c in Sources */,
@@ -632,6 +639,7 @@
 				BF1617D519EC2BF700CD64A2 /* jdksavdecc_jdks.c in Sources */,
 				BF16176319EC2BBF00CD64A2 /* JDKSAvdeccMCU_PcapFile.cpp in Sources */,
 				BF16176219EC2BBF00CD64A2 /* JDKSAvdeccMCU_HandlerGroup.cpp in Sources */,
+				BF01F9FD1A2709870068F4C7 /* JDKSAvdeccMCU_Helpers.cpp in Sources */,
 				BF1617DC19EC2BF700CD64A2 /* jdksavdecc_util.c in Sources */,
 				BF1617DD19EC2BF700CD64A2 /* jdksavdecc.c in Sources */,
 				BF1604E01A02A9770067D241 /* JDKSAvdeccMCU_Control.cpp in Sources */,
