@@ -51,26 +51,56 @@ class HandlerGroup : public Handler
     uint32_t m_handled_count;
 
   public:
+    ///
+    /// \brief HandlerGroup construct a HandlerGroup object
+    /// \param item_storage pointer to array of pointers to Handler objects
+    /// \param max_items maximum number of pointers that the array can hold
+    ///
     HandlerGroup( Handler **item_storage, uint16_t max_items );
 
-    /// Add a handler to the list
+    ///
+    /// \brief add Add a handler to the list
+    /// \param v pointer to a Handler object
+    /// \return true on success, false if there is no room
+    ///
     bool add( Handler *v );
 
+    ///
+    /// \brief isFull test if the handler list is full or would be given additional items
+    /// \param additional number of items
+    /// \return true if it is or would be full
+    ///
     bool isFull( uint16_t additional = 0 ) const
     {
         return ( m_num_items + additional ) >= m_max_items;
     }
 
+    ///
+    /// \brief canPut test if the handler list has room for additional items
+    /// \param additional count of additional items
+    /// \return true if there is room
+    ///
     bool canPut( uint16_t additional = 1 ) const
     {
         return ( m_num_items + additional ) <= m_max_items;
     }
 
+    ///
+    /// \brief getRxCount get the count of received packets
+    /// \return count
+    ///
     uint32_t getRxCount() const { return m_rx_count; }
 
+    ///
+    /// \brief getHandledCount get the count of handled reeeived packets
+    /// \return count
+    ///
     uint32_t getHandledCount() const { return m_handled_count; }
 
-    /// Poll the NetIO object for an incoming frame.
+    ///
+    /// \brief pollNet Polls the RawSocket objects for an incoming frame
+    /// \return true if a message was received and processed
+    ///
     virtual bool pollNet();
 
     /// Send Tick() messages to all encapsulated Handlers

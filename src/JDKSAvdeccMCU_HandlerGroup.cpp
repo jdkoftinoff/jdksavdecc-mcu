@@ -55,7 +55,7 @@ bool HandlerGroup::add( Handler *v )
     return r;
 }
 
-// Poll the NetIO object for an incoming frame. If it is multicast, or m
+
 bool HandlerGroup::pollNet()
 {
     bool r = false;
