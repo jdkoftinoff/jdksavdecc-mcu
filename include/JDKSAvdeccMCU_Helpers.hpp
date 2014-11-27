@@ -45,32 +45,67 @@ inline bool wasTimeOutHit( jdksavdecc_timestamp_in_milliseconds cur_time,
     return difftime > timeout;
 }
 
-/// Helper function to parse AECP AEM message
+///
+/// \brief parseAEM Helper function to parse AECP AEM message
+/// \param aem pointer to AECPDU AEM structure to fill in
+/// \param buf pointer to the raw packet buffer
+/// \param pos offset in the buffer to the first payload byte
+/// \param len length of the valid data in the buffer
+/// \return true if the message is an AECPDU AEM message
+///
 bool parseAEM( jdksavdecc_aecpdu_aem *aem,
                uint8_t const *buf,
                uint16_t pos,
                uint16_t len );
 
-/// Test to see if AECPDU AEM message is a command for the specified target
-/// entity
+///
+/// \brief isAEMForTarget Test to see if AECPDU AEM message is a for target
+/// \param aem AECPDU AEM structure to read
+/// \param expected_target_entity_id Eui64 to test for
+/// \return true if the AEM message is for the entity
+///
 bool isAEMForTarget( jdksavdecc_aecpdu_aem const &aem,
                      Eui64 const &expected_target_entity_id );
 
 /// Test to see if AECPDU AEM message is a response for the specified controller
 /// entity
+
+///
+/// \brief isAEMForController Test if AEM message is response for a controller
+/// \param aem AECPDU AEM structure to read
+/// \param expected_controller_entity_id Controller Entity ID to test for
+/// \return true if the message is AEM response for the specified controller entity id
+///
 bool isAEMForController( jdksavdecc_aecpdu_aem const &aem,
                          Eui64 const &expected_controller_entity_id );
 
+///
+/// \brief setAEMReply Convert AEM command packet to an AEM response
+///
 /// Twiddle the header bytes to convert this message from AEM_COMMAND to
 /// AEM_RESPONSE in place with the new status code, and the new
 /// control_data_length to match the new_length
+///
+/// \param status_code The new AECPDU AEM status code to use
+/// \param new_length The new length to use
+/// \param buf The pointer to the base of the packet buffer
+/// \param pos The position of the packet payload
+/// \param len The length of the entire packet
+///
 void setAEMReply( uint8_t status_code,
                   uint16_t new_length,
                   uint8_t *buf,
                   uint16_t pos,
                   uint16_t len );
 
-/// Helper function to parse AECP AA message
+///
+/// \brief parseAA Helper function to parse AECP AA message
+/// \param aa Pointer to aecp aa structure to fill in
+/// \param buf pointer to the raw packet buffer
+/// \param pos offset in the buffer to the first payload byte
+/// \param len length of the valid data in the buffer
+/// \return true if the message is an AECPDU AA message
+///
 bool parseAA( jdksavdecc_aecp_aa *aa,
               uint8_t const *buf,
               uint16_t pos,
