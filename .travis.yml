@@ -1,0 +1,23 @@
+language: cpp
+
+compiler:
+  - gcc
+
+before_script:
+  - git clone https://github.com/jdkoftinoff/jdksavdecc-c.git
+  - cmake -G "Unix Makefiles" -DJDKSAVDECC_C_LOCAL=ON
+
+script:
+  - make
+
+notifications:
+  recipients:
+    - jeffk@jdkoftinoff.com
+  email:
+    on_success: change
+    on_failure: always
+
+os:
+  - linux
+  - osx
+

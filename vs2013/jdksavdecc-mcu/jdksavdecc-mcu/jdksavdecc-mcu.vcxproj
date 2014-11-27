@@ -1,0 +1,195 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{CA6A9DE5-D336-4BC8-B4D5-87AF935E67CA}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <RootNamespace>jdksavdeccmcu</RootNamespace>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v120</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v120</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <IncludePath>$(WindowsSDK_IncludePath);$(VC_IncludePath);$(SolutionDir)..\..\include;$(PCAP_INCLUDE);$(SolutionDir)..\..\jdksavdecc-c\include</IncludePath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <IncludePath>$(WindowsSDK_IncludePath);$(VC_IncludePath);$(SolutionDir)..\..\include;$(PCAP_INCLUDE);$(SolutionDir)..\..\jdksavdecc-c\include</IncludePath>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <Text Include="ReadMe.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\include\JDKSAvdeccMCU.hpp" />
+    <ClInclude Include="..\..\..\include\JDKSAvdeccMCU_ADPManager.hpp" />
+    <ClInclude Include="..\..\..\include\JDKSAvdeccMCU_Arduino.h" />
+    <ClInclude Include="..\..\..\include\JDKSAvdeccMCU_Arduino.hpp" />
+    <ClInclude Include="..\..\..\include\JDKSAvdeccMCU_ArduinoFakeImpl.h" />
+    <ClInclude Include="..\..\..\include\JDKSAvdeccMCU_Control.hpp" />
+    <ClInclude Include="..\..\..\include\JDKSAvdeccMCU_ControlIdentify.hpp" />
+    <ClInclude Include="..\..\..\include\JDKSAvdeccMCU_ControllerEntity.hpp" />
+    <ClInclude Include="..\..\..\include\JDKSAvdeccMCU_ControlReceiver.hpp" />
+    <ClInclude Include="..\..\..\include\JDKSAvdeccMCU_ControlSender.hpp" />
+    <ClInclude Include="..\..\..\include\JDKSAvdeccMCU_ControlValueHolder.hpp" />
+    <ClInclude Include="..\..\..\include\JDKSAvdeccMCU_EEPromStorage.hpp" />
+    <ClInclude Include="..\..\..\include\JDKSAvdeccMCU_Entity.hpp" />
+    <ClInclude Include="..\..\..\include\JDKSAvdeccMCU_EntityState.hpp" />
+    <ClInclude Include="..\..\..\include\JDKSAvdeccMCU_FixedBuffer.hpp" />
+    <ClInclude Include="..\..\..\include\JDKSAvdeccMCU_Frame.hpp" />
+    <ClInclude Include="..\..\..\include\JDKSAvdeccMCU_Handler.hpp" />
+    <ClInclude Include="..\..\..\include\JDKSAvdeccMCU_HandlerGroup.hpp" />
+    <ClInclude Include="..\..\..\include\JDKSAvdeccMCU_Helpers.hpp" />
+    <ClInclude Include="..\..\..\include\JDKSAvdeccMCU_IntelGalileo.hpp" />
+    <ClInclude Include="..\..\..\include\JDKSAvdeccMCU_MDNSRegister.hpp" />
+    <ClInclude Include="..\..\..\include\JDKSAvdeccMCU_PcapFile.hpp" />
+    <ClInclude Include="..\..\..\include\JDKSAvdeccMCU_PcapFileReader.hpp" />
+    <ClInclude Include="..\..\..\include\JDKSAvdeccMCU_PcapFileWriter.hpp" />
+    <ClInclude Include="..\..\..\include\JDKSAvdeccMCU_RawSocket.hpp" />
+    <ClInclude Include="..\..\..\include\JDKSAvdeccMCU_RawSocketLinux.hpp" />
+    <ClInclude Include="..\..\..\include\JDKSAvdeccMCU_RawSocketMacOSX.hpp" />
+    <ClInclude Include="..\..\..\include\JDKSAvdeccMCU_RawSocketPcapFile.hpp" />
+    <ClInclude Include="..\..\..\include\JDKSAvdeccMCU_RawSocketWin32.hpp" />
+    <ClInclude Include="..\..\..\include\JDKSAvdeccMCU_RawSocketWizNet.hpp" />
+    <ClInclude Include="..\..\..\include\JDKSAvdeccMCU_World.hpp" />
+    <ClInclude Include="..\..\..\jdksavdecc-c\include\jdksavdecc.h" />
+    <ClInclude Include="..\..\..\jdksavdecc-c\include\jdksavdecc_acmp.h" />
+    <ClInclude Include="..\..\..\jdksavdecc-c\include\jdksavdecc_acmp_print.h" />
+    <ClInclude Include="..\..\..\jdksavdecc-c\include\jdksavdecc_adp.h" />
+    <ClInclude Include="..\..\..\jdksavdecc-c\include\jdksavdecc_adp_print.h" />
+    <ClInclude Include="..\..\..\jdksavdecc-c\include\jdksavdecc_aecp.h" />
+    <ClInclude Include="..\..\..\jdksavdecc-c\include\jdksavdecc_aecp_aa.h" />
+    <ClInclude Include="..\..\..\jdksavdecc-c\include\jdksavdecc_aecp_aem.h" />
+    <ClInclude Include="..\..\..\jdksavdecc-c\include\jdksavdecc_aecp_avc.h" />
+    <ClInclude Include="..\..\..\jdksavdecc-c\include\jdksavdecc_aecp_hdcp_apm.h" />
+    <ClInclude Include="..\..\..\jdksavdecc-c\include\jdksavdecc_aecp_print.h" />
+    <ClInclude Include="..\..\..\jdksavdecc-c\include\jdksavdecc_aecp_vendor.h" />
+    <ClInclude Include="..\..\..\jdksavdecc-c\include\jdksavdecc_aem_command.h" />
+    <ClInclude Include="..\..\..\jdksavdecc-c\include\jdksavdecc_aem_descriptor.h" />
+    <ClInclude Include="..\..\..\jdksavdecc-c\include\jdksavdecc_aem_print.h" />
+    <ClInclude Include="..\..\..\jdksavdecc-c\include\jdksavdecc_app.h" />
+    <ClInclude Include="..\..\..\jdksavdecc-c\include\jdksavdecc_app_print.h" />
+    <ClInclude Include="..\..\..\jdksavdecc-c\include\jdksavdecc_avr.h" />
+    <ClInclude Include="..\..\..\jdksavdecc-c\include\jdksavdecc_control.h" />
+    <ClInclude Include="..\..\..\jdksavdecc-c\include\jdksavdecc_descriptor_storage.h" />
+    <ClInclude Include="..\..\..\jdksavdecc-c\include\jdksavdecc_descriptor_storage_gen.h" />
+    <ClInclude Include="..\..\..\jdksavdecc-c\include\jdksavdecc_entity_model.h" />
+    <ClInclude Include="..\..\..\jdksavdecc-c\include\jdksavdecc_frame.h" />
+    <ClInclude Include="..\..\..\jdksavdecc-c\include\jdksavdecc_jdks.h" />
+    <ClInclude Include="..\..\..\jdksavdecc-c\include\jdksavdecc_maap.h" />
+    <ClInclude Include="..\..\..\jdksavdecc-c\include\jdksavdecc_maap_print.h" />
+    <ClInclude Include="..\..\..\jdksavdecc-c\include\jdksavdecc_ms.h" />
+    <ClInclude Include="..\..\..\jdksavdecc-c\include\jdksavdecc_msinttypes.h" />
+    <ClInclude Include="..\..\..\jdksavdecc-c\include\jdksavdecc_msstdint.h" />
+    <ClInclude Include="..\..\..\jdksavdecc-c\include\jdksavdecc_pdu.h" />
+    <ClInclude Include="..\..\..\jdksavdecc-c\include\jdksavdecc_pdu_print.h" />
+    <ClInclude Include="..\..\..\jdksavdecc-c\include\jdksavdecc_plus.hpp" />
+    <ClInclude Include="..\..\..\jdksavdecc-c\include\jdksavdecc_print.h" />
+    <ClInclude Include="..\..\..\jdksavdecc-c\include\jdksavdecc_util.h" />
+    <ClInclude Include="..\..\..\jdksavdecc-c\include\jdksavdecc_world.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\..\jdksavdecc-c\src\jdksavdecc.c" />
+    <ClCompile Include="..\..\..\jdksavdecc-c\src\jdksavdecc_acmp_print.c" />
+    <ClCompile Include="..\..\..\jdksavdecc-c\src\jdksavdecc_adp_print.c" />
+    <ClCompile Include="..\..\..\jdksavdecc-c\src\jdksavdecc_aecp_print.c" />
+    <ClCompile Include="..\..\..\jdksavdecc-c\src\jdksavdecc_aem_descriptor.c" />
+    <ClCompile Include="..\..\..\jdksavdecc-c\src\jdksavdecc_aem_print.c" />
+    <ClCompile Include="..\..\..\jdksavdecc-c\src\jdksavdecc_app.c" />
+    <ClCompile Include="..\..\..\jdksavdecc-c\src\jdksavdecc_app_print.c" />
+    <ClCompile Include="..\..\..\jdksavdecc-c\src\jdksavdecc_control.c" />
+    <ClCompile Include="..\..\..\jdksavdecc-c\src\jdksavdecc_descriptor_storage.c" />
+    <ClCompile Include="..\..\..\jdksavdecc-c\src\jdksavdecc_descriptor_storage_gen.c" />
+    <ClCompile Include="..\..\..\jdksavdecc-c\src\jdksavdecc_entity_model.c" />
+    <ClCompile Include="..\..\..\jdksavdecc-c\src\jdksavdecc_frame.c" />
+    <ClCompile Include="..\..\..\jdksavdecc-c\src\jdksavdecc_jdks.c" />
+    <ClCompile Include="..\..\..\jdksavdecc-c\src\jdksavdecc_maap.c" />
+    <ClCompile Include="..\..\..\jdksavdecc-c\src\jdksavdecc_maap_print.c" />
+    <ClCompile Include="..\..\..\jdksavdecc-c\src\jdksavdecc_pdu.c" />
+    <ClCompile Include="..\..\..\jdksavdecc-c\src\jdksavdecc_pdu_print.c" />
+    <ClCompile Include="..\..\..\jdksavdecc-c\src\jdksavdecc_print.c" />
+    <ClCompile Include="..\..\..\jdksavdecc-c\src\jdksavdecc_util.c" />
+    <ClCompile Include="..\..\..\src\JDKSAvdeccMCU_ADPManager.cpp" />
+    <ClCompile Include="..\..\..\src\JDKSAvdeccMCU_Control.cpp" />
+    <ClCompile Include="..\..\..\src\JDKSAvdeccMCU_ControlIdentify.cpp" />
+    <ClCompile Include="..\..\..\src\JDKSAvdeccMCU_ControllerEntity.cpp" />
+    <ClCompile Include="..\..\..\src\JDKSAvdeccMCU_ControlSender.cpp" />
+    <ClCompile Include="..\..\..\src\JDKSAvdeccMCU_ControlValueHolder.cpp" />
+    <ClCompile Include="..\..\..\src\JDKSAvdeccMCU_EEPromStorage.cpp" />
+    <ClCompile Include="..\..\..\src\JDKSAvdeccMCU_Entity.cpp" />
+    <ClCompile Include="..\..\..\src\JDKSAvdeccMCU_EntityState.cpp" />
+    <ClCompile Include="..\..\..\src\JDKSAvdeccMCU_FixedBuffer.cpp" />
+    <ClCompile Include="..\..\..\src\JDKSAvdeccMCU_Handler.cpp" />
+    <ClCompile Include="..\..\..\src\JDKSAvdeccMCU_HandlerGroup.cpp" />
+    <ClCompile Include="..\..\..\src\JDKSAvdeccMCU_PcapFile.cpp" />
+    <ClCompile Include="..\..\..\src\JDKSAvdeccMCU_PcapFileReader.cpp" />
+    <ClCompile Include="..\..\..\src\JDKSAvdeccMCU_PcapFileWriter.cpp" />
+    <ClCompile Include="..\..\..\src\JDKSAvdeccMCU_RawSocket.cpp" />
+    <ClCompile Include="..\..\..\src\JDKSAvdeccMCU_RawSocketLinux.cpp" />
+    <ClCompile Include="..\..\..\src\JDKSAvdeccMCU_RawSocketMacOSX.cpp" />
+    <ClCompile Include="..\..\..\src\JDKSAvdeccMCU_RawSocketPcapFile.cpp" />
+    <ClCompile Include="..\..\..\src\JDKSAvdeccMCU_RawSocketWin32.cpp" />
+    <ClCompile Include="..\..\..\src\JDKSAvdeccMCU_RawSocketWizNet.cpp" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>
