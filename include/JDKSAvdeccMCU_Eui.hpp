@@ -268,3 +268,4 @@ inline std::ostream &operator<<( std::ostream &o, jdksavdecc_eui64 const &v )
     o << buf;
     return o;
 }
+
