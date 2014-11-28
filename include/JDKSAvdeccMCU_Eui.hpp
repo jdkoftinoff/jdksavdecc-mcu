@@ -36,11 +36,24 @@
 namespace JDKSAvdeccMCU
 {
 
+///
+/// \brief The Eui48 class hold an IEEE EUI48 / MAC Address
+///
 class Eui48 : public jdksavdecc_eui48
 {
   public:
+
+    ///
+    /// \brief Eui48 constructor
+    ///
+    /// Initialize all octets to 0xff
+    ///
     Eui48() { jdksavdecc_eui48_init( this ); }
 
+    ///
+    /// \brief Eui48 Construct with 6 octet values
+    /// \param a-f The 6 octets that make up the EUI48
+    ///
     Eui48( uint8_t a, uint8_t b, uint8_t c, uint8_t d, uint8_t e, uint8_t f )
     {
         value[0] = a;
@@ -51,58 +64,100 @@ class Eui48 : public jdksavdecc_eui48
         value[5] = f;
     }
 
+    ///
+    /// \brief Eui48 copy constructor from jdksavdecc_eui48 base class
+    /// \param other
+    ///
     Eui48( jdksavdecc_eui48 const &other )
     {
         jdksavdecc_eui48_copy( this, &other );
     }
 
+    ///
+    /// \brief Eui48 construct with right justified uint64_t
+    /// \param v uint64_t with low 48 bits containing EUI48
+    ///
     Eui48( uint64_t v ) { jdksavdecc_eui48_init_from_uint64( this, v ); }
 
+    ///
+    /// \brief Eui48 constructor from c string
+    ///
+    /// Parses in form UU:VV:WW:XX:YY:ZZ and
+    /// UU-VV-WW-XX-YY-ZZ
+    ///
+    /// \param s pointer to C string
+    ///
     Eui48( const char *s ) { jdksavdecc_eui48_init_from_cstr( this, s ); }
 
+    ///
+    /// \brief Eui48 constructor from C++ string
+    ///
+    /// Parses in form UU:VV:WW:XX:YY:ZZ and
+    /// UU-VV-WW-XX-YY-ZZ
+    ///
+    /// \param s std::string reference
+    ///
     Eui48( std::string const &s )
     {
         jdksavdecc_eui48_init_from_cstr( this, s.c_str() );
     }
 
-    Eui48 const &operator=( Eui48 const &other )
+    ///
+    /// \brief operator = from jdksavdecc_eui48
+    /// \param other reference to jdksavedecc_eui48
+    /// \return const reference to self
+    ///
+    Eui48 const &operator=( jdksavdecc_eui48 const &other )
     {
         jdksavdecc_eui48_copy( this, &other );
         return *this;
     }
 
+    ///
+    /// \brief convertToUint64 convert to uine64_t
+    /// \return uint64_t with lower 48 bits containing EUI48
+    ///
     uint64_t convertToUint64() const
     {
         return jdksavdecc_eui48_convert_to_uint64( this );
     }
 
+    ///
+    /// \brief isSet checks is Eui48 has been initialized
+    /// \return true if the EUI48 is not FF:FF:FF:FF:FF:FF
+    ///
     bool isSet() const { return jdksavdecc_eui48_is_set( *this ) != 0; }
 
-    int compare( const Eui48 &other ) const
+    ///
+    /// \brief compare Numeric compare with other Ei48
+    /// \param other jdksavdecc_eui48 reference to compare to
+    /// \return -1 if less than other, 0 if equal to other, 1 if greater than other
+    ///
+    int compare( const jdksavdecc_eui48 &other ) const
     {
         return jdksavdecc_eui48_compare( this, &other );
     }
 
-    bool operator<( const Eui48 &other ) const { return compare( other ) < 0; }
+    bool operator<( const jdksavdecc_eui48 &other ) const { return compare( other ) < 0; }
 
-    bool operator<=( const Eui48 &other ) const
+    bool operator<=( const jdksavdecc_eui48 &other ) const
     {
         return compare( other ) <= 0;
     }
 
-    bool operator==( const Eui48 &other ) const
+    bool operator==( const jdksavdecc_eui48 &other ) const
     {
         return compare( other ) == 0;
     }
 
-    bool operator>=( const Eui48 &other ) const
+    bool operator>=( const jdksavdecc_eui48 &other ) const
     {
         return compare( other ) >= 0;
     }
 
-    bool operator>( const Eui48 &other ) const { return compare( other ) > 0; }
+    bool operator>( const jdksavdecc_eui48 &other ) const { return compare( other ) > 0; }
 
-    bool operator!=( const Eui48 &other ) const
+    bool operator!=( const jdksavdecc_eui48 &other ) const
     {
         return compare( other ) != 0;
     }
