@@ -108,16 +108,6 @@ class Eui48 : public jdksavdecc_eui48
     }
 };
 
-inline std::ostream &operator<<( std::ostream &o, jdksavdecc_eui48 const &v )
-{
-    jdksavdecc_printer p;
-    char buf[128];
-    jdksavdecc_printer_init( &p, buf, sizeof( buf ) );
-    jdksavdecc_printer_print_eui48( &p, v );
-    o << buf;
-    return o;
-}
-
 class Eui64 : public jdksavdecc_eui64
 {
   public:
@@ -199,16 +189,6 @@ class Eui64 : public jdksavdecc_eui64
     }
 };
 
-inline std::ostream &operator<<( std::ostream &o, jdksavdecc_eui64 const &v )
-{
-    jdksavdecc_printer p;
-    char buf[128];
-    jdksavdecc_printer_init( &p, buf, sizeof( buf ) );
-    jdksavdecc_printer_print_eui64( &p, v );
-    o << buf;
-    return o;
-}
-
 inline void Eui48_set( jdksavdecc_eui48 const &v, void *buf, size_t pos )
 {
     jdksavdecc_eui48_set( v, buf, pos );
@@ -268,3 +248,24 @@ inline bool Eui64_is_zero( jdksavdecc_eui64 const &v )
     return jdksavdecc_eui64_is_zero( v ) != 0;
 }
 }
+
+inline std::ostream &operator<<( std::ostream &o, jdksavdecc_eui48 const &v )
+{
+    jdksavdecc_printer p;
+    char buf[128];
+    jdksavdecc_printer_init( &p, buf, sizeof( buf ) );
+    jdksavdecc_printer_print_eui48( &p, v );
+    o << buf;
+    return o;
+}
+
+inline std::ostream &operator<<( std::ostream &o, jdksavdecc_eui64 const &v )
+{
+    jdksavdecc_printer p;
+    char buf[128];
+    jdksavdecc_printer_init( &p, buf, sizeof( buf ) );
+    jdksavdecc_printer_print_eui64( &p, v );
+    o << buf;
+    return o;
+}
+
