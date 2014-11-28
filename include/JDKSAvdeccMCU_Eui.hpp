@@ -42,7 +42,6 @@ namespace JDKSAvdeccMCU
 class Eui48 : public jdksavdecc_eui48
 {
   public:
-
     ///
     /// \brief Eui48 constructor
     ///
@@ -131,14 +130,18 @@ class Eui48 : public jdksavdecc_eui48
     ///
     /// \brief compare Numeric compare with other Ei48
     /// \param other jdksavdecc_eui48 reference to compare to
-    /// \return -1 if less than other, 0 if equal to other, 1 if greater than other
+    /// \return -1 if less than other, 0 if equal to other, 1 if greater than
+    /// other
     ///
     int compare( const jdksavdecc_eui48 &other ) const
     {
         return jdksavdecc_eui48_compare( this, &other );
     }
 
-    bool operator<( const jdksavdecc_eui48 &other ) const { return compare( other ) < 0; }
+    bool operator<( const jdksavdecc_eui48 &other ) const
+    {
+        return compare( other ) < 0;
+    }
 
     bool operator<=( const jdksavdecc_eui48 &other ) const
     {
@@ -155,7 +158,10 @@ class Eui48 : public jdksavdecc_eui48
         return compare( other ) >= 0;
     }
 
-    bool operator>( const jdksavdecc_eui48 &other ) const { return compare( other ) > 0; }
+    bool operator>( const jdksavdecc_eui48 &other ) const
+    {
+        return compare( other ) > 0;
+    }
 
     bool operator!=( const jdksavdecc_eui48 &other ) const
     {
@@ -323,4 +329,3 @@ inline std::ostream &operator<<( std::ostream &o, jdksavdecc_eui64 const &v )
     o << buf;
     return o;
 }
-
