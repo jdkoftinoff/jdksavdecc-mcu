@@ -152,7 +152,7 @@ void ADPManager::triggerSend()
 
 void ADPManager::setGPTPGrandMasterID( const Eui64 &new_gm )
 {
-    if ( Eui64_compare( m_gptp_grandmaster_id, new_gm ) != 0 )
+    if ( m_gptp_grandmaster_id != new_gm )
     {
         m_gptp_grandmaster_id = new_gm;
         triggerSend();
@@ -171,9 +171,8 @@ bool ADPManager::receivedPDU( Frame &frame )
         if ( header.message_type
              == JDKSAVDECC_ADP_MESSAGE_TYPE_ENTITY_DISCOVER )
         {
-            if ( Eui64_compare( header.entity_id, m_entity_id ) == 0
-                 || Eui64_is_unset( header.entity_id )
-                 || Eui64_is_zero( header.entity_id ) )
+            if ( header.entity_id == m_entity_id || isUnset( header.entity_id )
+                 || isZero( header.entity_id ) )
             {
                 m_last_send_time_in_millis
                     -= ( m_valid_time_in_seconds * ( 1000 / 4 ) );

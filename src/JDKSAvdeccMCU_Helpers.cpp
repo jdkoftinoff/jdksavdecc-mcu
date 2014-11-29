@@ -72,8 +72,8 @@ bool isAEMForTarget( jdksavdecc_aecpdu_aem const &aem,
     {
         // Yes
         // Is it for me?
-        if ( Eui64_compare( expected_target_entity_id,
-                            aem.aecpdu_header.header.target_entity_id ) == 0 )
+        if ( expected_target_entity_id
+             == aem.aecpdu_header.header.target_entity_id )
         {
             r = true;
         }
@@ -91,8 +91,8 @@ bool isAEMForController( jdksavdecc_aecpdu_aem const &aem,
     {
         // Yes
         // Is it for me?
-        if ( Eui64_compare( expected_controller_entity_id,
-                            aem.aecpdu_header.controller_entity_id ) == 0 )
+        if ( expected_controller_entity_id
+             == aem.aecpdu_header.controller_entity_id )
         {
             r = true;
         }
@@ -158,8 +158,8 @@ bool isAAForTarget( jdksavdecc_aecp_aa const &aa,
     {
         // Yes
         // Is it for me?
-        if ( Eui64_compare( expected_target_entity_id,
-                            aa.aecpdu_header.header.target_entity_id ) == 0 )
+        if ( expected_target_entity_id
+             == aa.aecpdu_header.header.target_entity_id )
         {
             r = true;
         }
@@ -178,8 +178,7 @@ bool isAAForController( jdksavdecc_aecp_aa const &aa,
     {
         // Yes
         // Is it for me?
-        if ( Eui64_compare( expected_controller_entity_id,
-                            aa.controller_entity_id ) == 0 )
+        if ( expected_controller_entity_id == aa.controller_entity_id )
         {
             r = true;
         }
@@ -242,9 +241,9 @@ bool isACMPInvolvingTarget( jdksavdecc_acmpdu const &acmpdu,
 {
     bool r = false;
 
-    if ( Eui64_compare( acmpdu.controller_entity_id, entity_id ) == 0
-         || Eui64_compare( acmpdu.talker_entity_id, entity_id ) == 0
-         || Eui64_compare( acmpdu.listener_entity_id, entity_id ) == 0 )
+    if ( ( acmpdu.controller_entity_id == entity_id )
+         || ( acmpdu.talker_entity_id == entity_id )
+         || ( acmpdu.listener_entity_id == entity_id ) )
     {
         r = true;
     }

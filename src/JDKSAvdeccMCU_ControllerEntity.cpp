@@ -94,8 +94,8 @@ bool ControllerEntity::receivedAEMResponse( jdksavdecc_aecpdu_aem const &aem,
     if ( !unsolicited )
     {
         // First, is it from the entity we sent the command to?
-        if ( Eui64_compare( m_last_sent_command_target_entity_id,
-                            aem.aecpdu_header.header.target_entity_id ) == 0 )
+        if ( m_last_sent_command_target_entity_id
+             == aem.aecpdu_header.header.target_entity_id )
         {
             // yes, does the command type match?
             if ( actual_command_type == m_last_sent_command_type )

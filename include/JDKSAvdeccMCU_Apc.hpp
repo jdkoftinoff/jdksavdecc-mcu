@@ -411,5 +411,6 @@ class ApcStateMachine : public ApcActions
     void executeStateEnd();
 };
 }
-
+#else
+const char *jdksavdeccmcu_apc_file = __FILE__;
 #endif

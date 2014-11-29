@@ -65,7 +65,7 @@ void Entity::tick( jdksavdecc_timestamp_in_milliseconds time_in_millis )
 {
     uint16_t cmd = m_last_sent_command_type;
     // If we are locked, then time out the lock
-    if ( Eui64_is_set( m_locked_by_controller_entity_id ) )
+    if ( isSet( m_locked_by_controller_entity_id ) )
     {
         if ( wasTimeOutHit( time_in_millis,
                             m_locked_time,
@@ -338,14 +338,14 @@ uint8_t Entity::validatePermissions( jdksavdecc_aecpdu_aem const &aem )
     // Check to see that it matches the current owner, if any
     // First, check if there is an owner (acquired)
     bool has_owner;
-    has_owner = ( Eui64_is_set( m_acquired_by_controller_entity_id ) != 0 );
+    has_owner = ( isSet( m_acquired_by_controller_entity_id ) != 0 );
 
     // if we have an owner and it isn't the controller that sent us the request
     // then fail
     if ( has_owner )
     {
-        if ( Eui64_compare( m_acquired_by_controller_entity_id,
-                            aem.aecpdu_header.controller_entity_id ) != 0 )
+        if ( m_acquired_by_controller_entity_id
+             != aem.aecpdu_header.controller_entity_id )
         {
             // not our controller.
             response_status = JDKSAVDECC_AEM_STATUS_ENTITY_ACQUIRED;
@@ -359,12 +359,12 @@ uint8_t Entity::validatePermissions( jdksavdecc_aecpdu_aem const &aem )
     else
     {
         // We don't have an owner, so check to see if we are locked
-        if ( Eui64_is_set( m_locked_by_controller_entity_id ) )
+        if ( isSet( m_locked_by_controller_entity_id ) )
         {
             // Yes, we are locked. Are we locked by the controller that sent us
             // the message?
-            if ( Eui64_compare( m_locked_by_controller_entity_id,
-                                aem.aecpdu_header.controller_entity_id ) != 0 )
+            if ( m_locked_by_controller_entity_id
+                 != aem.aecpdu_header.controller_entity_id )
             {
                 // not our controller
                 response_status = JDKSAVDECC_AEM_STATUS_ENTITY_LOCKED;
@@ -514,13 +514,12 @@ void Entity::sendResponses( bool internally_generated,
             // We only care about controllers with entity_id !=
             // FF:FF:FF:FF:FF:FF:FF:FF
 
-            if ( Eui64_is_set( m_registered_controllers_entity_id[i] ) )
+            if ( isSet( m_registered_controllers_entity_id[i] ) )
             {
                 // and don't send the original requesting controller a double
                 // response
-                if ( Eui64_compare( original_controller_id,
-                                    m_registered_controllers_entity_id[i] )
-                     != 0 )
+                if ( original_controller_id
+                     != m_registered_controllers_entity_id[i] )
                 {
                     // Set the controller_entity_id in the frame
                     Eui64_set(
@@ -672,12 +671,11 @@ uint8_t Entity::receiveAcquireEntityCommand( jdksavdecc_aecpdu_aem const &aem,
 
     bool controller_id_matches_current_owner;
     controller_id_matches_current_owner
-        = ( Eui64_compare( m_acquired_by_controller_entity_id,
-                           aem.aecpdu_header.controller_entity_id ) == 0 );
+        = ( m_acquired_by_controller_entity_id
+            == aem.aecpdu_header.controller_entity_id );
 
     bool has_current_owner;
-    has_current_owner
-        = ( Eui64_is_set( m_acquired_by_controller_entity_id ) != 0 );
+    has_current_owner = ( isSet( m_acquired_by_controller_entity_id ) != 0 );
 
     // First, make sure this is entity level:
     if ( jdksavdecc_aem_command_acquire_entity_get_descriptor_index(
@@ -723,8 +721,7 @@ uint8_t Entity::receiveAcquireEntityCommand( jdksavdecc_aecpdu_aem const &aem,
             {
                 // Are we already in progress of acquiring from a second
                 // controller?
-                if ( Eui64_is_set(
-                         m_acquire_in_progress_by_controller_entity_id ) )
+                if ( isSet( m_acquire_in_progress_by_controller_entity_id ) )
                 {
                     // yes, we we are already waiting for a dispute between 2
                     // controllers.

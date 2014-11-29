@@ -100,7 +100,7 @@ bool RawSocketPcapFile::sendFrame( const Frame &frame,
 {
     Eui48 da = frame.getDA();
     Eui48 sa = m_my_mac;
-    if ( Eui48_is_unset( da ) )
+    if ( isUnset( da ) )
     {
         da = m_default_dest_mac;
     }

@@ -30,6 +30,7 @@
 */
 #pragma once
 
+#include "JDKSAvdeccMCU_World.hpp"
 #include "jdksavdecc_util.h"
 #include "jdksavdecc_print.h"
 
@@ -88,6 +89,7 @@ class Eui48 : public jdksavdecc_eui48
     ///
     Eui48( const char *s ) { jdksavdecc_eui48_init_from_cstr( this, s ); }
 
+#if JDKSAVDECCMCU_ENABLE_STRING
     ///
     /// \brief Eui48 constructor from C++ string
     ///
@@ -100,6 +102,7 @@ class Eui48 : public jdksavdecc_eui48
     {
         jdksavdecc_eui48_init_from_cstr( this, s.c_str() );
     }
+#endif
 
     ///
     /// \brief operator = from jdksavdecc_eui48
@@ -137,36 +140,6 @@ class Eui48 : public jdksavdecc_eui48
     {
         return jdksavdecc_eui48_compare( this, &other );
     }
-
-    bool operator<( const jdksavdecc_eui48 &other ) const
-    {
-        return compare( other ) < 0;
-    }
-
-    bool operator<=( const jdksavdecc_eui48 &other ) const
-    {
-        return compare( other ) <= 0;
-    }
-
-    bool operator==( const jdksavdecc_eui48 &other ) const
-    {
-        return compare( other ) == 0;
-    }
-
-    bool operator>=( const jdksavdecc_eui48 &other ) const
-    {
-        return compare( other ) >= 0;
-    }
-
-    bool operator>( const jdksavdecc_eui48 &other ) const
-    {
-        return compare( other ) > 0;
-    }
-
-    bool operator!=( const jdksavdecc_eui48 &other ) const
-    {
-        return compare( other ) != 0;
-    }
 };
 
 class Eui64 : public jdksavdecc_eui64
@@ -202,10 +175,12 @@ class Eui64 : public jdksavdecc_eui64
 
     Eui64( const char *s ) { jdksavdecc_eui64_init_from_cstr( this, s ); }
 
+#if JDKSAVDECCMCU_ENABLE_STRING
     Eui64( std::string const &s )
     {
         jdksavdecc_eui64_init_from_cstr( this, s.c_str() );
     }
+#endif
 
     Eui64 const &operator=( Eui64 const &other )
     {
@@ -220,33 +195,13 @@ class Eui64 : public jdksavdecc_eui64
 
     bool isSet() const { return jdksavdecc_eui64_is_set( *this ) != 0; }
 
+    bool isUnset() const { return jdksavdecc_eui64_is_unset( *this ) != 0; }
+
+    bool isZero() const { return jdksavdecc_eui64_is_zero( *this ) != 0; }
+
     int compare( const Eui64 &other ) const
     {
         return jdksavdecc_eui64_compare( this, &other );
-    }
-
-    bool operator<( const Eui64 &other ) const { return compare( other ) < 0; }
-
-    bool operator<=( const Eui64 &other ) const
-    {
-        return compare( other ) <= 0;
-    }
-
-    bool operator==( const Eui64 &other ) const
-    {
-        return compare( other ) == 0;
-    }
-
-    bool operator>=( const Eui64 &other ) const
-    {
-        return compare( other ) >= 0;
-    }
-
-    bool operator>( const Eui64 &other ) const { return compare( other ) > 0; }
-
-    bool operator!=( const Eui64 &other ) const
-    {
-        return compare( other ) != 0;
     }
 };
 
@@ -271,44 +226,111 @@ inline Eui64 Eui64_get( void *buf, size_t pos )
     Eui64 v( jdksavdecc_eui64_get( buf, pos ) );
     return v;
 }
-
-inline int Eui48_compare( jdksavdecc_eui48 const &lhs,
-                          jdksavdecc_eui48 const &rhs )
-{
-    return jdksavdecc_eui48_compare( &lhs, &rhs );
 }
 
-inline int Eui64_compare( jdksavdecc_eui64 const &lhs,
-                          jdksavdecc_eui64 const &rhs )
-{
-    return jdksavdecc_eui64_compare( &lhs, &rhs );
-}
-
-inline bool Eui48_is_set( jdksavdecc_eui48 const &v )
+inline bool isSet( jdksavdecc_eui48 const &v )
 {
     return jdksavdecc_eui48_is_set( v ) != 0;
 }
 
-inline bool Eui48_is_unset( jdksavdecc_eui48 const &v )
+inline bool isUnset( jdksavdecc_eui48 const &v )
 {
     return jdksavdecc_eui48_is_unset( v ) != 0;
 }
 
-inline bool Eui64_is_set( jdksavdecc_eui64 const &v )
+inline bool isZero( jdksavdecc_eui48 const &v )
+{
+    return jdksavdecc_eui48_is_zero( v ) != 0;
+}
+
+inline bool isSet( jdksavdecc_eui64 const &v )
 {
     return jdksavdecc_eui64_is_set( v ) != 0;
 }
 
-inline bool Eui64_is_unset( jdksavdecc_eui64 const &v )
+inline bool isUnset( jdksavdecc_eui64 const &v )
 {
     return jdksavdecc_eui64_is_unset( v ) != 0;
 }
 
-inline bool Eui64_is_zero( jdksavdecc_eui64 const &v )
+inline bool isZero( jdksavdecc_eui64 const &v )
 {
     return jdksavdecc_eui64_is_zero( v ) != 0;
 }
+
+inline bool operator<( const jdksavdecc_eui48 &lhs,
+                       const jdksavdecc_eui48 &rhs )
+{
+    return jdksavdecc_eui48_compare( &lhs, &rhs ) < 0;
 }
+
+inline bool operator<=( const jdksavdecc_eui48 &lhs,
+                        const jdksavdecc_eui48 &rhs )
+{
+    return jdksavdecc_eui48_compare( &lhs, &rhs ) <= 0;
+}
+
+inline bool operator==( const jdksavdecc_eui48 &lhs,
+                        const jdksavdecc_eui48 &rhs )
+{
+    return jdksavdecc_eui48_compare( &lhs, &rhs ) == 0;
+}
+
+inline bool operator>=( const jdksavdecc_eui48 &lhs,
+                        const jdksavdecc_eui48 &rhs )
+{
+    return jdksavdecc_eui48_compare( &lhs, &rhs ) >= 0;
+}
+
+inline bool operator>( const jdksavdecc_eui48 &lhs,
+                       const jdksavdecc_eui48 &rhs )
+{
+    return jdksavdecc_eui48_compare( &lhs, &rhs ) > 0;
+}
+
+inline bool operator!=( const jdksavdecc_eui48 &lhs,
+                        const jdksavdecc_eui48 &rhs )
+{
+    return jdksavdecc_eui48_compare( &lhs, &rhs ) != 0;
+}
+
+inline bool operator<( const jdksavdecc_eui64 &lhs,
+                       const jdksavdecc_eui64 &rhs )
+{
+    return jdksavdecc_eui64_compare( &lhs, &rhs ) < 0;
+}
+
+inline bool operator<=( const jdksavdecc_eui64 &lhs,
+                        const jdksavdecc_eui64 &rhs )
+{
+    return jdksavdecc_eui64_compare( &lhs, &rhs ) <= 0;
+}
+
+inline bool operator==( const jdksavdecc_eui64 &lhs,
+                        const jdksavdecc_eui64 &rhs )
+{
+    return jdksavdecc_eui64_compare( &lhs, &rhs ) == 0;
+}
+
+inline bool operator>=( const jdksavdecc_eui64 &lhs,
+                        const jdksavdecc_eui64 &rhs )
+{
+    return jdksavdecc_eui64_compare( &lhs, &rhs ) >= 0;
+}
+
+inline bool operator>( const jdksavdecc_eui64 &lhs,
+                       const jdksavdecc_eui64 &rhs )
+{
+    return jdksavdecc_eui64_compare( &lhs, &rhs ) > 0;
+}
+
+inline bool operator!=( const jdksavdecc_eui64 &lhs,
+                        const jdksavdecc_eui64 &rhs )
+{
+    return jdksavdecc_eui64_compare( &lhs, &rhs ) != 0;
+}
+
+#if JDKSAVDECCMCU_ENABLE_IOSTREAM
 
 inline std::ostream &operator<<( std::ostream &o, jdksavdecc_eui48 const &v )
 {
@@ -329,3 +351,5 @@ inline std::ostream &operator<<( std::ostream &o, jdksavdecc_eui64 const &v )
     o << buf;
     return o;
 }
+
+#endif
