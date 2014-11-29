@@ -390,10 +390,12 @@ uint8_t Entity::receivedAACommand( jdksavdecc_aecp_aa const &aa, Frame &pdu )
         // See 9.2.1.3.3
         uint8_t tlv_mode
             = ( p[JDKSAVDECC_AECPDU_AA_TLV_OFFSET_MODE_LENGTH] >> 4 ) & 0xf;
+
         uint16_t tlv_length
             = ( ( ( uint16_t )( p[JDKSAVDECC_AECPDU_AA_TLV_OFFSET_MODE_LENGTH]
                                 & 0xf ) )
                 << 4 ) + p[JDKSAVDECC_AECPDU_AA_TLV_OFFSET_MODE_LENGTH + 1];
+
         // require top 32 bits of address to be zero
         if ( p[JDKSAVDECC_AECPDU_AA_TLV_OFFSET_ADDRESS_UPPER] == 0
              && p[JDKSAVDECC_AECPDU_AA_TLV_OFFSET_ADDRESS_UPPER + 1] == 0
@@ -627,26 +629,31 @@ void Entity::sendUnsolicitedResponses( uint16_t aem_command_type,
           + additional_data_length1 + additional_data_length2;
 
     // AECPDU common control header
-    pdu.putOctet( JDKSAVDECC_1722A_SUBTYPE_AECP ); // cd=1, subtype=0x7b (AECP)
-    pdu.putOctet(
-        0x00 + JDKSAVDECC_AECP_MESSAGE_TYPE_AEM_COMMAND ); // sv=0, version=0,
-                                                           // message_type =
-                                                           // AEM_COMMAND
-    pdu.putOctet(
-        ( ( JDKSAVDECC_AEM_STATUS_SUCCESS ) << 3 )
-        + ( ( control_data_length >> 8 )
-            & 0x7 ) ); // Send success code. top 3 bits of control_data_length
-    pdu.putOctet( control_data_length
-                  & 0xff ); // lower 8 bits of control_data_length
 
-    pdu.putEUI64( getEntityID() ); // entity_id of the device we
-                                   // are setting (placeholder)
-    pdu.putEUI64( getEntityID() ); // controller_id
+    // cd=1, subtype=0x7b (AECP)
+    pdu.putOctet( JDKSAVDECC_1722A_SUBTYPE_AECP );
+
+    // sv=0, version=0, message_type = AEM_COMMAND
+    pdu.putOctet( 0x00 + JDKSAVDECC_AECP_MESSAGE_TYPE_AEM_COMMAND );
+
+    // Send success code. top 3 bits of control_data_length
+    pdu.putOctet( ( ( JDKSAVDECC_AEM_STATUS_SUCCESS ) << 3 )
+                  + ( ( control_data_length >> 8 ) & 0x7 ) );
+
+    // lower 8 bits of control_data_length
+    pdu.putOctet( control_data_length & 0xff );
+
+    // entity_id of the device we are setting (placeholder)
+    pdu.putEUI64( getEntityID() );
+
+    // controller_id
+    pdu.putEUI64( getEntityID() );
 
     // increment outoging sequence id before sending it, so when we receive a
     // response we know what sequence id to expect
     // there are no inflight messages here
     ++m_outgoing_sequence_id;
+
     pdu.putDoublet( m_outgoing_sequence_id );
     pdu.putDoublet( aem_command_type );
 
