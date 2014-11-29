@@ -161,6 +161,9 @@ class Eui48 : public jdksavdecc_eui48
     }
 };
 
+///
+/// \brief The Eui64 class hold an IEEE EUI64
+///
 class Eui64 : public jdksavdecc_eui64
 {
   public:

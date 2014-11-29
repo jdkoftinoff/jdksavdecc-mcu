@@ -38,7 +38,7 @@ namespace JDKSAvdeccMCU
 {
 
 ///
-/// \brief The Frame class
+/// \brief The Ethernet Frame class
 ///
 /// A type of FixedBuffer that adds methods to manage
 /// Ethernet Frame headers and payloads and a timestamp
@@ -179,7 +179,7 @@ class Frame : public FixedBuffer
 };
 
 ///
-/// \brief The FrameWithSize class
+/// \brief The Ethernet FrameWithSize class
 ///
 /// A subclass of Frame which is templatized on a MaxSize
 /// argument and allocates a static buffer of that size
