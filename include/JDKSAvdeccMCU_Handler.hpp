@@ -38,11 +38,18 @@ namespace JDKSAvdeccMCU
 
 class HandlerGroup;
 
+///
+/// \brief The Handler class
+///
 /// Abstract base class for classes that need to be notified
 /// of time traversal and received PDU's
+///
 class Handler
 {
   public:
+    ///
+    /// \brief ~Handler Virtual destructor
+    ///
     virtual ~Handler();
 
     ///
@@ -52,16 +59,14 @@ class Handler
     virtual void tick( jdksavdecc_timestamp_in_milliseconds timestamp );
 
     ///
-    /// \brief receivedPDU Notification of received raw PDU. Return true if PDU
-    /// is handled
+    /// \brief receivedPDU Notification of received raw PDU.
     /// \param frame reference to received Frame object
     /// \return true if the message was handled
     ///
     virtual bool receivedPDU( Frame &frame );
 
     ///
-    /// \brief addToHandlerGroup Register this handler with a HandlerGroup
-    /// object
+    /// \brief addToHandlerGroup Register with HandlerGroup
     /// \param group HandlerGroup to add to
     ///
     virtual void addToHandlerGroup( HandlerGroup &group );
