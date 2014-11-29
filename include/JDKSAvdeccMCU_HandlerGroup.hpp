@@ -37,10 +37,14 @@
 namespace JDKSAvdeccMCU
 {
 
+///
+/// \brief The HandlerGroup class
+///
 /// The HandlerGroupBase class maintains a list of Handler pointers
 /// Dispatches Tick() and ReceivedPDU() calls to all Handlers
 /// It does not contain the storage of the handlers
 /// No bounds checking is done
+///
 class HandlerGroup : public Handler
 {
   protected:
@@ -112,9 +116,13 @@ class HandlerGroup : public Handler
     virtual bool receivedPDU( Frame &frame );
 };
 
+///
+/// \brief The HandlerGroupWithSize class
+///
 /// HandlerGroup is a HandlerGroupBase and contains
 /// the storage of the contained Handler pointers.
 /// The HandlerGroup is templatelized by the MaxItem count.
+///
 template <uint16_t MaxItems>
 class HandlerGroupWithSize : public HandlerGroup
 {
