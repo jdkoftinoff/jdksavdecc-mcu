@@ -62,21 +62,26 @@ class ControllerEntity : public Entity
                             Eui48 const &target_mac_address,
                             uint32_t flags )
     {
-        uint8_t additional1[16];
-        jdksavdecc_uint32_set( flags, additional1, 0 ); // offset 12 in Figure
-                                                        // 7.34, and Table 7.127
-                                                        // for flags
-        Eui64_set( getEntityID(), additional1, 4 ); // offset 16 in Figure 7.34
-        jdksavdecc_uint16_set( JDKSAVDECC_DESCRIPTOR_ENTITY,
-                               additional1,
-                               12 );                 // offset 24 in Figure 7.34
-        jdksavdecc_uint16_set( 0, additional1, 14 ); // offset 26 in Figure 7.34
+        FixedBufferWithSize<16> additional1;
+
+        // offset 12 in Figure 7.34, and Table 7.127 for flags
+        additional1.putQuadlet( flags );
+
+        // offset 16 in Figure 7.34
+        additional1.putEUI64( getEntityID() );
+
+        // offset 24 in Figure 7.34
+        additional1.putDoublet( JDKSAVDECC_DESCRIPTOR_ENTITY );
+
+        // offset 26 in Figure 7.34
+        additional1.putDoublet( 0 );
+
         sendCommand( target_entity_id,
                      target_mac_address,
                      JDKSAVDECC_AEM_COMMAND_ACQUIRE_ENTITY,
                      true,
-                     additional1,
-                     sizeof( additional1 ) );
+                     additional1.getBuf(),
+                     additional1.getLength() );
     }
 
     virtual bool receiveAcquireEntityResponse( jdksavdecc_aecpdu_aem const &aem,
@@ -87,21 +92,26 @@ class ControllerEntity : public Entity
                          Eui48 const &target_mac_address,
                          uint32_t flags )
     {
-        uint8_t additional1[16];
-        jdksavdecc_uint32_set( flags, additional1, 0 ); // offset 12 in Figure
-                                                        // 7.35, and Table 7.128
-                                                        // for flags
-        Eui64_set( getEntityID(), additional1, 4 ); // offset 16 in Figure 7.35
-        jdksavdecc_uint16_set( JDKSAVDECC_DESCRIPTOR_ENTITY,
-                               additional1,
-                               12 );                 // offset 24 in Figure 7.35
-        jdksavdecc_uint16_set( 0, additional1, 14 ); // offset 26 in Figure 7.35
+        FixedBufferWithSize<16> additional1;
+
+        // offset 12 in Figure 7.35, and Table 7.128 for flags
+        additional1.putQuadlet( flags );
+
+        // offset 16 in Figure 7.35
+        additional1.putEUI64( getEntityID() );
+
+        // offset 24 in Figure 7.35
+        additional1.putDoublet( JDKSAVDECC_DESCRIPTOR_ENTITY );
+
+        // offset 26 in Figure 7.35
+        additional1.putDoublet( 0 );
+
         sendCommand( target_entity_id,
                      target_mac_address,
                      JDKSAVDECC_AEM_COMMAND_LOCK_ENTITY,
                      true,
-                     additional1,
-                     sizeof( additional1 ) );
+                     additional1.getBuf(),
+                     additional1.getLength() );
     }
 
     virtual bool receiveLockEntityResponse( jdksavdecc_aecpdu_aem const &aem,

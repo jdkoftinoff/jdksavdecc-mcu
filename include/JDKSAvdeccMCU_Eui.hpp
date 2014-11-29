@@ -65,6 +65,15 @@ class Eui48 : public jdksavdecc_eui48
     }
 
     ///
+    /// \brief Eui48 Construct via pointer to 6 octet values
+    /// \param p pointer to 6 octets
+    ///
+    Eui48( uint8_t const *p )
+    {
+        jdksavdecc_eui48_copy( this, (jdksavdecc_eui48 const *)p );
+    }
+
+    ///
     /// \brief Eui48 copy constructor from jdksavdecc_eui48 base class
     /// \param other
     ///
@@ -116,12 +125,22 @@ class Eui48 : public jdksavdecc_eui48
     }
 
     ///
-    /// \brief convertToUint64 convert to uine64_t
+    /// \brief convertToUint64 convert to uint64_t
     /// \return uint64_t with lower 48 bits containing EUI48
     ///
     uint64_t convertToUint64() const
     {
         return jdksavdecc_eui48_convert_to_uint64( this );
+    }
+
+    ///
+    /// \brief store Store octets into buffer
+    /// \param p destination buffer pointer
+    /// \param pos offset from start of buffer
+    ///
+    void store( uint8_t *p, size_t pos ) const
+    {
+        memcpy( p + pos, &value[0], 6 );
     }
 
     ///
@@ -131,7 +150,7 @@ class Eui48 : public jdksavdecc_eui48
     bool isSet() const { return jdksavdecc_eui48_is_set( *this ) != 0; }
 
     ///
-    /// \brief compare Numeric compare with other Ei48
+    /// \brief compare Numeric compare with other Eui48
     /// \param other jdksavdecc_eui48 reference to compare to
     /// \return -1 if less than other, 0 if equal to other, 1 if greater than
     /// other
@@ -145,8 +164,17 @@ class Eui48 : public jdksavdecc_eui48
 class Eui64 : public jdksavdecc_eui64
 {
   public:
+    ///
+    /// \brief Eui64 constructor
+    ///
+    /// Initialize all octets to 0xff
+    ///
     Eui64() { jdksavdecc_eui64_init( this ); }
 
+    ///
+    /// \brief Eui48 Construct with 8 octet values
+    /// \param a-h The 8 octets that make up the EUI48
+    ///
     Eui64( uint8_t a,
            uint8_t b,
            uint8_t c,
@@ -166,66 +194,115 @@ class Eui64 : public jdksavdecc_eui64
         value[7] = h;
     }
 
+    ///
+    /// \brief Eui64 Construct via pointer to 8 octet values
+    /// \param p pointer to 8 octets
+    ///
+    Eui64( uint8_t const *p )
+    {
+        jdksavdecc_eui64_copy( this, (jdksavdecc_eui64 const *)p );
+    }
+
+    ///
+    /// \brief Eui64 copy constructor from jdksavdecc_eui64 base class
+    /// \param other
+    ///
     Eui64( jdksavdecc_eui64 const &other )
     {
         jdksavdecc_eui64_copy( this, &other );
     }
 
+    ///
+    /// \brief Eui48 construct with right justified uint64_t
+    /// \param v uint64_t containing EUI48
+    ///
     Eui64( uint64_t v ) { jdksavdecc_eui64_init_from_uint64( this, v ); }
 
+    ///
+    /// \brief Eui48 constructor from C string
+    ///
+    /// Parses in form SS:TT:UU:VV:WW:XX:YY:ZZ and
+    /// SS-TT-UU-VV-WW-XX-YY-ZZ
+    ///
+    /// \param s pointer to C string
+    ///
     Eui64( const char *s ) { jdksavdecc_eui64_init_from_cstr( this, s ); }
 
 #if JDKSAVDECCMCU_ENABLE_STRING
+
+    ///
+    /// \brief Eui48 constructor from C++ string
+    ///
+    /// Parses in form SS:TT:UU:VV:WW:XX:YY:ZZ and
+    /// SS-TT-UU-VV-WW-XX-YY-ZZ
+    ///
+    /// \param s std::string reference
+    ///
     Eui64( std::string const &s )
     {
         jdksavdecc_eui64_init_from_cstr( this, s.c_str() );
     }
 #endif
 
+    ///
+    /// \brief operator = from jdksavdecc_eui64
+    /// \param other reference to jdksavedecc_eui64
+    /// \return const reference to self
+    ///
     Eui64 const &operator=( Eui64 const &other )
     {
         jdksavdecc_eui64_copy( this, &other );
         return *this;
     }
 
+    ///
+    /// \brief convertToUint64 convert to uint64_t
+    /// \return uint64_t containing EUI48
+    ///
     uint64_t convertToUint64() const
     {
         return jdksavdecc_eui64_convert_to_uint64( this );
     }
 
+    ///
+    /// \brief store Store octets into buffer
+    /// \param p destination buffer pointer
+    /// \param pos offset from start of buffer
+    ///
+    void store( uint8_t *p, size_t pos ) const
+    {
+        memcpy( p + pos, &value[0], 8 );
+    }
+
+    ///
+    /// \brief isSet checks is Eui48 has been initialized
+    /// \return true if the EUI64 is not FF:FF:FF:FF:FF:FF:FF:FF
+    ///
     bool isSet() const { return jdksavdecc_eui64_is_set( *this ) != 0; }
 
+    ///
+    /// \brief isSet checks is Eui64 has not been initialized
+    /// \return true if the EUI64 is FF:FF:FF:FF:FF:FF:FF:FF
+    ///
     bool isUnset() const { return jdksavdecc_eui64_is_unset( *this ) != 0; }
 
+    ///
+    /// \brief isSet checks is Eui48 is 0
+    /// \return true if the EUI64 is 00:00:00:00:00:00:00:00
+    ///
     bool isZero() const { return jdksavdecc_eui64_is_zero( *this ) != 0; }
 
+    ///
+    /// \brief compare Numeric compare with other Eui64
+    /// \param other jdksavdecc_eui64 reference to compare to
+    /// \return -1 if less than other, 0 if equal to other, 1 if greater than
+    /// other
+    ///
     int compare( const Eui64 &other ) const
     {
         return jdksavdecc_eui64_compare( this, &other );
     }
 };
-
-inline void Eui48_set( jdksavdecc_eui48 const &v, void *buf, size_t pos )
-{
-    jdksavdecc_eui48_set( v, buf, pos );
-}
-
-inline Eui48 Eui48_get( void *buf, size_t pos )
-{
-    Eui48 v( jdksavdecc_eui48_get( buf, pos ) );
-    return v;
-}
-
-inline void Eui64_set( jdksavdecc_eui64 const &v, void *buf, size_t pos )
-{
-    jdksavdecc_eui64_set( v, buf, pos );
-}
-
-inline Eui64 Eui64_get( void *buf, size_t pos )
-{
-    Eui64 v( jdksavdecc_eui64_get( buf, pos ) );
-    return v;
-}
 }
 
 inline bool isSet( jdksavdecc_eui48 const &v )

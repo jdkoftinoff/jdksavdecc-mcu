@@ -220,13 +220,13 @@ class FixedBuffer
         return jdksavdecc_uint32_get( m_buf, pos );
     }
 
-    void setEUI48( Eui48 v, uint16_t pos ) { Eui48_set( v, m_buf, pos ); }
+    void setEUI48( Eui48 v, uint16_t pos ) { v.store( m_buf, pos ); }
 
-    Eui48 getEUI48( uint16_t pos ) const { return Eui48_get( m_buf, pos ); }
+    Eui48 getEUI48( uint16_t pos ) const { return Eui48( m_buf + pos ); }
 
-    void setEUI64( Eui64 v, uint16_t pos ) { Eui64_set( v, m_buf, pos ); }
+    void setEUI64( Eui64 v, uint16_t pos ) { v.store( m_buf, pos ); }
 
-    Eui64 getEUI64( uint16_t pos ) { return Eui64_get( m_buf, pos ); }
+    Eui64 getEUI64( uint16_t pos ) { return Eui64( m_buf + pos ); }
 
     uint8_t const *getBuf() const { return m_buf; }
     uint8_t *getBuf() { return m_buf; }

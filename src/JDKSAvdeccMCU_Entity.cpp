@@ -481,11 +481,8 @@ void Entity::sendResponses( bool internally_generated,
     if ( !internally_generated )
     {
         // The message is not internally generated, it is a response to a real
-        // request
-        // extract the actually requested controller entity id from the frame.
-        Eui64_get( pdu.getBuf(),
-                   JDKSAVDECC_FRAME_HEADER_LEN
-                   + JDKSAVDECC_AECPDU_COMMON_OFFSET_CONTROLLER_ENTITY_ID );
+        // request.
+
         // Send the buf to the original
         getRawSocket().sendReplyFrame( pdu,
                                        additional_data1,
@@ -522,15 +519,15 @@ void Entity::sendResponses( bool internally_generated,
                      != m_registered_controllers_entity_id[i] )
                 {
                     // Set the controller_entity_id in the frame
-                    Eui64_set(
-                        m_registered_controllers_entity_id[i],
+
+                    m_registered_controllers_entity_id[i].store(
                         pdu.getBuf(),
                         JDKSAVDECC_FRAME_HEADER_LEN
                         + JDKSAVDECC_AECPDU_COMMON_OFFSET_CONTROLLER_ENTITY_ID );
+
                     // Set the destination mac address
-                    Eui48_set( m_registered_controllers_mac_address[i],
-                               pdu.getBuf(),
-                               0 );
+                    pdu.setDA( m_registered_controllers_mac_address[i] );
+
                     // Send the frame to that controller
                     getRawSocket().sendFrame( pdu,
                                               additional_data1,
