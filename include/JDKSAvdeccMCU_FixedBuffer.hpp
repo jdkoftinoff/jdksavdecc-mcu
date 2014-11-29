@@ -391,6 +391,9 @@ template <size_t MaxSize>
 class FixedBufferWithSize : public FixedBuffer
 {
   protected:
+    ///
+    /// \brief m_buf_storage The storage for the buffer
+    ///
     uint8_t m_buf_storage[MaxSize];
 
   public:
