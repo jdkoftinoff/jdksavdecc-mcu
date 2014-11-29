@@ -423,7 +423,7 @@ class KnobsAndButtonsController : public EntityState
         pdu.putDoublet( JDKSAVDECC_CONTROL_VALUE_ARRAY_UINT16 );
 
         // control_type
-        pdu.putEUI64( 0x70, 0xb3, 0xd5, 0xed, 0xcf, 0x00, 0x00, 0x00 );
+        pdu.putEUI64( Eui64( 0x70, 0xb3, 0xd5, 0xed, 0xcf, 0x00, 0x00, 0x00 ) );
 
         // reset_time
         pdu.putQuadlet( 0 );
@@ -498,7 +498,7 @@ class KnobsAndButtonsController : public EntityState
         pdu.putDoublet( JDKSAVDECC_CONTROL_VALUE_ARRAY_UINT8 );
 
         // control_type
-        pdu.putEUI64( 0x70, 0xb3, 0xd5, 0xed, 0xcf, 0x00, 0x00, 0x01 );
+        pdu.putEUI64( Eui64( 0x70, 0xb3, 0xd5, 0xed, 0xcf, 0x00, 0x00, 0x01 ) );
 
         // reset_time
         pdu.putQuadlet( 0 );
