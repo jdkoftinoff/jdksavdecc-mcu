@@ -4,8 +4,7 @@ compiler:
   - gcc
 
 before_script:
-  - git clone https://github.com/jdkoftinoff/jdksavdecc-c.git
-  - cmake -G "Unix Makefiles" -DJDKSAVDECC_C_LOCAL=ON
+  - cmake -G "Unix Makefiles"
 
 script:
   - make
