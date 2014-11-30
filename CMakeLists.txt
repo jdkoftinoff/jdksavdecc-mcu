@@ -3,14 +3,16 @@ set(PROJECT jdksavdecc-mcu)
 
 project(${PROJECT} C CXX)
 
-option(JDKSAVDECC_C_LOCAL "embed jdksavdecc-c from jdksavdecc-c directory" "OFF")
+option(JDKSAVDECC_C_LOCAL "embed jdksavdecc-c from jdksavdecc-c directory" "ON")
 option(CXX11 "Force C++11 compiler" "OFF")
 
 IF(JDKSAVDECC_C_LOCAL MATCHES "ON")
     add_subdirectory( jdksavdecc-c )
+    include_directories( "include" "jdksavdecc-c/include" )
+ELSE()
+    include_directories( "include" "../jdksavdecc-c/include" )
 ENDIF()
 
-include_directories( "include" "jdksavdecc-c/include" "../jdksavdecc-c/include" )
 
 set(LIBS ${LIBS} jdksavdecc-c)
 
