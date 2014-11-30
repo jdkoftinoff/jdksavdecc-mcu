@@ -3,18 +3,14 @@ set(PROJECT jdksavdecc-mcu)
 
 project(${PROJECT} C CXX)
 
-option(JDKSAVDECC_C_LOCAL "embed jdksavdecc-c from jdksavdecc-c directory" "ON")
 option(CXX11 "Force C++11 compiler" "OFF")
 
-IF(JDKSAVDECC_C_LOCAL MATCHES "ON")
-    add_subdirectory( jdksavdecc-c )
-    include_directories( "include" "jdksavdecc-c/include" )
-ELSE()
-    include_directories( "include" "../jdksavdecc-c/include" )
-ENDIF()
+include_directories( "include" "jdksavdecc-c/include" )
 
+file(GLOB PROJECT_SRC "jdksavdecc-c/src/*.c" )
 
-set(LIBS ${LIBS} jdksavdecc-c)
+set(PROJECT_INCLUDES_GLOBS "jdksavdecc-c/include/*.h" "jdksavdecc-c/include/*.hpp")
+set(PROJECT_SRC_GLOBS "jdksavdecc-c/src/*.c" "jdksavdecc-c/src/*.cpp" )
 
 if( WIN32 )
     include_directories($ENV{PCAP_INCLUDE})
