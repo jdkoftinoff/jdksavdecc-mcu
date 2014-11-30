@@ -121,26 +121,26 @@ inline int Eui64_compare( Eui64 const &lhs, Eui64 const &rhs )
 
 inline bool Eui48_is_set( Eui48 const &v )
 {
-    return jdksavdecc_eui48_is_set( v );
+    return jdksavdecc_eui48_is_set( v )!=0;
 }
 
 inline bool Eui48_is_unset( Eui48 const &v )
 {
-    return jdksavdecc_eui48_is_unset( v );
+	return jdksavdecc_eui48_is_unset(v) != 0;
 }
 
 inline bool Eui64_is_set( Eui64 const &v )
 {
-    return jdksavdecc_eui64_is_set( v );
+	return jdksavdecc_eui64_is_set(v) != 0;
 }
 
 inline bool Eui64_is_unset( Eui64 const &v )
 {
-    return jdksavdecc_eui64_is_unset( v );
+	return jdksavdecc_eui64_is_unset(v) != 0;
 }
 
 inline bool Eui64_is_zero( Eui64 const &v )
 {
-    return jdksavdecc_eui64_is_zero( v );
+	return jdksavdecc_eui64_is_zero(v) != 0;
 }
 }
