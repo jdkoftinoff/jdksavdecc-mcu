@@ -146,5 +146,7 @@ void ApcStateMachine::executeStateStartTransfer() {}
 
 void ApcStateMachine::gotoStateWaiting() {}
 }
+#else
+const char *jdksavdeccmcu_apc_file = __FILE__;
 
 #endif
