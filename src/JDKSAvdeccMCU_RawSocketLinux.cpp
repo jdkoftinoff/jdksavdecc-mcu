@@ -49,8 +49,6 @@
 namespace JDKSAvdeccMCU
 {
 
-
-
 void RawSocketTracker::closeAllEthernetPorts()
 {
     for ( int i = 0; i < num_rawsockets; ++i )
