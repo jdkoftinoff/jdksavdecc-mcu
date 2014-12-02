@@ -72,6 +72,58 @@ static void rawsocket_win32_initialize()
     }
 }
 
+
+void RawSocketTracker::closeAllEthernetPorts()
+{
+	for (int i = 0; i < num_rawsockets; ++i)
+	{
+		delete net[i];
+	}
+	num_rawsockets = 0;
+}
+
+int RawSocketTracker::openAllEthernetPorts(uint16_t ethertype,
+	const Eui48 &multicast_to_join)
+{
+#if 0
+	// TODO
+	struct ifaddrs *ifaddr, *ifa;
+	int family;
+
+	if (getifaddrs(&ifaddr) == -1)
+	{
+		return 0;
+	}
+
+	closeAllEthernetPorts();
+
+	for (ifa = ifaddr; ifa != NULL; ifa = ifa->ifa_next)
+	{
+		if (ifa->ifa_addr == NULL)
+		{
+			continue;
+		}
+
+		if (num_rawsockets >= JDKSAVDECCMCU_MAX_RAWSOCKETS)
+		{
+			break;
+		}
+
+		family = ifa->ifa_addr->sa_family;
+
+		if (family == AF_LINK)
+		{
+			new RawSocketWin32(ifa->ifa_name, ethertype, multicast_to_join);
+		}
+	}
+
+	atexit(closeAllEthernetPorts);
+
+	freeifaddrs(ifaddr);
+#endif
+	return num_rawsockets;
+}
+
 RawSocketWin32::RawSocketWin32( const char *device,
                                 uint16_t ethertype,
                                 const Eui48 &multicast_to_join )

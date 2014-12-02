@@ -34,7 +34,11 @@ int main()
         while ( 1 )
         {
             handlers.tick( net.getTimeInMilliseconds() );
+#if defined(_WIN32)
+            Sleep(10);
+#else
             usleep( 10000 );
+#endif
         }
     }
 }

@@ -228,6 +228,9 @@
     <ClInclude Include="..\..\..\include\JDKSAvdeccMCU_Eui.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\include\JDKSAvdeccMCU_RawSocketMulti.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\jdksavdecc-c\src\jdksavdecc.c">

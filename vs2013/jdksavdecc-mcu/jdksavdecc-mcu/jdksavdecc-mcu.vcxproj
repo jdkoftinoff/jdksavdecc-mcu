@@ -110,6 +110,7 @@
     <ClInclude Include="..\..\..\include\JDKSAvdeccMCU_RawSocket.hpp" />
     <ClInclude Include="..\..\..\include\JDKSAvdeccMCU_RawSocketLinux.hpp" />
     <ClInclude Include="..\..\..\include\JDKSAvdeccMCU_RawSocketMacOSX.hpp" />
+    <ClInclude Include="..\..\..\include\JDKSAvdeccMCU_RawSocketMulti.hpp" />
     <ClInclude Include="..\..\..\include\JDKSAvdeccMCU_RawSocketPcapFile.hpp" />
     <ClInclude Include="..\..\..\include\JDKSAvdeccMCU_RawSocketWin32.hpp" />
     <ClInclude Include="..\..\..\include\JDKSAvdeccMCU_RawSocketWizNet.hpp" />

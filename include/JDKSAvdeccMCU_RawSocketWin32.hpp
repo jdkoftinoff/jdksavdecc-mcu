@@ -37,7 +37,7 @@
 
 namespace JDKSAvdeccMCU
 {
-class RawSocketWin32 : public RawSocket
+class RawSocketWin32 : public RawSocketTracker
 {
   public:
     RawSocketWin32( const char *interface_name,
