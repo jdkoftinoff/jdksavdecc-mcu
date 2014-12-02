@@ -35,6 +35,7 @@
 #if defined( __linux__ ) && JDKSAVDECCMCU_ENABLE_RAWSOCKETLINUX
 #include <fcntl.h>
 #include <signal.h>
+#include <ifaddrs.h>
 #include <sys/socket.h>
 #include <sys/select.h>
 #include <sys/ioctl.h>

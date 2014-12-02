@@ -36,7 +36,7 @@
 #if defined( __linux__ ) && JDKSAVDECCMCU_ENABLE_RAWSOCKETLINUX
 namespace JDKSAvdeccMCU
 {
-class RawSocketLinux : public RawSocket
+class RawSocketLinux : public RawSocketTracker
 {
   public:
     RawSocketLinux( const char *device,
