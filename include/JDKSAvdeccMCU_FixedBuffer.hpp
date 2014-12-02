@@ -230,7 +230,6 @@ class FixedBuffer
         {
             m_buf[m_length++] = 0;
         }
-        m_length += count;
     }
 
     ///
@@ -244,7 +243,6 @@ class FixedBuffer
         {
             m_buf[m_length++] = buf[i];
         }
-        m_length += len;
     }
 
     ///
@@ -257,7 +255,6 @@ class FixedBuffer
         {
             m_buf[m_length++] = buf.getOctet( i );
         }
-        m_length += buf.getLength();
     }
 
     ///
