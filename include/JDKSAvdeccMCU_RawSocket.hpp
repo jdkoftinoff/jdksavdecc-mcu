@@ -33,16 +33,13 @@
 #include "JDKSAvdeccMCU_World.hpp"
 #include "JDKSAvdeccMCU_Frame.hpp"
 
-#ifndef JDKSAVDECCMCU_MAX_RAWSOCKETS
-#define JDKSAVDECCMCU_MAX_RAWSOCKETS ( 1 )
-#endif
-
 #define JDKSAVDECCMCU_RAWSOCKET_MIN_PAYLOAD_LENGTH ( 64 )
 #define JDKSAVDECCMCU_RAWSOCKET_MIN_FRAME_LENGTH                               \
     ( JDKSAVDECC_FRAME_HEADER_LEN + JDKSAVDECCMCU_RAWSOCKET_MIN_PAYLOAD_LENGTH )
 
 namespace JDKSAvdeccMCU
 {
+
 class RawSocket
 {
   public:
@@ -54,7 +51,7 @@ class RawSocket
     static const filedescriptor_type bad_filedescriptor = -1;
 #endif
 
-    RawSocket() { net[num_rawsockets++] = this; }
+    RawSocket() {}
 
     virtual ~RawSocket() {}
 
@@ -84,7 +81,7 @@ class RawSocket
     */
     virtual void setNonblocking() = 0;
 
-    virtual void initialize() {}
+    virtual void initialize() = 0;
 
     /**
     * Get the file descriptor
@@ -99,7 +96,15 @@ class RawSocket
     /**
      * Get the device's name
      */
-    virtual const char *getDeviceName() const { return "Raw"; }
+    virtual const char *getDeviceName() const = 0;
+};
+
+class RawSocketTracker : public RawSocket
+{
+  public:
+    RawSocketTracker() { net[num_rawsockets++] = this; }
+
+    virtual ~RawSocketTracker() {}
 
     /**
      * Ask the first ethernet port for the current time in milliseconds
@@ -126,7 +131,11 @@ class RawSocket
                                      uint8_t const *data2 = 0,
                                      uint16_t len2 = 0 );
 
-  protected:
+    static int openAllEthernetPorts( uint16_t ethertype,
+                                     const Eui48 &multicast_to_join );
+
+    static void closeAllEthernetPorts();
+
     static RawSocket *net[JDKSAVDECCMCU_MAX_RAWSOCKETS];
     static uint16_t num_rawsockets;
     static uint16_t last_recv_socket;

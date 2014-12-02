@@ -47,6 +47,57 @@
 
 namespace JDKSAvdeccMCU
 {
+
+
+
+void RawSocketTracker::closeAllEthernetPorts()
+{
+    for ( int i = 0; i < num_rawsockets; ++i )
+    {
+        delete net[i];
+    }
+    num_rawsockets = 0;
+}
+
+int RawSocketTracker::openAllEthernetPorts( uint16_t ethertype,
+                                            const Eui48 &multicast_to_join )
+{
+    struct ifaddrs *ifaddr, *ifa;
+    int family;
+
+    if ( getifaddrs( &ifaddr ) == -1 )
+    {
+        return 0;
+    }
+
+    closeAllEthernetPorts();
+
+    for ( ifa = ifaddr; ifa != NULL; ifa = ifa->ifa_next )
+    {
+        if ( ifa->ifa_addr == NULL )
+        {
+            continue;
+        }
+
+        if ( num_rawsockets >= JDKSAVDECCMCU_MAX_RAWSOCKETS )
+        {
+            break;
+        }
+
+        family = ifa->ifa_addr->sa_family;
+
+        if ( family == AF_PACKET )
+        {
+            new RawSocketLinux( ifa->ifa_name, ethertype, multicast_to_join );
+        }
+    }
+
+    atexit( closeAllEthernetPorts );
+
+    freeifaddrs( ifaddr );
+    return num_rawsockets;
+}
+
 static void rawsocket_linux_initialize()
 {
     static bool initted = false;

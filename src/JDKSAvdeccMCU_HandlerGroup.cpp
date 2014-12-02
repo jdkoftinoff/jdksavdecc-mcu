@@ -35,12 +35,15 @@
 namespace JDKSAvdeccMCU
 {
 
-HandlerGroup::HandlerGroup( Handler **item_storage, uint16_t max_items )
+HandlerGroup::HandlerGroup( Frame *frame,
+                            Handler **item_storage,
+                            uint16_t max_items )
     : m_num_items( 0 )
     , m_max_items( max_items )
     , m_item( item_storage )
     , m_rx_count( 0 )
     , m_handled_count( 0 )
+    , m_frame( frame )
 {
 }
 
@@ -58,19 +61,20 @@ bool HandlerGroup::add( Handler *v )
 bool HandlerGroup::pollNet()
 {
     bool r = false;
-    FrameWithSize<JDKSAVDECC_AECP_FRAME_MAX_SIZE> aecp_frame;
+    FrameWithSize<JDKSAVDECC_AECP_FRAME_MAX_SIZE> ethernet_frame;
     // Try receive data
-    if ( RawSocket::multiRecvFrame( &aecp_frame ) )
+    if ( RawSocketTracker::multiRecvFrame( &ethernet_frame ) )
     {
         // Make sure we read DA,SA,Ethertype
-        if ( aecp_frame.getLength() > JDKSAVDECC_FRAME_HEADER_LEN )
+        if ( ethernet_frame.getLength() > JDKSAVDECC_FRAME_HEADER_LEN )
         {
             // Ok, this PDU is worth spending time on. Send it on to all known
             // Handlers.
 
+            r = true;
             m_rx_count++;
-            r = receivedPDU( aecp_frame );
-            if ( r )
+            bool handled = receivedPDU( ethernet_frame );
+            if ( handled )
             {
                 m_handled_count++;
             }
@@ -83,7 +87,21 @@ bool HandlerGroup::pollNet()
 /// and poll incoming network for PDU's and dispatch them
 void HandlerGroup::tick( jdksavdecc_timestamp_in_milliseconds time_in_millis )
 {
-    pollNet();
+    // Receive up to 100 messages per ethernet port per tick
+    int max_receive_per_tick = 100;
+
+    bool did_receive = true;
+    while ( max_receive_per_tick > 0 && did_receive )
+    {
+        // poll each ethernet port once, and set did_receive to false if
+        // no port received a message
+        did_receive = false;
+        for ( int i = 0; i < RawSocketTracker::num_rawsockets; ++i )
+        {
+            did_receive |= pollNet();
+        }
+        --max_receive_per_tick;
+    }
     for ( uint16_t i = 0; i < m_num_items; ++i )
     {
         m_item[i]->tick( time_in_millis );

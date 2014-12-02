@@ -37,7 +37,7 @@
 
 namespace JDKSAvdeccMCU
 {
-class RawSocketMacOSX : public RawSocket
+class RawSocketMacOSX : public RawSocketTracker
 {
   public:
     RawSocketMacOSX( const char *interface_name,

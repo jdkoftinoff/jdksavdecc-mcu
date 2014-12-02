@@ -7,6 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		BF00D00D1A2D3BD6006BC8DB /* JDKSAvdeccMCU_ADP_Advertise.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BF00D00C1A2D3BD6006BC8DB /* JDKSAvdeccMCU_ADP_Advertise.cpp */; };
+		BF00D0191A2D3C5D006BC8DB /* JDKSAvdeccMCU_ADP_Advertise.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BF00D00C1A2D3BD6006BC8DB /* JDKSAvdeccMCU_ADP_Advertise.cpp */; };
+		BF00D01A1A2D3C63006BC8DB /* libjdksavdecc-mcu.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BF16170719EC2B4C00CD64A2 /* libjdksavdecc-mcu.a */; };
+		BF00D01C1A2D3CEB006BC8DB /* libpcap.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = BF00D01B1A2D3CEB006BC8DB /* libpcap.dylib */; };
 		BF01F9FC1A2709870068F4C7 /* JDKSAvdeccMCU_Apc.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BF01F9FA1A2709870068F4C7 /* JDKSAvdeccMCU_Apc.cpp */; };
 		BF01F9FD1A2709870068F4C7 /* JDKSAvdeccMCU_Helpers.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BF01F9FB1A2709870068F4C7 /* JDKSAvdeccMCU_Helpers.cpp */; };
 		BF0DCB3119F80F7E008C4455 /* JDKSAvdeccMCU_ArduinoFakeImpl.h in Headers */ = {isa = PBXBuildFile; fileRef = BF0DCB3019F80F7E008C4455 /* JDKSAvdeccMCU_ArduinoFakeImpl.h */; };
@@ -113,6 +117,7 @@
 		BF1617DD19EC2BF700CD64A2 /* jdksavdecc.c in Sources */ = {isa = PBXBuildFile; fileRef = BF1617C819EC2BF700CD64A2 /* jdksavdecc.c */; };
 		BF185EB519F81C49007728C3 /* JDKSAvdeccMCU_KnobsAndButtons.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BF185EA919F81C10007728C3 /* JDKSAvdeccMCU_KnobsAndButtons.cpp */; };
 		BF185EB619F81C4F007728C3 /* libjdksavdecc-mcu.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BF16170719EC2B4C00CD64A2 /* libjdksavdecc-mcu.a */; };
+		BF6C64DF1A2D517600518FDC /* JDKSAvdeccMCU_RawSocketMulti.hpp in Headers */ = {isa = PBXBuildFile; fileRef = BF6C64DE1A2D517600518FDC /* JDKSAvdeccMCU_RawSocketMulti.hpp */; };
 		BF8A584419FCB6AA00107E1D /* JDKSAvdeccMCU_MDNSRegister.hpp in Headers */ = {isa = PBXBuildFile; fileRef = BF8A584319FCB6AA00107E1D /* JDKSAvdeccMCU_MDNSRegister.hpp */; };
 		BFC034BD19F08CBA009A41FF /* JDKSAvdeccMCU_EntityState.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BFC034BC19F08CBA009A41FF /* JDKSAvdeccMCU_EntityState.cpp */; };
 		BFC034BF19F08CCD009A41FF /* JDKSAvdeccMCU_EntityState.hpp in Headers */ = {isa = PBXBuildFile; fileRef = BFC034BE19F08CCD009A41FF /* JDKSAvdeccMCU_EntityState.hpp */; };
@@ -135,6 +140,15 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
+		BF00D0101A2D3C10006BC8DB /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = /usr/share/man/man1/;
+			dstSubfolderSpec = 0;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 1;
+		};
 		BF185EAC19F81C3B007728C3 /* CopyFiles */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
@@ -147,6 +161,9 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		BF00D00C1A2D3BD6006BC8DB /* JDKSAvdeccMCU_ADP_Advertise.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = JDKSAvdeccMCU_ADP_Advertise.cpp; path = ../../examples/JDKSAvdeccMCU_ADP_Advertise.cpp; sourceTree = "<group>"; };
+		BF00D0121A2D3C10006BC8DB /* ADPAdvertiser */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = ADPAdvertiser; sourceTree = BUILT_PRODUCTS_DIR; };
+		BF00D01B1A2D3CEB006BC8DB /* libpcap.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libpcap.dylib; path = usr/lib/libpcap.dylib; sourceTree = SDKROOT; };
 		BF01F9FA1A2709870068F4C7 /* JDKSAvdeccMCU_Apc.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = JDKSAvdeccMCU_Apc.cpp; path = ../../src/JDKSAvdeccMCU_Apc.cpp; sourceTree = "<group>"; };
 		BF01F9FB1A2709870068F4C7 /* JDKSAvdeccMCU_Helpers.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = JDKSAvdeccMCU_Helpers.cpp; path = ../../src/JDKSAvdeccMCU_Helpers.cpp; sourceTree = "<group>"; };
 		BF0DCB3019F80F7E008C4455 /* JDKSAvdeccMCU_ArduinoFakeImpl.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = JDKSAvdeccMCU_ArduinoFakeImpl.h; path = ../../include/JDKSAvdeccMCU_ArduinoFakeImpl.h; sourceTree = "<group>"; };
@@ -254,7 +271,7 @@
 		BF1617C819EC2BF700CD64A2 /* jdksavdecc.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = jdksavdecc.c; path = "../../jdksavdecc-c/src/jdksavdecc.c"; sourceTree = "<group>"; };
 		BF185EA919F81C10007728C3 /* JDKSAvdeccMCU_KnobsAndButtons.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = JDKSAvdeccMCU_KnobsAndButtons.cpp; path = ../../examples/JDKSAvdeccMCU_KnobsAndButtons.cpp; sourceTree = "<group>"; };
 		BF185EAE19F81C3B007728C3 /* KnobsAndButtons */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = KnobsAndButtons; sourceTree = BUILT_PRODUCTS_DIR; };
-		BF185EB019F81C3B007728C3 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
+		BF6C64DE1A2D517600518FDC /* JDKSAvdeccMCU_RawSocketMulti.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = JDKSAvdeccMCU_RawSocketMulti.hpp; path = ../../include/JDKSAvdeccMCU_RawSocketMulti.hpp; sourceTree = "<group>"; };
 		BF8A584319FCB6AA00107E1D /* JDKSAvdeccMCU_MDNSRegister.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = JDKSAvdeccMCU_MDNSRegister.hpp; path = ../../include/JDKSAvdeccMCU_MDNSRegister.hpp; sourceTree = "<group>"; };
 		BFC034BC19F08CBA009A41FF /* JDKSAvdeccMCU_EntityState.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = JDKSAvdeccMCU_EntityState.cpp; path = ../../src/JDKSAvdeccMCU_EntityState.cpp; sourceTree = "<group>"; };
 		BFC034BE19F08CCD009A41FF /* JDKSAvdeccMCU_EntityState.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = JDKSAvdeccMCU_EntityState.hpp; path = ../../include/JDKSAvdeccMCU_EntityState.hpp; sourceTree = "<group>"; };
@@ -267,6 +284,15 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		BF00D00F1A2D3C10006BC8DB /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				BF00D01C1A2D3CEB006BC8DB /* libpcap.dylib in Frameworks */,
+				BF00D01A1A2D3C63006BC8DB /* libjdksavdecc-mcu.a in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		BF16170419EC2B4C00CD64A2 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -285,13 +311,22 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		BF00D0131A2D3C10006BC8DB /* ADPAdvertiser */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = ADPAdvertiser;
+			sourceTree = "<group>";
+		};
 		BF1616FE19EC2B4C00CD64A2 = {
 			isa = PBXGroup;
 			children = (
+				BF00D01B1A2D3CEB006BC8DB /* libpcap.dylib */,
 				BF185EA819F81BF8007728C3 /* Examples */,
 				BF16176C19EC2BD600CD64A2 /* jdksavdecc-c */,
 				BF16171519EC2B9E00CD64A2 /* Sources */,
 				BF185EAF19F81C3B007728C3 /* KnobsAndButtons */,
+				BF00D0131A2D3C10006BC8DB /* ADPAdvertiser */,
 				BF16170819EC2B4C00CD64A2 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -301,6 +336,7 @@
 			children = (
 				BF16170719EC2B4C00CD64A2 /* libjdksavdecc-mcu.a */,
 				BF185EAE19F81C3B007728C3 /* KnobsAndButtons */,
+				BF00D0121A2D3C10006BC8DB /* ADPAdvertiser */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -308,6 +344,7 @@
 		BF16171519EC2B9E00CD64A2 /* Sources */ = {
 			isa = PBXGroup;
 			children = (
+				BF6C64DE1A2D517600518FDC /* JDKSAvdeccMCU_RawSocketMulti.hpp */,
 				BF16174819EC2BBF00CD64A2 /* JDKSAvdeccMCU_ADPManager.cpp */,
 				BF16171619EC2BB100CD64A2 /* JDKSAvdeccMCU_ADPManager.hpp */,
 				BF01F9FA1A2709870068F4C7 /* JDKSAvdeccMCU_Apc.cpp */,
@@ -435,6 +472,7 @@
 		BF185EA819F81BF8007728C3 /* Examples */ = {
 			isa = PBXGroup;
 			children = (
+				BF00D00C1A2D3BD6006BC8DB /* JDKSAvdeccMCU_ADP_Advertise.cpp */,
 				BF185EA919F81C10007728C3 /* JDKSAvdeccMCU_KnobsAndButtons.cpp */,
 			);
 			name = Examples;
@@ -443,7 +481,6 @@
 		BF185EAF19F81C3B007728C3 /* KnobsAndButtons */ = {
 			isa = PBXGroup;
 			children = (
-				BF185EB019F81C3B007728C3 /* main.cpp */,
 			);
 			path = KnobsAndButtons;
 			sourceTree = "<group>";
@@ -456,6 +493,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				BF16179819EC2BE700CD64A2 /* jdksavdecc_aecp_hdcp_apm.h in Headers */,
+				BF6C64DF1A2D517600518FDC /* JDKSAvdeccMCU_RawSocketMulti.hpp in Headers */,
 				BF8A584419FCB6AA00107E1D /* JDKSAvdeccMCU_MDNSRegister.hpp in Headers */,
 				BF1617A019EC2BE700CD64A2 /* jdksavdecc_app.h in Headers */,
 				BF1604E41A02AA410067D241 /* JDKSAvdeccMCU_Control.hpp in Headers */,
@@ -531,6 +569,23 @@
 /* End PBXHeadersBuildPhase section */
 
 /* Begin PBXNativeTarget section */
+		BF00D0111A2D3C10006BC8DB /* ADPAdvertiser */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = BF00D0161A2D3C10006BC8DB /* Build configuration list for PBXNativeTarget "ADPAdvertiser" */;
+			buildPhases = (
+				BF00D00E1A2D3C10006BC8DB /* Sources */,
+				BF00D00F1A2D3C10006BC8DB /* Frameworks */,
+				BF00D0101A2D3C10006BC8DB /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = ADPAdvertiser;
+			productName = ADPAdvertiser;
+			productReference = BF00D0121A2D3C10006BC8DB /* ADPAdvertiser */;
+			productType = "com.apple.product-type.tool";
+		};
 		BF16170619EC2B4C00CD64A2 /* jdksavdecc-mcu */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = BF16171219EC2B4C00CD64A2 /* Build configuration list for PBXNativeTarget "jdksavdecc-mcu" */;
@@ -575,6 +630,9 @@
 				LastUpgradeCheck = 0610;
 				ORGANIZATIONNAME = "J.D. Koftinoff Software, Ltd.";
 				TargetAttributes = {
+					BF00D0111A2D3C10006BC8DB = {
+						CreatedOnToolsVersion = 6.1;
+					};
 					BF16170619EC2B4C00CD64A2 = {
 						CreatedOnToolsVersion = 6.0.1;
 					};
@@ -597,11 +655,20 @@
 			targets = (
 				BF16170619EC2B4C00CD64A2 /* jdksavdecc-mcu */,
 				BF185EAD19F81C3B007728C3 /* KnobsAndButtons */,
+				BF00D0111A2D3C10006BC8DB /* ADPAdvertiser */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXSourcesBuildPhase section */
+		BF00D00E1A2D3C10006BC8DB /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				BF00D0191A2D3C5D006BC8DB /* JDKSAvdeccMCU_ADP_Advertise.cpp in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		BF16170319EC2B4C00CD64A2 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -623,6 +690,7 @@
 				BFDF9A2D19EC6D8500E72732 /* JDKSAvdeccMCU_FixedBuffer.cpp in Sources */,
 				BF1617DB19EC2BF700CD64A2 /* jdksavdecc_print.c in Sources */,
 				BF16175A19EC2BBF00CD64A2 /* JDKSAvdeccMCU_ADPManager.cpp in Sources */,
+				BF00D00D1A2D3BD6006BC8DB /* JDKSAvdeccMCU_ADP_Advertise.cpp in Sources */,
 				BF16176019EC2BBF00CD64A2 /* JDKSAvdeccMCU_Entity.cpp in Sources */,
 				BF16176919EC2BBF00CD64A2 /* JDKSAvdeccMCU_RawSocketPcapFile.cpp in Sources */,
 				BF16176A19EC2BBF00CD64A2 /* JDKSAvdeccMCU_RawSocketWin32.cpp in Sources */,
@@ -671,6 +739,24 @@
 /* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
+		BF00D0171A2D3C10006BC8DB /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		BF00D0181A2D3C10006BC8DB /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
 		BF16171019EC2B4C00CD64A2 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -792,6 +878,15 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		BF00D0161A2D3C10006BC8DB /* Build configuration list for PBXNativeTarget "ADPAdvertiser" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				BF00D0171A2D3C10006BC8DB /* Debug */,
+				BF00D0181A2D3C10006BC8DB /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		BF16170219EC2B4C00CD64A2 /* Build configuration list for PBXProject "jdksavdecc-mcu" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (

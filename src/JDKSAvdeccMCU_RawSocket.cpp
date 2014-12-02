@@ -35,11 +35,11 @@
 namespace JDKSAvdeccMCU
 {
 
-RawSocket *RawSocket::net[JDKSAVDECCMCU_MAX_RAWSOCKETS] = {};
-uint16_t RawSocket::num_rawsockets = 0;
-uint16_t RawSocket::last_recv_socket = 0;
+RawSocket *RawSocketTracker::net[JDKSAVDECCMCU_MAX_RAWSOCKETS] = {};
+uint16_t RawSocketTracker::num_rawsockets = 0;
+uint16_t RawSocketTracker::last_recv_socket = 0;
 
-bool RawSocket::multiRecvFrame( Frame *frame )
+bool RawSocketTracker::multiRecvFrame( Frame *frame )
 {
     bool r = false;
     if ( last_recv_socket < num_rawsockets )
@@ -53,11 +53,11 @@ bool RawSocket::multiRecvFrame( Frame *frame )
     return r;
 }
 
-bool RawSocket::multiSendFrame( Frame const &frame,
-                                uint8_t const *data1,
-                                uint16_t len1,
-                                uint8_t const *data2,
-                                uint16_t len2 )
+bool RawSocketTracker::multiSendFrame( Frame const &frame,
+                                       uint8_t const *data1,
+                                       uint16_t len1,
+                                       uint8_t const *data2,
+                                       uint16_t len2 )
 {
     for ( uint16_t i = 0; i < num_rawsockets; ++i )
     {
@@ -72,11 +72,11 @@ bool RawSocket::multiSendFrame( Frame const &frame,
     return true;
 }
 
-bool RawSocket::multiSendReplyFrame( Frame &frame,
-                                     uint8_t const *data1,
-                                     uint16_t len1,
-                                     uint8_t const *data2,
-                                     uint16_t len2 )
+bool RawSocketTracker::multiSendReplyFrame( Frame &frame,
+                                            uint8_t const *data1,
+                                            uint16_t len1,
+                                            uint8_t const *data2,
+                                            uint16_t len2 )
 {
     for ( uint16_t i = 0; i < num_rawsockets; ++i )
     {
@@ -91,7 +91,8 @@ bool RawSocket::multiSendReplyFrame( Frame &frame,
     return true;
 }
 
-jdksavdecc_timestamp_in_milliseconds RawSocket::multiGetTimeInMilliseconds()
+jdksavdecc_timestamp_in_milliseconds
+    RawSocketTracker::multiGetTimeInMilliseconds()
 {
     if ( num_rawsockets > 0 )
     {

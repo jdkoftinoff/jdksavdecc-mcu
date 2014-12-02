@@ -50,6 +50,7 @@
 #include "JDKSAvdeccMCU_RawSocketWin32.hpp"
 #include "JDKSAvdeccMCU_RawSocketLinux.hpp"
 #include "JDKSAvdeccMCU_RawSocketWizNet.hpp"
+#include "JDKSAvdeccMCU_RawSocketMulti.hpp"
 #include "JDKSAvdeccMCU_MDNSRegister.hpp"
 #include "JDKSAvdeccMCU_App.hpp"
 #include "JDKSAvdeccMCU_Apc.hpp"

@@ -38,10 +38,10 @@ namespace JDKSAvdeccMCU
 
 class RawSocketMulti : public RawSocket
 {
-public:
+  public:
     RawSocketMulti( uint16_t ethertype, const Eui48 &multicast_to_join )
     {
-        RawSocketTracker::openAllEthernetPorts(ethertype, multicast_to_join);
+        RawSocketTracker::openAllEthernetPorts( ethertype, multicast_to_join );
     }
 
     virtual jdksavdecc_timestamp_in_milliseconds getTimeInMilliseconds()
@@ -51,7 +51,7 @@ public:
 
     virtual bool recvFrame( Frame *frame )
     {
-        return RawSocketTracker::multiRecvFrame(frame);
+        return RawSocketTracker::multiRecvFrame( frame );
     }
 
     virtual bool sendFrame( Frame const &frame,
@@ -60,7 +60,8 @@ public:
                             uint8_t const *data2 = 0,
                             uint16_t len2 = 0 )
     {
-        return RawSocketTracker::multiSendFrame(frame,data1,len1,data2,len2);
+        return RawSocketTracker::multiSendFrame(
+            frame, data1, len1, data2, len2 );
     }
 
     virtual bool sendReplyFrame( Frame &frame,
@@ -69,20 +70,18 @@ public:
                                  uint8_t const *data2 = 0,
                                  uint16_t len2 = 0 )
     {
-        return RawSocketTracker::multiSendReplyFrame(frame,data1,len1,data2,len2 );
+        return RawSocketTracker::multiSendReplyFrame(
+            frame, data1, len1, data2, len2 );
     }
 
-    virtual bool joinMulticast( const Eui48 &multicast_mac )
-    {
-        return false;
-    }
+    virtual bool joinMulticast( const Eui48 &multicast_mac ) { return false; }
 
     /**
     * Set the socket to non blocking mode
     */
     virtual void setNonblocking()
     {
-        for( int i=0; i<RawSocketTracker::num_rawsockets; ++i )
+        for ( int i = 0; i < RawSocketTracker::num_rawsockets; ++i )
         {
             RawSocketTracker::net[i]->setNonblocking();
         }
@@ -90,7 +89,7 @@ public:
 
     virtual void initialize()
     {
-        for( int i=0; i<RawSocketTracker::num_rawsockets; ++i )
+        for ( int i = 0; i < RawSocketTracker::num_rawsockets; ++i )
         {
             RawSocketTracker::net[i]->initialize();
         }
@@ -99,10 +98,7 @@ public:
     /**
     * Get the file descriptor
     */
-    virtual filedescriptor_type getFd() const
-    {
-        return bad_filedescriptor;
-    }
+    virtual filedescriptor_type getFd() const { return bad_filedescriptor; }
 
     /**
      * Get the MAC address of the ethernet port
@@ -115,11 +111,6 @@ public:
     /**
      * Get the device's name
      */
-    virtual const char *getDeviceName() const
-    {
-        return "RawSocketMulti";
-    }
-
+    virtual const char *getDeviceName() const { return "RawSocketMulti"; }
 };
-
 }

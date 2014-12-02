@@ -53,6 +53,7 @@ class HandlerGroup : public Handler
     Handler **m_item;
     uint32_t m_rx_count;
     uint32_t m_handled_count;
+    Frame *m_frame;
 
   public:
     ///
@@ -60,7 +61,7 @@ class HandlerGroup : public Handler
     /// \param item_storage pointer to array of pointers to Handler objects
     /// \param max_items maximum number of pointers that the array can hold
     ///
-    HandlerGroup( Handler **item_storage, uint16_t max_items );
+    HandlerGroup( Frame *frame, Handler **item_storage, uint16_t max_items );
 
     ///
     /// \brief add Add a handler to the list
@@ -130,6 +131,9 @@ class HandlerGroupWithSize : public HandlerGroup
     Handler *m_item_storage[MaxItems];
 
   public:
-    HandlerGroupWithSize() : HandlerGroup( m_item_storage, MaxItems ) {}
+    HandlerGroupWithSize( Frame *frame )
+        : HandlerGroup( frame, m_item_storage, MaxItems )
+    {
+    }
 };
 }

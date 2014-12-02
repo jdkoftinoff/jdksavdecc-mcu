@@ -37,6 +37,7 @@
 #include <netdb.h>
 #include <fcntl.h>
 #include <signal.h>
+#include <ifaddrs.h>
 #include <sys/socket.h>
 #include <sys/select.h>
 #include <sys/ioctl.h>
@@ -73,6 +74,54 @@ static void rawsocket_macosx_initialize()
         atexit( rawsocket_macosx_raw_cleanup );
         initted = true;
     }
+}
+
+void RawSocketTracker::closeAllEthernetPorts()
+{
+    for ( int i = 0; i < num_rawsockets; ++i )
+    {
+        delete net[i];
+    }
+    num_rawsockets = 0;
+}
+
+int RawSocketTracker::openAllEthernetPorts( uint16_t ethertype,
+                                            const Eui48 &multicast_to_join )
+{
+    struct ifaddrs *ifaddr, *ifa;
+    int family;
+
+    if ( getifaddrs( &ifaddr ) == -1 )
+    {
+        return 0;
+    }
+
+    closeAllEthernetPorts();
+
+    for ( ifa = ifaddr; ifa != NULL; ifa = ifa->ifa_next )
+    {
+        if ( ifa->ifa_addr == NULL )
+        {
+            continue;
+        }
+
+        if ( num_rawsockets >= JDKSAVDECCMCU_MAX_RAWSOCKETS )
+        {
+            break;
+        }
+
+        family = ifa->ifa_addr->sa_family;
+
+        if ( family == AF_LINK )
+        {
+            new RawSocketMacOSX( ifa->ifa_name, ethertype, multicast_to_join );
+        }
+    }
+
+    atexit( closeAllEthernetPorts );
+
+    freeifaddrs( ifaddr );
+    return num_rawsockets;
 }
 
 RawSocketMacOSX::RawSocketMacOSX( const char *device,
@@ -218,7 +267,7 @@ bool RawSocketMacOSX::recvFrame( Frame *frame )
 
         if ( e == 1 && ( (ssize_t)header->caplen <= frame->getMaxLength() ) )
         {
-            memcpy( frame->getBuf(), &data, r );
+            memcpy( frame->getBuf(), data, header->caplen );
             frame->setLength( header->caplen );
             frame->setTimeInMilliseconds( ( header->ts.tv_sec * 1000 )
                                           + ( header->ts.tv_usec / 1000 ) );

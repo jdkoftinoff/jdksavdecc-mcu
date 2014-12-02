@@ -676,8 +676,10 @@ class KnobsAndButtonsController : public EntityState
 
 KnobsAndButtonsController my_entity_state( my_entity_id, my_entity_model_id );
 
+FrameWithSize<600> received_frame;
+
 /// Create a HandlerGroup which can manage up to 16 handlers
-HandlerGroupWithSize<16> all_handlers;
+HandlerGroupWithSize<16> all_handlers( &received_frame );
 
 void setup()
 {
@@ -710,7 +712,7 @@ void jdksavdeccmcu_debug_log( const char *str, uint16_t v )
         pdu.setLength( r );
         memcpy(
             pdu.getBuf( JDKSAVDECC_FRAME_HEADER_SA_OFFSET ), my_mac.value, 6 );
-        RawSocket::multiSendFrame( pdu );
+        RawSocketTracker::multiSendFrame( pdu );
     }
 }
 
@@ -719,7 +721,7 @@ void loop()
     static jdksavdecc_timestamp_in_milliseconds last_second = 0;
     // Get the current time in milliseconds
     jdksavdecc_timestamp_in_milliseconds cur_time
-        = RawSocket::multiGetTimeInMilliseconds();
+        = RawSocketTracker::multiGetTimeInMilliseconds();
 
     // Tell all the handlers to do their periodic jobs
     all_handlers.tick( cur_time );

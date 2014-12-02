@@ -22,7 +22,7 @@
 		<key>3ECC3E45D06E2AADEAEF82D724BF235294F9E8A0</key>
 		<string>../../../..</string>
 		<key>5043A1B046B78D186DE82D16970B90B133E7907E</key>
-		<string>../../../..jdksavdecc-c/</string>
+		<string>../../../..jdksavdecc-c</string>
 	</dict>
 	<key>IDESourceControlProjectURL</key>
 	<string>https://github.com/jdkoftinoff/jdksavdecc-mcu.git</string>
@@ -36,17 +36,17 @@
 			<key>IDESourceControlRepositoryExtensionIdentifierKey</key>
 			<string>public.vcs.git</string>
 			<key>IDESourceControlWCCIdentifierKey</key>
-			<string>5043A1B046B78D186DE82D16970B90B133E7907E</string>
+			<string>3ECC3E45D06E2AADEAEF82D724BF235294F9E8A0</string>
 			<key>IDESourceControlWCCName</key>
-			<string>jdksavdecc-c</string>
+			<string>jdksavdecc-mcu</string>
 		</dict>
 		<dict>
 			<key>IDESourceControlRepositoryExtensionIdentifierKey</key>
 			<string>public.vcs.git</string>
 			<key>IDESourceControlWCCIdentifierKey</key>
-			<string>3ECC3E45D06E2AADEAEF82D724BF235294F9E8A0</string>
+			<string>5043A1B046B78D186DE82D16970B90B133E7907E</string>
 			<key>IDESourceControlWCCName</key>
-			<string>jdksavdecc-mcu</string>
+			<string>jdksavdecc-mcujdksavdecc-c</string>
 		</dict>
 	</array>
 </dict>
