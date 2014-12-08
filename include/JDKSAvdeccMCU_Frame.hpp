@@ -184,7 +184,7 @@ class Frame : public FixedBuffer
 /// A subclass of Frame which is templatized on a MaxSize
 /// argument and allocates a static buffer of that size
 ///
-template <size_t MaxSize>
+template <size_t MaxSize=(1500+JDKSAVDECC_FRAME_HEADER_LEN)>
 class FrameWithSize : public Frame
 {
   protected:
