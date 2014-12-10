@@ -184,7 +184,7 @@ class Frame : public FixedBuffer
 /// A subclass of Frame which is templatized on a MaxSize
 /// argument and allocates a static buffer of that size
 ///
-template <size_t MaxSize=(1500+JDKSAVDECC_FRAME_HEADER_LEN)>
+template <size_t MaxSize>
 class FrameWithSize : public Frame
 {
   protected:
@@ -224,4 +224,23 @@ class FrameWithSize : public Frame
     {
     }
 };
+
+class FrameWithMTU : public FrameWithSize<(1500+JDKSAVDECC_FRAME_HEADER_LEN)>
+{
+    public:
+    FrameWithMTU() {}
+    FrameWithMTU( jdksavdecc_timestamp_in_milliseconds time_in_ms )
+        : FrameWithSize(time_in_ms) {}
+    FrameWithMTU( jdksavdecc_timestamp_in_milliseconds time_in_ms,
+                   Eui48 const &dest_mac,
+                   Eui48 const &src_mac,
+                   uint16_t ethertype )
+        : FrameWithSize(
+              time_in_ms, dest_mac, src_mac, ethertype )
+    {
+    }
+
+};
+
+
 }
