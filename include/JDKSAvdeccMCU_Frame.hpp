@@ -160,6 +160,24 @@ class Frame : public FixedBuffer
     }
 
     ///
+    /// \brief getPayloadLength Get the length of the payload
+    /// or 0 if there is payload
+    /// \return payload length in octets
+    ///
+    uint16_t getPayloadLength() const
+    {
+        uint16_t total_length = getLength();
+        uint16_t payload_length = 0;
+
+        if( total_length > JDKSAVDECC_FRAME_HEADER_LEN )
+        {
+            payload_length = total_length - JDKSAVDECC_FRAME_HEADER_LEN;
+        }
+
+        return payload_length;
+    }
+
+    ///
     /// \brief getTimeInMilliseconds Get the timestamp in milliseconds
     /// \return The timestamp
     ///
