@@ -31,8 +31,67 @@
 #pragma once
 
 #include "JDKSAvdeccMCU_World.hpp"
+#include "JDKSAvdeccMCU_FixedBuffer.hpp"
+#include "JDKSAvdeccMCU_Frame.hpp"
 #include "jdksavdecc_app.h"
 
 namespace JDKSAvdeccMCU
 {
+
+struct AppMessage
+{
+    AppMessage();
+
+    AppMessage( AppMessage const &other );
+
+    AppMessage const &operator=( AppMessage const &other );
+
+    void clear() { setNOP(); }
+
+    void setNOP();
+
+    void setEntityIdRequest( Eui48 const &apc_primary_mac,
+                             Eui64 const &requested_entity_id );
+
+    void setEntityIdResponse( Eui48 const &apc_primary_mac,
+                              Eui64 const &requested_entity_id );
+
+    void setLinkUp( Eui48 const &network_port_mac );
+
+    void setLinkDown( Eui48 const &network_port_mac );
+
+    void setAvdeccFromAps( Frame const &frame );
+
+    void setAvdeccFromApc( Frame const &frame );
+
+    void setVendor( Eui48 const &vendor_message_type,
+                    FixedBuffer const &payload );
+
+    jdksavdecc_fullappdu m_appdu;
+};
+
+class AppMessageParser
+{
+  public:
+    static const int max_appdu_message_size
+        = JDKSAVDECC_APPDU_HEADER_LEN + JDKSAVDECC_APPDU_MAX_PAYLOAD_LENGTH;
+
+    AppMessageParser( FixedBuffer *state );
+
+    void clear() { m_state->setLength( 0 ); }
+
+    ssize_t parse( AppMessage *destination_msg, uint8_t octet );
+
+  protected:
+    FixedBuffer *m_state;
+};
+
+class AppMessageParserWithStorage : public AppMessageParser
+{
+  public:
+    AppMessageParserWithStorage() : AppMessageParser( &m_state_storage ) {}
+
+  protected:
+    FixedBufferWithSize<max_appdu_message_size> m_state_storage;
+};
 }
