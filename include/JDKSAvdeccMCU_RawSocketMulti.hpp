@@ -74,7 +74,7 @@ class RawSocketMulti : public RawSocket
             frame, data1, len1, data2, len2 );
     }
 
-    virtual bool joinMulticast( const Eui48 &multicast_mac ) { return false; }
+    virtual bool joinMulticast( const Eui48 &multicast_mac ) { (void)multicast_mac; return false; }
 
     /**
     * Set the socket to non blocking mode
