@@ -72,18 +72,17 @@ static void rawsocket_win32_initialize()
     }
 }
 
-
 void RawSocketTracker::closeAllEthernetPorts()
 {
-	for (int i = 0; i < num_rawsockets; ++i)
-	{
-		delete net[i];
-	}
-	num_rawsockets = 0;
+    for ( int i = 0; i < num_rawsockets; ++i )
+    {
+        delete net[i];
+    }
+    num_rawsockets = 0;
 }
 
-int RawSocketTracker::openAllEthernetPorts(uint16_t ethertype,
-	const Eui48 &multicast_to_join)
+int RawSocketTracker::openAllEthernetPorts( uint16_t ethertype,
+                                            const Eui48 &multicast_to_join )
 {
 #if 0
 	// TODO
@@ -121,7 +120,7 @@ int RawSocketTracker::openAllEthernetPorts(uint16_t ethertype,
 
 	freeifaddrs(ifaddr);
 #endif
-	return num_rawsockets;
+    return num_rawsockets;
 }
 
 RawSocketWin32::RawSocketWin32( const char *device,

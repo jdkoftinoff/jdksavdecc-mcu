@@ -169,7 +169,7 @@ class Frame : public FixedBuffer
         uint16_t total_length = getLength();
         uint16_t payload_length = 0;
 
-        if( total_length > JDKSAVDECC_FRAME_HEADER_LEN )
+        if ( total_length > JDKSAVDECC_FRAME_HEADER_LEN )
         {
             payload_length = total_length - JDKSAVDECC_FRAME_HEADER_LEN;
         }
@@ -243,22 +243,21 @@ class FrameWithSize : public Frame
     }
 };
 
-class FrameWithMTU : public FrameWithSize<(1500+JDKSAVDECC_FRAME_HEADER_LEN)>
+class FrameWithMTU
+    : public FrameWithSize<( 1500 + JDKSAVDECC_FRAME_HEADER_LEN )>
 {
-    public:
+  public:
     FrameWithMTU() {}
     FrameWithMTU( jdksavdecc_timestamp_in_milliseconds time_in_ms )
-        : FrameWithSize(time_in_ms) {}
-    FrameWithMTU( jdksavdecc_timestamp_in_milliseconds time_in_ms,
-                   Eui48 const &dest_mac,
-                   Eui48 const &src_mac,
-                   uint16_t ethertype )
-        : FrameWithSize(
-              time_in_ms, dest_mac, src_mac, ethertype )
+        : FrameWithSize( time_in_ms )
     {
     }
-
+    FrameWithMTU( jdksavdecc_timestamp_in_milliseconds time_in_ms,
+                  Eui48 const &dest_mac,
+                  Eui48 const &src_mac,
+                  uint16_t ethertype )
+        : FrameWithSize( time_in_ms, dest_mac, src_mac, ethertype )
+    {
+    }
 };
-
-
 }
