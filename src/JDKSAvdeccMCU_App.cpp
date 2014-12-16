@@ -106,47 +106,228 @@ void AppMessage::setVendor( const JDKSAvdeccMCU::Eui48 &vendor_message_type,
                                  payload.getBuf() );
 }
 
-AppMessageParser::AppMessageParser( FixedBuffer *state ) : m_state( state ) {}
-
-ssize_t AppMessageParser::parse( AppMessage *destination_msg, uint8_t octet )
+AppMessageParser::AppMessageParser()
+    : m_octets_left_in_payload( 0 ), m_error_count( 0 )
 {
-    ssize_t r = JDKSAVDECC_APPDU_ERROR_INVALID_HEADER;
+}
 
-    if ( !m_state->canPut() )
+AppMessage *AppMessageParser::parse( uint8_t octet )
+{
+    AppMessage *msg = 0;
+
+    // Is there room in the header buffer?
+    if ( m_header_buffer.canPut() )
     {
-        // The buffer filled up. clear it and start over.
-        clear();
-        m_state->putOctet( octet );
-        r = JDKSAVDECC_APPDU_ERROR_INVALID_HEADER;
+        // yes, try parse the header
+        msg = parseHeader( octet );
     }
     else
     {
-        m_state->putOctet( octet );
-        if ( m_state->getLength() == JDKSAVDECC_APPDU_HEADER_LEN )
+        // is there octets we are expecting for the payload?
+        if ( m_octets_left_in_payload )
         {
-            r = jdksavdecc_appdu_read( &destination_msg->m_appdu.base,
-                                       m_state->getBuf(),
-                                       0,
-                                       m_state->getLength() );
-        }
-        else if ( m_state->getLength() > JDKSAVDECC_APPDU_HEADER_LEN )
-        {
-            if ( m_state->getLength()
-                 == destination_msg->m_appdu.base.payload_length )
-            {
-                r = jdksavdecc_appdu_read( &destination_msg->m_appdu.base,
-                                           m_state->getBuf(),
-                                           0,
-                                           m_state->getLength() );
-            }
+            // yes, parse the payload
+            msg = parsePayload( octet );
         }
     }
 
-    if ( r >= 0 )
+    return msg;
+}
+
+AppMessage *AppMessageParser::parseHeader( uint8_t octet )
+{
+    AppMessage *msg = 0;
+
+    // store the header octet
+    m_header_buffer.putOctet( octet );
+
+    // is the header buffer full now?
+    if ( m_header_buffer.isFull() )
     {
-        // Successfully parsed a messaged
-        clear();
+        // yes, try parse the header
+
+        jdksavdecc_appdu *p = &m_current_message.m_appdu.base;
+
+        p->version
+            = m_header_buffer.getOctet( JDKSAVDECC_APPDU_OFFSET_VERSION );
+
+        p->message_type
+            = m_header_buffer.getOctet( JDKSAVDECC_APPDU_OFFSET_MESSAGE_TYPE );
+
+        p->payload_length = m_header_buffer.getDoublet(
+            JDKSAVDECC_APPDU_OFFSET_PAYLOAD_LENGTH );
+
+        p->address
+            = m_header_buffer.getEUI48( JDKSAVDECC_APPDU_OFFSET_ADDRESS );
+
+        p->reserved
+            = m_header_buffer.getDoublet( JDKSAVDECC_APPDU_OFFSET_RESERVED );
+
+        // and validate the header
+        msg = validateHeader();
     }
-    return r;
+
+    return msg;
+}
+
+AppMessage *AppMessageParser::validateHeader()
+{
+    AppMessage *msg = 0;
+    jdksavdecc_appdu *p = &m_current_message.m_appdu.base;
+
+    // Is the version field recognized?
+    if ( p->version == JDKSAVDECC_APPDU_VERSION )
+    {
+        switch ( p->message_type )
+        {
+        case JDKSAVDECC_APPDU_MESSAGE_TYPE_NOP:
+            /// See IEEE Std 1722.1-2013 Annex C.5.1.1
+            if ( p->payload_length == 0 && p->reserved == 0
+                 && Eui48( p->address ).isZero() )
+            {
+                // Yes, we parsed the entire NOP message now.
+                msg = &m_current_message;
+                m_header_buffer.clear();
+                m_octets_left_in_payload = 0;
+            }
+            else
+            {
+                m_error_count++;
+            }
+            break;
+        case JDKSAVDECC_APPDU_MESSAGE_TYPE_ENTITY_ID_REQUEST:
+            /// See IEEE Std 1722.1-2013 Annex C.5.1.2
+            if ( p->payload_length == 8 && p->reserved == 0 )
+            {
+                // We have 8 more payload bytes to go
+                m_octets_left_in_payload = p->payload_length;
+                // use p->payload_length as payload octet counter
+                p->payload_length = 0;
+            }
+            else
+            {
+                m_error_count++;
+            }
+            break;
+        case JDKSAVDECC_APPDU_MESSAGE_TYPE_ENTITY_ID_RESPONSE:
+            /// See IEEE Std 1722.1-2013 Annex C.5.1.3
+            if ( p->payload_length == 8 && p->reserved == 0 )
+            {
+                // We have 8 more payload bytes to go
+                m_octets_left_in_payload = p->payload_length;
+                // use p->payload_length as payload octet counter
+                p->payload_length = 0;
+            }
+            else
+            {
+                m_error_count++;
+            }
+            break;
+        case JDKSAVDECC_APPDU_MESSAGE_TYPE_LINK_UP:
+            /// See IEEE Std 1722.1-2013 Annex C.5.1.4
+            if ( p->payload_length == 0 && p->reserved == 0 )
+            {
+                // Yes, we parsed the entire LINK_UP message now.
+                msg = &m_current_message;
+                m_header_buffer.clear();
+                m_octets_left_in_payload = 0;
+            }
+            else
+            {
+                m_error_count++;
+            }
+            break;
+        case JDKSAVDECC_APPDU_MESSAGE_TYPE_LINK_DOWN:
+            /// See IEEE Std 1722.1-2013 Annex C.5.1.5
+            if ( p->payload_length == 0 && p->reserved == 0 )
+            {
+                // Yes, we parsed the entire LINK_DOWN message now.
+                msg = &m_current_message;
+                m_header_buffer.clear();
+                m_octets_left_in_payload = 0;
+            }
+            else
+            {
+                m_error_count++;
+            }
+            break;
+        case JDKSAVDECC_APPDU_MESSAGE_TYPE_AVDECC_FROM_APS:
+            /// See IEEE Std 1722.1-2013 Annex C.5.1.6
+            if ( p->payload_length <= JDKSAVDECC_APPDU_MAX_PAYLOAD_LENGTH
+                 && p->reserved == 0 )
+            {
+                // we have some payload to read now
+                m_octets_left_in_payload = p->payload_length;
+                // use p->payload_length as payload octet counter
+                p->payload_length = 0;
+            }
+            else
+            {
+                m_error_count++;
+            }
+            break;
+        case JDKSAVDECC_APPDU_MESSAGE_TYPE_AVDECC_FROM_APC:
+            /// See IEEE Std 1722.1-2013 Annex C.5.1.7
+            if ( p->payload_length <= JDKSAVDECC_APPDU_MAX_PAYLOAD_LENGTH
+                 && p->reserved == 0 )
+            {
+                // we have some payload to read now
+                m_octets_left_in_payload = p->payload_length;
+                // use p->payload_length as payload octet counter
+                p->payload_length = 0;
+            }
+            else
+            {
+                m_error_count++;
+            }
+            break;
+        case JDKSAVDECC_APPDU_MESSAGE_TYPE_VENDOR:
+            /// See IEEE Std 1722.1-2013 Annex C.5.1.8
+            if ( p->payload_length <= JDKSAVDECC_APPDU_MAX_PAYLOAD_LENGTH
+                 && p->reserved == 0 )
+            {
+                // we have some payload to read now
+                m_octets_left_in_payload = p->payload_length;
+                // use p->payload_length as payload octet counter
+                p->payload_length = 0;
+            }
+            else
+            {
+                m_error_count++;
+            }
+            break;
+        default:
+            // Unrecognized message type
+            m_error_count++;
+            break;
+        }
+    }
+    else
+    {
+        // We don't know this version
+        m_error_count++;
+    }
+    return msg;
+}
+
+AppMessage *AppMessageParser::parsePayload( uint8_t octet )
+{
+    AppMessage *msg = 0;
+    jdksavdecc_appdu *p = &m_current_message.m_appdu.base;
+
+    // append the octet to the payload buffer
+    p->payload[p->payload_length++] = octet;
+    --m_octets_left_in_payload;
+
+    // are we done?
+    if ( m_octets_left_in_payload == 0 )
+    {
+        // yes, return the fully formed message
+        msg = &m_current_message;
+
+        // and clear our state to be ready for the next one
+        m_header_buffer.clear();
+    }
+    return msg;
 }
 }

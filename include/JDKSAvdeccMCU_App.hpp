@@ -165,28 +165,78 @@ struct AppMessage
     jdksavdecc_fullappdu m_appdu;
 };
 
+///
+/// \brief The AppMessageParser class
+///
+/// Consumes bytes one at a time and parses
+/// AppMessages from the byte stream
+///
 class AppMessageParser
 {
   public:
+    ///
+    /// \brief max_appdu_message_size The maximum size of an APPDU message
+    /// including headers
+    ///
     static const int max_appdu_message_size
         = JDKSAVDECC_APPDU_HEADER_LEN + JDKSAVDECC_APPDU_MAX_PAYLOAD_LENGTH;
 
-    AppMessageParser( FixedBuffer *state );
+    ///
+    /// \brief AppMessageParser
+    /// Construct an AppMessageParser object
+    ///
+    AppMessageParser();
 
-    void clear() { m_state->setLength( 0 ); }
+    ///
+    /// \brief clear
+    ///
+    /// Clear the current header parsing state and error count
+    ///
+    void clear()
+    {
+        m_header_buffer.setLength( 0 );
+        m_error_count = 0;
+        m_octets_left_in_payload = 0;
+    }
 
-    ssize_t parse( AppMessage *destination_msg, uint8_t octet );
+    ///
+    /// \brief parse parses one octet from a TCP stream
+    ///
+    /// This method consumes the octet and returns
+    /// a pointer to a fully parsed AppMessage or
+    /// 0 if no message was parsed yet.
+    ///
+    /// \param octet
+    /// \return
+    ///
+    AppMessage *parse( uint8_t octet );
+
+    size_t getErrorCount() const { return m_error_count; }
 
   protected:
-    FixedBuffer *m_state;
-};
+    ///
+    /// \brief parseHeader
+    /// \param octet
+    /// \return
+    ///
+    AppMessage *parseHeader( uint8_t octet );
 
-class AppMessageParserWithStorage : public AppMessageParser
-{
-  public:
-    AppMessageParserWithStorage() : AppMessageParser( &m_state_storage ) {}
+    ///
+    /// \brief validateHeader
+    /// \return
+    ///
+    AppMessage *validateHeader();
 
-  protected:
-    FixedBufferWithSize<max_appdu_message_size> m_state_storage;
+    ///
+    /// \brief parsePayload
+    /// \param octet
+    /// \return
+    ///
+    AppMessage *parsePayload( uint8_t octet );
+
+    size_t m_octets_left_in_payload;
+    size_t m_error_count;
+    FixedBufferWithSize<JDKSAVDECC_APPDU_HEADER_LEN> m_header_buffer;
+    AppMessage m_current_message;
 };
 }
