@@ -33,40 +33,135 @@
 #include "JDKSAvdeccMCU_World.hpp"
 #include "JDKSAvdeccMCU_FixedBuffer.hpp"
 #include "JDKSAvdeccMCU_Frame.hpp"
-#include "jdksavdecc_app.h"
 
 namespace JDKSAvdeccMCU
 {
 
+///
+/// \brief The AppMessage AVDECC Proxy Protocol Message
+///
+/// See IEEE Std 1722.1-2013 Annex C.4 and Annex C.5
+///
 struct AppMessage
 {
+    ///
+    /// \brief AppMessage Constructor
+    ///
+    /// Creates an AppMessage containing a NOP
+    ///
     AppMessage();
 
+    ///
+    /// \brief AppMessage Copy Constructor
+    /// \param other the AppMessage to copy
+    ///
     AppMessage( AppMessage const &other );
 
+    ///
+    /// \brief operator =
+    /// Assignment operator
+    /// \param other the AppMessage to copy
+    /// \return *this
+    ///
     AppMessage const &operator=( AppMessage const &other );
 
+    ///
+    /// \brief clear
+    ///
+    /// Alias for setNOP
+    ///
     void clear() { setNOP(); }
 
+    ///
+    /// \brief setNOP
+    ///
+    /// Set the message type to NOP
+    /// See IEEE Std 1722.1-2013 Annex C.5.1.1
+    ///
     void setNOP();
 
+    ///
+    /// \brief setEntityIdRequest
+    ///
+    /// Set the message type to ENTITY_ID_REQUEST
+    /// See IEEE Std 1722.1-2013 Annex C.5.1.2
+    ///
+    /// \param apc_primary_mac
+    /// \param requested_entity_id
+    ///
     void setEntityIdRequest( Eui48 const &apc_primary_mac,
                              Eui64 const &requested_entity_id );
 
+    ///
+    /// \brief setEntityIdResponse
+    ///
+    /// Set the message type to ENTITY_ID_RESPONSE
+    /// See IEEE Std 1722.1-2013 Annex C.5.1.3
+    ///
+    /// \param apc_primary_mac
+    /// \param requested_entity_id
+    ///
     void setEntityIdResponse( Eui48 const &apc_primary_mac,
                               Eui64 const &requested_entity_id );
 
+    ///
+    /// \brief setLinkUp
+    ///
+    /// Set the message type to LINK_UP
+    /// See IEEE Std 1722.1-2013 Annex C.5.1.4
+    ///
+    /// \param network_port_mac
+    ///
     void setLinkUp( Eui48 const &network_port_mac );
 
+    ///
+    /// \brief setLinkDown
+    ///
+    /// Set the message type to LINK_DOWN
+    /// See IEEE Std 1722.1-2013 Annex C.5.1.5
+    ///
+    /// \param network_port_mac
+    ///
     void setLinkDown( Eui48 const &network_port_mac );
 
+    ///
+    /// \brief setAvdeccFromAps
+    ///
+    /// Set the message type to AVDECC_FROM_APS
+    /// See IEEE Std 1722.1-2013 Annex C.5.1.6
+    ///
+    /// \param frame The AVDECC message from APS
+    /// to be encapsulated into APPDU
+    ///
     void setAvdeccFromAps( Frame const &frame );
 
+    ///
+    /// \brief setAvdeccFromApc
+    ///
+    /// Set the message type to AVDECC_FROM_APC
+    /// See IEEE Std 1722.1-2013 Annex C.5.1.7
+    ///
+    /// \param frame The AVDECC message from APC
+    /// to be encapsulated into APPDU
+    ///
     void setAvdeccFromApc( Frame const &frame );
 
+    ///
+    /// \brief setVendor
+    ///
+    /// Set the message type to VENDOR
+    /// See IEEE Std 1722.1-2013 Annex C.5.1.8
+    ///
+    /// \param vendor_message_type Eui48 code
+    /// \param payload the vendor specific message data
+    ///
     void setVendor( Eui48 const &vendor_message_type,
                     FixedBuffer const &payload );
 
+    ///
+    /// \brief m_appdu
+    /// The parsed header and additional payload storage
+    ///
     jdksavdecc_fullappdu m_appdu;
 };
 
