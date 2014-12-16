@@ -239,4 +239,36 @@ class AppMessageParser
     FixedBufferWithSize<JDKSAVDECC_APPDU_HEADER_LEN> m_header_buffer;
     AppMessage m_current_message;
 };
+
+///
+/// \brief The AppMessageHandler class
+///
+/// Dispatch received AppMessages to an appropriate
+/// handler
+///
+class AppMessageHandler
+{
+  public:
+    AppMessageHandler() {}
+    virtual ~AppMessageHandler() {}
+
+    virtual void onApp( AppMessage const &msg );
+
+  protected:
+    virtual void onAppNop( AppMessage const &msg ) = 0;
+
+    virtual void onAppEntityIdRequest( AppMessage const &msg ) = 0;
+
+    virtual void onAppEntityIdResponse( AppMessage const &msg ) = 0;
+
+    virtual void onAppLinkUp( AppMessage const &msg ) = 0;
+
+    virtual void onAppLinkDown( AppMessage const &msg ) = 0;
+
+    virtual void onAppAvdeccFromAps( AppMessage const &msg ) = 0;
+
+    virtual void onAppAvdeccFromApc( AppMessage const &msg ) = 0;
+
+    virtual void onAppVendor( AppMessage const &msg ) = 0;
+};
 }

@@ -330,4 +330,37 @@ AppMessage *AppMessageParser::parsePayload( uint8_t octet )
     }
     return msg;
 }
+
+void AppMessageHandler::onApp( const AppMessage &msg )
+{
+    switch ( msg.m_appdu.base.message_type )
+    {
+    case JDKSAVDECC_APPDU_MESSAGE_TYPE_NOP:
+        onAppNop( msg );
+        break;
+    case JDKSAVDECC_APPDU_MESSAGE_TYPE_ENTITY_ID_REQUEST:
+        onAppEntityIdRequest( msg );
+        break;
+    case JDKSAVDECC_APPDU_MESSAGE_TYPE_ENTITY_ID_RESPONSE:
+        onAppEntityIdResponse( msg );
+        break;
+    case JDKSAVDECC_APPDU_MESSAGE_TYPE_LINK_UP:
+        onAppLinkUp( msg );
+        break;
+    case JDKSAVDECC_APPDU_MESSAGE_TYPE_LINK_DOWN:
+        onAppLinkDown( msg );
+        break;
+    case JDKSAVDECC_APPDU_MESSAGE_TYPE_AVDECC_FROM_APS:
+        onAppAvdeccFromAps( msg );
+        break;
+    case JDKSAVDECC_APPDU_MESSAGE_TYPE_AVDECC_FROM_APC:
+        onAppAvdeccFromApc( msg );
+        break;
+    case JDKSAVDECC_APPDU_MESSAGE_TYPE_VENDOR:
+        onAppVendor( msg );
+        break;
+    default:
+        break;
+    }
+}
 }
