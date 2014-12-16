@@ -144,10 +144,31 @@ class Eui48 : public jdksavdecc_eui48
     }
 
     ///
-    /// \brief isSet checks is Eui48 has been initialized
+    /// \brief isSet checks if Eui48 has been initialized
     /// \return true if the EUI48 is not FF:FF:FF:FF:FF:FF
     ///
     bool isSet() const { return jdksavdecc_eui48_is_set( *this ) != 0; }
+
+    ///
+    /// \brief isNotSet checks if Eui48 is set to FF:FF:FF:FF:FF:FF
+    /// \return true if EUI48 is FF:FF:FF:FF:FF:FF
+    ///
+    bool isNotSet() const { return jdksavdecc_eui48_is_set( *this ) == 0; }
+
+    ///
+    /// \brief isZero checks if Eui48 is set to 00:00:00:00:00:00
+    /// \return true if EUI48 is 00:00:00:00:00:00
+    ///
+    bool isZero() const { return jdksavdecc_eui48_is_zero( *this ) != 0; }
+
+    ///
+    /// \brief isNotZero checks if Eui48 is not set to 00:00:00:00:00:00
+    /// \return true if EUI48 is not 00:00:00:00:00:00
+    ///
+    bool isNotZero() const
+    {
+        return jdksavdecc_eui48_is_not_zero( *this ) != 0;
+    }
 
     ///
     /// \brief compare Numeric compare with other Eui48
