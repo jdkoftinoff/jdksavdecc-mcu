@@ -376,6 +376,11 @@ class FixedBuffer
     /// \param n The new buffer length in Octets
     ///
     void setLength( uint16_t n ) { m_length = n; }
+
+    ///
+    /// \brief clear Set the actual buffer length to 0
+    ///
+    void clear() { m_length = 0; }
 };
 
 ///
