@@ -6,8 +6,8 @@ int main()
 {
     AppMessage msg;
     AppMessageHandler *handler = 0;
-    AppMessageParser parser(*handler);
-    parser.parse(0x00);
+    AppMessageParser parser( *handler );
+    parser.parse( 0x00 );
 
     Eui48 join_multicast = jdksavdecc_multicast_adp_acmp;
 

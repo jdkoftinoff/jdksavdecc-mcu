@@ -64,5 +64,4 @@ class AppMessageHandler
 
     virtual void onAppVendor( AppMessage const &msg ) = 0;
 };
-
 }

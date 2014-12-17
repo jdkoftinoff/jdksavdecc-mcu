@@ -37,7 +37,6 @@
 namespace JDKSAvdeccMCU
 {
 
-
 ///
 /// \brief The AppMessageParser class
 ///
@@ -47,14 +46,14 @@ namespace JDKSAvdeccMCU
 class AppMessageParser
 {
   public:
-
-
     ///
     /// \brief AppMessageParser
     /// Construct an AppMessageParser object
     ///
-    AppMessageParser(AppMessageHandler &handler )
-        : m_octets_left_in_payload( 0 ), m_error_count( 0 ), m_handler(handler)
+    AppMessageParser( AppMessageHandler &handler )
+        : m_octets_left_in_payload( 0 )
+        , m_error_count( 0 )
+        , m_handler( handler )
     {
     }
 
@@ -94,7 +93,6 @@ class AppMessageParser
         = JDKSAVDECC_APPDU_HEADER_LEN + JDKSAVDECC_APPDU_MAX_PAYLOAD_LENGTH;
 
   protected:
-
     ///
     /// \brief dispatchMsg
     ///
@@ -132,5 +130,4 @@ class AppMessageParser
     AppMessage m_current_message;
     AppMessageHandler &m_handler;
 };
-
 }

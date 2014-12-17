@@ -37,7 +37,7 @@ namespace JDKSAvdeccMCU
 
 int AppMessageParser::dispatchMsg( const AppMessage &msg )
 {
-    int r=0;
+    int r = 0;
     switch ( msg.m_appdu.base.message_type )
     {
     case AppMessage::NOP:
@@ -65,7 +65,7 @@ int AppMessageParser::dispatchMsg( const AppMessage &msg )
         m_handler.onAppVendor( msg );
         break;
     default:
-        r=-1;
+        r = -1;
         m_error_count++;
         break;
     }
@@ -74,7 +74,7 @@ int AppMessageParser::dispatchMsg( const AppMessage &msg )
 
 int AppMessageParser::parse( uint8_t octet )
 {
-    int r=0;
+    int r = 0;
     AppMessage *msg = 0;
 
     // Is there room in the header buffer?
@@ -93,15 +93,15 @@ int AppMessageParser::parse( uint8_t octet )
         }
     }
 
-    if( msg )
+    if ( msg )
     {
         dispatchMsg( *msg );
-        r=0;
+        r = 0;
     }
 
-    if( m_error_count>0 )
+    if ( m_error_count > 0 )
     {
-        r=-1;
+        r = -1;
     }
 
     return r;
@@ -303,5 +303,4 @@ AppMessage *AppMessageParser::parsePayload( uint8_t octet )
     }
     return msg;
 }
-
 }

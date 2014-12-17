@@ -72,9 +72,7 @@ struct AppMessage
         setNOP();
     }
 
-    virtual ~AppMessage()
-    {
-    }
+    virtual ~AppMessage() {}
 
     ///
     /// \brief AppMessage Copy Constructor
@@ -122,9 +120,8 @@ struct AppMessage
     /// \param apc_primary_mac
     /// \param requested_entity_id
     ///
-    void setEntityIdRequest(
-        const Eui48 &apc_primary_mac,
-        const Eui64 &requested_entity_id )
+    void setEntityIdRequest( const Eui48 &apc_primary_mac,
+                             const Eui64 &requested_entity_id )
     {
         jdksavdecc_appdu_set_entity_id_request(
             &m_appdu.base, apc_primary_mac, requested_entity_id );
@@ -139,9 +136,8 @@ struct AppMessage
     /// \param apc_primary_mac
     /// \param requested_entity_id
     ///
-    void setEntityIdResponse(
-        const Eui48 &apc_primary_mac,
-        const Eui64 &requested_entity_id )
+    void setEntityIdResponse( const Eui48 &apc_primary_mac,
+                              const Eui64 &requested_entity_id )
     {
         jdksavdecc_appdu_set_entity_id_response(
             &m_appdu.base, apc_primary_mac, requested_entity_id );
@@ -217,7 +213,7 @@ struct AppMessage
     /// \param payload the vendor specific message data
     ///
     void setVendor( const Eui48 &vendor_message_type,
-                                const FixedBuffer &payload )
+                    const FixedBuffer &payload )
     {
         jdksavdecc_appdu_set_vendor( &m_appdu.base,
                                      vendor_message_type,
@@ -225,24 +221,15 @@ struct AppMessage
                                      payload.getBuf() );
     }
 
-    Eui48 getAddress() const
-    {
-        return Eui48(m_appdu.base.address);
-    }
+    Eui48 getAddress() const { return Eui48( m_appdu.base.address ); }
 
-    uint16_t getPayloadLength() const
-    {
-        return m_appdu.base.payload_length;
-    }
+    uint16_t getPayloadLength() const { return m_appdu.base.payload_length; }
 
-    uint8_t getVersion() const
-    {
-        return m_appdu.base.version;
-    }
+    uint8_t getVersion() const { return m_appdu.base.version; }
 
     MessageType getMessageType() const
     {
-        return MessageType(m_appdu.base.message_type);
+        return MessageType( m_appdu.base.message_type );
     }
 
     ///
@@ -250,7 +237,5 @@ struct AppMessage
     /// The parsed header and additional payload storage
     ///
     jdksavdecc_fullappdu m_appdu;
-
 };
-
 }
