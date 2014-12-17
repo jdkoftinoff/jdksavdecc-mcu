@@ -34,5 +34,5 @@
 
 namespace JDKSAvdeccMCU
 {
-
+    const char *jdksavdeccmcu_appmessagehandler_file = __FILE__;
 }
