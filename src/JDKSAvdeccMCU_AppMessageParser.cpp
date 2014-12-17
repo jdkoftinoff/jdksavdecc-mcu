@@ -30,89 +30,51 @@
 */
 
 #include "JDKSAvdeccMCU_World.hpp"
-#include "JDKSAvdeccMCU_App.hpp"
+#include "JDKSAvdeccMCU_AppMessageParser.hpp"
 
 namespace JDKSAvdeccMCU
 {
 
-AppMessage::AppMessage()
+int AppMessageParser::dispatchMsg( const AppMessage &msg )
 {
-    jdksavdecc_fullappdu_init( &m_appdu );
-    jdksavdecc_appdu_set_nop( &m_appdu.base );
+    int r=0;
+    switch ( msg.m_appdu.base.message_type )
+    {
+    case AppMessage::MessageType::NOP:
+        m_handler.onAppNop( msg );
+        break;
+    case AppMessage::MessageType::ENTITY_ID_REQUEST:
+        m_handler.onAppEntityIdRequest( msg );
+        break;
+    case AppMessage::MessageType::ENTITY_ID_RESPONSE:
+        m_handler.onAppEntityIdResponse( msg );
+        break;
+    case AppMessage::MessageType::LINK_UP:
+        m_handler.onAppLinkUp( msg );
+        break;
+    case AppMessage::MessageType::LINK_DOWN:
+        m_handler.onAppLinkDown( msg );
+        break;
+    case AppMessage::MessageType::AVDECC_FROM_APS:
+        m_handler.onAppAvdeccFromAps( msg );
+        break;
+    case AppMessage::MessageType::AVDECC_FROM_APC:
+        m_handler.onAppAvdeccFromApc( msg );
+        break;
+    case AppMessage::MessageType::VENDOR:
+        m_handler.onAppVendor( msg );
+        break;
+    default:
+        r=-1;
+        m_error_count++;
+        break;
+    }
+    return r;
 }
 
-AppMessage::AppMessage( const AppMessage &other ) : m_appdu( other.m_appdu )
+int AppMessageParser::parse( uint8_t octet )
 {
-    m_appdu.base.payload = m_appdu.payload_buffer;
-}
-
-const AppMessage &AppMessage::operator=( const AppMessage &other )
-{
-    m_appdu = other.m_appdu;
-    m_appdu.base.payload = m_appdu.payload_buffer;
-    return *this;
-}
-
-void AppMessage::setNOP() { jdksavdecc_appdu_set_nop( &m_appdu.base ); }
-
-void AppMessage::setEntityIdRequest(
-    const JDKSAvdeccMCU::Eui48 &apc_primary_mac,
-    const JDKSAvdeccMCU::Eui64 &requested_entity_id )
-{
-    jdksavdecc_appdu_set_entity_id_request(
-        &m_appdu.base, apc_primary_mac, requested_entity_id );
-}
-
-void AppMessage::setEntityIdResponse(
-    const JDKSAvdeccMCU::Eui48 &apc_primary_mac,
-    const JDKSAvdeccMCU::Eui64 &requested_entity_id )
-{
-    jdksavdecc_appdu_set_entity_id_response(
-        &m_appdu.base, apc_primary_mac, requested_entity_id );
-}
-
-void AppMessage::setLinkUp( const JDKSAvdeccMCU::Eui48 &network_port_mac )
-{
-    jdksavdecc_appdu_set_link_up( &m_appdu.base, network_port_mac );
-}
-
-void AppMessage::setLinkDown( const JDKSAvdeccMCU::Eui48 &network_port_mac )
-{
-    jdksavdecc_appdu_set_link_down( &m_appdu.base, network_port_mac );
-}
-
-void AppMessage::setAvdeccFromAps( const JDKSAvdeccMCU::Frame &frame )
-{
-    jdksavdecc_appdu_set_avdecc_from_aps( &m_appdu.base,
-                                          frame.getSA(),
-                                          frame.getPayloadLength(),
-                                          frame.getPayload() );
-}
-
-void AppMessage::setAvdeccFromApc( const JDKSAvdeccMCU::Frame &frame )
-{
-    jdksavdecc_appdu_set_avdecc_from_apc( &m_appdu.base,
-                                          frame.getSA(),
-                                          frame.getPayloadLength(),
-                                          frame.getPayload() );
-}
-
-void AppMessage::setVendor( const JDKSAvdeccMCU::Eui48 &vendor_message_type,
-                            const JDKSAvdeccMCU::FixedBuffer &payload )
-{
-    jdksavdecc_appdu_set_vendor( &m_appdu.base,
-                                 vendor_message_type,
-                                 payload.getLength(),
-                                 payload.getBuf() );
-}
-
-AppMessageParser::AppMessageParser()
-    : m_octets_left_in_payload( 0 ), m_error_count( 0 )
-{
-}
-
-AppMessage *AppMessageParser::parse( uint8_t octet )
-{
+    int r=0;
     AppMessage *msg = 0;
 
     // Is there room in the header buffer?
@@ -131,7 +93,18 @@ AppMessage *AppMessageParser::parse( uint8_t octet )
         }
     }
 
-    return msg;
+    if( msg )
+    {
+        dispatchMsg( *msg );
+        r=0;
+    }
+
+    if( m_error_count>0 )
+    {
+        r=-1;
+    }
+
+    return r;
 }
 
 AppMessage *AppMessageParser::parseHeader( uint8_t octet )
@@ -180,7 +153,7 @@ AppMessage *AppMessageParser::validateHeader()
     {
         switch ( p->message_type )
         {
-        case JDKSAVDECC_APPDU_MESSAGE_TYPE_NOP:
+        case AppMessage::MessageType::NOP:
             /// See IEEE Std 1722.1-2013 Annex C.5.1.1
             if ( p->payload_length == 0 && p->reserved == 0
                  && Eui48( p->address ).isZero() )
@@ -195,7 +168,7 @@ AppMessage *AppMessageParser::validateHeader()
                 m_error_count++;
             }
             break;
-        case JDKSAVDECC_APPDU_MESSAGE_TYPE_ENTITY_ID_REQUEST:
+        case AppMessage::MessageType::ENTITY_ID_REQUEST:
             /// See IEEE Std 1722.1-2013 Annex C.5.1.2
             if ( p->payload_length == 8 && p->reserved == 0 )
             {
@@ -209,7 +182,7 @@ AppMessage *AppMessageParser::validateHeader()
                 m_error_count++;
             }
             break;
-        case JDKSAVDECC_APPDU_MESSAGE_TYPE_ENTITY_ID_RESPONSE:
+        case AppMessage::MessageType::ENTITY_ID_RESPONSE:
             /// See IEEE Std 1722.1-2013 Annex C.5.1.3
             if ( p->payload_length == 8 && p->reserved == 0 )
             {
@@ -223,7 +196,7 @@ AppMessage *AppMessageParser::validateHeader()
                 m_error_count++;
             }
             break;
-        case JDKSAVDECC_APPDU_MESSAGE_TYPE_LINK_UP:
+        case AppMessage::MessageType::LINK_UP:
             /// See IEEE Std 1722.1-2013 Annex C.5.1.4
             if ( p->payload_length == 0 && p->reserved == 0 )
             {
@@ -237,7 +210,7 @@ AppMessage *AppMessageParser::validateHeader()
                 m_error_count++;
             }
             break;
-        case JDKSAVDECC_APPDU_MESSAGE_TYPE_LINK_DOWN:
+        case AppMessage::MessageType::LINK_DOWN:
             /// See IEEE Std 1722.1-2013 Annex C.5.1.5
             if ( p->payload_length == 0 && p->reserved == 0 )
             {
@@ -251,7 +224,7 @@ AppMessage *AppMessageParser::validateHeader()
                 m_error_count++;
             }
             break;
-        case JDKSAVDECC_APPDU_MESSAGE_TYPE_AVDECC_FROM_APS:
+        case AppMessage::MessageType::AVDECC_FROM_APS:
             /// See IEEE Std 1722.1-2013 Annex C.5.1.6
             if ( p->payload_length <= JDKSAVDECC_APPDU_MAX_PAYLOAD_LENGTH
                  && p->reserved == 0 )
@@ -266,7 +239,7 @@ AppMessage *AppMessageParser::validateHeader()
                 m_error_count++;
             }
             break;
-        case JDKSAVDECC_APPDU_MESSAGE_TYPE_AVDECC_FROM_APC:
+        case AppMessage::MessageType::AVDECC_FROM_APC:
             /// See IEEE Std 1722.1-2013 Annex C.5.1.7
             if ( p->payload_length <= JDKSAVDECC_APPDU_MAX_PAYLOAD_LENGTH
                  && p->reserved == 0 )
@@ -281,7 +254,7 @@ AppMessage *AppMessageParser::validateHeader()
                 m_error_count++;
             }
             break;
-        case JDKSAVDECC_APPDU_MESSAGE_TYPE_VENDOR:
+        case AppMessage::MessageType::VENDOR:
             /// See IEEE Std 1722.1-2013 Annex C.5.1.8
             if ( p->payload_length <= JDKSAVDECC_APPDU_MAX_PAYLOAD_LENGTH
                  && p->reserved == 0 )
@@ -331,36 +304,4 @@ AppMessage *AppMessageParser::parsePayload( uint8_t octet )
     return msg;
 }
 
-void AppMessageHandler::onApp( const AppMessage &msg )
-{
-    switch ( msg.m_appdu.base.message_type )
-    {
-    case JDKSAVDECC_APPDU_MESSAGE_TYPE_NOP:
-        onAppNop( msg );
-        break;
-    case JDKSAVDECC_APPDU_MESSAGE_TYPE_ENTITY_ID_REQUEST:
-        onAppEntityIdRequest( msg );
-        break;
-    case JDKSAVDECC_APPDU_MESSAGE_TYPE_ENTITY_ID_RESPONSE:
-        onAppEntityIdResponse( msg );
-        break;
-    case JDKSAVDECC_APPDU_MESSAGE_TYPE_LINK_UP:
-        onAppLinkUp( msg );
-        break;
-    case JDKSAVDECC_APPDU_MESSAGE_TYPE_LINK_DOWN:
-        onAppLinkDown( msg );
-        break;
-    case JDKSAVDECC_APPDU_MESSAGE_TYPE_AVDECC_FROM_APS:
-        onAppAvdeccFromAps( msg );
-        break;
-    case JDKSAVDECC_APPDU_MESSAGE_TYPE_AVDECC_FROM_APC:
-        onAppAvdeccFromApc( msg );
-        break;
-    case JDKSAVDECC_APPDU_MESSAGE_TYPE_VENDOR:
-        onAppVendor( msg );
-        break;
-    default:
-        break;
-    }
-}
 }

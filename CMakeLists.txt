@@ -3,7 +3,7 @@ set(PROJECT jdksavdecc-mcu)
 
 project(${PROJECT} C CXX)
 
-option(CXX11 "Force C++11 compiler" "OFF")
+set(CXX11 "ON")
 
 include_directories( "include" "jdksavdecc-c/include" )
 

@@ -31,8 +31,9 @@
 #pragma once
 
 #include "JDKSAvdeccMCU_World.hpp"
-#include "JDKSAvdeccMCU_App.hpp"
-#include "JDKSAvdeccMCU_Frame.hpp"
+#include "JDKSAvdeccMCU_AppMessage.hpp"
+#include "JDKSAvdeccMCU_AppMessageParser.hpp"
+#include "JDKSAvdeccMCU_AppMessageHandler.hpp"
 
 #if defined( TODO )
 namespace JDKSAvdeccMCU

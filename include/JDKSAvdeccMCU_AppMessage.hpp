@@ -45,17 +45,45 @@ namespace JDKSAvdeccMCU
 struct AppMessage
 {
     ///
+    /// \brief The MessageType enum
+    ///
+    /// See IEEE Std 1722.1-2013 Annex C.4.2
+    ///
+    enum MessageType
+    {
+        NOP = 0,
+        ENTITY_ID_REQUEST = 1,
+        ENTITY_ID_RESPONSE = 2,
+        LINK_UP = 3,
+        LINK_DOWN = 4,
+        AVDECC_FROM_APS = 5,
+        AVDECC_FROM_APC = 6,
+        VENDOR = 0xff
+    };
+
+    ///
     /// \brief AppMessage Constructor
     ///
     /// Creates an AppMessage containing a NOP
     ///
-    AppMessage();
+    AppMessage()
+    {
+        jdksavdecc_fullappdu_init( &m_appdu );
+        setNOP();
+    }
+
+    virtual ~AppMessage()
+    {
+    }
 
     ///
     /// \brief AppMessage Copy Constructor
     /// \param other the AppMessage to copy
     ///
-    AppMessage( AppMessage const &other );
+    AppMessage( const AppMessage &other ) : m_appdu( other.m_appdu )
+    {
+        m_appdu.base.payload = m_appdu.payload_buffer;
+    }
 
     ///
     /// \brief operator =
@@ -63,7 +91,12 @@ struct AppMessage
     /// \param other the AppMessage to copy
     /// \return *this
     ///
-    AppMessage const &operator=( AppMessage const &other );
+    const AppMessage &operator=( const AppMessage &other )
+    {
+        m_appdu = other.m_appdu;
+        m_appdu.base.payload = m_appdu.payload_buffer;
+        return *this;
+    }
 
     ///
     /// \brief clear
@@ -78,7 +111,7 @@ struct AppMessage
     /// Set the message type to NOP
     /// See IEEE Std 1722.1-2013 Annex C.5.1.1
     ///
-    void setNOP();
+    void setNOP() { jdksavdecc_appdu_set_nop( &m_appdu.base ); }
 
     ///
     /// \brief setEntityIdRequest
@@ -89,8 +122,13 @@ struct AppMessage
     /// \param apc_primary_mac
     /// \param requested_entity_id
     ///
-    void setEntityIdRequest( Eui48 const &apc_primary_mac,
-                             Eui64 const &requested_entity_id );
+    void setEntityIdRequest(
+        const Eui48 &apc_primary_mac,
+        const Eui64 &requested_entity_id )
+    {
+        jdksavdecc_appdu_set_entity_id_request(
+            &m_appdu.base, apc_primary_mac, requested_entity_id );
+    }
 
     ///
     /// \brief setEntityIdResponse
@@ -101,8 +139,13 @@ struct AppMessage
     /// \param apc_primary_mac
     /// \param requested_entity_id
     ///
-    void setEntityIdResponse( Eui48 const &apc_primary_mac,
-                              Eui64 const &requested_entity_id );
+    void setEntityIdResponse(
+        const Eui48 &apc_primary_mac,
+        const Eui64 &requested_entity_id )
+    {
+        jdksavdecc_appdu_set_entity_id_response(
+            &m_appdu.base, apc_primary_mac, requested_entity_id );
+    }
 
     ///
     /// \brief setLinkUp
@@ -112,7 +155,10 @@ struct AppMessage
     ///
     /// \param network_port_mac
     ///
-    void setLinkUp( Eui48 const &network_port_mac );
+    void setLinkUp( const Eui48 &network_port_mac )
+    {
+        jdksavdecc_appdu_set_link_up( &m_appdu.base, network_port_mac );
+    }
 
     ///
     /// \brief setLinkDown
@@ -122,7 +168,10 @@ struct AppMessage
     ///
     /// \param network_port_mac
     ///
-    void setLinkDown( Eui48 const &network_port_mac );
+    void setLinkDown( const Eui48 &network_port_mac )
+    {
+        jdksavdecc_appdu_set_link_down( &m_appdu.base, network_port_mac );
+    }
 
     ///
     /// \brief setAvdeccFromAps
@@ -133,7 +182,13 @@ struct AppMessage
     /// \param frame The AVDECC message from APS
     /// to be encapsulated into APPDU
     ///
-    void setAvdeccFromAps( Frame const &frame );
+    void setAvdeccFromAps( const Frame &frame )
+    {
+        jdksavdecc_appdu_set_avdecc_from_aps( &m_appdu.base,
+                                              frame.getSA(),
+                                              frame.getPayloadLength(),
+                                              frame.getPayload() );
+    }
 
     ///
     /// \brief setAvdeccFromApc
@@ -144,7 +199,13 @@ struct AppMessage
     /// \param frame The AVDECC message from APC
     /// to be encapsulated into APPDU
     ///
-    void setAvdeccFromApc( Frame const &frame );
+    void setAvdeccFromApc( const Frame &frame )
+    {
+        jdksavdecc_appdu_set_avdecc_from_apc( &m_appdu.base,
+                                              frame.getSA(),
+                                              frame.getPayloadLength(),
+                                              frame.getPayload() );
+    }
 
     ///
     /// \brief setVendor
@@ -155,120 +216,41 @@ struct AppMessage
     /// \param vendor_message_type Eui48 code
     /// \param payload the vendor specific message data
     ///
-    void setVendor( Eui48 const &vendor_message_type,
-                    FixedBuffer const &payload );
+    void setVendor( const Eui48 &vendor_message_type,
+                                const FixedBuffer &payload )
+    {
+        jdksavdecc_appdu_set_vendor( &m_appdu.base,
+                                     vendor_message_type,
+                                     payload.getLength(),
+                                     payload.getBuf() );
+    }
+
+    Eui48 getAddress() const
+    {
+        return Eui48(m_appdu.base.address);
+    }
+
+    uint16_t getPayloadLength() const
+    {
+        return m_appdu.base.payload_length;
+    }
+
+    uint8_t getVersion() const
+    {
+        return m_appdu.base.version;
+    }
+
+    MessageType getMessageType() const
+    {
+        return MessageType(m_appdu.base.message_type);
+    }
 
     ///
     /// \brief m_appdu
     /// The parsed header and additional payload storage
     ///
     jdksavdecc_fullappdu m_appdu;
+
 };
 
-///
-/// \brief The AppMessageParser class
-///
-/// Consumes bytes one at a time and parses
-/// AppMessages from the byte stream
-///
-class AppMessageParser
-{
-  public:
-    ///
-    /// \brief max_appdu_message_size The maximum size of an APPDU message
-    /// including headers
-    ///
-    static const int max_appdu_message_size
-        = JDKSAVDECC_APPDU_HEADER_LEN + JDKSAVDECC_APPDU_MAX_PAYLOAD_LENGTH;
-
-    ///
-    /// \brief AppMessageParser
-    /// Construct an AppMessageParser object
-    ///
-    AppMessageParser();
-
-    ///
-    /// \brief clear
-    ///
-    /// Clear the current header parsing state and error count
-    ///
-    void clear()
-    {
-        m_header_buffer.setLength( 0 );
-        m_error_count = 0;
-        m_octets_left_in_payload = 0;
-    }
-
-    ///
-    /// \brief parse parses one octet from a TCP stream
-    ///
-    /// This method consumes the octet and returns
-    /// a pointer to a fully parsed AppMessage or
-    /// 0 if no message was parsed yet.
-    ///
-    /// \param octet
-    /// \return
-    ///
-    AppMessage *parse( uint8_t octet );
-
-    size_t getErrorCount() const { return m_error_count; }
-
-  protected:
-    ///
-    /// \brief parseHeader
-    /// \param octet
-    /// \return
-    ///
-    AppMessage *parseHeader( uint8_t octet );
-
-    ///
-    /// \brief validateHeader
-    /// \return
-    ///
-    AppMessage *validateHeader();
-
-    ///
-    /// \brief parsePayload
-    /// \param octet
-    /// \return
-    ///
-    AppMessage *parsePayload( uint8_t octet );
-
-    size_t m_octets_left_in_payload;
-    size_t m_error_count;
-    FixedBufferWithSize<JDKSAVDECC_APPDU_HEADER_LEN> m_header_buffer;
-    AppMessage m_current_message;
-};
-
-///
-/// \brief The AppMessageHandler class
-///
-/// Dispatch received AppMessages to an appropriate
-/// handler
-///
-class AppMessageHandler
-{
-  public:
-    AppMessageHandler() {}
-    virtual ~AppMessageHandler() {}
-
-    virtual void onApp( AppMessage const &msg );
-
-  protected:
-    virtual void onAppNop( AppMessage const &msg ) = 0;
-
-    virtual void onAppEntityIdRequest( AppMessage const &msg ) = 0;
-
-    virtual void onAppEntityIdResponse( AppMessage const &msg ) = 0;
-
-    virtual void onAppLinkUp( AppMessage const &msg ) = 0;
-
-    virtual void onAppLinkDown( AppMessage const &msg ) = 0;
-
-    virtual void onAppAvdeccFromAps( AppMessage const &msg ) = 0;
-
-    virtual void onAppAvdeccFromApc( AppMessage const &msg ) = 0;
-
-    virtual void onAppVendor( AppMessage const &msg ) = 0;
-};
 }

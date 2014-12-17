@@ -4,6 +4,11 @@ using namespace JDKSAvdeccMCU;
 
 int main()
 {
+    AppMessage msg;
+    AppMessageHandler *handler = 0;
+    AppMessageParser parser(*handler);
+    parser.parse(0x00);
+
     Eui48 join_multicast = jdksavdecc_multicast_adp_acmp;
 
     RawSocketMulti net( JDKSAVDECC_AVTP_ETHERTYPE, join_multicast );
