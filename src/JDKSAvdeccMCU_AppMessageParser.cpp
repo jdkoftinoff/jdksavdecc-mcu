@@ -40,28 +40,28 @@ int AppMessageParser::dispatchMsg( const AppMessage &msg )
     int r=0;
     switch ( msg.m_appdu.base.message_type )
     {
-    case AppMessage::MessageType::NOP:
+    case AppMessage::NOP:
         m_handler.onAppNop( msg );
         break;
-    case AppMessage::MessageType::ENTITY_ID_REQUEST:
+    case AppMessage::ENTITY_ID_REQUEST:
         m_handler.onAppEntityIdRequest( msg );
         break;
-    case AppMessage::MessageType::ENTITY_ID_RESPONSE:
+    case AppMessage::ENTITY_ID_RESPONSE:
         m_handler.onAppEntityIdResponse( msg );
         break;
-    case AppMessage::MessageType::LINK_UP:
+    case AppMessage::LINK_UP:
         m_handler.onAppLinkUp( msg );
         break;
-    case AppMessage::MessageType::LINK_DOWN:
+    case AppMessage::LINK_DOWN:
         m_handler.onAppLinkDown( msg );
         break;
-    case AppMessage::MessageType::AVDECC_FROM_APS:
+    case AppMessage::AVDECC_FROM_APS:
         m_handler.onAppAvdeccFromAps( msg );
         break;
-    case AppMessage::MessageType::AVDECC_FROM_APC:
+    case AppMessage::AVDECC_FROM_APC:
         m_handler.onAppAvdeccFromApc( msg );
         break;
-    case AppMessage::MessageType::VENDOR:
+    case AppMessage::VENDOR:
         m_handler.onAppVendor( msg );
         break;
     default:
@@ -153,7 +153,7 @@ AppMessage *AppMessageParser::validateHeader()
     {
         switch ( p->message_type )
         {
-        case AppMessage::MessageType::NOP:
+        case AppMessage::NOP:
             /// See IEEE Std 1722.1-2013 Annex C.5.1.1
             if ( p->payload_length == 0 && p->reserved == 0
                  && Eui48( p->address ).isZero() )
@@ -168,7 +168,7 @@ AppMessage *AppMessageParser::validateHeader()
                 m_error_count++;
             }
             break;
-        case AppMessage::MessageType::ENTITY_ID_REQUEST:
+        case AppMessage::ENTITY_ID_REQUEST:
             /// See IEEE Std 1722.1-2013 Annex C.5.1.2
             if ( p->payload_length == 8 && p->reserved == 0 )
             {
@@ -182,7 +182,7 @@ AppMessage *AppMessageParser::validateHeader()
                 m_error_count++;
             }
             break;
-        case AppMessage::MessageType::ENTITY_ID_RESPONSE:
+        case AppMessage::ENTITY_ID_RESPONSE:
             /// See IEEE Std 1722.1-2013 Annex C.5.1.3
             if ( p->payload_length == 8 && p->reserved == 0 )
             {
@@ -196,7 +196,7 @@ AppMessage *AppMessageParser::validateHeader()
                 m_error_count++;
             }
             break;
-        case AppMessage::MessageType::LINK_UP:
+        case AppMessage::LINK_UP:
             /// See IEEE Std 1722.1-2013 Annex C.5.1.4
             if ( p->payload_length == 0 && p->reserved == 0 )
             {
@@ -210,7 +210,7 @@ AppMessage *AppMessageParser::validateHeader()
                 m_error_count++;
             }
             break;
-        case AppMessage::MessageType::LINK_DOWN:
+        case AppMessage::LINK_DOWN:
             /// See IEEE Std 1722.1-2013 Annex C.5.1.5
             if ( p->payload_length == 0 && p->reserved == 0 )
             {
@@ -224,7 +224,7 @@ AppMessage *AppMessageParser::validateHeader()
                 m_error_count++;
             }
             break;
-        case AppMessage::MessageType::AVDECC_FROM_APS:
+        case AppMessage::AVDECC_FROM_APS:
             /// See IEEE Std 1722.1-2013 Annex C.5.1.6
             if ( p->payload_length <= JDKSAVDECC_APPDU_MAX_PAYLOAD_LENGTH
                  && p->reserved == 0 )
@@ -239,7 +239,7 @@ AppMessage *AppMessageParser::validateHeader()
                 m_error_count++;
             }
             break;
-        case AppMessage::MessageType::AVDECC_FROM_APC:
+        case AppMessage::AVDECC_FROM_APC:
             /// See IEEE Std 1722.1-2013 Annex C.5.1.7
             if ( p->payload_length <= JDKSAVDECC_APPDU_MAX_PAYLOAD_LENGTH
                  && p->reserved == 0 )
@@ -254,7 +254,7 @@ AppMessage *AppMessageParser::validateHeader()
                 m_error_count++;
             }
             break;
-        case AppMessage::MessageType::VENDOR:
+        case AppMessage::VENDOR:
             /// See IEEE Std 1722.1-2013 Annex C.5.1.8
             if ( p->payload_length <= JDKSAVDECC_APPDU_MAX_PAYLOAD_LENGTH
                  && p->reserved == 0 )
