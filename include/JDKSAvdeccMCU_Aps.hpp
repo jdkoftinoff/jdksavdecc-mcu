@@ -45,7 +45,7 @@ namespace JDKSAvdeccMCU
 ///
 class ApsStateMachine
 {
-public:
+  public:
     class StateVariables;
     class StateActions;
     class States;
@@ -56,7 +56,7 @@ public:
     ///
     class StateVariables
     {
-    public:
+      public:
         StateVariables();
         virtual ~StateVariables();
 
@@ -64,10 +64,7 @@ public:
         /// \brief setOwner set the owner
         /// \param owner ApsStateMachine
         ///
-        virtual void setOwner( ApsStateMachine *owner )
-        {
-            m_owner = owner;
-        }
+        virtual void setOwner( ApsStateMachine *owner ) { m_owner = owner; }
 
         ///
         /// \brief clear all variables
@@ -76,17 +73,17 @@ public:
         ///
         virtual void clear()
         {
-            m_finished=false;
-            m_tcpConnected=false;
-            m_requestValid=-1;
-            m_incomingTcpClosed=false;
-            m_linkStatus=false;
-            m_linkStatusChanged=false;
-            m_apcMsg=false;
-            m_L2Msg=false;
-            m_assignEntityIdRequest=false;
-            m_nopTimeout=0;
-            m_currentTime=0;
+            m_finished = false;
+            m_tcpConnected = false;
+            m_requestValid = -1;
+            m_incomingTcpClosed = false;
+            m_linkStatus = false;
+            m_linkStatusChanged = false;
+            m_apcMsg = false;
+            m_L2Msg = false;
+            m_assignEntityIdRequest = false;
+            m_nopTimeout = 0;
+            m_currentTime = 0;
             m_out.setNOP();
             m_in.setNOP();
         }
@@ -235,7 +232,6 @@ public:
         AppMessage m_in;
     };
 
-
     ///
     /// \brief The StateActions class
     ///
@@ -243,7 +239,7 @@ public:
     ///
     class StateActions
     {
-    public:
+      public:
         StateActions() {}
         virtual ~StateActions() {}
 
@@ -251,19 +247,13 @@ public:
         /// \brief setOwner Sets the owner
         /// \param owner ApsStateMachine
         ///
-        virtual void setOwner( ApsStateMachine *owner )
-        {
-            m_owner = owner;
-        }
+        virtual void setOwner( ApsStateMachine *owner ) { m_owner = owner; }
 
         ///
         /// \brief getOwner gets the owner
         /// \return ApsStateMachine
         ///
-        ApsStateMachine *getOwner()
-        {
-            return m_owner;
-        }
+        ApsStateMachine *getOwner() { return m_owner; }
 
         ///
         /// \brief getVariables
@@ -272,18 +262,13 @@ public:
         ///
         /// \return StateVariables
         ///
-        StateVariables *getVariables()
-        {
-            return m_owner->getVariables();
-        }
+        StateVariables *getVariables() { return m_owner->getVariables(); }
 
         ///
         /// \brief clear any additional
         /// state
         ///
-        virtual void clear()
-        {
-        }
+        virtual void clear() {}
 
         ///
         /// \brief initialize see Annex C.5.2.2.2
@@ -335,7 +320,7 @@ public:
         /// \param link_mac The MAC Address of ethernet port
         /// \param linkStatus true if link is up
         ///
-        virtual void sendLinkStatus(Eui48 link_mac, bool linkStatus) = 0;
+        virtual void sendLinkStatus( Eui48 link_mac, bool linkStatus ) = 0;
 
         ///
         /// \brief sendAvdeccToL2 See Annex C.5.2.2.4
@@ -385,7 +370,7 @@ public:
         /// \param a Primary MAC Address of the APC
         /// \param entity_id Requested entity_id
         ///
-        virtual void sendEntityIdAssignment(Eui48 a, Eui64 entity_id ) = 0;
+        virtual void sendEntityIdAssignment( Eui48 a, Eui64 entity_id ) = 0;
 
         ///
         /// \brief sendNopToApc See Annex C.5.2.2.8
@@ -409,8 +394,7 @@ public:
         ///
         virtual void closeTcpServer() = 0;
 
-    protected:
-
+      protected:
         ///
         /// \brief m_owner the owner
         ///
@@ -427,31 +411,24 @@ public:
     ///
     class States
     {
-    public:
-
+      public:
         ///
         /// The state_proc member is a pointer to the
         /// current state handling procedure, or 0 if done
         ///
-        typedef void (States::*state_proc)();
+        typedef void ( States::*state_proc )();
 
         ///
         /// \brief States constructor
         ///
         /// Start the state machine in the begin state
         ///
-        States()
-            : m_owner(0)
-            , m_current_state(&States::doBegin)
-        {
-        }
+        States() : m_owner( 0 ), m_current_state( &States::doBegin ) {}
 
         ///
         /// \brief ~States
         ///
-        virtual ~States()
-        {
-        }
+        virtual ~States() {}
 
         ///
         /// \brief setOwner
@@ -459,10 +436,7 @@ public:
         ///
         /// \param owner
         ///
-        virtual void setOwner( ApsStateMachine *owner )
-        {
-            m_owner = owner;
-        }
+        virtual void setOwner( ApsStateMachine *owner ) { m_owner = owner; }
 
         ///
         /// \brief getOwner
@@ -470,10 +444,7 @@ public:
         ///
         /// \return ApsStateMachine
         ///
-        ApsStateMachine *getOwner()
-        {
-            return m_owner;
-        }
+        ApsStateMachine *getOwner() { return m_owner; }
 
         ///
         /// \brief getActions
@@ -482,10 +453,7 @@ public:
         ///
         /// \return StateActions
         ///
-        StateActions *getActions()
-        {
-            return m_owner->getActions();
-        }
+        StateActions *getActions() { return m_owner->getActions(); }
 
         ///
         /// \brief getVariables
@@ -494,10 +462,7 @@ public:
         ///
         /// \return StateVariables
         ///
-        StateVariables *getVariables()
-        {
-            return m_owner->getVariables();
-        }
+        StateVariables *getVariables() { return m_owner->getVariables(); }
 
         ///
         /// \brief clear
@@ -507,12 +472,12 @@ public:
         {
             m_current_state = &States::doBegin;
 
-            getVariables()->m_tcpConnected= false;
-            getVariables()->m_incomingTcpClosed= false;
-            getVariables()->m_linkStatusChanged= false;
-            getVariables()->m_apcMsg= false;
-            getVariables()->m_L2Msg= false;
-            getVariables()->m_assignEntityIdRequest= false;
+            getVariables()->m_tcpConnected = false;
+            getVariables()->m_incomingTcpClosed = false;
+            getVariables()->m_linkStatusChanged = false;
+            getVariables()->m_apcMsg = false;
+            getVariables()->m_L2Msg = false;
+            getVariables()->m_assignEntityIdRequest = false;
         }
 
         ///
@@ -522,12 +487,12 @@ public:
         ///
         virtual bool run()
         {
-            bool r=false;
+            bool r = false;
 
-            if( m_current_state )
+            if ( m_current_state )
             {
-                (this->*m_current_state)();
-                r=true;
+                ( this->*m_current_state )();
+                r = true;
             }
             return r;
         }
@@ -537,10 +502,7 @@ public:
         ///
         /// Implement the BEGIN state
         ///
-        virtual void doBegin()
-        {
-            goToInitialize();
-        }
+        virtual void doBegin() { goToInitialize(); }
 
         ///
         /// \brief goToInitialize
@@ -558,10 +520,7 @@ public:
         ///
         /// Implement the INITIALIZE state
         ///
-        virtual void doInitialize()
-        {
-            goToWaitForConnect();
-        }
+        virtual void doInitialize() { goToWaitForConnect(); }
 
         ///
         /// \brief goToWaitForConnect
@@ -582,11 +541,11 @@ public:
         ///
         virtual void doWaitForConnect()
         {
-            if( getVariables()->m_finished==true )
+            if ( getVariables()->m_finished == true )
             {
                 goToFinish();
             }
-            if( getVariables()->m_tcpConnected==true )
+            if ( getVariables()->m_tcpConnected == true )
             {
                 goToAccept();
             }
@@ -612,11 +571,11 @@ public:
         {
             int requestValid = getVariables()->m_requestValid;
 
-            if( requestValid==200 )
+            if ( requestValid == 200 )
             {
                 goToStartTransfer();
             }
-            if( requestValid!=-1 && requestValid!=200 )
+            if ( requestValid != -1 && requestValid != 200 )
             {
                 goToReject();
             }
@@ -638,20 +597,14 @@ public:
         ///
         /// Implement the REJECT state
         ///
-        virtual void doReject()
-        {
-            goToClosed();
-        }
+        virtual void doReject() { goToClosed(); }
 
         ///
         /// \brief goToClosed
         ///
         /// Transition to the CLOSED State
         ///
-        virtual void goToClosed()
-        {
-            m_current_state = &States::doClosed;
-        }
+        virtual void goToClosed() { m_current_state = &States::doClosed; }
 
         ///
         /// \brief doClosed
@@ -675,9 +628,8 @@ public:
 
             getActions()->sendHttpResponse( getVariables()->m_requestValid );
 
-            getActions()->sendLinkStatus(
-                        getVariables()->m_linkMac,
-                        getVariables()->m_linkStatus );
+            getActions()->sendLinkStatus( getVariables()->m_linkMac,
+                                          getVariables()->m_linkStatus );
 
             getVariables()->m_nopTimeout = getVariables()->m_currentTime + 10;
         }
@@ -687,20 +639,14 @@ public:
         ///
         /// Implement the START_TRANSFER state
         ///
-        virtual void doStartTransfer()
-        {
-            goToWaiting();
-        }
+        virtual void doStartTransfer() { goToWaiting(); }
 
         ///
         /// \brief goToWaiting
         ///
         /// Transition to the WAITING state
         ///
-        virtual void goToWaiting()
-        {
-            m_current_state = &States::doWaiting;
-        }
+        virtual void goToWaiting() { m_current_state = &States::doWaiting; }
 
         ///
         /// \brief doWaiting
@@ -709,32 +655,32 @@ public:
         ///
         virtual void doWaiting()
         {
-            if( getVariables()->m_incomingTcpClosed==true )
+            if ( getVariables()->m_incomingTcpClosed == true )
             {
                 goToClosed();
             }
-            else if( getVariables()->m_finished==true )
+            else if ( getVariables()->m_finished == true )
             {
                 goToCloseAndFinish();
             }
-            else if( getVariables()->m_linkStatusChanged==true )
+            else if ( getVariables()->m_linkStatusChanged == true )
             {
                 goToLinkStatus();
             }
-            else if( getVariables()->m_apcMsg==true )
+            else if ( getVariables()->m_apcMsg == true )
             {
                 goToTransferToL2();
             }
-            else if( getVariables()->m_L2Msg==true )
+            else if ( getVariables()->m_L2Msg == true )
             {
                 goToTransferToApc();
             }
-            else if( getVariables()->m_assignEntityIdRequest==true )
+            else if ( getVariables()->m_assignEntityIdRequest == true )
             {
                 goToAssignEntityId();
             }
-            else if( ((int)getVariables()->m_nopTimeout -
-                      (int)getVariables()->m_currentTime) < 0 )
+            else if ( ( (int)getVariables()->m_nopTimeout
+                        - (int)getVariables()->m_currentTime ) < 0 )
             {
                 goToSendNop();
             }
@@ -749,9 +695,8 @@ public:
         {
             m_current_state = &States::doLinkStatus;
 
-            getActions()->sendLinkStatus(
-                        getVariables()->m_linkMac,
-                        getVariables()->m_linkStatus );
+            getActions()->sendLinkStatus( getVariables()->m_linkMac,
+                                          getVariables()->m_linkStatus );
 
             getVariables()->m_nopTimeout = getVariables()->m_currentTime + 10;
 
@@ -763,10 +708,7 @@ public:
         ///
         /// Implement the LINK_STATUS state
         ///
-        virtual void doLinkStatus()
-        {
-            goToWaiting();
-        }
+        virtual void doLinkStatus() { goToWaiting(); }
 
         ///
         /// \brief goToTransferToL2
@@ -785,10 +727,7 @@ public:
         ///
         /// Implement the TRANSFER_TO_L2 state
         ///
-        virtual void doTransferToL2()
-        {
-            goToWaiting();
-        }
+        virtual void doTransferToL2() { goToWaiting(); }
 
         ///
         /// \brief goToTransferToApc
@@ -808,10 +747,7 @@ public:
         ///
         /// Implement the TRANSFER_TO_APC state
         ///
-        virtual void doTransferToApc()
-        {
-            goToWaiting();
-        }
+        virtual void doTransferToApc() { goToWaiting(); }
 
         ///
         /// \brief goToAssignEntityId
@@ -821,9 +757,8 @@ public:
         virtual void goToAssignEntityId()
         {
             m_current_state = &States::doAssignEntityId;
-            getActions()->sendEntityIdAssignment(
-                        getVariables()->m_a,
-                        getVariables()->m_entity_id );
+            getActions()->sendEntityIdAssignment( getVariables()->m_a,
+                                                  getVariables()->m_entity_id );
             getVariables()->m_nopTimeout = getVariables()->m_currentTime + 10;
             getVariables()->m_assignEntityIdRequest = false;
         }
@@ -833,10 +768,7 @@ public:
         ///
         /// Implement the ASSIGN_ENTITY_ID state
         ///
-        virtual void doAssignEntityId()
-        {
-            goToWaiting();
-        }
+        virtual void doAssignEntityId() { goToWaiting(); }
 
         ///
         /// \brief goToSendNop
@@ -855,10 +787,7 @@ public:
         ///
         /// Implement the SEND_NOP state
         ///
-        virtual void doSendNop()
-        {
-            goToWaiting();
-        }
+        virtual void doSendNop() { goToWaiting(); }
 
         ///
         /// \brief goToCloseAndFinish
@@ -876,10 +805,7 @@ public:
         ///
         /// Implement the CLOSE_AND_FINISH state
         ///
-        virtual void doCloseAndFinish()
-        {
-            goToFinish();
-        }
+        virtual void doCloseAndFinish() { goToFinish(); }
 
         ///
         /// \brief goToFinish
@@ -888,7 +814,7 @@ public:
         ///
         virtual void goToFinish()
         {
-            m_current_state=&States::doFinish;
+            m_current_state = &States::doFinish;
             getActions()->closeTcpServer();
         }
 
@@ -897,12 +823,9 @@ public:
         ///
         /// Implement the FINISH state
         ///
-        virtual void doFinish()
-        {
-            m_current_state = 0;
-        }
+        virtual void doFinish() { m_current_state = 0; }
 
-    protected:
+      protected:
         ApsStateMachine *m_owner;
         state_proc m_current_state;
     };
@@ -919,10 +842,9 @@ public:
 
     virtual bool run();
 
-protected:
+  protected:
     StateVariables *m_variables;
     StateActions *m_actions;
     States *m_states;
 };
-
 }

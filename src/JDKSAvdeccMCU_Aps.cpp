@@ -35,17 +35,14 @@
 namespace JDKSAvdeccMCU
 {
 
-ApsStateMachine::ApsStateMachine(
-        ApsStateMachine::StateVariables *events,
-        ApsStateMachine::StateActions *actions,
-        ApsStateMachine::States *states)
-    : m_variables(events)
-    , m_actions(actions)
-    , m_states(states)
+ApsStateMachine::ApsStateMachine( ApsStateMachine::StateVariables *events,
+                                  ApsStateMachine::StateActions *actions,
+                                  ApsStateMachine::States *states )
+    : m_variables( events ), m_actions( actions ), m_states( states )
 {
-    m_variables->setOwner(this);
-    m_actions->setOwner(this);
-    m_states->setOwner(this);
+    m_variables->setOwner( this );
+    m_actions->setOwner( this );
+    m_states->setOwner( this );
 
     m_variables->clear();
     m_actions->clear();
@@ -54,16 +51,10 @@ ApsStateMachine::ApsStateMachine(
 
 ApsStateMachine::~ApsStateMachine()
 {
-    m_variables->setOwner(0);
-    m_actions->setOwner(0);
-    m_states->setOwner(0);
+    m_variables->setOwner( 0 );
+    m_actions->setOwner( 0 );
+    m_states->setOwner( 0 );
 }
 
-bool ApsStateMachine::run()
-{
-    return getStates()->run();
+bool ApsStateMachine::run() { return getStates()->run(); }
 }
-
-
-}
-
