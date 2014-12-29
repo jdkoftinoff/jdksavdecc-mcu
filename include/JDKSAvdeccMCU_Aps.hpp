@@ -33,6 +33,8 @@
 #include "JDKSAvdeccMCU_World.hpp"
 #include "JDKSAvdeccMCU_Eui.hpp"
 #include "JDKSAvdeccMCU_AppMessage.hpp"
+#include "JDKSAvdeccMCU_AppMessageParser.hpp"
+#include "JDKSAvdeccMCU_Http.hpp"
 
 namespace JDKSAvdeccMCU
 {
@@ -489,11 +491,25 @@ class ApsStateMachine
         {
             bool r = false;
 
-            if ( m_current_state )
+            state_proc last_state;
+
+            // call the current state function
+            do
             {
-                ( this->*m_current_state )();
-                r = true;
-            }
+                last_state = m_current_state;
+
+                // only call state function if it is set
+                if ( m_current_state )
+                {
+                    ( this->*m_current_state )();
+                    r = true;
+                }
+
+                // if the current state transitioned, repeat
+            } while ( last_state != m_current_state );
+
+            // return true if there was activity,
+            // return false if there is no state
             return r;
         }
 
@@ -830,21 +846,252 @@ class ApsStateMachine
         state_proc m_current_state;
     };
 
+    class StateEvents : protected AppMessageHandler, protected HttpServerHandler
+    {
+      public:
+        StateEvents( HttpServerParser *http_parser )
+            : m_owner( 0 ), m_http_parser( http_parser ), m_app_parser( *this )
+        {
+        }
+
+        virtual ~StateEvents() {}
+
+        ///
+        /// \brief setOwner
+        /// Set the owner of this state events object
+        ///
+        /// \param owner
+        ///
+        virtual void setOwner( ApsStateMachine *owner ) { m_owner = owner; }
+
+        ///
+        /// \brief getOwner
+        /// get the owner
+        ///
+        /// \return ApsStateMachine
+        ///
+        ApsStateMachine *getOwner() { return m_owner; }
+
+        ///
+        /// \brief getActions
+        ///
+        /// Ask the owning state machine for the actions object
+        ///
+        /// \return StateActions
+        ///
+        StateActions *getActions() { return m_owner->getActions(); }
+
+        ///
+        /// \brief getVariables
+        ///
+        /// As the owning state machine for the state variables object
+        ///
+        /// \return StateVariables
+        ///
+        StateVariables *getVariables() { return m_owner->getVariables(); }
+
+        ///
+        /// \brief clear
+        ///
+        /// Clear the events object
+        ///
+        virtual void clear();
+
+        ///
+        /// \brief onIncomingTcpConnection
+        ///
+        /// Notify the state machine that an incoming tcp connection
+        /// has happened
+        ///
+        virtual void onIncomingTcpConnection();
+
+        ///
+        /// \brief onIncomingTcpData
+        ///
+        /// Notify the state machine that some data was received
+        /// from the APC
+        ///
+        /// \param data ptr to octets
+        /// \param len lenth of data in octets
+        /// \return length of consumed data
+        ///
+        virtual ssize_t onIncomingTcpData( uint8_t const *data, ssize_t len );
+
+        ///
+        /// \brief onNetLinkStatusUpdated
+        ///
+        /// Notify the state machine that the link status
+        /// of the L2 network port has been updated
+        ///
+        /// \param link_mac MAC Address of link
+        /// \param link_status true if link is up
+        ///
+        virtual void onNetLinkStatusUpdated( Eui48 link_mac, bool link_status );
+
+        ///
+        /// \brief onNetAvdeccMessageReceived
+        ///
+        /// Notify the state machine that an AVDECC message
+        /// was received from the L2 network
+        ///
+        /// \param frame Ethernet frame
+        ///
+        virtual void onNetAvdeccMessageReceived( Frame const &frame );
+
+        ///
+        /// \brief onTimeTick
+        ///
+        /// Notify the state machine that some time has passed
+        /// and the new time in seconds is updated
+        ///
+        /// \param time_in_seconds
+        ///
+        virtual void onTimeTick( uint32_t time_in_seconds );
+
+      protected:
+        ///
+        /// \brief onIncomingTcpHttpData
+        ///
+        /// Notify the state machine that some data was received
+        /// from the APC during the HTTP header section
+        ///
+        /// \param data ptr to octets
+        /// \param len lenth of data in octets
+        /// \return length of consumed data
+        ///
+        virtual ssize_t onIncomingTcpHttpData( uint8_t const *data,
+                                               ssize_t len );
+
+        ///
+        /// \brief onIncomingHttpRequest
+        /// \param request
+        /// \return
+        ///
+        virtual bool onIncomingHttpRequest( HttpRequest const &request );
+
+        ///
+        /// \brief onIncomingTcpAppData
+        ///
+        /// Notify the state machine that some data was received
+        /// from the APC during the APP message section
+        ///
+        /// \param data ptr to octets
+        /// \param len lenth of data in octets
+        /// \return length of consumed data
+        ///
+        virtual ssize_t onIncomingTcpAppData( uint8_t const *data,
+                                              ssize_t len );
+
+        ///
+        /// \brief onTcpConnectionClosed
+        ///
+        /// Notify the state machine that the TCP connection
+        /// was closed
+        ///
+        ///
+        virtual void onTcpConnectionClosed();
+
+      protected:
+        ///
+        /// \brief onAppNop
+        ///
+        /// Received NOP from APC
+        ///
+        /// \param msg
+        ///
+        virtual void onAppNop( AppMessage const &msg );
+
+        ///
+        /// \brief onAppEntityIdRequest
+        ///
+        /// Received ENTITY_ID_REQUEST from APC
+        ///
+        /// \param msg
+        ///
+        virtual void onAppEntityIdRequest( AppMessage const &msg );
+
+        ///
+        /// \brief onAppEntityIdResponse
+        ///
+        /// Received ENTITY_ID_RESPONSE from APC
+        ///
+        /// \param msg
+        ///
+        virtual void onAppEntityIdResponse( AppMessage const &msg );
+
+        ///
+        /// \brief onAppLinkUp
+        ///
+        /// Received LINK_UP from APC
+        ///
+        /// \param msg
+        ///
+        virtual void onAppLinkUp( AppMessage const &msg );
+
+        ///
+        /// \brief onAppLinkDown
+        ///
+        /// Received LINK_DOWN from APC
+        ///
+        /// \param msg
+        ///
+        virtual void onAppLinkDown( AppMessage const &msg );
+
+        ///
+        /// \brief onAppAvdeccFromAps
+        ///
+        /// Received AVDECC_FROM_APS from APC
+        ///
+        /// \param msg
+        ///
+        virtual void onAppAvdeccFromAps( AppMessage const &msg );
+
+        ///
+        /// \brief onAppAvdeccFromApc
+        ///
+        /// Received AVDECC_FROM_APC from APC
+        ///
+        /// \param msg
+        ///
+        virtual void onAppAvdeccFromApc( AppMessage const &msg );
+
+        ///
+        /// \brief onAppVendor
+        ///
+        /// Received VENDOR from APC
+        ///
+        /// \param msg
+        ///
+        virtual void onAppVendor( AppMessage const &msg );
+
+      protected:
+        ApsStateMachine *m_owner;
+
+        bool m_in_http;
+        HttpServerParser *m_http_parser;
+        AppMessageParser m_app_parser;
+    };
+
     StateVariables *getVariables() { return m_variables; }
     StateActions *getActions() { return m_actions; }
+    StateEvents *getEvents() { return m_events; }
     States *getStates() { return m_states; }
 
     ApsStateMachine( StateVariables *variables,
                      StateActions *actions,
+                     StateEvents *events,
                      States *states );
 
     virtual ~ApsStateMachine();
 
     virtual bool run();
 
+    virtual void clear();
+
   protected:
     StateVariables *m_variables;
     StateActions *m_actions;
+    StateEvents *m_events;
     States *m_states;
 };
 }
