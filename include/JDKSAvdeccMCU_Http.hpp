@@ -35,28 +35,196 @@
 namespace JDKSAvdeccMCU
 {
 
+///
+/// \brief The HttpRequest class
+///
+/// Contains the details of an HTTP Request
+///
 class HttpRequest
 {
   public:
     virtual ~HttpRequest() {}
 
+    ///
+    /// \brief clear Clears all fields
+    ///
     virtual void clear();
 
+    ///
+    /// \brief setCONNECT
+    ///
+    /// Set the request to be a CONNECT method
+    ///
+    /// \param path
+    /// \param headers
+    ///
     void setCONNECT( std::string const &path,
                      std::vector<std::string> const &headers );
 
+    ///
+    /// \brief setGET
+    ///
+    /// Set the request to be a GET method
+    ///
+    /// \param host
+    /// \param port
+    /// \param path
+    /// \param headers
+    ///
     void setGET( std::string const &host,
                  std::string const &port,
                  std::string const &path,
-                 std::vector<std::string> const &headers );
+                 std::vector<std::string> const &headers )
+    {
+        set( "GET", host, port, path, headers );
+    }
 
+    ///
+    /// \brief setHEAD
+    ///
+    /// Set the request to be a HEAD method
+    ///
+    /// \param host
+    /// \param port
+    /// \param path
+    /// \param headers
+    ///
+    void setHEAD( std::string const &host,
+                  std::string const &port,
+                  std::string const &path,
+                  std::vector<std::string> const &headers )
+    {
+        set( "HEAD", host, port, path, headers );
+    }
+
+    ///
+    /// \brief setOPTIONS
+    ///
+    /// Set the request to be a OPTIONS request
+    ///
+    /// \param host
+    /// \param port
+    /// \param path
+    /// \param headers
+    ///
+    void setOPTIONS( std::string const &host,
+                     std::string const &port,
+                     std::string const &path,
+                     std::vector<std::string> const &headers )
+    {
+        set( "OPTIONS", host, port, path, headers );
+    }
+
+    ///
+    /// \brief setDELETE
+    ///
+    /// Set the request to be a DELETE request
+    ///
+    /// \param host
+    /// \param port
+    /// \param path
+    /// \param headers
+    ///
+    void setDELETE( std::string const &host,
+                    std::string const &port,
+                    std::string const &path,
+                    std::vector<std::string> const &headers )
+    {
+        set( "DELETE", host, port, path, headers );
+    }
+
+    ///
+    /// \brief setPOST
+    ///
+    /// Set the request to be a POST request
+    ///
+    /// \param host
+    /// \param port
+    /// \param path
+    /// \param headers
+    /// \param content_type
+    /// \param content
+    ///
     void setPOST( std::string const &host,
                   std::string const &port,
                   std::string const &path,
                   std::vector<std::string> const &headers,
                   std::string const &content_type,
-                  std::vector<uint8_t> const &content );
+                  std::vector<uint8_t> const &content )
+    {
+        set( "POST", host, port, path, headers, content_type, content );
+    }
 
+    ///
+    /// \brief setPUT
+    ///
+    /// Set the request to be a PUT request
+    ///
+    /// \param host
+    /// \param port
+    /// \param path
+    /// \param headers
+    /// \param content_type
+    /// \param content
+    ///
+    void setPUT( std::string const &host,
+                  std::string const &port,
+                  std::string const &path,
+                  std::vector<std::string> const &headers,
+                  std::string const &content_type,
+                  std::vector<uint8_t> const &content )
+    {
+        set( "PUT", host, port, path, headers, content_type, content );
+    }
+
+    ///
+    /// \brief set
+    ///
+    /// Set the request to be an arbitrary method with no content
+    ///
+    /// \param method
+    /// \param host
+    /// \param port
+    /// \param path
+    /// \param headers
+    ///
+    void set( std::string const &method,
+              std::string const &host,
+              std::string const &port,
+              std::string const &path,
+              std::vector<std::string> const &headers );
+
+
+    ///
+    /// \brief set
+    ///
+    /// Set the request to be an arbitrary method with content
+    ///
+    /// \param method
+    /// \param host
+    /// \param port
+    /// \param path
+    /// \param headers
+    /// \param content_type
+    /// \param content
+    ///
+    void set( std::string const &method,
+              std::string const &host,
+              std::string const &port,
+              std::string const &path,
+              std::vector<std::string> const &headers,
+              std::string const &content_type,
+              std::vector<uint8_t> const &content );
+
+    ///
+    /// \brief flattenHeaders
+    ///
+    /// Flatten all the header parameters into one buffer suitable
+    /// for transmission via socket
+    ///
+    /// \param dest pointer to std::string which will contain the
+    /// entire header for the request in one block
+    ///
     virtual void flattenHeaders( std::string *dest );
 
     std::string m_method;

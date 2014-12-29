@@ -63,24 +63,31 @@ void HttpRequest::setCONNECT( const std::string &path,
     m_content.clear();
 }
 
-void HttpRequest::setGET( const std::string &host,
-                          const std::string &port,
-                          const std::string &path,
-                          const std::vector<std::string> &headers )
+void HttpRequest::set(  const std::string &method,
+                        const std::string &host,
+                        const std::string &port,
+                        const std::string &path,
+                        const std::vector<std::string> &headers )
 {
-    m_method = "GET";
+    m_method = method;
     m_path = path;
     m_version = "HTTP/1.1";
     m_headers.clear();
 
     std::string s;
 
-    s.clear();
-    s.append( "Host: " );
-    s.append( host );
-    s.append( ":" );
-    s.append( port );
-    m_headers.push_back( s );
+    if( host.length()>0 )
+    {
+        s.clear();
+        s.append( "Host: " );
+        s.append( host );
+        if( port.length()>0 )
+        {
+            s.append( ":" );
+            s.append( port );
+        }
+        m_headers.push_back( s );
+    }
 
     for ( std::vector<std::string>::const_iterator i = headers.begin();
           i != headers.end();
@@ -92,41 +99,54 @@ void HttpRequest::setGET( const std::string &host,
     m_content.clear();
 }
 
-void HttpRequest::setPOST( const std::string &host,
-                           const std::string &port,
-                           const std::string &path,
-                           const std::vector<std::string> &headers,
-                           const std::string &content_type,
-                           const std::vector<uint8_t> &content )
+void HttpRequest::set( const std::string &method,
+                       const std::string &host,
+                       const std::string &port,
+                       const std::string &path,
+                       const std::vector<std::string> &headers,
+                       const std::string &content_type,
+                       const std::vector<uint8_t> &content )
 {
-    m_method = "POST";
+    m_method = method;
     m_path = path;
     m_version = "HTTP/1.1";
     m_headers.clear();
 
     std::string s;
 
-    s.clear();
-    s.append( "Host: " );
-    s.append( host );
-    s.append( ":" );
-    s.append( port );
-    m_headers.push_back( s );
-
-    s.clear();
-    s.append( "Content-Type: " );
-    s.append( content_type );
-    m_headers.push_back( s );
-
-    s.clear();
-    s.append( "Content-Length: " );
-
+    if( host.length()>0 )
     {
-        char lenascii[32];
-        sprintf( lenascii, "%d\r\n", (int)content.size() );
-        s.append( lenascii );
+        s.clear();
+        s.append( "Host: " );
+        s.append( host );
+        if( port.length()>0 )
+        {
+            s.append( ":" );
+            s.append( port );
+        }
+        m_headers.push_back( s );
     }
-    m_headers.push_back( s );
+
+    if( content_type.length()>0 )
+    {
+        s.clear();
+        s.append( "Content-Type: " );
+        s.append( content_type );
+        m_headers.push_back( s );
+
+        if( content.size()>0 )
+        {
+            s.clear();
+            s.append( "Content-Length: " );
+
+            {
+                char lenascii[32];
+                sprintf( lenascii, "%d\r\n", (int)content.size() );
+                s.append( lenascii );
+            }
+            m_headers.push_back( s );
+        }
+    }
 
     for ( std::vector<std::string>::const_iterator i = headers.begin();
           i != headers.end();
