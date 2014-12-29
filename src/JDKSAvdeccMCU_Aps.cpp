@@ -126,7 +126,7 @@ bool ApsStateMachine::StateEvents::onIncomingHttpRequest(
     const HttpRequest &request )
 {
     bool r = false;
-    if ( request.m_method == "CONNECT" && request.m_path == "/"
+    if ( request.m_method == "CONNECT" && request.m_path == m_path
          && request.m_version == "HTTP/1.1" )
     {
         m_in_http = false;

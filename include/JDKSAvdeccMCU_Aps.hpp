@@ -849,8 +849,11 @@ class ApsStateMachine
     class StateEvents : protected AppMessageHandler, protected HttpServerHandler
     {
       public:
-        StateEvents( HttpServerParser *http_parser )
-            : m_owner( 0 ), m_http_parser( http_parser ), m_app_parser( *this )
+        StateEvents( HttpServerParser *http_parser, std::string path )
+            : m_owner( 0 )
+            , m_http_parser( http_parser )
+            , m_path(path)
+            , m_app_parser( *this )
         {
         }
 
@@ -1069,6 +1072,7 @@ class ApsStateMachine
 
         bool m_in_http;
         HttpServerParser *m_http_parser;
+        std::string m_path;
         AppMessageParser m_app_parser;
     };
 
