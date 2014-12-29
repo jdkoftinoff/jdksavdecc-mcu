@@ -114,12 +114,12 @@ void HttpRequest::setPOST( const std::string &host,
     m_headers.push_back( s );
 
     s.clear();
-    s.append( "Content-type: " );
+    s.append( "Content-Type: " );
     s.append( content_type );
     m_headers.push_back( s );
 
     s.clear();
-    s.append( "Content-length: " );
+    s.append( "Content-Length: " );
 
     {
         char lenascii[32];
