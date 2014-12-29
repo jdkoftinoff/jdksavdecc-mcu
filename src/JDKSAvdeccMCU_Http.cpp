@@ -44,9 +44,8 @@ void HttpRequest::clear()
     m_content.clear();
 }
 
-void HttpRequest::setCONNECT(
-        const std::string &path,
-        const std::vector< std::string > &headers)
+void HttpRequest::setCONNECT( const std::string &path,
+                              const std::vector<std::string> &headers )
 {
     m_method = "CONNECT";
     m_path = path;
@@ -54,21 +53,20 @@ void HttpRequest::setCONNECT(
 
     m_headers.clear();
 
-    for( std::vector< std::string >::const_iterator i=headers.begin();
-         i!=headers.end();
-         ++i )
+    for ( std::vector<std::string>::const_iterator i = headers.begin();
+          i != headers.end();
+          ++i )
     {
-        m_headers.push_back(*i);
+        m_headers.push_back( *i );
     }
 
     m_content.clear();
 }
 
-void HttpRequest::setGET(
-        const std::string &host,
-        const std::string &port,
-        const std::string &path,
-        const std::vector< std::string > &headers )
+void HttpRequest::setGET( const std::string &host,
+                          const std::string &port,
+                          const std::string &path,
+                          const std::vector<std::string> &headers )
 {
     m_method = "GET";
     m_path = path;
@@ -84,23 +82,22 @@ void HttpRequest::setGET(
     s.append( port );
     m_headers.push_back( s );
 
-    for( std::vector< std::string >::const_iterator i=headers.begin();
-         i!=headers.end();
-         ++i )
+    for ( std::vector<std::string>::const_iterator i = headers.begin();
+          i != headers.end();
+          ++i )
     {
-        m_headers.push_back(*i);
+        m_headers.push_back( *i );
     }
 
     m_content.clear();
 }
 
-void HttpRequest::setPOST(
-        const std::string &host,
-        const std::string &port,
-        const std::string &path,
-        const std::vector< std::string > &headers,
-        const std::string &content_type,
-        const std::vector< uint8_t > &content)
+void HttpRequest::setPOST( const std::string &host,
+                           const std::string &port,
+                           const std::string &path,
+                           const std::vector<std::string> &headers,
+                           const std::string &content_type,
+                           const std::vector<uint8_t> &content )
 {
     m_method = "POST";
     m_path = path;
@@ -129,19 +126,19 @@ void HttpRequest::setPOST(
         sprintf( lenascii, "%d\r\n", (int)content.size() );
         s.append( lenascii );
     }
-    m_headers.push_back(s);
+    m_headers.push_back( s );
 
-    for( std::vector< std::string >::const_iterator i=headers.begin();
-         i!=headers.end();
-         ++i )
+    for ( std::vector<std::string>::const_iterator i = headers.begin();
+          i != headers.end();
+          ++i )
     {
-        m_headers.push_back(*i);
+        m_headers.push_back( *i );
     }
 
     m_content = content;
 }
 
-void HttpRequest::flattenHeaders(std::string *dest)
+void HttpRequest::flattenHeaders( std::string *dest )
 {
     dest->clear();
     dest->append( m_method );
@@ -151,9 +148,9 @@ void HttpRequest::flattenHeaders(std::string *dest)
     dest->append( m_version );
     dest->append( "\r\n" );
 
-    for( std::vector< std::string >::const_iterator i=m_headers.begin();
-         i!=m_headers.end();
-         ++i )
+    for ( std::vector<std::string>::const_iterator i = m_headers.begin();
+          i != m_headers.end();
+          ++i )
     {
         dest->append( *i );
         dest->append( "\r\n" );
@@ -163,7 +160,7 @@ void HttpRequest::flattenHeaders(std::string *dest)
 
 void HttpResponse::clear()
 {
-    m_code=-1;
+    m_code = -1;
     m_code_string.clear();
     m_headers.clear();
     m_content.clear();
@@ -175,79 +172,78 @@ void HttpServerParserSimple::clear()
     m_parse_state = ParsingMethod;
 }
 
-ssize_t HttpServerParserSimple::onIncomingHttpData(
-        const uint8_t *data,
-        ssize_t len)
+ssize_t HttpServerParserSimple::onIncomingHttpData( const uint8_t *data,
+                                                    ssize_t len )
 {
-    ssize_t r=0;
+    ssize_t r = 0;
 
     // did we receive EOF
-    if( len==0 )
+    if ( len == 0 )
     {
         // if we were in ParsingContentUntilClose state, then we are done
-        if( m_parse_state == ParsingContentUntilClose )
+        if ( m_parse_state == ParsingContentUntilClose )
         {
             // call the handler
-            if( m_handler->onIncomingHttpRequest( *m_request ) )
+            if ( m_handler->onIncomingHttpRequest( *m_request ) )
             {
                 // the handler returned true, so we will return 0 here
-                r=0;
+                r = 0;
             }
             else
             {
                 // the handler returned false, so we will error out here
-                r=-1;
+                r = -1;
             }
         }
         else
         {
             // If this happens during any other state, then this is an error
-            r=-1;
+            r = -1;
         }
     }
     else
     {
-        bool stop=false;
+        bool stop = false;
 
         // parse through as much of the data block as possible
-        for( r=0; r<len; ++r )
+        for ( r = 0; r < len; ++r )
         {
             // Abort parsing if we need to here
-            if( stop )
+            if ( stop )
             {
                 break;
             }
 
             // get the current octet as a char
-            char c=(char)data[r];
+            char c = (char)data[r];
 
-            switch( m_parse_state )
+            switch ( m_parse_state )
             {
             case ParsingMethod:
                 // the HTTP method is delimited by a space
-                if( c==' ' )
+                if ( c == ' ' )
                 {
                     m_parse_state = ParsingPath;
                 }
-                else if( isprint(c) )
+                else if ( isprint( c ) )
                 {
                     // only append printable chars to the method
-                    m_request->m_method.push_back(c);
+                    m_request->m_method.push_back( c );
                 }
                 else
                 {
                     // any non-printing char is an error here
-                    stop=true;
-                    r=-1;
+                    stop = true;
+                    r = -1;
                 }
                 break;
             case ParsingPath:
                 // the HTTP path is delimited by a space
-                if( c==' ' )
+                if ( c == ' ' )
                 {
                     m_parse_state = ParsingVersion;
                 }
-                else if( isprint(c) )
+                else if ( isprint( c ) )
                 {
                     // only append printable chars to the path
                     m_request->m_path.push_back( c );
@@ -255,40 +251,40 @@ ssize_t HttpServerParserSimple::onIncomingHttpData(
                 else
                 {
                     // any non-printing char is an error here
-                    stop=true;
-                    r=-1;
+                    stop = true;
+                    r = -1;
                 }
                 break;
             case ParsingVersion:
                 // The HTTP Version is delimited by LF
-                if( c=='\n' )
+                if ( c == '\n' )
                 {
                     m_parse_state = ParsingHeaderLine;
                     m_cur_line.clear();
                 }
-                else if( isprint(c) )
+                else if ( isprint( c ) )
                 {
                     // only append printable chars to the version
                     m_request->m_version.push_back( c );
                 }
-                else if( c!='\r' )
+                else if ( c != '\r' )
                 {
                     // any non-printing char besides CR is an error here
-                    stop=true;
-                    r=-1;
+                    stop = true;
+                    r = -1;
                 }
                 break;
             case ParsingHeaderLine:
-                if( c=='\n' )
+                if ( c == '\n' )
                 {
                     // The header line is delimited by LF
-                    if( m_cur_line.length()==0 )
+                    if ( m_cur_line.length() == 0 )
                     {
                         // The HTTP header is delimited by a blank line
                         // If the method is POST or PUT then we have content
                         // to parse too
-                        if( m_request->m_method=="POST" ||
-                                m_request->m_method=="PUT" )
+                        if ( m_request->m_method == "POST"
+                             || m_request->m_method == "PUT" )
                         {
                             m_parse_state = ParsingContentUntilClose;
                             m_request->m_content.clear();
@@ -299,17 +295,17 @@ ssize_t HttpServerParserSimple::onIncomingHttpData(
                         else
                         {
                             // For other methods, we are done now.
-                            stop=true;
+                            stop = true;
                             m_request->m_content.clear();
 
                             // give the request to the handler
-                            if( !m_handler->onIncomingHttpRequest( *m_request ) )
+                            if ( !m_handler->onIncomingHttpRequest(
+                                     *m_request ) )
                             {
                                 // the handler returned false, so we will
                                 // error out here
-                                r=-1;
+                                r = -1;
                             }
-
                         }
                     }
                     else
@@ -319,23 +315,23 @@ ssize_t HttpServerParserSimple::onIncomingHttpData(
                         m_cur_line.clear();
                     }
                 }
-                else if( isprint(c) )
+                else if ( isprint( c ) )
                 {
                     // only append printable chars to the line
-                    m_cur_line.push_back(c);
+                    m_cur_line.push_back( c );
                 }
-                else if( c!='\r' )
+                else if ( c != '\r' )
                 {
                     // any non-printing char besides CR is an error here
-                    stop=true;
-                    r=-1;
+                    stop = true;
+                    r = -1;
                 }
                 break;
             case ParsingContentUntilClose:
                 m_request->m_content.push_back( data[r] );
                 break;
             case ParsingFinished:
-                stop=true;
+                stop = true;
                 break;
             }
         }
@@ -343,10 +339,5 @@ ssize_t HttpServerParserSimple::onIncomingHttpData(
     return r;
 }
 
-void HttpServerParser::clear()
-{
-    m_request->clear();
+void HttpServerParser::clear() { m_request->clear(); }
 }
-
-}
-
