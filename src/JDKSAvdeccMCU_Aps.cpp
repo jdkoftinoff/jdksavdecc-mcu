@@ -411,4 +411,6 @@ void ApsStateMachine::States::goToFinish()
     m_current_state = &States::doFinish;
     getActions()->closeTcpServer();
 }
+
+void ApsStateMachine::States::doFinish() { m_current_state = 0; }
 }

@@ -310,65 +310,255 @@ class ApcStateMachine
         ///
         virtual void clear();
 
-        virtual void goToBegin();
+        ///
+        /// \brief run Run the state machine
+        ///
+        /// \return false when the state machine is complete
+        ///
+        virtual bool run();
 
+      protected:
+        ///
+        /// \brief doBegin
+        ///
+        /// Implement the BEGIN state
+        ///
+        /// See Figure C.3 'Begin'
+        ///
         virtual void doBegin();
 
+        ///
+        /// \brief goToInitialize
+        ///
+        /// Transition to the INITIALIZE state
+        ///
+        /// Perform the functions listed in Figure C.3 'INITIALIZE'
+        /// state
+        ///
         virtual void goToInitialize();
 
+        ///
+        /// \brief doInitialize
+        ///
+        /// Implement the INITIALIZE state
+        ///
+        /// Perform the tests for the paths leaving Figure
+        /// C.3 'INITIALIZE' state
+        ///
         virtual void doInitialize();
 
+        ///
+        /// \brief goToWaitForConnect
+        ///
+        /// Transition to the WAIT_FOR_CONNECT state
+        ///
+        /// Perform the functions listed in Figure C.3,
+        /// 'WAIT_FOR_CONNECT' state
+        ///
         virtual void goToWaitForConnect();
 
+        ///
+        /// \brief doWaitForConnect
+        ///
+        /// Implement the WAIT_FOR_CONNECT state
+        ///
+        /// Perform the tests for the paths leaving Figure
+        /// C.3 'WAIT_FOR_CONNECT' state
+        ///
         virtual void doWaitForConnect();
 
-        virtual void goToAccept();
+        ///
+        /// \brief goToConnected
+        ///
+        /// Transition to the CONNECTED state
+        ///
+        /// Perform the functions listed in Figure C.3
+        /// 'CONNECTED' state
+        ///
+        virtual void goToConnected();
 
-        virtual void doAccept();
+        ///
+        /// \brief doConnected
+        ///
+        /// Implement the CONNECTED state
+        ///
+        /// Perform the tests for the paths leaving Figure
+        /// C.3 'CONNECTED' state
+        ///
+        virtual void doConnected();
 
+        ///
+        /// \brief goToStartTransfer
+        ///
+        /// Transition to the START_TRANSFER state
+        ///
+        /// Perform the functions listed in Figure C.3
+        /// 'START_TRANSFER' state
+        ///
         virtual void goToStartTransfer();
 
+        ///
+        /// \brief doStartTransfer
+        ///
+        /// Implement the START_TRANSFER state
+        ///
+        /// Perform the tests for the paths leaving Figure
+        /// C.3 'START_TRANSFER' state
+        ///
         virtual void doStartTransfer();
 
+        ///
+        /// \brief goToWaiting
+        ///
+        /// Transition to the WAITING state
+        ///
+        /// Perform the functions listed in Figure C.3
+        /// 'WAITING' state
+        ///
         virtual void goToWaiting();
 
+        ///
+        /// \brief doWaiting
+        ///
+        /// Implement the WAITING state
+        ///
+        /// Perform the tests for the paths leaving Figure
+        /// C.3 'WAITING' state
+        ///
         virtual void doWaiting();
 
+        ///
+        /// \brief goToClosed
+        ///
+        /// Transition to the CLOSED state
+        ///
+        /// Perform the functions listed in Figur C.3
+        /// 'CLOSED' state
+        ///
         virtual void goToClosed();
 
+        ///
+        /// \brief doClosed
+        ///
+        /// Implement the CLOSED state
+        ///
+        /// Perform the tests for the paths leaving Figure
+        /// C.3 'CLOSED" state
+        ///
         virtual void doClosed();
 
+        ///
+        /// \brief goToLinkStatus
+        ///
+        /// Transition to the LINK_STATUS state
+        ///
+        /// Perform the functions listed in Figure C.3
+        /// 'LINK_STATUS' state
+        ///
         virtual void goToLinkStatus();
 
+        ///
+        /// \brief doLinkStatus
+        ///
+        /// Implement the LINK_STATUS state
+        ///
+        /// Perform the tests for the paths leaving Figure
+        /// C.3 'LINK_STATUS' state
+        ///
         virtual void doLinkStatus();
 
+        ///
+        /// \brief goToReceiveMsg
+        ///
+        /// Transition to the RECEIVE_MSG state
+        ///
+        /// Peform the functions listed in Figure C.3
+        /// 'RECEIVE_MSG' state
+        ///
         virtual void goToReceiveMsg();
 
+        ///
+        /// \brief doReceiveMsg
+        ///
+        /// Perform the tests for the paths leaving Figure
+        /// C.3 'RECEIVE_MSG' state
+        ///
         virtual void doReceiveMsg();
 
+        ///
+        /// \brief goToSendMsg
+        ///
+        /// Transition to the SEND_MSG state
+        ///
+        /// Peform the functions listed in Figure C.3
+        /// 'SEND_MSG' state
+        ///
         virtual void goToSendMsg();
 
+        ///
+        /// \brief doSendMsg
+        ///
+        /// Perform the tests for the paths leaving Figure
+        /// C.3 'SEND_MSG' state
+        ///
         virtual void doSendMsg();
 
+        ///
+        /// \brief goToEntityIdAssigned
+        ///
+        /// Transition to the ENTITY_ID_ASSIGNED state
+        ///
+        /// Peform the functions listed in Figure C.3
+        /// 'ENTITY_ID_ASSIGNED' state
+        ///
         virtual void goToEntityIdAssigned();
 
+        ///
+        /// \brief doEntityIdAssigned
+        ///
+        /// Perform the tests for the paths leaving Figure
+        /// C.3 'ENTITY_ID_ASSIGNED' state
+        ///
         virtual void doEntityIdAssigned();
 
+        ///
+        /// \brief goToSendNop
+        ///
+        /// Transition to the SEND_NOP state
+        ///
+        /// Peform the functions listed in Figure C.3
+        /// 'SEND_NOP' state
+        ///
         virtual void goToSendNop();
 
+        ///
+        /// \brief doSendNop
+        ///
+        /// Perform the tests for the paths leaving Figure
+        /// C.3 'SEND_NOP' state
+        ///
         virtual void doSendNop();
 
+        ///
+        /// \brief goToFinish
+        ///
+        /// Transition to the FINISH state
+        ///
+        /// Perform the functions listed in Figure C.3
+        /// 'FINISH' state
+        ///
         virtual void goToFinish();
 
+        ///
+        /// \brief doFinish
+        ///
+        /// Implement the FINISH state
+        ///
+        ///
         virtual void doFinish();
-
-        virtual void goToEnd();
-
-        virtual void doEnd();
 
       protected:
         ApcStateMachine *m_owner;
-
         state_proc m_current_state;
     };
 
@@ -427,18 +617,27 @@ class ApcStateMachine
         virtual void clear();
 
         ///
-        /// \brief onIncomingTcpConnection
+        /// \brief onTcpConnection
         ///
-        /// Notify the state machine that an incoming tcp connection
-        /// has happened
+        /// Notify the state machine that a tcp connection
+        /// to the APS has completed
         ///
         virtual void onIncomingTcpConnection();
+
+        ///
+        /// \brief onTcpConnectionClosed
+        ///
+        /// Notify the state machine that the TCP connection
+        /// was closed
+        ///
+        ///
+        virtual void onTcpConnectionClosed();
 
         ///
         /// \brief onIncomingTcpData
         ///
         /// Notify the state machine that some data was received
-        /// from the APC
+        /// from the APS
         ///
         /// \param data ptr to octets
         /// \param len lenth of data in octets
@@ -447,21 +646,10 @@ class ApcStateMachine
         virtual ssize_t onIncomingTcpData( uint8_t const *data, ssize_t len );
 
         ///
-        /// \brief onNetLinkStatusUpdated
-        ///
-        /// Notify the state machine that the link status
-        /// of the L2 network port has been updated
-        ///
-        /// \param link_mac MAC Address of link
-        /// \param link_status true if link is up
-        ///
-        virtual void onNetLinkStatusUpdated( Eui48 link_mac, bool link_status );
-
-        ///
         /// \brief onNetAvdeccMessageReceived
         ///
         /// Notify the state machine that an AVDECC message
-        /// was received from the L2 network
+        /// destined for the APS was received
         ///
         /// \param frame Ethernet frame
         ///
@@ -492,17 +680,17 @@ class ApcStateMachine
                                                ssize_t len );
 
         ///
-        /// \brief onIncomingHttpRequest
+        /// \brief onIncomingHttpResponse
         /// \param request
         /// \return
         ///
-        virtual bool onIncomingHttpRequest( HttpRequest const &request );
+        virtual bool onIncomingHttpResponse( HttpResponse const &request );
 
         ///
         /// \brief onIncomingTcpAppData
         ///
         /// Notify the state machine that some data was received
-        /// from the APC during the APP message section
+        /// from the APS during the APP message section
         ///
         /// \param data ptr to octets
         /// \param len lenth of data in octets
@@ -510,15 +698,6 @@ class ApcStateMachine
         ///
         virtual ssize_t onIncomingTcpAppData( uint8_t const *data,
                                               ssize_t len );
-
-        ///
-        /// \brief onTcpConnectionClosed
-        ///
-        /// Notify the state machine that the TCP connection
-        /// was closed
-        ///
-        ///
-        virtual void onTcpConnectionClosed();
 
       protected:
         ///
@@ -601,6 +780,7 @@ class ApcStateMachine
         std::string m_path;
         AppMessageParser m_app_parser;
     };
+
     StateVariables *getVariables() { return m_variables; }
     StateActions *getActions() { return m_actions; }
     StateEvents *getEvents() { return m_events; }

@@ -481,6 +481,7 @@ class ApsStateMachine
         ///
         virtual bool run();
 
+      protected:
         ///
         /// \brief doBegin
         ///
@@ -555,7 +556,7 @@ class ApsStateMachine
         ///
         /// Transition to the REJECT state
         ///
-        /// Perform the functions lsited in Figure C.2
+        /// Perform the functions listed in Figure C.2
         /// 'REJECT' state
         ///
         virtual void goToReject();
@@ -575,7 +576,7 @@ class ApsStateMachine
         ///
         /// Transition to the CLOSED State
         ///
-        /// Perform the functions lsited in Figure C.2
+        /// Perform the functions listed in Figure C.2
         /// 'CLOSED' state
         ///
         virtual void goToClosed();
@@ -585,12 +586,18 @@ class ApsStateMachine
         ///
         /// Implement the CLOSED state
         ///
+        /// Perform the tests for the paths leaving Figure
+        /// C.2 'CLOSED' state
+        ///
         virtual void doClosed();
 
         ///
         /// \brief goToStartTransfer
         ///
         /// Transition to the START_TRANSFER state
+        ///
+        /// Perform the functions listed in Figure C.2
+        /// 'START_TRANSFER' state
         ///
         virtual void goToStartTransfer();
 
@@ -599,12 +606,18 @@ class ApsStateMachine
         ///
         /// Implement the START_TRANSFER state
         ///
+        /// Perform the tests for the paths leaving Figure
+        /// C.2 'START_TRANSFER' state
+        ///
         virtual void doStartTransfer();
 
         ///
         /// \brief goToWaiting
         ///
         /// Transition to the WAITING state
+        ///
+        /// Perform the functions listed in Figure C.2
+        /// 'WAITING' state
         ///
         virtual void goToWaiting();
 
@@ -613,12 +626,18 @@ class ApsStateMachine
         ///
         /// Implement the WAITING state
         ///
+        /// Perform the tests for the paths leaving Figure
+        /// C.2 'WAITING' state
+        ///
         virtual void doWaiting();
 
         ///
         /// \brief goToLinkStatus
         ///
         /// Transition to the LINK_STATUS state
+        ///
+        /// Perform the functions listed in Figure C.2
+        /// 'LINK_STATUS' state
         ///
         virtual void goToLinkStatus();
 
@@ -627,12 +646,18 @@ class ApsStateMachine
         ///
         /// Implement the LINK_STATUS state
         ///
+        /// Perform the tests for the paths leaving Figure
+        /// C.2 'LINK_STATUS' state
+        ///
         virtual void doLinkStatus();
 
         ///
         /// \brief goToTransferToL2
         ///
         /// Transition to the TRANSFER_TO_L2 state
+        ///
+        /// Perform the functions listed in Figure C.2
+        /// 'TRANSFER_TO_L2' state
         ///
         virtual void goToTransferToL2();
 
@@ -641,12 +666,18 @@ class ApsStateMachine
         ///
         /// Implement the TRANSFER_TO_L2 state
         ///
+        /// Perform the tests for the paths leaving Figure
+        /// C.2 'TRANSFER_TO_L2' state
+        ///
         virtual void doTransferToL2();
 
         ///
         /// \brief goToTransferToApc
         ///
         /// Transition to TRANSFER_TO_APC state
+        ///
+        /// Perform the functions listed in Figure C.2
+        /// 'TRANSFER_TO_APC' state
         ///
         virtual void goToTransferToApc();
 
@@ -655,12 +686,18 @@ class ApsStateMachine
         ///
         /// Implement the TRANSFER_TO_APC state
         ///
+        /// Perform the tests for the paths leaving Figure
+        /// C.2 'TRANSFER_TO_APC' state
+        ///
         virtual void doTransferToApc();
 
         ///
         /// \brief goToAssignEntityId
         ///
         /// Transition to the ASSIGN_ENTITY_ID state
+        ///
+        /// Perform the functions listed in Figure C.2
+        /// 'ASSIGN_ENTITY_ID' state
         ///
         virtual void goToAssignEntityId();
 
@@ -669,12 +706,18 @@ class ApsStateMachine
         ///
         /// Implement the ASSIGN_ENTITY_ID state
         ///
+        /// Perform the tests for the paths leaving Figure
+        /// C.2 'ASSIGN_ENTITY_ID' state
+        ///
         virtual void doAssignEntityId();
 
         ///
         /// \brief goToSendNop
         ///
         /// Transition to the SEND_NOP state
+        ///
+        /// Perform the functions listed in Figure C.2
+        /// 'SEND_NOP' state
         ///
         virtual void goToSendNop();
 
@@ -683,12 +726,18 @@ class ApsStateMachine
         ///
         /// Implement the SEND_NOP state
         ///
+        /// Perform the tests for the paths leaving Figure
+        /// C.2 'SEND_NOP' state
+        ///
         virtual void doSendNop();
 
         ///
         /// \brief goToCloseAndFinish
         ///
         /// Transition to the CLOSE_AND_FINISH state
+        ///
+        /// Perform the functions listed in Figure C.2
+        /// 'CLOSE_AND_FINISH' state
         ///
         virtual void goToCloseAndFinish();
 
@@ -697,12 +746,18 @@ class ApsStateMachine
         ///
         /// Implement the CLOSE_AND_FINISH state
         ///
+        /// Perform the tests for the paths leaving Figure
+        /// C.2 'CLOSE_AND_FINISH' state
+        ///
         virtual void doCloseAndFinish();
 
         ///
         /// \brief goToFinish
         ///
         /// Transition to the FINISH state
+        ///
+        /// Perform the functions listed in Figure C.2
+        /// 'FINISH' state
         ///
         virtual void goToFinish();
 
@@ -711,7 +766,8 @@ class ApsStateMachine
         ///
         /// Implement the FINISH state
         ///
-        virtual void doFinish() { m_current_state = 0; }
+        ///
+        virtual void doFinish();
 
       protected:
         ApsStateMachine *m_owner;
@@ -780,6 +836,15 @@ class ApsStateMachine
         /// has happened
         ///
         virtual void onIncomingTcpConnection();
+
+        ///
+        /// \brief onTcpConnectionClosed
+        ///
+        /// Notify the state machine that the TCP connection
+        /// was closed
+        ///
+        ///
+        virtual void onTcpConnectionClosed();
 
         ///
         /// \brief onIncomingTcpData
@@ -857,15 +922,6 @@ class ApsStateMachine
         ///
         virtual ssize_t onIncomingTcpAppData( uint8_t const *data,
                                               ssize_t len );
-
-        ///
-        /// \brief onTcpConnectionClosed
-        ///
-        /// Notify the state machine that the TCP connection
-        /// was closed
-        ///
-        ///
-        virtual void onTcpConnectionClosed();
 
       protected:
         ///

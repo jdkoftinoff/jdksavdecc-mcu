@@ -32,121 +32,212 @@
 #include "JDKSAvdeccMCU_World.hpp"
 #include "JDKSAvdeccMCU_Apc.hpp"
 
-#if defined( TODO )
 namespace JDKSAvdeccMCU
 {
 
-void ApcStateMachine::start() {}
-
-void ApcStateMachine::finish() {}
-
-void ApcStateMachine::executeState()
+bool ApcStateMachine::States::run()
 {
-    switch ( m_state )
+    bool r = false;
+
+    state_proc last_state;
+
+    // call the current state function
+    do
     {
-    case StateBegin:
-        executeStateBegin();
-        break;
-    case StateInitialize:
-        executeStateInitialize();
-        break;
-    case StateWaitForConnect:
-        executeStateWaitForConnect();
-        break;
-    case StateAccept:
-        executeStateAccept();
-        break;
-    case StateStartTransfer:
-        executeStateStartTransfer();
-        break;
-    case StateWaiting:
-        executeStateWaiting();
-        break;
-    case StateClosed:
-        executeStateClosed();
-        break;
-    case StateLinkStatus:
-        executeStateLinkStatus();
-        break;
-    case StateReceiveMsg:
-        executeStateReceiveMsg();
-        break;
-    case StateSendMsg:
-        executeStateSendMsg();
-        break;
-    case StateEntityIdAssigned:
-        executeStateEntityIdAssigned();
-        break;
-    case StateSendNop:
-        executeStateSendNop();
-        break;
-    case StateFinish:
-        executeStateFinish();
-        break;
-    case StateEnd:
-        executeStateEnd();
-        break;
-    default:
-        executeStateEnd();
-        break;
-    }
+        last_state = m_current_state;
+
+        // only call state function if it is set
+        if ( m_current_state )
+        {
+            ( this->*m_current_state )();
+            r = true;
+        }
+
+        // if the current state transitioned, repeat
+    } while ( last_state != m_current_state );
+
+    // return true if there was activity,
+    // return false if there is no state
+    return r;
 }
 
-void ApcStateMachine::gotoStateBegin() { m_state = StateBegin; }
+void ApcStateMachine::States::doBegin() {}
 
-void ApcStateMachine::executeStateBegin() { gotoStateInitialize(); }
+void ApcStateMachine::States::goToInitialize() {}
 
-void ApcStateMachine::gotoStateInitialize()
+void ApcStateMachine::States::doInitialize() {}
+
+void ApcStateMachine::States::goToWaitForConnect() {}
+
+void ApcStateMachine::States::doWaitForConnect() {}
+
+void ApcStateMachine::States::goToConnected() {}
+
+void ApcStateMachine::States::doConnected() {}
+
+void ApcStateMachine::States::goToStartTransfer() {}
+
+void ApcStateMachine::States::doStartTransfer() {}
+
+void ApcStateMachine::States::goToWaiting() {}
+
+void ApcStateMachine::States::doWaiting() {}
+
+void ApcStateMachine::States::goToClosed() {}
+
+void ApcStateMachine::States::doClosed() {}
+
+void ApcStateMachine::States::goToLinkStatus() {}
+
+void ApcStateMachine::States::doLinkStatus() {}
+
+void ApcStateMachine::States::goToReceiveMsg() {}
+
+void ApcStateMachine::States::doReceiveMsg() {}
+
+void ApcStateMachine::States::goToSendMsg() {}
+
+void ApcStateMachine::States::doSendMsg() {}
+
+void ApcStateMachine::States::goToEntityIdAssigned() {}
+
+void ApcStateMachine::States::doEntityIdAssigned() {}
+
+void ApcStateMachine::States::goToSendNop() {}
+
+void ApcStateMachine::States::doSendNop() {}
+
+void ApcStateMachine::States::goToFinish() {}
+
+void ApcStateMachine::States::doFinish() {}
+
+void ApcStateMachine::StateActions::closeTcpConnection() {}
+
+void ApcStateMachine::StateActions::connectToProxy( const HttpRequest &addr ) {}
+
+bool ApcStateMachine::StateActions::getHttpResponse() {}
+
+void ApcStateMachine::StateActions::initialize() {}
+
+void ApcStateMachine::StateActions::notifyLinkStatus(
+    const jdksavdecc_appdu &linkMsg )
 {
-    m_state = StateInitialize;
-    initialize();
-    connectToProxy( m_addr );
 }
 
-void ApcStateMachine::executeStateInitialize() { gotoStateWaitForConnect(); }
-
-void ApcStateMachine::gotoStateWaitForConnect()
+void ApcStateMachine::StateActions::processMsg( const jdksavdecc_appdu &apsMsg )
 {
-    m_state = StateWaitForConnect;
 }
 
-void ApcStateMachine::executeStateWaitForConnect()
+void ApcStateMachine::StateActions::sendIdRequest( const Eui48 &primaryMac,
+                                                   const Eui64 &entity_id )
 {
-    if ( m_tcpConnected )
-    {
-        gotoStateAccept();
-    }
-    else if ( m_finished )
-    {
-        gotoStateFinish();
-    }
 }
 
-void ApcStateMachine::gotoStateAccept()
+void
+    ApcStateMachine::StateActions::sendHttpRequest( const HttpRequest &request )
 {
-    m_state = StateAccept;
-    sendHttpRequest( m_addr );
 }
 
-void ApcStateMachine::executeStateAccept()
+void ApcStateMachine::StateActions::sendMsgToAps(
+    const jdksavdecc_appdu &apcMsg )
 {
-    if ( getHttpResponse() )
-    {
-        gotoStateStartTransfer();
-    }
-    else
-    {
-        gotoStateClosed();
-    }
 }
 
-void ApcStateMachine::gotoStateStartTransfer() {}
+void ApcStateMachine::StateActions::sendNopToAps() {}
 
-void ApcStateMachine::executeStateStartTransfer() {}
-
-void ApcStateMachine::gotoStateWaiting() {}
+void ApcStateMachine::StateActions::notifyNewEntityId( const Eui64 &entity_id )
+{
 }
-#else
-const char *jdksavdeccmcu_apc_file = __FILE__;
 
-#endif
+void ApcStateMachine::StateEvents::clear() {}
+
+void ApcStateMachine::StateEvents::onIncomingTcpConnection() {}
+
+void ApcStateMachine::StateEvents::onTcpConnectionClosed() {}
+
+ssize_t ApcStateMachine::StateEvents::onIncomingTcpData( const uint8_t *data,
+                                                         ssize_t len )
+{
+}
+
+void ApcStateMachine::StateEvents::onNetAvdeccMessageReceived(
+    const Frame &frame )
+{
+}
+
+void ApcStateMachine::StateEvents::onTimeTick( uint32_t time_in_seconds ) {}
+
+ssize_t
+    ApcStateMachine::StateEvents::onIncomingTcpHttpData( const uint8_t *data,
+                                                         ssize_t len )
+{
+}
+
+bool ApcStateMachine::StateEvents::onIncomingHttpResponse(
+    const HttpResponse &request )
+{
+}
+
+ssize_t ApcStateMachine::StateEvents::onIncomingTcpAppData( const uint8_t *data,
+                                                            ssize_t len )
+{
+}
+
+void ApcStateMachine::StateEvents::onAppNop( const AppMessage &msg ) {}
+
+void ApcStateMachine::StateEvents::onAppEntityIdRequest( const AppMessage &msg )
+{
+}
+
+void
+    ApcStateMachine::StateEvents::onAppEntityIdResponse( const AppMessage &msg )
+{
+}
+
+void ApcStateMachine::StateEvents::onAppLinkUp( const AppMessage &msg ) {}
+
+void ApcStateMachine::StateEvents::onAppLinkDown( const AppMessage &msg ) {}
+
+void ApcStateMachine::StateEvents::onAppAvdeccFromAps( const AppMessage &msg )
+{
+}
+
+void ApcStateMachine::StateEvents::onAppAvdeccFromApc( const AppMessage &msg )
+{
+}
+
+void ApcStateMachine::StateEvents::onAppVendor( const AppMessage &msg ) {}
+
+ApcStateMachine::ApcStateMachine( ApcStateMachine::StateVariables *variables,
+                                  ApcStateMachine::StateActions *actions,
+                                  ApcStateMachine::StateEvents *events,
+                                  ApcStateMachine::States *states )
+    : m_variables( variables )
+    , m_actions( actions )
+    , m_events( events )
+    , m_states( states )
+{
+    m_variables->setOwner( this );
+    m_actions->setOwner( this );
+    m_events->setOwner( this );
+    m_states->setOwner( this );
+}
+
+ApcStateMachine::~ApcStateMachine()
+{
+    m_variables->setOwner( 0 );
+    m_actions->setOwner( 0 );
+    m_events->setOwner( 0 );
+    m_states->setOwner( 0 );
+}
+
+bool ApcStateMachine::run() { return getStates()->run(); }
+
+void ApcStateMachine::clear()
+{
+    m_variables->clear();
+    m_actions->clear();
+    m_events->clear();
+    m_states->clear();
+}
+}
