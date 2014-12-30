@@ -471,369 +471,210 @@ class ApsStateMachine
         /// \brief clear
         /// Clear all variables and initialize the initial state
         ///
-        virtual void clear()
-        {
-            m_current_state = &States::doBegin;
-
-            getVariables()->m_tcpConnected = false;
-            getVariables()->m_incomingTcpClosed = false;
-            getVariables()->m_linkStatusChanged = false;
-            getVariables()->m_apcMsg = false;
-            getVariables()->m_L2Msg = false;
-            getVariables()->m_assignEntityIdRequest = false;
-        }
+        virtual void clear();
 
         ///
         /// \brief run Run the state machine
         ///
         /// \return false when the state machine is complete
         ///
-        virtual bool run()
-        {
-            bool r = false;
-
-            state_proc last_state;
-
-            // call the current state function
-            do
-            {
-                last_state = m_current_state;
-
-                // only call state function if it is set
-                if ( m_current_state )
-                {
-                    ( this->*m_current_state )();
-                    r = true;
-                }
-
-                // if the current state transitioned, repeat
-            } while ( last_state != m_current_state );
-
-            // return true if there was activity,
-            // return false if there is no state
-            return r;
-        }
+        virtual bool run();
 
         ///
         /// \brief doBegin
         ///
         /// Implement the BEGIN state
         ///
-        virtual void doBegin() { goToInitialize(); }
+        virtual void doBegin();
 
         ///
         /// \brief goToInitialize
         ///
         /// Transition to the INITIALIZE state
         ///
-        virtual void goToInitialize()
-        {
-            m_current_state = &States::doInitialize;
-            getActions()->initialize();
-        }
+        virtual void goToInitialize();
 
         ///
         /// \brief doInitialize
         ///
         /// Implement the INITIALIZE state
         ///
-        virtual void doInitialize() { goToWaitForConnect(); }
+        virtual void doInitialize();
 
         ///
         /// \brief goToWaitForConnect
         ///
         /// Transition to the WAIT_FOR_CONNECT state
         ///
-        virtual void goToWaitForConnect()
-        {
-            m_current_state = &States::doWaitForConnect;
-            getVariables()->m_tcpConnected = false;
-            getVariables()->m_incomingTcpClosed = false;
-        }
+        virtual void goToWaitForConnect();
 
         ///
         /// \brief doWaitForConnect
         ///
         /// Implement the WAIT_FOR_CONNECT state
         ///
-        virtual void doWaitForConnect()
-        {
-            if ( getVariables()->m_finished == true )
-            {
-                goToFinish();
-            }
-            if ( getVariables()->m_tcpConnected == true )
-            {
-                goToAccept();
-            }
-        }
+        virtual void doWaitForConnect();
 
         ///
         /// \brief goToAccept
         ///
         /// Transition to the ACCEPT state
         ///
-        virtual void goToAccept()
-        {
-            m_current_state = &States::doAccept;
-            getVariables()->m_requestValid = -1;
-        }
+        virtual void goToAccept();
 
         ///
         /// \brief doAccept
         ///
         /// Implement the ACCEPT state
         ///
-        virtual void doAccept()
-        {
-            int requestValid = getVariables()->m_requestValid;
-
-            if ( requestValid == 200 )
-            {
-                goToStartTransfer();
-            }
-            if ( requestValid != -1 && requestValid != 200 )
-            {
-                goToReject();
-            }
-        }
+        virtual void doAccept();
 
         ///
         /// \brief goToReject
         ///
         /// Transition to the REJECT state
         ///
-        virtual void goToReject()
-        {
-            m_current_state = &States::doReject;
-            getActions()->sendHttpResponse( getVariables()->m_requestValid );
-        }
+        virtual void goToReject();
 
         ///
         /// \brief doReject
         ///
         /// Implement the REJECT state
         ///
-        virtual void doReject() { goToClosed(); }
+        virtual void doReject();
 
         ///
         /// \brief goToClosed
         ///
         /// Transition to the CLOSED State
         ///
-        virtual void goToClosed() { m_current_state = &States::doClosed; }
+        virtual void goToClosed();
 
         ///
         /// \brief doClosed
         ///
         /// Implement the CLOSED state
         ///
-        virtual void doClosed()
-        {
-            getActions()->closeTcpConnection();
-            goToWaitForConnect();
-        }
+        virtual void doClosed();
 
         ///
         /// \brief goToStartTransfer
         ///
         /// Transition to the START_TRANSFER state
         ///
-        virtual void goToStartTransfer()
-        {
-            m_current_state = &States::doStartTransfer;
-
-            getActions()->sendHttpResponse( getVariables()->m_requestValid );
-
-            getActions()->sendLinkStatus( getVariables()->m_linkMac,
-                                          getVariables()->m_linkStatus );
-
-            getVariables()->m_nopTimeout = getVariables()->m_currentTime + 10;
-        }
+        virtual void goToStartTransfer();
 
         ///
         /// \brief doStartTransfer
         ///
         /// Implement the START_TRANSFER state
         ///
-        virtual void doStartTransfer() { goToWaiting(); }
+        virtual void doStartTransfer();
 
         ///
         /// \brief goToWaiting
         ///
         /// Transition to the WAITING state
         ///
-        virtual void goToWaiting() { m_current_state = &States::doWaiting; }
+        virtual void goToWaiting();
 
         ///
         /// \brief doWaiting
         ///
         /// Implement the WAITING state
         ///
-        virtual void doWaiting()
-        {
-            if ( getVariables()->m_incomingTcpClosed == true )
-            {
-                goToClosed();
-            }
-            else if ( getVariables()->m_finished == true )
-            {
-                goToCloseAndFinish();
-            }
-            else if ( getVariables()->m_linkStatusChanged == true )
-            {
-                goToLinkStatus();
-            }
-            else if ( getVariables()->m_apcMsg == true )
-            {
-                goToTransferToL2();
-            }
-            else if ( getVariables()->m_L2Msg == true )
-            {
-                goToTransferToApc();
-            }
-            else if ( getVariables()->m_assignEntityIdRequest == true )
-            {
-                goToAssignEntityId();
-            }
-            else if ( ( (int)getVariables()->m_nopTimeout
-                        - (int)getVariables()->m_currentTime ) < 0 )
-            {
-                goToSendNop();
-            }
-        }
+        virtual void doWaiting();
 
         ///
         /// \brief goToLinkStatus
         ///
         /// Transition to the LINK_STATUS state
         ///
-        virtual void goToLinkStatus()
-        {
-            m_current_state = &States::doLinkStatus;
-
-            getActions()->sendLinkStatus( getVariables()->m_linkMac,
-                                          getVariables()->m_linkStatus );
-
-            getVariables()->m_nopTimeout = getVariables()->m_currentTime + 10;
-
-            getVariables()->m_linkStatusChanged = false;
-        }
+        virtual void goToLinkStatus();
 
         ///
         /// \brief doLinkStatus
         ///
         /// Implement the LINK_STATUS state
         ///
-        virtual void doLinkStatus() { goToWaiting(); }
+        virtual void doLinkStatus();
 
         ///
         /// \brief goToTransferToL2
         ///
         /// Transition to the TRANSFER_TO_L2 state
         ///
-        virtual void goToTransferToL2()
-        {
-            m_current_state = &States::doTransferToL2;
-            getActions()->sendAvdeccToL2( &getVariables()->m_out );
-            getVariables()->m_apcMsg = false;
-        }
+        virtual void goToTransferToL2();
 
         ///
         /// \brief doTransferToL2
         ///
         /// Implement the TRANSFER_TO_L2 state
         ///
-        virtual void doTransferToL2() { goToWaiting(); }
+        virtual void doTransferToL2();
 
         ///
         /// \brief goToTransferToApc
         ///
         /// Transition to TRANSFER_TO_APC state
         ///
-        virtual void goToTransferToApc()
-        {
-            m_current_state = &States::doTransferToApc;
-            getActions()->sendAvdeccToApc( &getVariables()->m_in );
-            getVariables()->m_nopTimeout = getVariables()->m_currentTime + 10;
-            getVariables()->m_L2Msg = false;
-        }
+        virtual void goToTransferToApc();
 
         ///
         /// \brief doTransferToApc
         ///
         /// Implement the TRANSFER_TO_APC state
         ///
-        virtual void doTransferToApc() { goToWaiting(); }
+        virtual void doTransferToApc();
 
         ///
         /// \brief goToAssignEntityId
         ///
         /// Transition to the ASSIGN_ENTITY_ID state
         ///
-        virtual void goToAssignEntityId()
-        {
-            m_current_state = &States::doAssignEntityId;
-            getActions()->sendEntityIdAssignment( getVariables()->m_a,
-                                                  getVariables()->m_entity_id );
-            getVariables()->m_nopTimeout = getVariables()->m_currentTime + 10;
-            getVariables()->m_assignEntityIdRequest = false;
-        }
+        virtual void goToAssignEntityId();
 
         ///
         /// \brief doAssignEntityId
         ///
         /// Implement the ASSIGN_ENTITY_ID state
         ///
-        virtual void doAssignEntityId() { goToWaiting(); }
+        virtual void doAssignEntityId();
 
         ///
         /// \brief goToSendNop
         ///
         /// Transition to the SEND_NOP state
         ///
-        virtual void goToSendNop()
-        {
-            m_current_state = &States::doSendNop;
-            getActions()->sendNopToApc();
-            getVariables()->m_nopTimeout = getVariables()->m_currentTime + 10;
-        }
+        virtual void goToSendNop();
 
         ///
         /// \brief doSendNop
         ///
         /// Implement the SEND_NOP state
         ///
-        virtual void doSendNop() { goToWaiting(); }
+        virtual void doSendNop();
 
         ///
         /// \brief goToCloseAndFinish
         ///
         /// Transition to the CLOSE_AND_FINISH state
         ///
-        virtual void goToCloseAndFinish()
-        {
-            m_current_state = &States::doCloseAndFinish;
-            getActions()->closeTcpConnection();
-        }
+        virtual void goToCloseAndFinish();
 
         ///
         /// \brief doCloseAndFinish
         ///
         /// Implement the CLOSE_AND_FINISH state
         ///
-        virtual void doCloseAndFinish() { goToFinish(); }
+        virtual void doCloseAndFinish();
 
         ///
         /// \brief goToFinish
         ///
         /// Transition to the FINISH state
         ///
-        virtual void goToFinish()
-        {
-            m_current_state = &States::doFinish;
-            getActions()->closeTcpServer();
-        }
+        virtual void goToFinish();
 
         ///
         /// \brief doFinish
