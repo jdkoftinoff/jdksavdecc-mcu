@@ -469,6 +469,7 @@ class ApsStateMachine
 
         ///
         /// \brief clear
+        ///
         /// Clear all variables and initialize the initial state
         ///
         virtual void clear();
@@ -485,12 +486,17 @@ class ApsStateMachine
         ///
         /// Implement the BEGIN state
         ///
+        /// See Figure C.2 'Begin'
+        ///
         virtual void doBegin();
 
         ///
         /// \brief goToInitialize
         ///
         /// Transition to the INITIALIZE state
+        ///
+        /// Perform the functions listed in Figure C.2 'INITIALIZE'
+        /// state
         ///
         virtual void goToInitialize();
 
@@ -499,12 +505,18 @@ class ApsStateMachine
         ///
         /// Implement the INITIALIZE state
         ///
+        /// Perform the tests for the paths leaving Figure
+        /// C.2 'INITIALIZE' state
+        ///
         virtual void doInitialize();
 
         ///
         /// \brief goToWaitForConnect
         ///
         /// Transition to the WAIT_FOR_CONNECT state
+        ///
+        /// Perform the functions listed in Figure C.2,
+        /// 'WAIT_FOR_CONNECT' state
         ///
         virtual void goToWaitForConnect();
 
@@ -513,12 +525,18 @@ class ApsStateMachine
         ///
         /// Implement the WAIT_FOR_CONNECT state
         ///
+        /// Perform the tests for the paths leaving Figure
+        /// C.2 'WAIT_FOR_CONNECT' state
+        ///
         virtual void doWaitForConnect();
 
         ///
         /// \brief goToAccept
         ///
         /// Transition to the ACCEPT state
+        ///
+        /// Perform the functions listed in Figure C.2
+        /// 'ACCEPT' state
         ///
         virtual void goToAccept();
 
@@ -527,12 +545,18 @@ class ApsStateMachine
         ///
         /// Implement the ACCEPT state
         ///
+        /// Perform the tests for the paths leaving Figure
+        /// C.2 'ACCEPT' state
+        ///
         virtual void doAccept();
 
         ///
         /// \brief goToReject
         ///
         /// Transition to the REJECT state
+        ///
+        /// Perform the functions lsited in Figure C.2
+        /// 'REJECT' state
         ///
         virtual void goToReject();
 
@@ -541,12 +565,18 @@ class ApsStateMachine
         ///
         /// Implement the REJECT state
         ///
+        /// Perform the tests for the paths leaving Figure
+        /// C.2 'REJECT' state
+        ///
         virtual void doReject();
 
         ///
         /// \brief goToClosed
         ///
         /// Transition to the CLOSED State
+        ///
+        /// Perform the functions lsited in Figure C.2
+        /// 'CLOSED' state
         ///
         virtual void goToClosed();
 
@@ -711,6 +741,7 @@ class ApsStateMachine
 
         ///
         /// \brief getOwner
+        ///
         /// get the owner
         ///
         /// \return ApsStateMachine
