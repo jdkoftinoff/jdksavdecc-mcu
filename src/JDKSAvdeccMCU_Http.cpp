@@ -63,11 +63,11 @@ void HttpRequest::setCONNECT( const std::string &path,
     m_content.clear();
 }
 
-void HttpRequest::set(  const std::string &method,
-                        const std::string &host,
-                        const std::string &port,
-                        const std::string &path,
-                        const std::vector<std::string> &headers )
+void HttpRequest::set( const std::string &method,
+                       const std::string &host,
+                       const std::string &port,
+                       const std::string &path,
+                       const std::vector<std::string> &headers )
 {
     m_method = method;
     m_path = path;
@@ -76,12 +76,12 @@ void HttpRequest::set(  const std::string &method,
 
     std::string s;
 
-    if( host.length()>0 )
+    if ( host.length() > 0 )
     {
         s.clear();
         s.append( "Host: " );
         s.append( host );
-        if( port.length()>0 )
+        if ( port.length() > 0 )
         {
             s.append( ":" );
             s.append( port );
@@ -114,12 +114,12 @@ void HttpRequest::set( const std::string &method,
 
     std::string s;
 
-    if( host.length()>0 )
+    if ( host.length() > 0 )
     {
         s.clear();
         s.append( "Host: " );
         s.append( host );
-        if( port.length()>0 )
+        if ( port.length() > 0 )
         {
             s.append( ":" );
             s.append( port );
@@ -127,14 +127,14 @@ void HttpRequest::set( const std::string &method,
         m_headers.push_back( s );
     }
 
-    if( content_type.length()>0 )
+    if ( content_type.length() > 0 )
     {
         s.clear();
         s.append( "Content-Type: " );
         s.append( content_type );
         m_headers.push_back( s );
 
-        if( content.size()>0 )
+        if ( content.size() > 0 )
         {
             s.clear();
             s.append( "Content-Length: " );
@@ -180,8 +180,9 @@ void HttpRequest::flattenHeaders( std::string *dest )
 
 void HttpResponse::clear()
 {
-    m_code = -1;
-    m_code_string.clear();
+    m_version.clear();
+    m_status_code.clear();
+    m_reason_phrase.clear();
     m_headers.clear();
     m_content.clear();
 }
@@ -190,6 +191,7 @@ void HttpServerParserSimple::clear()
 {
     HttpServerParser::clear();
     m_parse_state = ParsingMethod;
+    m_cur_line.clear();
 }
 
 ssize_t HttpServerParserSimple::onIncomingHttpData( const uint8_t *data,
@@ -360,4 +362,142 @@ ssize_t HttpServerParserSimple::onIncomingHttpData( const uint8_t *data,
 }
 
 void HttpServerParser::clear() { m_request->clear(); }
+
+void HttpClientParser::clear() { m_response->clear(); }
+
+void HttpClientParserSimple::clear()
+{
+    HttpClientParser::clear();
+    m_cur_line.clear();
+    m_parse_state = ParsingVersion;
+}
+
+ssize_t HttpClientParserSimple::onIncomingHttpData( const uint8_t *data,
+                                                    ssize_t len )
+{
+    ssize_t r = 0;
+
+    // did we receive EOF
+    if ( len == 0 )
+    {
+        // If this happens during any other state, then this is an error
+        r = -1;
+    }
+    else
+    {
+        bool stop = false;
+
+        // parse through as much of the data block as possible
+        for ( r = 0; r < len; ++r )
+        {
+            // Abort parsing if we need to here
+            if ( stop )
+            {
+                break;
+            }
+
+            // get the current octet as a char
+            char c = (char)data[r];
+
+            switch ( m_parse_state )
+            {
+            case ParsingVersion:
+                // The HTTP Version is delimited by space
+                if ( c == ' ' )
+                {
+                    m_parse_state = ParsingStatusCode;
+                    m_response->m_status_code.clear();
+                }
+                else if ( isprint( c ) )
+                {
+                    // only append printable chars to the version
+                    m_response->m_version.push_back( c );
+                }
+                else if ( c != '\r' )
+                {
+                    // any non-printing char besides CR is an error here
+                    stop = true;
+                    r = -1;
+                }
+                break;
+            case ParsingStatusCode:
+                // the HTTP status code is delimited by a space
+                if ( c == ' ' )
+                {
+                    m_parse_state = ParsingReasonPhrase;
+                    m_response->m_reason_phrase.clear();
+                }
+                else if ( isprint( c ) )
+                {
+                    // only append printable chars to the status code
+                    m_response->m_status_code.push_back( c );
+                }
+                else
+                {
+                    // any non-printing char is an error here
+                    stop = true;
+                    r = -1;
+                }
+                break;
+            case ParsingReasonPhrase:
+                // the HTTP reason phrase is delimited by a '\n'
+                if ( c == '\n' )
+                {
+                    m_parse_state = ParsingHeaderLine;
+                    m_cur_line.clear();
+                }
+                else if ( isprint( c ) )
+                {
+                    // only append printable chars to the reason phrase
+                    m_response->m_reason_phrase.push_back( c );
+                }
+                else
+                {
+                    // any non-printing char is an error here
+                    stop = true;
+                    r = -1;
+                }
+                break;
+            case ParsingHeaderLine:
+                if ( c == '\n' )
+                {
+                    // The header line is delimited by LF
+                    if ( m_cur_line.length() == 0 )
+                    {
+                        // We got all the headers
+                        stop = true;
+                        m_response->m_content.clear();
+
+                        // give the request to the handler
+                        if ( !m_handler->onIncomingHttpResponse( *m_response ) )
+                        {
+                            // the handler returned false, so we will
+                            // error out here
+                            r = -1;
+                        }
+                    }
+                    else
+                    {
+                        // save the formed line
+                        m_response->m_headers.push_back( m_cur_line );
+                        m_cur_line.clear();
+                    }
+                }
+                else if ( isprint( c ) )
+                {
+                    // only append printable chars to the line
+                    m_cur_line.push_back( c );
+                }
+                else if ( c != '\r' )
+                {
+                    // any non-printing char besides CR is an error here
+                    stop = true;
+                    r = -1;
+                }
+                break;
+            }
+        }
+    }
+    return r;
+}
 }

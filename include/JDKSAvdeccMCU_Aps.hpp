@@ -51,6 +51,7 @@ class ApsStateMachine
     class StateVariables;
     class StateActions;
     class States;
+    class StateEvents;
 
     ///
     /// \brief The StateVariables class
@@ -852,7 +853,7 @@ class ApsStateMachine
         StateEvents( HttpServerParser *http_parser, std::string path )
             : m_owner( 0 )
             , m_http_parser( http_parser )
-            , m_path(path)
+            , m_path( path )
             , m_app_parser( *this )
         {
         }

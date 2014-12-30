@@ -34,382 +34,593 @@
 #include "JDKSAvdeccMCU_AppMessage.hpp"
 #include "JDKSAvdeccMCU_AppMessageParser.hpp"
 #include "JDKSAvdeccMCU_AppMessageHandler.hpp"
+#include "JDKSAvdeccMCU_Http.hpp"
 
-#if defined( TODO )
 namespace JDKSAvdeccMCU
 {
 
-class RawSocketSignals
+class ApcStateMachine
 {
   public:
-    virtual ~RawSocketSignals() = 0;
+    class StateVariables;
+    class StateActions;
+    class States;
+    class StateEvents;
 
-    /**
-     * External Networking Event: The network port obtained link
-     */
-    virtual void linkUp( uint64_t bps, const Eui48 &link_addr ) = 0;
-
-    /**
-     * External Networking Event: The network port lost link
-     */
-    virtual void linkDown( uint64_t bps, const Eui48 &link_addr ) = 0;
-
-    /**
-     * External Networking Event: The socket was readable and some data was read
-     */
-    virtual void readable( const Frame &frame ) = 0;
-
-    /**
-     * External Networking Event: The socket is writable now
-     */
-    virtual void writable() = 0;
-
-    /**
-     * External Networking Event: The socket was closed
-     */
-    virtual void closed() = 0;
-
-    /**
-     * External Networking Event: Some time passed
-     */
-    virtual void tick( jdksavdecc_timestamp_in_milliseconds timestamp ) = 0;
-};
-
-class RawSocketSlots
-{
-  public:
-    virtual ~RawSocketSlots() = 0;
-
-    /**
-     * External Networking Request: The client object wants to wake up when the
-     * socket is writable
-     */
-    virtual void wakeOnWritable( bool enable );
-
-    /**
-     * External Networking Request: The client object wants to send a frame
-     */
-    virtual ssize_t send( const Frame &frame );
-
-    /**
-     * External Networking Request: The client object wants to be woken up in
-     * the future
-     */
-    virtual void wakeUpIn( uint32_t delta_time_in_milliseconds );
-};
-
-/** Collection of function pointers that will be called when a networking event
- * occurs
- */
-class ApcTcp
-{
-  public:
-    /**
-     * External Networking Event: The socket was readable and some data was read
-     */
-    virtual void readable( const Frame &frame ) = 0;
-
-    /**
-     * External Networking Event: The socket was connected
-     */
-    virtual void connected( const sockaddr *local_addr,
-                            socklen_t local_addr_len,
-                            const sockaddr *remote_addr,
-                            socklen_t remote_addr_len ) = 0;
-
-    /**
-     * External Networking Event: The socket is writable now
-     */
-    virtual void writable() = 0;
-
-    /**
-     * External Networking Event: The socket was closed
-     */
-    virtual void closed() = 0;
-
-    /**
-     * External Networking Event: Some time passed
-     */
-    virtual void tick( jdksavdecc_timestamp_in_milliseconds timestamp ) = 0;
-
-    /**
-     * External Networking Request: The client object wants to wake up when the
-     * socket is writable
-     */
-    virtual void wakeOnWritable( bool enable ) = 0;
-
-    /**
-     * External Networking Request: The client object wants to connect to a
-     * destination
-     */
-    virtual void connect( sockaddr const *addr, socklen_t addr_len ) = 0;
-
-    /**
-     * External Networking Request: The client object wants to close the socket
-     */
-    virtual void close() = 0;
-
-    /**
-     * External Networking Request: The client object wants to send a frame
-     */
-    virtual ssize_t send( const Frame &frame ) = 0;
-
-    /**
-     * External Networking Request: The client object wants to be woken up in
-     * the future
-     */
-    virtual void wakeUpIn( uint32_t delta_time_in_milliseconds ) = 0;
-};
-
-struct ApcAddr
-{
-    struct sockaddr *m_addr;
-    ssize_t m_addr_len;
-    char m_path[4096];
-    char m_host[1024];
-    char m_port[128];
-    char *m_additional_request_headers;
-};
-
-class ApcActions : public ApcTcp
-{
-  public:
-    /**
-     * See IEEE Std 1722.1 Annex C.5.3.2.1
-     */
-    virtual void closeTcpConnection() = 0;
-
-    /**
-     * See IEEE Std 1722.1 Annex C.5.3.2.2
-     */
-    virtual void connectToProxy( ApcAddr const &addr ) = 0;
-
-    /**
-     * See IEEE Std 1722.1 Annex C.5.3.2.3
-     */
-    virtual bool getHttpResponse() = 0;
-
-    /**
-     * See IEEE Std 1722.1 Annex C.5.3.2.4
-     */
-    virtual void initialize() = 0;
-
-    /**
-     * See IEEE Std 1722.1 Annex C.5.3.2.5
-     */
-    virtual void notifyLinkStatus( jdksavdecc_appdu const &linkMsg ) = 0;
-
-    /**
-     * See IEEE Std 1722.1 Annex C.5.3.2.6
-     */
-    virtual void processMsg( jdksavdecc_appdu const &apsMsg ) = 0;
-
-    /**
-     * See IEEE Std 1722.1 Annex C.5.3.2.7
-     */
-    virtual void sendIdRequest( Eui48 const &primaryMac,
-                                Eui64 const &entity_id ) = 0;
-
-    /**
-     * See IEEE Std 1722.1 Annex C.5.3.2.8
-     */
-    virtual void sendHttpRequest( ApcAddr const &addr ) = 0;
-
-    /**
-     * See IEEE Std 1722.1 Annex C.5.3.2.9
-     */
-    virtual void sendMsgToAps( jdksavdecc_appdu const &apcMsg );
-
-    /**
-     * See IEEE Std 1722.1 Annex C.5.3.2.10
-     */
-    virtual void sendNopToAps() = 0;
-
-    /**
-     * See IEEE Std 1722.1 Annex C.5.3.2.X
-     */
-    virtual void notifyNewEntityId( Eui64 const &entity_id );
-};
-
-class ApcStateMachine : public ApcActions
-{
-  public:
-    /**
-     * @brief The Apc State enum
-     *
-     * See IEEE Std 1722.1 Annex C.5.3.3, Figure C.3
-     *
-     */
-    enum State
+    class StateVariables
     {
-        StateBegin = 0,
-        StateInitialize,
-        StateWaitForConnect,
-        StateAccept,
-        StateStartTransfer,
-        StateWaiting,
-        StateClosed,
-        StateLinkStatus,
-        StateReceiveMsg,
-        StateSendMsg,
-        StateEntityIdAssigned,
-        StateSendNop,
-        StateFinish,
-        StateEnd
+      public:
+        virtual ~StateVariables();
+
+        ///
+        /// \brief setOwner set the owner
+        /// \param owner ApsStateMachine
+        ///
+        virtual void setOwner( ApcStateMachine *owner ) { m_owner = owner; }
+
+        ///
+        /// \brief clear all variables
+        ///
+        virtual void clear();
+
+        ///
+        /// \brief m_owner
+        ///
+        /// The ApsStateMachine that owns these variables
+        ///
+        ApcStateMachine *m_owner;
+
+        /**
+         * See IEEE 1722.1 Annex C.5.3.1.1
+         */
+        HttpRequest m_addr;
+
+        /**
+         * See IEEE 1722.1 Annex C.5.3.1.2
+         */
+        AppMessage m_apcMsg;
+
+        /**
+         * See IEEE 1722.1 Annex C.5.3.1.3
+         */
+        bool m_apcMsgOut;
+
+        /**
+         * See IEEE 1722.1 Annex C.5.3.1.4
+         */
+        AppMessage m_apsMsg;
+
+        /**
+         * See IEEE 1722.1 Annex C.5.3.1.5
+         */
+        bool m_apsMsgIn;
+
+        /**
+         * See IEEE 1722.1 Annex C.5.3.1.6
+         */
+        uint32_t m_currentTime;
+
+        /**
+         * See IEEE 1722.1 Annex C.5.3.1.7
+         */
+        bool m_finished;
+
+        /**
+         * See IEEE 1722.1 Annex C.5.3.1.8
+         */
+        Eui64 m_entityId;
+
+        /**
+         * See IEEE 1722.1 Annex C.5.3.1.9
+         */
+        bool m_idAssigned;
+
+        /**
+         * See IEEE 1722.1 Annex C.5.3.1.10
+         */
+        bool m_incomingTcpClosed;
+
+        /**
+         * See IEEE 1722.1 Annex C.5.3.1.11
+         */
+        AppMessage m_linkMsg;
+
+        /**
+         * See IEEE 1722.1 Annex C.5.3.1.12
+         */
+        bool m_linkStatusMsg;
+
+        /**
+         * See IEEE 1722.1 Annex C.5.3.1.13
+         */
+        Eui64 m_newId;
+
+        /**
+         * See IEEE 1722.1 Annex C.5.3.1.14
+         */
+        bool m_nopTimeout;
+
+        /**
+         * See IEEE 1722.1 Annex C.5.3.1.15
+         */
+        Eui48 m_primaryMac;
+
+        /**
+         * See IEEE 1722.1 Annex C.5.3.1.16
+         */
+        bool m_responseValid;
+
+        /**
+         * See IEEE 1722.1 Annex C.5.3.1.17
+         */
+        bool m_tcpConnected;
     };
 
-    /**
-     * The Current State
-     */
-    State m_state;
+    class StateActions
+    {
+      public:
+        StateActions() {}
+        virtual ~StateActions() {}
 
-    /**
-     * See IEEE 1722.1 Annex C.5.3.1.1
-     */
-    ApcAddr m_addr;
+        ///
+        /// \brief setOwner Sets the owner
+        /// \param owner ApsStateMachine
+        ///
+        virtual void setOwner( ApcStateMachine *owner ) { m_owner = owner; }
 
-    /**
-     * See IEEE 1722.1 Annex C.5.3.1.2
-     */
-    jdksavdecc_appdu m_apcMsg;
+        ///
+        /// \brief getOwner gets the owner
+        /// \return ApsStateMachine
+        ///
+        ApcStateMachine *getOwner() { return m_owner; }
 
-    /**
-     * See IEEE 1722.1 Annex C.5.3.1.3
-     */
-    bool m_apcMsgOut;
+        ///
+        /// \brief getVariables
+        ///
+        /// Get the state machine variables
+        ///
+        /// \return StateVariables
+        ///
+        StateVariables *getVariables() { return m_owner->getVariables(); }
 
-    /**
-     * See IEEE 1722.1 Annex C.5.3.1.4
-     */
-    jdksavdecc_appdu m_apsMsg;
+        ///
+        /// \brief clear any additional
+        /// state
+        ///
+        virtual void clear();
 
-    /**
-     * See IEEE 1722.1 Annex C.5.3.1.5
-     */
-    bool m_apsMsgIn;
+        /**
+         * See IEEE Std 1722.1 Annex C.5.3.2.1
+         */
+        virtual void closeTcpConnection();
 
-    /**
-     * See IEEE 1722.1 Annex C.5.3.1.6
-     */
-    jdksavdecc_timestamp_in_milliseconds m_currentTime;
+        /**
+         * See IEEE Std 1722.1 Annex C.5.3.2.2
+         */
+        virtual void connectToProxy( HttpRequest const &addr );
 
-    /**
-     * See IEEE 1722.1 Annex C.5.3.1.7
-     */
-    bool m_finished;
+        /**
+         * See IEEE Std 1722.1 Annex C.5.3.2.3
+         */
+        virtual bool getHttpResponse();
 
-    /**
-     * See IEEE 1722.1 Annex C.5.3.1.8
-     */
-    Eui64 m_entityId;
+        /**
+         * See IEEE Std 1722.1 Annex C.5.3.2.4
+         */
+        virtual void initialize();
 
-    /**
-     * See IEEE 1722.1 Annex C.5.3.1.9
-     */
-    bool m_idAssigned;
+        /**
+         * See IEEE Std 1722.1 Annex C.5.3.2.5
+         */
+        virtual void notifyLinkStatus( jdksavdecc_appdu const &linkMsg );
 
-    /**
-     * See IEEE 1722.1 Annex C.5.3.1.10
-     */
-    bool m_incomingTcpClosed;
+        /**
+         * See IEEE Std 1722.1 Annex C.5.3.2.6
+         */
+        virtual void processMsg( jdksavdecc_appdu const &apsMsg );
 
-    /**
-     * See IEEE 1722.1 Annex C.5.3.1.11
-     */
-    jdksavdecc_appdu m_linkMsg;
+        /**
+         * See IEEE Std 1722.1 Annex C.5.3.2.7
+         */
+        virtual void sendIdRequest( Eui48 const &primaryMac,
+                                    Eui64 const &entity_id );
 
-    /**
-     * See IEEE 1722.1 Annex C.5.3.1.12
-     */
-    bool m_linkStatusMsg;
+        /**
+         * See IEEE Std 1722.1 Annex C.5.3.2.8
+         */
+        virtual void sendHttpRequest( HttpRequest const &request );
 
-    /**
-     * See IEEE 1722.1 Annex C.5.3.1.13
-     */
-    Eui64 m_newId;
+        /**
+         * See IEEE Std 1722.1 Annex C.5.3.2.9
+         */
+        virtual void sendMsgToAps( jdksavdecc_appdu const &apcMsg );
 
-    /**
-     * See IEEE 1722.1 Annex C.5.3.1.14
-     */
-    bool m_nopTimeout;
+        /**
+         * See IEEE Std 1722.1 Annex C.5.3.2.10
+         */
+        virtual void sendNopToAps();
 
-    /**
-     * See IEEE 1722.1 Annex C.5.3.1.15
-     */
-    Eui48 m_primaryMac;
+        /**
+         * See IEEE Std 1722.1 Annex C.5.3.2.X
+         */
+        virtual void notifyNewEntityId( Eui64 const &entity_id );
 
-    /**
-     * See IEEE 1722.1 Annex C.5.3.1.16
-     */
-    bool m_responseValid;
+      protected:
+        ApcStateMachine *m_owner;
+    };
 
-    /**
-     * See IEEE 1722.1 Annex C.5.3.1.17
-     */
-    bool m_tcpConnected;
+    class States
+    {
+      public:
+        ///
+        /// The state_proc member is a pointer to the
+        /// current state handling procedure, or 0 if done
+        ///
+        typedef void ( States::*state_proc )();
 
-    void start();
+        ///
+        /// \brief States constructor
+        ///
+        /// Start the state machine in the begin state
+        ///
+        States() : m_owner( 0 ), m_current_state( &States::doBegin ) {}
 
-    void finish();
+        ///
+        /// \brief ~States
+        ///
+        virtual ~States() {}
 
-    void executeState();
+        ///
+        /// \brief setOwner
+        /// Set the owner of this state machine
+        ///
+        /// \param owner
+        ///
+        virtual void setOwner( ApcStateMachine *owner ) { m_owner = owner; }
 
-  private:
-    void gotoStateBegin();
+        ///
+        /// \brief getOwner
+        /// get the owner
+        ///
+        /// \return ApsStateMachine
+        ///
+        ApcStateMachine *getOwner() { return m_owner; }
 
-    void executeStateBegin();
+        ///
+        /// \brief getActions
+        ///
+        /// Ask the owning state machine for the actions object
+        ///
+        /// \return StateActions
+        ///
+        StateActions *getActions() { return m_owner->getActions(); }
 
-    void gotoStateInitialize();
+        ///
+        /// \brief getVariables
+        ///
+        /// As the owning state machine for the state variables object
+        ///
+        /// \return StateVariables
+        ///
+        StateVariables *getVariables() { return m_owner->getVariables(); }
 
-    void executeStateInitialize();
+        ///
+        /// \brief clear
+        /// Clear all variables and initialize the initial state
+        ///
+        virtual void clear();
 
-    void gotoStateWaitForConnect();
+        virtual void goToBegin();
 
-    void executeStateWaitForConnect();
+        virtual void doBegin();
 
-    void gotoStateAccept();
+        virtual void goToInitialize();
 
-    void executeStateAccept();
+        virtual void doInitialize();
 
-    void gotoStateStartTransfer();
+        virtual void goToWaitForConnect();
 
-    void executeStateStartTransfer();
+        virtual void doWaitForConnect();
 
-    void gotoStateWaiting();
+        virtual void goToAccept();
 
-    void executeStateWaiting();
+        virtual void doAccept();
 
-    void gotoStateClosed();
+        virtual void goToStartTransfer();
 
-    void executeStateClosed();
+        virtual void doStartTransfer();
 
-    void gotoStateLinkStatus();
+        virtual void goToWaiting();
 
-    void executeStateLinkStatus();
+        virtual void doWaiting();
 
-    void gotoStateReceiveMsg();
+        virtual void goToClosed();
 
-    void executeStateReceiveMsg();
+        virtual void doClosed();
 
-    void gotoStateSendMsg();
+        virtual void goToLinkStatus();
 
-    void executeStateSendMsg();
+        virtual void doLinkStatus();
 
-    void gotoStateEntityIdAssigned();
+        virtual void goToReceiveMsg();
 
-    void executeStateEntityIdAssigned();
+        virtual void doReceiveMsg();
 
-    void gotoStateSendNop();
+        virtual void goToSendMsg();
 
-    void executeStateSendNop();
+        virtual void doSendMsg();
 
-    void gotoStateFinish();
+        virtual void goToEntityIdAssigned();
 
-    void executeStateFinish();
+        virtual void doEntityIdAssigned();
 
-    void gotoStateEnd();
+        virtual void goToSendNop();
 
-    void executeStateEnd();
+        virtual void doSendNop();
+
+        virtual void goToFinish();
+
+        virtual void doFinish();
+
+        virtual void goToEnd();
+
+        virtual void doEnd();
+
+      protected:
+        ApcStateMachine *m_owner;
+
+        state_proc m_current_state;
+    };
+
+    class StateEvents : protected AppMessageHandler, protected HttpClientHandler
+    {
+      public:
+        StateEvents( HttpClientParser *http_parser, std::string path )
+            : m_owner( 0 )
+            , m_http_parser( http_parser )
+            , m_path( path )
+            , m_app_parser( *this )
+        {
+        }
+
+        virtual ~StateEvents() {}
+
+        ///
+        /// \brief setOwner
+        /// Set the owner of this state events object
+        ///
+        /// \param owner
+        ///
+        virtual void setOwner( ApcStateMachine *owner ) { m_owner = owner; }
+
+        ///
+        /// \brief getOwner
+        /// get the owner
+        ///
+        /// \return ApsStateMachine
+        ///
+        ApcStateMachine *getOwner() { return m_owner; }
+
+        ///
+        /// \brief getActions
+        ///
+        /// Ask the owning state machine for the actions object
+        ///
+        /// \return StateActions
+        ///
+        StateActions *getActions() { return m_owner->getActions(); }
+
+        ///
+        /// \brief getVariables
+        ///
+        /// As the owning state machine for the state variables object
+        ///
+        /// \return StateVariables
+        ///
+        StateVariables *getVariables() { return m_owner->getVariables(); }
+
+        ///
+        /// \brief clear
+        ///
+        /// Clear the events object
+        ///
+        virtual void clear();
+
+        ///
+        /// \brief onIncomingTcpConnection
+        ///
+        /// Notify the state machine that an incoming tcp connection
+        /// has happened
+        ///
+        virtual void onIncomingTcpConnection();
+
+        ///
+        /// \brief onIncomingTcpData
+        ///
+        /// Notify the state machine that some data was received
+        /// from the APC
+        ///
+        /// \param data ptr to octets
+        /// \param len lenth of data in octets
+        /// \return length of consumed data
+        ///
+        virtual ssize_t onIncomingTcpData( uint8_t const *data, ssize_t len );
+
+        ///
+        /// \brief onNetLinkStatusUpdated
+        ///
+        /// Notify the state machine that the link status
+        /// of the L2 network port has been updated
+        ///
+        /// \param link_mac MAC Address of link
+        /// \param link_status true if link is up
+        ///
+        virtual void onNetLinkStatusUpdated( Eui48 link_mac, bool link_status );
+
+        ///
+        /// \brief onNetAvdeccMessageReceived
+        ///
+        /// Notify the state machine that an AVDECC message
+        /// was received from the L2 network
+        ///
+        /// \param frame Ethernet frame
+        ///
+        virtual void onNetAvdeccMessageReceived( Frame const &frame );
+
+        ///
+        /// \brief onTimeTick
+        ///
+        /// Notify the state machine that some time has passed
+        /// and the new time in seconds is updated
+        ///
+        /// \param time_in_seconds
+        ///
+        virtual void onTimeTick( uint32_t time_in_seconds );
+
+      protected:
+        ///
+        /// \brief onIncomingTcpHttpData
+        ///
+        /// Notify the state machine that some data was received
+        /// from the APC during the HTTP header section
+        ///
+        /// \param data ptr to octets
+        /// \param len lenth of data in octets
+        /// \return length of consumed data
+        ///
+        virtual ssize_t onIncomingTcpHttpData( uint8_t const *data,
+                                               ssize_t len );
+
+        ///
+        /// \brief onIncomingHttpRequest
+        /// \param request
+        /// \return
+        ///
+        virtual bool onIncomingHttpRequest( HttpRequest const &request );
+
+        ///
+        /// \brief onIncomingTcpAppData
+        ///
+        /// Notify the state machine that some data was received
+        /// from the APC during the APP message section
+        ///
+        /// \param data ptr to octets
+        /// \param len lenth of data in octets
+        /// \return length of consumed data
+        ///
+        virtual ssize_t onIncomingTcpAppData( uint8_t const *data,
+                                              ssize_t len );
+
+        ///
+        /// \brief onTcpConnectionClosed
+        ///
+        /// Notify the state machine that the TCP connection
+        /// was closed
+        ///
+        ///
+        virtual void onTcpConnectionClosed();
+
+      protected:
+        ///
+        /// \brief onAppNop
+        ///
+        /// Received NOP from APC
+        ///
+        /// \param msg
+        ///
+        virtual void onAppNop( AppMessage const &msg );
+
+        ///
+        /// \brief onAppEntityIdRequest
+        ///
+        /// Received ENTITY_ID_REQUEST from APC
+        ///
+        /// \param msg
+        ///
+        virtual void onAppEntityIdRequest( AppMessage const &msg );
+
+        ///
+        /// \brief onAppEntityIdResponse
+        ///
+        /// Received ENTITY_ID_RESPONSE from APC
+        ///
+        /// \param msg
+        ///
+        virtual void onAppEntityIdResponse( AppMessage const &msg );
+
+        ///
+        /// \brief onAppLinkUp
+        ///
+        /// Received LINK_UP from APC
+        ///
+        /// \param msg
+        ///
+        virtual void onAppLinkUp( AppMessage const &msg );
+
+        ///
+        /// \brief onAppLinkDown
+        ///
+        /// Received LINK_DOWN from APC
+        ///
+        /// \param msg
+        ///
+        virtual void onAppLinkDown( AppMessage const &msg );
+
+        ///
+        /// \brief onAppAvdeccFromAps
+        ///
+        /// Received AVDECC_FROM_APS from APC
+        ///
+        /// \param msg
+        ///
+        virtual void onAppAvdeccFromAps( AppMessage const &msg );
+
+        ///
+        /// \brief onAppAvdeccFromApc
+        ///
+        /// Received AVDECC_FROM_APC from APC
+        ///
+        /// \param msg
+        ///
+        virtual void onAppAvdeccFromApc( AppMessage const &msg );
+
+        ///
+        /// \brief onAppVendor
+        ///
+        /// Received VENDOR from APC
+        ///
+        /// \param msg
+        ///
+        virtual void onAppVendor( AppMessage const &msg );
+
+      protected:
+        ApcStateMachine *m_owner;
+
+        bool m_in_http;
+        HttpClientParser *m_http_parser;
+        std::string m_path;
+        AppMessageParser m_app_parser;
+    };
+    StateVariables *getVariables() { return m_variables; }
+    StateActions *getActions() { return m_actions; }
+    StateEvents *getEvents() { return m_events; }
+    States *getStates() { return m_states; }
+
+    ApcStateMachine( StateVariables *variables,
+                     StateActions *actions,
+                     StateEvents *events,
+                     States *states );
+
+    virtual ~ApcStateMachine();
+
+    virtual bool run();
+
+    virtual void clear();
+
+  protected:
+    StateVariables *m_variables;
+    StateActions *m_actions;
+    StateEvents *m_events;
+    States *m_states;
 };
 }
-#endif

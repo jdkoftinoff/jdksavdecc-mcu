@@ -168,11 +168,11 @@ class HttpRequest
     /// \param content
     ///
     void setPUT( std::string const &host,
-                  std::string const &port,
-                  std::string const &path,
-                  std::vector<std::string> const &headers,
-                  std::string const &content_type,
-                  std::vector<uint8_t> const &content )
+                 std::string const &port,
+                 std::string const &path,
+                 std::vector<std::string> const &headers,
+                 std::string const &content_type,
+                 std::vector<uint8_t> const &content )
     {
         set( "PUT", host, port, path, headers, content_type, content );
     }
@@ -193,7 +193,6 @@ class HttpRequest
               std::string const &port,
               std::string const &path,
               std::vector<std::string> const &headers );
-
 
     ///
     /// \brief set
@@ -241,9 +240,11 @@ class HttpResponse
 
     virtual void clear();
 
-    int m_code;
-    std::string m_code_string;
+    std::string m_version;
+    std::string m_status_code;
+    std::string m_reason_phrase;
     std::vector<std::string> m_headers;
+
     std::vector<uint8_t> m_content;
 };
 
@@ -258,6 +259,15 @@ class HttpServerHandler
     ///
     ///
     virtual bool onIncomingHttpRequest( HttpRequest const &request ) = 0;
+};
+
+class HttpClientHandler
+{
+  public:
+    HttpClientHandler() {}
+    virtual ~HttpClientHandler() {}
+
+    virtual bool onIncomingHttpResponse( HttpResponse const &response ) = 0;
 };
 
 class HttpServerParser
@@ -302,6 +312,51 @@ class HttpServerParserSimple : protected HttpServerParser
         ParsingHeaderLine,
         ParsingContentUntilClose,
         ParsingFinished
+    } m_parse_state;
+
+    std::string m_cur_line;
+};
+
+class HttpClientParser
+{
+  public:
+    HttpClientParser( HttpResponse *response, HttpClientHandler *handler )
+        : m_response( response ), m_handler( handler )
+    {
+    }
+
+    virtual ~HttpClientParser() {}
+
+    virtual void clear();
+
+    virtual ssize_t onIncomingHttpData( uint8_t const *data, ssize_t len ) = 0;
+
+  protected:
+    HttpResponse *m_response;
+    HttpClientHandler *m_handler;
+};
+
+class HttpClientParserSimple : protected HttpClientParser
+{
+  public:
+    HttpClientParserSimple( HttpResponse *response, HttpClientHandler *handler )
+        : HttpClientParser( response, handler )
+    {
+    }
+
+    virtual ~HttpClientParserSimple() {}
+
+    virtual void clear();
+
+    virtual ssize_t onIncomingHttpData( uint8_t const *data, ssize_t len );
+
+  protected:
+    enum
+    {
+        ParsingVersion,
+        ParsingStatusCode,
+        ParsingReasonPhrase,
+        ParsingHeaderLine
     } m_parse_state;
 
     std::string m_cur_line;
