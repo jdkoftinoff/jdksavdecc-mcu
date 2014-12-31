@@ -221,6 +221,10 @@ struct AppMessage
                                      payload.getBuf() );
     }
 
+    uint8_t const *getPayload() const { return m_appdu.payload_buffer; }
+
+    uint8_t *getPayload() { return m_appdu.payload_buffer; }
+
     Eui48 getAddress() const { return Eui48( m_appdu.base.address ); }
 
     uint16_t getPayloadLength() const { return m_appdu.base.payload_length; }

@@ -304,6 +304,15 @@ class ApsStateMachine
         virtual void sendHttpResponse( int requestValid );
 
         ///
+        /// \brief sendMsgToApc
+        ///
+        /// The sendMsgToApc function sends the apsMsg to the APC
+        ///
+        /// \param apsMsg
+        ///
+        virtual void sendMsgToApc( AppMessage const &apsMsg );
+
+        ///
         /// \brief sendLinkStatus see Annex C.5.2.2.7
         ///
         /// The sendLinkStatus(linkStatus) function forms and sends
@@ -1030,6 +1039,7 @@ class ApsStateMachine
     virtual void closeTcpConnection() = 0;
     virtual void closeTcpServer() = 0;
     virtual void sendTcpData( uint8_t const *data, ssize_t len ) = 0;
+    virtual void sendAvdeccToL2( uint8_t const *data, ssize_t len ) = 0;
 
   protected:
     StateVariables *m_variables;

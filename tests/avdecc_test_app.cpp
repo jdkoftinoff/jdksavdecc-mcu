@@ -8,6 +8,82 @@ class TestApsStateMachine;
 class TestApcStateMachine : public ApcStateMachine
 {
   public:
+    class TestStates : public States
+    {
+      protected:
+        virtual void goToInitialize()
+        {
+            std::cout << "APC: INITIALIZE" << std::endl;
+            States::goToInitialize();
+        }
+
+        virtual void goToWaitForConnect()
+        {
+            std::cout << "APC: WAIT_FOR_CONNECT" << std::endl;
+            States::goToWaitForConnect();
+        }
+
+        virtual void goToConnected()
+        {
+            std::cout << "APC: CONNECTED" << std::endl;
+            States::goToConnected();
+        }
+
+        virtual void goToStartTransfer()
+        {
+            std::cout << "APC: START_TRANSFER" << std::endl;
+            States::goToStartTransfer();
+        }
+
+        virtual void goToWaiting()
+        {
+            std::cout << "APC: WAITING" << std::endl;
+            States::goToWaiting();
+        }
+
+        virtual void goToClosed()
+        {
+            std::cout << "APC: CLOSED" << std::endl;
+            States::goToClosed();
+        }
+
+        virtual void goToLinkStatus()
+        {
+            std::cout << "APC: LINK_STATUS" << std::endl;
+            States::goToLinkStatus();
+        }
+
+        virtual void goToReceiveMsg()
+        {
+            std::cout << "APC: RECEIVE_MSG" << std::endl;
+            States::goToReceiveMsg();
+        }
+
+        virtual void goToSendMsg()
+        {
+            std::cout << "APC: SEND_MSG" << std::endl;
+            States::goToSendMsg();
+        }
+
+        virtual void goToEntityIdAssigned()
+        {
+            std::cout << "APC: ENTITY_ID_ASSIGNED" << std::endl;
+            States::goToEntityIdAssigned();
+        }
+
+        virtual void goToSendNop()
+        {
+            std::cout << "APC: SEND_NOP" << std::endl;
+            States::goToSendNop();
+        }
+
+        virtual void goToFinish()
+        {
+            std::cout << "APC: FINISH" << std::endl;
+            States::goToFinish();
+        }
+    };
+
     TestApcStateMachine()
         : ApcStateMachine( &m_test_variables,
                            &m_test_actions,
@@ -70,7 +146,7 @@ class TestApcStateMachine : public ApcStateMachine
 
     StateVariables m_test_variables;
     StateActions m_test_actions;
-    States m_test_states;
+    TestStates m_test_states;
     StateEvents m_test_events;
 
     HttpClientParserSimple m_http_parser_simple;
@@ -82,6 +158,94 @@ class TestApcStateMachine : public ApcStateMachine
 class TestApsStateMachine : public ApsStateMachine
 {
   public:
+    class TestStates : public States
+    {
+      protected:
+        virtual void goToInitialize()
+        {
+            std::cout << "APS: INITIALIZE" << std::endl;
+            States::goToInitialize();
+        }
+
+        virtual void goToWaitForConnect()
+        {
+            std::cout << "APS: WAIT_FOR_CONNECT" << std::endl;
+            States::goToWaitForConnect();
+        }
+
+        virtual void goToAccept()
+        {
+            std::cout << "APS: ACCEPT" << std::endl;
+            States::goToAccept();
+        }
+
+        virtual void goToReject()
+        {
+            std::cout << "APS: REJECT" << std::endl;
+            States::goToReject();
+        }
+
+        virtual void goToClosed()
+        {
+            std::cout << "APS: CLOSED" << std::endl;
+            States::goToClosed();
+        }
+
+        virtual void goToStartTransfer()
+        {
+            std::cout << "APS: START_TRANSFER" << std::endl;
+            States::goToStartTransfer();
+        }
+
+        virtual void goToWaiting()
+        {
+            std::cout << "APS: WAITING" << std::endl;
+            States::goToWaiting();
+        }
+
+        virtual void goToLinkStatus()
+        {
+            std::cout << "APS: LINK_STATUS" << std::endl;
+            States::goToLinkStatus();
+        }
+
+        virtual void goToTransferToL2()
+        {
+            std::cout << "APS: TRANSFER_TO_L2" << std::endl;
+            States::goToTransferToL2();
+        }
+
+        virtual void goToTransferToApc()
+        {
+            std::cout << "APS: TRANSFER_TO_APC" << std::endl;
+            States::goToTransferToApc();
+        }
+
+        virtual void goToAssignEntityId()
+        {
+            std::cout << "APS: ASSIGN_ENTITY_ID" << std::endl;
+            States::goToAssignEntityId();
+        }
+
+        virtual void goToSendNop()
+        {
+            std::cout << "APS: SEND_NOP" << std::endl;
+            States::goToSendNop();
+        }
+
+        virtual void goToCloseAndFinish()
+        {
+            std::cout << "APS: CLOSE_AND_FINISH" << std::endl;
+            States::goToCloseAndFinish();
+        }
+
+        virtual void goToFinish()
+        {
+            std::cout << "APS: FINISH" << std::endl;
+            States::goToFinish();
+        }
+    };
+
     TestApsStateMachine()
         : ApsStateMachine( &m_test_variables,
                            &m_test_actions,
@@ -92,10 +256,9 @@ class TestApsStateMachine : public ApsStateMachine
     {
     }
 
-    virtual void sendAvdeccToL2( AppMessage const *msg )
+    virtual void sendAvdeccToL2( uint8_t const *data, ssize_t len )
     {
-        std::cout << "APS: sendAvdeccToL2( " << msg->getMessageType() << " )"
-                  << std::endl;
+        std::cout << "APS: sendAvdeccToL2( " << len << " )" << std::endl;
     }
 
     virtual void closeTcpConnection()
@@ -121,7 +284,7 @@ class TestApsStateMachine : public ApsStateMachine
 
     StateVariables m_test_variables;
     StateActions m_test_actions;
-    States m_test_states;
+    TestStates m_test_states;
     StateEvents m_test_events;
 
     HttpServerParserSimple m_http_server_parser;

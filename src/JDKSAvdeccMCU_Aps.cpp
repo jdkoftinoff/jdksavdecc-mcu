@@ -263,31 +263,53 @@ void ApsStateMachine::StateActions::sendHttpResponse( int requestValid )
     response.m_reason_phrase = "OK";
 }
 
+void ApsStateMachine::StateActions::sendMsgToApc( const AppMessage &apsMsg )
+{
+    FixedBufferWithSize<1500> msg_as_octets;
+    if ( apsMsg.store( &msg_as_octets ) )
+    {
+        getEvents()->sendTcpData( msg_as_octets.getBuf(),
+                                  msg_as_octets.getLength() );
+    }
+}
+
 void ApsStateMachine::StateActions::sendLinkStatus( Eui48 link_mac,
                                                     bool linkStatus )
 {
-    // TODO:
+    AppMessage msg;
+    if ( linkStatus )
+    {
+        msg.setLinkUp( link_mac );
+    }
+    else
+    {
+        msg.setLinkDown( link_mac );
+    }
+    sendMsgToApc( msg );
 }
 
 void ApsStateMachine::StateActions::sendAvdeccToL2( const AppMessage *msg )
 {
-    // TODO:
+    getOwner()->sendAvdeccToL2( msg->getPayload(), msg->getPayloadLength() );
 }
 
 void ApsStateMachine::StateActions::sendAvdeccToApc( const AppMessage *msg )
 {
-    // TODO:
+    sendMsgToApc( *msg );
 }
 
 void ApsStateMachine::StateActions::sendEntityIdAssignment( Eui48 a,
                                                             Eui64 entity_id )
 {
-    // TODO:
+    AppMessage msg;
+    msg.setEntityIdResponse( a, entity_id );
+    sendMsgToApc( msg );
 }
 
 void ApsStateMachine::StateActions::sendNopToApc()
 {
-    // TODO:
+    AppMessage msg;
+    sendMsgToApc( msg );
 }
 
 void ApsStateMachine::StateActions::closeTcpConnection()
