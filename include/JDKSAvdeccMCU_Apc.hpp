@@ -211,37 +211,37 @@ class ApcStateMachine
         /**
          * See IEEE Std 1722.1 Annex C.5.3.2.1
          */
-        virtual void closeTcpConnection() = 0;
+        virtual void closeTcpConnection();
 
         /**
          * See IEEE Std 1722.1 Annex C.5.3.2.2
          */
-        virtual void connectToProxy( std::string const &addr ) = 0;
+        virtual void connectToProxy( std::string const &addr );
 
         /**
          * See IEEE Std 1722.1 Cor1 Annex C
          */
-        virtual void notifyProxyAvailable() = 0;
+        virtual void notifyProxyAvailable();
 
         /**
          * See IEEE Std 1722.1 Cor1 Annex C
          */
-        virtual void notifyProxyUnavailable() = 0;
+        virtual void notifyProxyUnavailable();
 
         /**
          * See IEEE Std 1722.1 Annex C.5.3.2.5
          */
-        virtual void notifyLinkStatus( AppMessage const &linkMsg ) = 0;
+        virtual void notifyLinkStatus( AppMessage const &linkMsg );
 
         /**
          * See IEEE Std 1722.1 Annex C.5.3.2.6
          */
-        virtual void processMsg( AppMessage const &apsMsg ) = 0;
+        virtual void processMsg( AppMessage const &apsMsg );
 
         /**
          * See IEEE Std 1722.1 Annex C.5.3.2.X
          */
-        virtual void notifyNewEntityId( Eui64 const &entity_id ) = 0;
+        virtual void notifyNewEntityId( Eui64 const &entity_id );
 
         /**
          * See IEEE Std 1722.1 Annex C.5.3.2.4
@@ -595,7 +595,7 @@ class ApcStateMachine
         state_proc m_current_state;
     };
 
-    class StateEvents : protected AppMessageHandler, protected HttpClientHandler
+    class StateEvents : public AppMessageHandler, public HttpClientHandler
     {
       public:
         StateEvents( HttpClientParser *http_parser, std::string path )
@@ -706,7 +706,7 @@ class ApcStateMachine
         /// \param data
         /// \param len
         ///
-        virtual void sendTcpData( uint8_t const *data, ssize_t len ) = 0;
+        virtual void sendTcpData( uint8_t const *data, ssize_t len );
 
       protected:
         ///
@@ -836,9 +836,20 @@ class ApcStateMachine
 
     virtual ~ApcStateMachine();
 
+    virtual void start();
+
     virtual bool run();
 
     virtual void clear();
+
+    virtual void closeTcpConnection() = 0;
+    virtual void connectToProxy( std::string const &addr ) = 0;
+    virtual void notifyProxyAvailable() = 0;
+    virtual void notifyProxyUnavailable() = 0;
+    virtual void notifyLinkStatus( AppMessage const &linkMsg ) = 0;
+    virtual void processMsg( AppMessage const &apsMsg ) = 0;
+    virtual void notifyNewEntityId( Eui64 const &entity_id ) = 0;
+    virtual void sendTcpData( uint8_t const *data, ssize_t len ) = 0;
 
   protected:
     StateVariables *m_variables;

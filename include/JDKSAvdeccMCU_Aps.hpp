@@ -379,14 +379,14 @@ class ApsStateMachine
         /// The closeTcpConnection() function closes the TCP connection with
         /// the APC and sets the incomingTcpClosed variable to FALSE.
         ///
-        virtual void closeTcpConnection() = 0;
+        virtual void closeTcpConnection();
 
         ///
         /// \brief closeTcpServer
         ///
         /// Close the tcp server
         ///
-        virtual void closeTcpServer() = 0;
+        virtual void closeTcpServer();
 
       protected:
         ///
@@ -774,7 +774,7 @@ class ApsStateMachine
         state_proc m_current_state;
     };
 
-    class StateEvents : protected AppMessageHandler, protected HttpServerHandler
+    class StateEvents : public AppMessageHandler, public HttpServerHandler
     {
       public:
         StateEvents( HttpServerParser *http_parser, std::string path );
@@ -831,7 +831,7 @@ class ApsStateMachine
         /// \param data
         /// \param len
         ///
-        virtual void sendTcpData( uint8_t const *data, ssize_t len ) = 0;
+        virtual void sendTcpData( uint8_t const *data, ssize_t len );
 
         ///
         /// \brief onIncomingTcpConnection
@@ -1021,9 +1021,15 @@ class ApsStateMachine
 
     virtual ~ApsStateMachine();
 
+    virtual void start();
+
     virtual bool run();
 
     virtual void clear();
+
+    virtual void closeTcpConnection() = 0;
+    virtual void closeTcpServer() = 0;
+    virtual void sendTcpData( uint8_t const *data, ssize_t len ) = 0;
 
   protected:
     StateVariables *m_variables;

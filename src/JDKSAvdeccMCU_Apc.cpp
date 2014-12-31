@@ -44,10 +44,6 @@ ApcStateMachine::ApcStateMachine( ApcStateMachine::StateVariables *variables,
     , m_events( events )
     , m_states( states )
 {
-    m_variables->setOwner( this );
-    m_actions->setOwner( this );
-    m_events->setOwner( this );
-    m_states->setOwner( this );
 }
 
 ApcStateMachine::~ApcStateMachine()
@@ -58,10 +54,16 @@ ApcStateMachine::~ApcStateMachine()
     m_states->setOwner( 0 );
 }
 
+void ApcStateMachine::start() { clear(); }
+
 bool ApcStateMachine::run() { return getStates()->run(); }
 
 void ApcStateMachine::clear()
 {
+    m_variables->setOwner( this );
+    m_actions->setOwner( this );
+    m_events->setOwner( this );
+    m_states->setOwner( this );
     m_variables->clear();
     m_actions->clear();
     m_events->clear();
@@ -79,6 +81,7 @@ void ApcStateMachine::StateEvents::onIncomingTcpConnection()
 {
     m_in_http = true;
     m_http_parser->clear();
+    getVariables()->m_tcpConnected = true;
 }
 
 void ApcStateMachine::StateEvents::onTcpConnectionClosed()
@@ -127,6 +130,12 @@ void ApcStateMachine::StateEvents::onNetAvdeccMessageReceived(
 void ApcStateMachine::StateEvents::onTimeTick( uint32_t time_in_seconds )
 {
     getVariables()->m_currentTime = time_in_seconds;
+}
+
+void ApcStateMachine::StateEvents::sendTcpData( const uint8_t *data,
+                                                ssize_t len )
+{
+    getOwner()->sendTcpData( data, len );
 }
 
 ssize_t
@@ -211,6 +220,42 @@ void ApcStateMachine::StateEvents::onAppVendor( const AppMessage &msg )
 void ApcStateMachine::StateActions::clear()
 {
     // Do nothing
+}
+
+void ApcStateMachine::StateActions::closeTcpConnection()
+{
+    getOwner()->closeTcpConnection();
+}
+
+void ApcStateMachine::StateActions::connectToProxy( const std::string &addr )
+{
+    getOwner()->connectToProxy( addr );
+}
+
+void ApcStateMachine::StateActions::notifyProxyAvailable()
+{
+    getOwner()->notifyProxyAvailable();
+}
+
+void ApcStateMachine::StateActions::notifyProxyUnavailable()
+{
+    getOwner()->notifyProxyUnavailable();
+}
+
+void
+    ApcStateMachine::StateActions::notifyLinkStatus( const AppMessage &linkMsg )
+{
+    getOwner()->notifyLinkStatus( linkMsg );
+}
+
+void ApcStateMachine::StateActions::processMsg( const AppMessage &apsMsg )
+{
+    getOwner()->processMsg( apsMsg );
+}
+
+void ApcStateMachine::StateActions::notifyNewEntityId( const Eui64 &entity_id )
+{
+    getOwner()->notifyNewEntityId( entity_id );
 }
 
 void ApcStateMachine::StateActions::initialize()

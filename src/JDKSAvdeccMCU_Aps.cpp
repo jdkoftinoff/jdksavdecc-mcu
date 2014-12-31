@@ -44,15 +44,6 @@ ApsStateMachine::ApsStateMachine( ApsStateMachine::StateVariables *variables,
     , m_events( events )
     , m_states( states )
 {
-    m_variables->setOwner( this );
-    m_actions->setOwner( this );
-    m_events->setOwner( this );
-    m_states->setOwner( this );
-
-    m_variables->clear();
-    m_actions->clear();
-    m_events->clear();
-    m_states->clear();
 }
 
 ApsStateMachine::~ApsStateMachine()
@@ -63,10 +54,17 @@ ApsStateMachine::~ApsStateMachine()
     m_states->setOwner( 0 );
 }
 
+void ApsStateMachine::start() { clear(); }
+
 bool ApsStateMachine::run() { return getStates()->run(); }
 
 void ApsStateMachine::clear()
 {
+    m_variables->setOwner( this );
+    m_actions->setOwner( this );
+    m_events->setOwner( this );
+    m_states->setOwner( this );
+
     m_variables->clear();
     m_actions->clear();
     m_events->clear();
@@ -87,6 +85,12 @@ void ApsStateMachine::StateEvents::clear()
     m_in_http = true;
     m_http_parser->clear();
     m_app_parser.clear();
+}
+
+void ApsStateMachine::StateEvents::sendTcpData( const uint8_t *data,
+                                                ssize_t len )
+{
+    getOwner()->sendTcpData( data, len );
 }
 
 void ApsStateMachine::StateEvents::onIncomingTcpConnection()
@@ -139,6 +143,7 @@ bool ApsStateMachine::StateEvents::onIncomingHttpRequest(
          && request.m_version == "HTTP/1.1" )
     {
         m_in_http = false;
+        getVariables()->m_requestValid = 200;
         r = true;
     }
     return r;
@@ -165,13 +170,19 @@ void ApsStateMachine::StateEvents::onTcpConnectionClosed()
 void ApsStateMachine::StateEvents::onNetLinkStatusUpdated( Eui48 link_mac,
                                                            bool link_status )
 {
-    // TODO:
+    if ( getVariables()->m_linkStatus != link_status )
+    {
+        getVariables()->m_linkStatus = link_status;
+        getVariables()->m_linkMac = link_mac;
+        getVariables()->m_linkStatusChanged = true;
+    }
 }
 
 void ApsStateMachine::StateEvents::onNetAvdeccMessageReceived(
     const Frame &frame )
 {
-    // TODO:
+    getVariables()->m_in.setAvdeccFromAps( frame );
+    getVariables()->m_L2Msg = true;
 }
 
 void ApsStateMachine::StateEvents::onTimeTick( uint32_t time_in_seconds )
@@ -186,26 +197,41 @@ void ApsStateMachine::StateEvents::onAppNop( const AppMessage &msg )
 
 void ApsStateMachine::StateEvents::onAppEntityIdRequest( const AppMessage &msg )
 {
+    getVariables()->m_entity_id = msg.getEntityIdRequestEntityId();
+    getVariables()->m_assignEntityIdRequest = true;
 }
 
 void
     ApsStateMachine::StateEvents::onAppEntityIdResponse( const AppMessage &msg )
 {
+    // Do nothing
 }
 
-void ApsStateMachine::StateEvents::onAppLinkUp( const AppMessage &msg ) {}
+void ApsStateMachine::StateEvents::onAppLinkUp( const AppMessage &msg )
+{
+    // Do nothing
+}
 
-void ApsStateMachine::StateEvents::onAppLinkDown( const AppMessage &msg ) {}
+void ApsStateMachine::StateEvents::onAppLinkDown( const AppMessage &msg )
+{
+    // Do Nothing
+}
 
 void ApsStateMachine::StateEvents::onAppAvdeccFromAps( const AppMessage &msg )
 {
+    // Do Nothing
 }
 
 void ApsStateMachine::StateEvents::onAppAvdeccFromApc( const AppMessage &msg )
 {
+    getVariables()->m_out = msg;
+    getVariables()->m_apcMsg = true;
 }
 
-void ApsStateMachine::StateEvents::onAppVendor( const AppMessage &msg ) {}
+void ApsStateMachine::StateEvents::onAppVendor( const AppMessage &msg )
+{
+    // Do nothing
+}
 
 void ApsStateMachine::StateActions::initialize()
 {
@@ -223,7 +249,18 @@ void ApsStateMachine::StateActions::initialize()
 
 void ApsStateMachine::StateActions::sendHttpResponse( int requestValid )
 {
-    // TODO:
+    char buf[16];
+    HttpResponse response;
+
+    if ( requestValid < 0 )
+    {
+        requestValid = 404;
+        response.m_reason_phrase = "NOT FOUND";
+    }
+    sprintf( buf, "%d", requestValid );
+    response.m_version = "HTTP/1.1";
+    response.m_status_code = buf;
+    response.m_reason_phrase = "OK";
 }
 
 void ApsStateMachine::StateActions::sendLinkStatus( Eui48 link_mac,
@@ -245,9 +282,23 @@ void ApsStateMachine::StateActions::sendAvdeccToApc( const AppMessage *msg )
 void ApsStateMachine::StateActions::sendEntityIdAssignment( Eui48 a,
                                                             Eui64 entity_id )
 {
+    // TODO:
 }
 
-void ApsStateMachine::StateActions::sendNopToApc() {}
+void ApsStateMachine::StateActions::sendNopToApc()
+{
+    // TODO:
+}
+
+void ApsStateMachine::StateActions::closeTcpConnection()
+{
+    getOwner()->closeTcpConnection();
+}
+
+void ApsStateMachine::StateActions::closeTcpServer()
+{
+    getOwner()->closeTcpServer();
+}
 
 ApsStateMachine::StateVariables::StateVariables() {}
 
