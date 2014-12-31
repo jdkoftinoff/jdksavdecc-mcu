@@ -74,22 +74,7 @@ class ApsStateMachine
         ///
         /// Note, m_linkMac needs to be set
         ///
-        virtual void clear()
-        {
-            m_finished = false;
-            m_tcpConnected = false;
-            m_requestValid = -1;
-            m_incomingTcpClosed = false;
-            m_linkStatus = false;
-            m_linkStatusChanged = false;
-            m_apcMsg = false;
-            m_L2Msg = false;
-            m_assignEntityIdRequest = false;
-            m_nopTimeout = 0;
-            m_currentTime = 0;
-            m_out.setNOP();
-            m_in.setNOP();
-        }
+        virtual void clear();
 
         ///
         /// \brief m_owner
@@ -268,6 +253,24 @@ class ApsStateMachine
         StateVariables *getVariables() { return m_owner->getVariables(); }
 
         ///
+        /// \brief getActions
+        ///
+        /// Ask the owning state machine for the actions object
+        ///
+        /// \return StateActions
+        ///
+        StateActions *getActions() { return m_owner->getActions(); }
+
+        ///
+        /// \brief getEvents
+        ///
+        /// Ask the owning state machine for the state events object
+        ///
+        /// \return
+        ///
+        StateEvents *getEvents() { return m_owner->getEvents(); }
+
+        ///
         /// \brief clear any additional
         /// state
         ///
@@ -310,7 +313,7 @@ class ApsStateMachine
         ///
         /// \param requestValid HTTP Status-Code to send
         ///
-        virtual void sendHttpResponse( int requestValid ) = 0;
+        virtual void sendHttpResponse( int requestValid );
 
         ///
         /// \brief sendLinkStatus see Annex C.5.2.2.7
@@ -323,7 +326,7 @@ class ApsStateMachine
         /// \param link_mac The MAC Address of ethernet port
         /// \param linkStatus true if link is up
         ///
-        virtual void sendLinkStatus( Eui48 link_mac, bool linkStatus ) = 0;
+        virtual void sendLinkStatus( Eui48 link_mac, bool linkStatus );
 
         ///
         /// \brief sendAvdeccToL2 See Annex C.5.2.2.4
@@ -340,7 +343,7 @@ class ApsStateMachine
         ///
         /// \param msg AppMessage containing AVDECC msg to send to network
         ///
-        virtual void sendAvdeccToL2( AppMessage const *msg ) = 0;
+        virtual void sendAvdeccToL2( AppMessage const *msg );
 
         ///
         /// \brief sendAvdeccToApc See Annex C.5.2.2.3
@@ -352,7 +355,7 @@ class ApsStateMachine
         ///
         /// \param msg AppMessage containing AVDECC msg to send to APC
         ///
-        virtual void sendAvdeccToApc( AppMessage const *msg ) = 0;
+        virtual void sendAvdeccToApc( AppMessage const *msg );
 
         ///
         /// \brief sendEntityIdAssignment See Annex C.5.2.2.5
@@ -373,14 +376,14 @@ class ApsStateMachine
         /// \param a Primary MAC Address of the APC
         /// \param entity_id Requested entity_id
         ///
-        virtual void sendEntityIdAssignment( Eui48 a, Eui64 entity_id ) = 0;
+        virtual void sendEntityIdAssignment( Eui48 a, Eui64 entity_id );
 
         ///
         /// \brief sendNopToApc See Annex C.5.2.2.8
         ///
         /// The sendNopToApc() function sends a NOP message to the APC.
         ///
-        virtual void sendNopToApc() = 0;
+        virtual void sendNopToApc();
 
         ///
         /// \brief closeTcpConnection see Annex C.5.2.2.1
@@ -388,14 +391,14 @@ class ApsStateMachine
         /// The closeTcpConnection() function closes the TCP connection with
         /// the APC and sets the incomingTcpClosed variable to FALSE.
         ///
-        virtual void closeTcpConnection() = 0;
+        virtual void closeTcpConnection();
 
         ///
         /// \brief closeTcpServer
         ///
         /// Close the tcp server
         ///
-        virtual void closeTcpServer() = 0;
+        virtual void closeTcpServer();
 
       protected:
         ///
@@ -461,11 +464,20 @@ class ApsStateMachine
         ///
         /// \brief getVariables
         ///
-        /// As the owning state machine for the state variables object
+        /// Ask the owning state machine for the state variables object
         ///
         /// \return StateVariables
         ///
         StateVariables *getVariables() { return m_owner->getVariables(); }
+
+        ///
+        /// \brief getEvents
+        ///
+        /// Ask the owning state machine for the state events object
+        ///
+        /// \return
+        ///
+        StateEvents *getEvents() { return m_owner->getEvents(); }
 
         ///
         /// \brief clear
@@ -888,6 +900,16 @@ class ApsStateMachine
         /// \param time_in_seconds
         ///
         virtual void onTimeTick( uint32_t time_in_seconds );
+
+        ///
+        /// \brief sendTcpData
+        ///
+        /// Send data to the TCP socket
+        ///
+        /// \param data
+        /// \param len
+        ///
+        virtual void sendTcpData( uint8_t const *data, ssize_t len ) = 0;
 
       protected:
         ///

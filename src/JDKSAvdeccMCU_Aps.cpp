@@ -187,6 +187,45 @@ void ApsStateMachine::StateEvents::onAppAvdeccFromApc( const AppMessage &msg )
 
 void ApsStateMachine::StateEvents::onAppVendor( const AppMessage &msg ) {}
 
+void ApsStateMachine::StateActions::sendHttpResponse( int requestValid ) {}
+
+void ApsStateMachine::StateActions::sendLinkStatus( Eui48 link_mac,
+                                                    bool linkStatus )
+{
+}
+
+void ApsStateMachine::StateActions::sendAvdeccToL2( const AppMessage *msg ) {}
+
+void ApsStateMachine::StateActions::sendAvdeccToApc( const AppMessage *msg ) {}
+
+void ApsStateMachine::StateActions::sendEntityIdAssignment( Eui48 a,
+                                                            Eui64 entity_id )
+{
+}
+
+void ApsStateMachine::StateActions::sendNopToApc() {}
+
+void ApsStateMachine::StateActions::closeTcpConnection() {}
+
+void ApsStateMachine::StateActions::closeTcpServer() {}
+
+void ApsStateMachine::StateVariables::clear()
+{
+    m_finished = false;
+    m_tcpConnected = false;
+    m_requestValid = -1;
+    m_incomingTcpClosed = false;
+    m_linkStatus = false;
+    m_linkStatusChanged = false;
+    m_apcMsg = false;
+    m_L2Msg = false;
+    m_assignEntityIdRequest = false;
+    m_nopTimeout = 0;
+    m_currentTime = 0;
+    m_out.setNOP();
+    m_in.setNOP();
+}
+
 void ApsStateMachine::States::clear()
 {
     m_current_state = &States::doBegin;

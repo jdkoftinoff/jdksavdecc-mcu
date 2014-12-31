@@ -35,6 +35,130 @@
 namespace JDKSAvdeccMCU
 {
 
+ApcStateMachine::ApcStateMachine( ApcStateMachine::StateVariables *variables,
+                                  ApcStateMachine::StateActions *actions,
+                                  ApcStateMachine::StateEvents *events,
+                                  ApcStateMachine::States *states )
+    : m_variables( variables )
+    , m_actions( actions )
+    , m_events( events )
+    , m_states( states )
+{
+    m_variables->setOwner( this );
+    m_actions->setOwner( this );
+    m_events->setOwner( this );
+    m_states->setOwner( this );
+}
+
+ApcStateMachine::~ApcStateMachine()
+{
+    m_variables->setOwner( 0 );
+    m_actions->setOwner( 0 );
+    m_events->setOwner( 0 );
+    m_states->setOwner( 0 );
+}
+
+bool ApcStateMachine::run() { return getStates()->run(); }
+
+void ApcStateMachine::clear()
+{
+    m_variables->clear();
+    m_actions->clear();
+    m_events->clear();
+    m_states->clear();
+}
+void ApcStateMachine::StateEvents::clear() {}
+
+void ApcStateMachine::StateEvents::onIncomingTcpConnection() {}
+
+void ApcStateMachine::StateEvents::onTcpConnectionClosed() {}
+
+ssize_t ApcStateMachine::StateEvents::onIncomingTcpData( const uint8_t *data,
+                                                         ssize_t len )
+{
+}
+
+void ApcStateMachine::StateEvents::onNetAvdeccMessageReceived(
+    const Frame &frame )
+{
+}
+
+void ApcStateMachine::StateEvents::onTimeTick( uint32_t time_in_seconds ) {}
+
+ssize_t
+    ApcStateMachine::StateEvents::onIncomingTcpHttpData( const uint8_t *data,
+                                                         ssize_t len )
+{
+}
+
+bool ApcStateMachine::StateEvents::onIncomingHttpResponse(
+    const HttpResponse &request )
+{
+}
+
+ssize_t ApcStateMachine::StateEvents::onIncomingTcpAppData( const uint8_t *data,
+                                                            ssize_t len )
+{
+}
+
+void ApcStateMachine::StateEvents::onAppNop( const AppMessage &msg ) {}
+
+void ApcStateMachine::StateEvents::onAppEntityIdRequest( const AppMessage &msg )
+{
+}
+
+void
+    ApcStateMachine::StateEvents::onAppEntityIdResponse( const AppMessage &msg )
+{
+}
+
+void ApcStateMachine::StateEvents::onAppLinkUp( const AppMessage &msg ) {}
+
+void ApcStateMachine::StateEvents::onAppLinkDown( const AppMessage &msg ) {}
+
+void ApcStateMachine::StateEvents::onAppAvdeccFromAps( const AppMessage &msg )
+{
+}
+
+void ApcStateMachine::StateEvents::onAppAvdeccFromApc( const AppMessage &msg )
+{
+}
+
+void ApcStateMachine::StateEvents::onAppVendor( const AppMessage &msg ) {}
+
+void ApcStateMachine::StateActions::closeTcpConnection() {}
+
+void ApcStateMachine::StateActions::connectToProxy( const std::string &addr ) {}
+
+bool ApcStateMachine::StateActions::getHttpResponse() {}
+
+void ApcStateMachine::StateActions::initialize() {}
+
+void
+    ApcStateMachine::StateActions::notifyLinkStatus( const AppMessage &linkMsg )
+{
+}
+
+void ApcStateMachine::StateActions::processMsg( const AppMessage &apsMsg ) {}
+
+void ApcStateMachine::StateActions::sendIdRequest( const Eui48 &primaryMac,
+                                                   const Eui64 &entity_id )
+{
+}
+
+void
+    ApcStateMachine::StateActions::sendHttpRequest( const HttpRequest &request )
+{
+}
+
+void ApcStateMachine::StateActions::sendMsgToAps( const AppMessage &apcMsg ) {}
+
+void ApcStateMachine::StateActions::sendNopToAps() {}
+
+void ApcStateMachine::StateActions::notifyNewEntityId( const Eui64 &entity_id )
+{
+}
+
 void ApcStateMachine::StateVariables::clear()
 {
     m_addr.clear();
@@ -243,129 +367,4 @@ void ApcStateMachine::States::goToFinish()
 }
 
 void ApcStateMachine::States::doFinish() { m_current_state = 0; }
-
-void ApcStateMachine::StateActions::closeTcpConnection() {}
-
-void ApcStateMachine::StateActions::connectToProxy( const std::string &addr ) {}
-
-bool ApcStateMachine::StateActions::getHttpResponse() {}
-
-void ApcStateMachine::StateActions::initialize() {}
-
-void
-    ApcStateMachine::StateActions::notifyLinkStatus( const AppMessage &linkMsg )
-{
-}
-
-void ApcStateMachine::StateActions::processMsg( const AppMessage &apsMsg ) {}
-
-void ApcStateMachine::StateActions::sendIdRequest( const Eui48 &primaryMac,
-                                                   const Eui64 &entity_id )
-{
-}
-
-void
-    ApcStateMachine::StateActions::sendHttpRequest( const HttpRequest &request )
-{
-}
-
-void ApcStateMachine::StateActions::sendMsgToAps( const AppMessage &apcMsg ) {}
-
-void ApcStateMachine::StateActions::sendNopToAps() {}
-
-void ApcStateMachine::StateActions::notifyNewEntityId( const Eui64 &entity_id )
-{
-}
-
-void ApcStateMachine::StateEvents::clear() {}
-
-void ApcStateMachine::StateEvents::onIncomingTcpConnection() {}
-
-void ApcStateMachine::StateEvents::onTcpConnectionClosed() {}
-
-ssize_t ApcStateMachine::StateEvents::onIncomingTcpData( const uint8_t *data,
-                                                         ssize_t len )
-{
-}
-
-void ApcStateMachine::StateEvents::onNetAvdeccMessageReceived(
-    const Frame &frame )
-{
-}
-
-void ApcStateMachine::StateEvents::onTimeTick( uint32_t time_in_seconds ) {}
-
-ssize_t
-    ApcStateMachine::StateEvents::onIncomingTcpHttpData( const uint8_t *data,
-                                                         ssize_t len )
-{
-}
-
-bool ApcStateMachine::StateEvents::onIncomingHttpResponse(
-    const HttpResponse &request )
-{
-}
-
-ssize_t ApcStateMachine::StateEvents::onIncomingTcpAppData( const uint8_t *data,
-                                                            ssize_t len )
-{
-}
-
-void ApcStateMachine::StateEvents::onAppNop( const AppMessage &msg ) {}
-
-void ApcStateMachine::StateEvents::onAppEntityIdRequest( const AppMessage &msg )
-{
-}
-
-void
-    ApcStateMachine::StateEvents::onAppEntityIdResponse( const AppMessage &msg )
-{
-}
-
-void ApcStateMachine::StateEvents::onAppLinkUp( const AppMessage &msg ) {}
-
-void ApcStateMachine::StateEvents::onAppLinkDown( const AppMessage &msg ) {}
-
-void ApcStateMachine::StateEvents::onAppAvdeccFromAps( const AppMessage &msg )
-{
-}
-
-void ApcStateMachine::StateEvents::onAppAvdeccFromApc( const AppMessage &msg )
-{
-}
-
-void ApcStateMachine::StateEvents::onAppVendor( const AppMessage &msg ) {}
-
-ApcStateMachine::ApcStateMachine( ApcStateMachine::StateVariables *variables,
-                                  ApcStateMachine::StateActions *actions,
-                                  ApcStateMachine::StateEvents *events,
-                                  ApcStateMachine::States *states )
-    : m_variables( variables )
-    , m_actions( actions )
-    , m_events( events )
-    , m_states( states )
-{
-    m_variables->setOwner( this );
-    m_actions->setOwner( this );
-    m_events->setOwner( this );
-    m_states->setOwner( this );
-}
-
-ApcStateMachine::~ApcStateMachine()
-{
-    m_variables->setOwner( 0 );
-    m_actions->setOwner( 0 );
-    m_events->setOwner( 0 );
-    m_states->setOwner( 0 );
-}
-
-bool ApcStateMachine::run() { return getStates()->run(); }
-
-void ApcStateMachine::clear()
-{
-    m_variables->clear();
-    m_actions->clear();
-    m_events->clear();
-    m_states->clear();
-}
 }

@@ -194,6 +194,15 @@ class ApcStateMachine
         StateVariables *getVariables() { return m_owner->getVariables(); }
 
         ///
+        /// \brief getEvents
+        ///
+        /// Ask the owning state machine for the state events object
+        ///
+        /// \return
+        ///
+        StateEvents *getEvents() { return m_owner->getEvents(); }
+
+        ///
         /// \brief clear any additional
         /// state
         ///
@@ -323,6 +332,15 @@ class ApcStateMachine
         /// \return StateVariables
         ///
         StateVariables *getVariables() { return m_owner->getVariables(); }
+
+        ///
+        /// \brief getEvents
+        ///
+        /// Ask the owning state machine for the state events object
+        ///
+        /// \return
+        ///
+        StateEvents *getEvents() { return m_owner->getEvents(); }
 
         ///
         /// \brief clear
@@ -684,6 +702,16 @@ class ApcStateMachine
         /// \param time_in_seconds
         ///
         virtual void onTimeTick( uint32_t time_in_seconds );
+
+        ///
+        /// \brief sendTcpData
+        ///
+        /// Send data to the TCP socket
+        ///
+        /// \param data
+        /// \param len
+        ///
+        virtual void sendTcpData( uint8_t const *data, ssize_t len ) = 0;
 
       protected:
         ///
