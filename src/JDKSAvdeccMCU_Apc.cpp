@@ -121,43 +121,128 @@ void ApcStateMachine::States::goToConnected()
     getActions()->sendHttpRequest( getVariables()->m_request );
 }
 
-void ApcStateMachine::States::doConnected() {}
+void ApcStateMachine::States::doConnected()
+{
+    if ( getVariables()->m_responseReceived
+         && getVariables()->m_responseValid == false )
+    {
+        goToClosed();
+    }
+    else if ( getVariables()->m_responseReceived
+              && getVariables()->m_responseValid == true )
+    {
+        goToStartTransfer();
+    }
+}
 
-void ApcStateMachine::States::goToStartTransfer() {}
+void ApcStateMachine::States::goToStartTransfer()
+{
+    m_current_state = &States::doStartTransfer;
+    getActions()->sendIdRequest( getVariables()->m_primaryMac,
+                                 getVariables()->m_entityId );
+    getVariables()->m_nopTimeout = getVariables()->m_currentTime + 10;
+}
 
-void ApcStateMachine::States::doStartTransfer() {}
+void ApcStateMachine::States::doStartTransfer() { goToWaiting(); }
 
-void ApcStateMachine::States::goToWaiting() {}
+void ApcStateMachine::States::goToWaiting()
+{
+    m_current_state = &States::doWaiting;
+}
 
-void ApcStateMachine::States::doWaiting() {}
+void ApcStateMachine::States::doWaiting()
+{
+    if ( getVariables()->m_incomingTcpClosed )
+    {
+        goToClosed();
+    }
+    else if ( getVariables()->m_finished )
+    {
+        goToClosed();
+    }
+    else if ( getVariables()->m_linkStatusMsg )
+    {
+        goToLinkStatus();
+    }
+    else if ( getVariables()->m_apsMsgIn )
+    {
+        goToReceiveMsg();
+    }
+    else if ( getVariables()->m_apcMsgOut )
+    {
+        goToSendMsg();
+    }
+    else if ( getVariables()->m_idAssigned )
+    {
+        goToEntityIdAssigned();
+    }
+    else if ( getVariables()->m_currentTime > getVariables()->m_nopTimeout )
+    {
+        goToSendNop();
+    }
+}
 
-void ApcStateMachine::States::goToClosed() {}
+void ApcStateMachine::States::goToClosed()
+{
+    m_current_state = &States::doClosed;
+    getActions()->notifyProxyUnavailable();
+}
 
-void ApcStateMachine::States::doClosed() {}
+void ApcStateMachine::States::doClosed() { goToFinish(); }
 
-void ApcStateMachine::States::goToLinkStatus() {}
+void ApcStateMachine::States::goToLinkStatus()
+{
+    m_current_state = &States::doLinkStatus;
+    getActions()->notifyLinkStatus( getVariables()->m_linkMsg );
+    getVariables()->m_nopTimeout = getVariables()->m_currentTime + 10;
+    getVariables()->m_linkStatusMsg = false;
+}
 
-void ApcStateMachine::States::doLinkStatus() {}
+void ApcStateMachine::States::doLinkStatus() { goToWaiting(); }
 
-void ApcStateMachine::States::goToReceiveMsg() {}
+void ApcStateMachine::States::goToReceiveMsg()
+{
+    getActions()->processMsg( getVariables()->m_apsMsg );
+    getVariables()->m_apsMsgIn = false;
+}
 
-void ApcStateMachine::States::doReceiveMsg() {}
+void ApcStateMachine::States::doReceiveMsg() { goToWaiting(); }
 
-void ApcStateMachine::States::goToSendMsg() {}
+void ApcStateMachine::States::goToSendMsg()
+{
+    getActions()->sendMsgToAps( getVariables()->m_apcMsg );
+    getVariables()->m_nopTimeout = getVariables()->m_currentTime + 10;
+    getVariables()->m_apcMsgOut = false;
+}
 
-void ApcStateMachine::States::doSendMsg() {}
+void ApcStateMachine::States::doSendMsg() { goToWaiting(); }
 
-void ApcStateMachine::States::goToEntityIdAssigned() {}
+void ApcStateMachine::States::goToEntityIdAssigned()
+{
+    getVariables()->m_entityId = getVariables()->m_newId;
+    getActions()->notifyNewEntityId( getVariables()->m_newId );
+    getActions()->notifyProxyAvailable();
+    getVariables()->m_nopTimeout = getVariables()->m_currentTime + 10;
+    getVariables()->m_idAssigned = false;
+}
 
-void ApcStateMachine::States::doEntityIdAssigned() {}
+void ApcStateMachine::States::doEntityIdAssigned() { goToWaiting(); }
 
-void ApcStateMachine::States::goToSendNop() {}
+void ApcStateMachine::States::goToSendNop()
+{
+    getActions()->sendNopToAps();
+    getVariables()->m_nopTimeout = getVariables()->m_currentTime + 10;
+}
 
-void ApcStateMachine::States::doSendNop() {}
+void ApcStateMachine::States::doSendNop() { goToWaiting(); }
 
-void ApcStateMachine::States::goToFinish() {}
+void ApcStateMachine::States::goToFinish()
+{
+    m_current_state = &States::doFinish;
+    getActions()->closeTcpConnection();
+}
 
-void ApcStateMachine::States::doFinish() {}
+void ApcStateMachine::States::doFinish() { m_current_state = 0; }
 
 void ApcStateMachine::StateActions::closeTcpConnection() {}
 
@@ -167,14 +252,12 @@ bool ApcStateMachine::StateActions::getHttpResponse() {}
 
 void ApcStateMachine::StateActions::initialize() {}
 
-void ApcStateMachine::StateActions::notifyLinkStatus(
-    const jdksavdecc_appdu &linkMsg )
+void
+    ApcStateMachine::StateActions::notifyLinkStatus( const AppMessage &linkMsg )
 {
 }
 
-void ApcStateMachine::StateActions::processMsg( const jdksavdecc_appdu &apsMsg )
-{
-}
+void ApcStateMachine::StateActions::processMsg( const AppMessage &apsMsg ) {}
 
 void ApcStateMachine::StateActions::sendIdRequest( const Eui48 &primaryMac,
                                                    const Eui64 &entity_id )
@@ -186,10 +269,7 @@ void
 {
 }
 
-void ApcStateMachine::StateActions::sendMsgToAps(
-    const jdksavdecc_appdu &apcMsg )
-{
-}
+void ApcStateMachine::StateActions::sendMsgToAps( const AppMessage &apcMsg ) {}
 
 void ApcStateMachine::StateActions::sendNopToAps() {}
 

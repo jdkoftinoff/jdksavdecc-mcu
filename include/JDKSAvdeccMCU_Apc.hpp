@@ -215,6 +215,16 @@ class ApcStateMachine
         virtual bool getHttpResponse();
 
         /**
+         * See IEEE Std 1722.1 Cor1 Annex C
+         */
+        virtual void notifyProxyAvailable();
+
+        /**
+         * See IEEE Std 1722.1 Cor1 Annex C
+         */
+        virtual void notifyProxyUnavailable();
+
+        /**
          * See IEEE Std 1722.1 Annex C.5.3.2.4
          */
         virtual void initialize();
@@ -222,12 +232,12 @@ class ApcStateMachine
         /**
          * See IEEE Std 1722.1 Annex C.5.3.2.5
          */
-        virtual void notifyLinkStatus( jdksavdecc_appdu const &linkMsg );
+        virtual void notifyLinkStatus( AppMessage const &linkMsg );
 
         /**
          * See IEEE Std 1722.1 Annex C.5.3.2.6
          */
-        virtual void processMsg( jdksavdecc_appdu const &apsMsg );
+        virtual void processMsg( AppMessage const &apsMsg );
 
         /**
          * See IEEE Std 1722.1 Annex C.5.3.2.7
@@ -243,7 +253,7 @@ class ApcStateMachine
         /**
          * See IEEE Std 1722.1 Annex C.5.3.2.9
          */
-        virtual void sendMsgToAps( jdksavdecc_appdu const &apcMsg );
+        virtual void sendMsgToAps( AppMessage const &apcMsg );
 
         /**
          * See IEEE Std 1722.1 Annex C.5.3.2.10
