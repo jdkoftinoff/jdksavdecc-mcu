@@ -379,14 +379,14 @@ class ApsStateMachine
         /// The closeTcpConnection() function closes the TCP connection with
         /// the APC and sets the incomingTcpClosed variable to FALSE.
         ///
-        virtual void closeTcpConnection();
+        virtual void closeTcpConnection() = 0;
 
         ///
         /// \brief closeTcpServer
         ///
         /// Close the tcp server
         ///
-        virtual void closeTcpServer();
+        virtual void closeTcpServer() = 0;
 
       protected:
         ///

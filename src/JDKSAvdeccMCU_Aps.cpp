@@ -221,16 +221,26 @@ void ApsStateMachine::StateActions::initialize()
     v->m_tcpConnected = false;
 }
 
-void ApsStateMachine::StateActions::sendHttpResponse( int requestValid ) {}
+void ApsStateMachine::StateActions::sendHttpResponse( int requestValid )
+{
+    // TODO:
+}
 
 void ApsStateMachine::StateActions::sendLinkStatus( Eui48 link_mac,
                                                     bool linkStatus )
 {
+    // TODO:
 }
 
-void ApsStateMachine::StateActions::sendAvdeccToL2( const AppMessage *msg ) {}
+void ApsStateMachine::StateActions::sendAvdeccToL2( const AppMessage *msg )
+{
+    // TODO:
+}
 
-void ApsStateMachine::StateActions::sendAvdeccToApc( const AppMessage *msg ) {}
+void ApsStateMachine::StateActions::sendAvdeccToApc( const AppMessage *msg )
+{
+    // TODO:
+}
 
 void ApsStateMachine::StateActions::sendEntityIdAssignment( Eui48 a,
                                                             Eui64 entity_id )
@@ -239,9 +249,9 @@ void ApsStateMachine::StateActions::sendEntityIdAssignment( Eui48 a,
 
 void ApsStateMachine::StateActions::sendNopToApc() {}
 
-void ApsStateMachine::StateActions::closeTcpConnection() {}
+ApsStateMachine::StateVariables::StateVariables() {}
 
-void ApsStateMachine::StateActions::closeTcpServer() {}
+ApsStateMachine::StateVariables::~StateVariables() {}
 
 void ApsStateMachine::StateVariables::clear()
 {

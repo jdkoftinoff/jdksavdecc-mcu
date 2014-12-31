@@ -208,6 +208,11 @@ void ApcStateMachine::StateEvents::onAppVendor( const AppMessage &msg )
     // Do nothing
 }
 
+void ApcStateMachine::StateActions::clear()
+{
+    // Do nothing
+}
+
 void ApcStateMachine::StateActions::initialize()
 {
     getVariables()->m_apcMsgOut = false;
@@ -258,6 +263,11 @@ void ApcStateMachine::StateActions::sendNopToAps()
     sendMsgToAps( msg );
 }
 
+ApcStateMachine::StateVariables::~StateVariables()
+{
+    // Do nothing
+}
+
 void ApcStateMachine::StateVariables::clear()
 {
     m_addr.clear();
@@ -280,6 +290,8 @@ void ApcStateMachine::StateVariables::clear()
     m_responseValid = false;
     m_tcpConnected = false;
 }
+
+void ApcStateMachine::States::clear() { m_current_state = &States::doBegin; }
 
 bool ApcStateMachine::States::run()
 {

@@ -289,7 +289,7 @@ class HttpServerParser
     HttpServerHandler *m_handler;
 };
 
-class HttpServerParserSimple : protected HttpServerParser
+class HttpServerParserSimple : public HttpServerParser
 {
   public:
     HttpServerParserSimple( HttpRequest *request, HttpServerHandler *handler )
@@ -336,7 +336,7 @@ class HttpClientParser
     HttpClientHandler *m_handler;
 };
 
-class HttpClientParserSimple : protected HttpClientParser
+class HttpClientParserSimple : public HttpClientParser
 {
   public:
     HttpClientParserSimple( HttpResponse *response, HttpClientHandler *handler )
