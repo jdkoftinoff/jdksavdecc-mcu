@@ -73,7 +73,12 @@ class ApcStateMachine
         /**
          * See IEEE 1722.1 Annex C.5.3.1.1
          */
-        HttpRequest m_addr;
+        std::string m_addr;
+
+        /**
+         * See IEEE 1722.1 Cor 1 Annex C
+         */
+        HttpRequest m_request;
 
         /**
          * See IEEE 1722.1 Annex C.5.3.1.2
@@ -146,6 +151,11 @@ class ApcStateMachine
         Eui48 m_primaryMac;
 
         /**
+         * See IEEE 1722.1 Cor 1 Annex C
+         */
+        bool m_responseReceived;
+
+        /**
          * See IEEE 1722.1 Annex C.5.3.1.16
          */
         bool m_responseValid;
@@ -197,7 +207,7 @@ class ApcStateMachine
         /**
          * See IEEE Std 1722.1 Annex C.5.3.2.2
          */
-        virtual void connectToProxy( HttpRequest const &addr );
+        virtual void connectToProxy( std::string const &addr );
 
         /**
          * See IEEE Std 1722.1 Annex C.5.3.2.3

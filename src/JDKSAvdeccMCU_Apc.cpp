@@ -35,6 +35,29 @@
 namespace JDKSAvdeccMCU
 {
 
+void ApcStateMachine::StateVariables::clear()
+{
+    m_addr.clear();
+    m_request.clear();
+    m_apcMsg.clear();
+    m_apcMsgOut = false;
+    m_apsMsg.clear();
+    m_apsMsgIn = false;
+    m_currentTime = 0;
+    m_finished = false;
+    m_entityId = Eui64();
+    m_idAssigned = false;
+    m_incomingTcpClosed = false;
+    m_linkMsg.clear();
+    m_linkStatusMsg = false;
+    m_newId = Eui64();
+    m_nopTimeout = false;
+    m_primaryMac = Eui48();
+    m_responseReceived = false;
+    m_responseValid = false;
+    m_tcpConnected = false;
+}
+
 bool ApcStateMachine::States::run()
 {
     bool r = false;
@@ -61,17 +84,42 @@ bool ApcStateMachine::States::run()
     return r;
 }
 
-void ApcStateMachine::States::doBegin() {}
+void ApcStateMachine::States::doBegin() { goToInitialize(); }
 
-void ApcStateMachine::States::goToInitialize() {}
+void ApcStateMachine::States::goToInitialize()
+{
+    m_current_state = &States::doInitialize;
+    getActions()->initialize();
+    getActions()->connectToProxy( getVariables()->m_addr );
+}
 
-void ApcStateMachine::States::doInitialize() {}
+void ApcStateMachine::States::doInitialize() { goToWaitForConnect(); }
 
-void ApcStateMachine::States::goToWaitForConnect() {}
+void ApcStateMachine::States::goToWaitForConnect()
+{
+    m_current_state = &States::doWaitForConnect;
+}
 
-void ApcStateMachine::States::doWaitForConnect() {}
+void ApcStateMachine::States::doWaitForConnect()
+{
+    if ( getVariables()->m_finished )
+    {
+        goToFinish();
+    }
+    else if ( getVariables()->m_tcpConnected )
+    {
+        goToConnected();
+    }
+}
 
-void ApcStateMachine::States::goToConnected() {}
+void ApcStateMachine::States::goToConnected()
+{
+    m_current_state = &States::doConnected;
+
+    getVariables()->m_responseValid = false;
+    getVariables()->m_responseReceived = false;
+    getActions()->sendHttpRequest( getVariables()->m_request );
+}
 
 void ApcStateMachine::States::doConnected() {}
 
@@ -113,7 +161,7 @@ void ApcStateMachine::States::doFinish() {}
 
 void ApcStateMachine::StateActions::closeTcpConnection() {}
 
-void ApcStateMachine::StateActions::connectToProxy( const HttpRequest &addr ) {}
+void ApcStateMachine::StateActions::connectToProxy( const std::string &addr ) {}
 
 bool ApcStateMachine::StateActions::getHttpResponse() {}
 
