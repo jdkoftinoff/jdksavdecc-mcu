@@ -95,6 +95,7 @@ void ApsStateMachine::StateEvents::sendTcpData( const uint8_t *data,
 
 void ApsStateMachine::StateEvents::onIncomingTcpConnection()
 {
+    getVariables()->m_tcpConnected = true;
     m_in_http = true;
     m_http_parser->clear();
 }
@@ -103,6 +104,10 @@ ssize_t ApsStateMachine::StateEvents::onIncomingTcpData( const uint8_t *data,
                                                          ssize_t len )
 {
     ssize_t r = -1;
+    if ( len > 0 )
+    {
+        getVariables()->m_tcpConnected = true;
+    }
     if ( m_in_http )
     {
         r = onIncomingTcpHttpData( data, len );
@@ -110,6 +115,8 @@ ssize_t ApsStateMachine::StateEvents::onIncomingTcpData( const uint8_t *data,
         // If the http request was accepted
         if ( r >= 0 && r < len && m_in_http == false )
         {
+            // and if there was additional data in the payload, then parse it
+            // as APP message data
             ssize_t r1 = onIncomingTcpAppData( data + r, len - r );
             if ( r1 > 0 )
             {
@@ -249,7 +256,7 @@ void ApsStateMachine::StateActions::initialize()
 
 void ApsStateMachine::StateActions::sendHttpResponse( int requestValid )
 {
-    char buf[16];
+    char statusbuf[16];
     HttpResponse response;
 
     if ( requestValid < 0 )
@@ -257,10 +264,15 @@ void ApsStateMachine::StateActions::sendHttpResponse( int requestValid )
         requestValid = 404;
         response.m_reason_phrase = "NOT FOUND";
     }
-    sprintf( buf, "%d", requestValid );
+    sprintf( statusbuf, "%d", requestValid );
     response.m_version = "HTTP/1.1";
-    response.m_status_code = buf;
+    response.m_status_code = statusbuf;
     response.m_reason_phrase = "OK";
+
+    std::vector<uint8_t> buf;
+    response.flatten( &buf );
+
+    getEvents()->sendTcpData( buf.data(), buf.size() );
 }
 
 void ApsStateMachine::StateActions::sendMsgToApc( const AppMessage &apsMsg )

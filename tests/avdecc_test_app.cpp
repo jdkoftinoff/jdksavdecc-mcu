@@ -103,7 +103,6 @@ class TestApcStateMachine : public ApcStateMachine
     virtual void connectToProxy( std::string const &addr )
     {
         std::cout << "APC: connectToProxy( " << addr << " )" << std::endl;
-        m_server->getEvents()->onIncomingTcpConnection();
         getEvents()->onIncomingTcpConnection();
     }
 
@@ -380,6 +379,9 @@ int test1()
     aps->getVariables()->m_linkMac
         = Eui48( 0x70, 0xb3, 0xd5, 0xed, 0xcf, 0xf1 );
     aps->getVariables()->m_linkStatus = true;
+
+    aps->run();
+    aps->getEvents()->onIncomingTcpConnection();
 
     tick();
     tick();

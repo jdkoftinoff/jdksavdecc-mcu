@@ -35,6 +35,24 @@
 namespace JDKSAvdeccMCU
 {
 
+static void append_to_vector( std::vector<uint8_t> *dest, std::string const &s )
+{
+    for ( std::string::const_iterator i = s.begin(); i != s.end(); ++i )
+    {
+        dest->push_back( (uint8_t)*i );
+    }
+}
+
+static void append_to_vector( std::vector<uint8_t> *dest,
+                              std::vector<uint8_t> const &b )
+{
+    for ( std::vector<uint8_t>::const_iterator i = b.begin(); i != b.end();
+          ++i )
+    {
+        dest->push_back( *i );
+    }
+}
+
 void HttpRequest::clear()
 {
     m_method.clear();
@@ -158,7 +176,7 @@ void HttpRequest::set( const std::string &method,
     m_content = content;
 }
 
-void HttpRequest::flattenHeaders( std::string *dest ) const
+void HttpRequest::flatten( std::string *dest ) const
 {
     dest->clear();
     dest->append( m_method );
@@ -185,6 +203,30 @@ void HttpResponse::clear()
     m_reason_phrase.clear();
     m_headers.clear();
     m_content.clear();
+}
+
+void HttpResponse::flatten( std::vector<uint8_t> *dest ) const
+{
+    dest->clear();
+    append_to_vector( dest, m_version );
+    dest->push_back( ' ' );
+    append_to_vector( dest, m_status_code );
+    dest->push_back( ' ' );
+    append_to_vector( dest, m_reason_phrase );
+    dest->push_back( '\r' );
+    dest->push_back( '\n' );
+
+    for ( std::vector<std::string>::const_iterator i = m_headers.begin();
+          i != m_headers.end();
+          ++i )
+    {
+        append_to_vector( dest, *i );
+        dest->push_back( '\r' );
+        dest->push_back( '\n' );
+    }
+    dest->push_back( '\r' );
+    dest->push_back( '\n' );
+    append_to_vector( dest, m_content );
 }
 
 void HttpServerParserSimple::clear()
@@ -451,7 +493,7 @@ ssize_t HttpClientParserSimple::onIncomingHttpData( const uint8_t *data,
                     // only append printable chars to the reason phrase
                     m_response->m_reason_phrase.push_back( c );
                 }
-                else
+                else if ( c != '\r' )
                 {
                     // any non-printing char is an error here
                     stop = true;

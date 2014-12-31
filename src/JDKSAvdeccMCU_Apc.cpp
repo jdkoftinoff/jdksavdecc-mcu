@@ -286,7 +286,7 @@ void
     ApcStateMachine::StateActions::sendHttpRequest( const HttpRequest &request )
 {
     std::string buf;
-    request.flattenHeaders( &buf );
+    request.flatten( &buf );
     getEvents()->sendTcpData( reinterpret_cast<const uint8_t *>( buf.data() ),
                               buf.length() );
 }
