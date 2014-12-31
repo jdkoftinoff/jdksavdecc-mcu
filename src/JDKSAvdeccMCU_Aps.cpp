@@ -73,6 +73,15 @@ void ApsStateMachine::clear()
     m_states->clear();
 }
 
+ApsStateMachine::StateEvents::StateEvents( HttpServerParser *http_parser,
+                                           std::string path )
+    : m_owner( 0 )
+    , m_http_parser( http_parser )
+    , m_path( path )
+    , m_app_parser( *this )
+{
+}
+
 void ApsStateMachine::StateEvents::clear()
 {
     m_in_http = true;
@@ -148,21 +157,32 @@ ssize_t ApsStateMachine::StateEvents::onIncomingTcpAppData( const uint8_t *data,
     return r;
 }
 
-void ApsStateMachine::StateEvents::onTcpConnectionClosed() {}
+void ApsStateMachine::StateEvents::onTcpConnectionClosed()
+{
+    getVariables()->m_incomingTcpClosed = true;
+}
 
 void ApsStateMachine::StateEvents::onNetLinkStatusUpdated( Eui48 link_mac,
                                                            bool link_status )
 {
+    // TODO:
 }
 
 void ApsStateMachine::StateEvents::onNetAvdeccMessageReceived(
     const Frame &frame )
 {
+    // TODO:
 }
 
-void ApsStateMachine::StateEvents::onTimeTick( uint32_t time_in_seconds ) {}
+void ApsStateMachine::StateEvents::onTimeTick( uint32_t time_in_seconds )
+{
+    getVariables()->m_currentTime = time_in_seconds;
+}
 
-void ApsStateMachine::StateEvents::onAppNop( const AppMessage &msg ) {}
+void ApsStateMachine::StateEvents::onAppNop( const AppMessage &msg )
+{
+    // Do nothing
+}
 
 void ApsStateMachine::StateEvents::onAppEntityIdRequest( const AppMessage &msg )
 {
@@ -186,6 +206,20 @@ void ApsStateMachine::StateEvents::onAppAvdeccFromApc( const AppMessage &msg )
 }
 
 void ApsStateMachine::StateEvents::onAppVendor( const AppMessage &msg ) {}
+
+void ApsStateMachine::StateActions::initialize()
+{
+    StateVariables *v = getVariables();
+
+    v->m_apcMsg = false;
+    v->m_assignEntityIdRequest = false;
+    v->m_currentTime = 0;
+    v->m_finished = false;
+    v->m_L2Msg = false;
+    v->m_linkStatus = false;
+    v->m_nopTimeout = 0;
+    v->m_tcpConnected = false;
+}
 
 void ApsStateMachine::StateActions::sendHttpResponse( int requestValid ) {}
 

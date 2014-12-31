@@ -232,6 +232,39 @@ struct AppMessage
         return MessageType( m_appdu.base.message_type );
     }
 
+    Eui64 getEntityIdRequestEntityId() const
+    {
+        Eui64 r;
+        if ( getMessageType() == ENTITY_ID_REQUEST && getPayloadLength() == 8 )
+        {
+            r = Eui64( m_appdu.payload_buffer );
+        }
+        return r;
+    }
+
+    Eui64 getEntityIdResponseEntityId() const
+    {
+        Eui64 r;
+        if ( getMessageType() == ENTITY_ID_RESPONSE && getPayloadLength() == 8 )
+        {
+            r = Eui64( m_appdu.payload_buffer );
+        }
+        return r;
+    }
+
+    bool store( FixedBuffer *dest ) const
+    {
+        ssize_t r;
+        dest->clear();
+        r = jdksavdecc_appdu_write(
+            &m_appdu.base, dest->getBuf(), 0, dest->getMaxLength() );
+        if ( r > 0 )
+        {
+            dest->setLength( uint16_t( r ) );
+        }
+        return r > 0;
+    }
+
     ///
     /// \brief m_appdu
     /// The parsed header and additional payload storage

@@ -158,7 +158,7 @@ void HttpRequest::set( const std::string &method,
     m_content = content;
 }
 
-void HttpRequest::flattenHeaders( std::string *dest )
+void HttpRequest::flattenHeaders( std::string *dest ) const
 {
     dest->clear();
     dest->append( m_method );

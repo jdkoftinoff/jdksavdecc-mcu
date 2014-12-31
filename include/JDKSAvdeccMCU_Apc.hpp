@@ -211,42 +211,42 @@ class ApcStateMachine
         /**
          * See IEEE Std 1722.1 Annex C.5.3.2.1
          */
-        virtual void closeTcpConnection();
+        virtual void closeTcpConnection() = 0;
 
         /**
          * See IEEE Std 1722.1 Annex C.5.3.2.2
          */
-        virtual void connectToProxy( std::string const &addr );
-
-        /**
-         * See IEEE Std 1722.1 Annex C.5.3.2.3
-         */
-        virtual bool getHttpResponse();
+        virtual void connectToProxy( std::string const &addr ) = 0;
 
         /**
          * See IEEE Std 1722.1 Cor1 Annex C
          */
-        virtual void notifyProxyAvailable();
+        virtual void notifyProxyAvailable() = 0;
 
         /**
          * See IEEE Std 1722.1 Cor1 Annex C
          */
-        virtual void notifyProxyUnavailable();
+        virtual void notifyProxyUnavailable() = 0;
+
+        /**
+         * See IEEE Std 1722.1 Annex C.5.3.2.5
+         */
+        virtual void notifyLinkStatus( AppMessage const &linkMsg ) = 0;
+
+        /**
+         * See IEEE Std 1722.1 Annex C.5.3.2.6
+         */
+        virtual void processMsg( AppMessage const &apsMsg ) = 0;
+
+        /**
+         * See IEEE Std 1722.1 Annex C.5.3.2.X
+         */
+        virtual void notifyNewEntityId( Eui64 const &entity_id ) = 0;
 
         /**
          * See IEEE Std 1722.1 Annex C.5.3.2.4
          */
         virtual void initialize();
-
-        /**
-         * See IEEE Std 1722.1 Annex C.5.3.2.5
-         */
-        virtual void notifyLinkStatus( AppMessage const &linkMsg );
-
-        /**
-         * See IEEE Std 1722.1 Annex C.5.3.2.6
-         */
-        virtual void processMsg( AppMessage const &apsMsg );
 
         /**
          * See IEEE Std 1722.1 Annex C.5.3.2.7
@@ -268,11 +268,6 @@ class ApcStateMachine
          * See IEEE Std 1722.1 Annex C.5.3.2.10
          */
         virtual void sendNopToAps();
-
-        /**
-         * See IEEE Std 1722.1 Annex C.5.3.2.X
-         */
-        virtual void notifyNewEntityId( Eui64 const &entity_id );
 
       protected:
         ApcStateMachine *m_owner;

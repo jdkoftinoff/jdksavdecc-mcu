@@ -290,19 +290,7 @@ class ApsStateMachine
         /// * nopTimeout to zero (0)
         /// * tcpConnected to FALSE
         ///
-        virtual void initialize()
-        {
-            StateVariables *v = getVariables();
-
-            v->m_apcMsg = false;
-            v->m_assignEntityIdRequest = false;
-            v->m_currentTime = 0;
-            v->m_finished = false;
-            v->m_L2Msg = false;
-            v->m_linkStatus = false;
-            v->m_nopTimeout = 0;
-            v->m_tcpConnected = false;
-        }
+        virtual void initialize();
 
         ///
         /// \brief sendHttpResponse See Annex C.5.2.2.6
@@ -789,13 +777,7 @@ class ApsStateMachine
     class StateEvents : protected AppMessageHandler, protected HttpServerHandler
     {
       public:
-        StateEvents( HttpServerParser *http_parser, std::string path )
-            : m_owner( 0 )
-            , m_http_parser( http_parser )
-            , m_path( path )
-            , m_app_parser( *this )
-        {
-        }
+        StateEvents( HttpServerParser *http_parser, std::string path );
 
         virtual ~StateEvents() {}
 
@@ -840,6 +822,16 @@ class ApsStateMachine
         /// Clear the events object
         ///
         virtual void clear();
+
+        ///
+        /// \brief sendTcpData
+        ///
+        /// Send data to the TCP socket
+        ///
+        /// \param data
+        /// \param len
+        ///
+        virtual void sendTcpData( uint8_t const *data, ssize_t len ) = 0;
 
         ///
         /// \brief onIncomingTcpConnection
@@ -900,16 +892,6 @@ class ApsStateMachine
         /// \param time_in_seconds
         ///
         virtual void onTimeTick( uint32_t time_in_seconds );
-
-        ///
-        /// \brief sendTcpData
-        ///
-        /// Send data to the TCP socket
-        ///
-        /// \param data
-        /// \param len
-        ///
-        virtual void sendTcpData( uint8_t const *data, ssize_t len ) = 0;
 
       protected:
         ///

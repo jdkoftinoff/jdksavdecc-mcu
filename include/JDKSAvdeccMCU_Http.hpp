@@ -224,7 +224,7 @@ class HttpRequest
     /// \param dest pointer to std::string which will contain the
     /// entire header for the request in one block
     ///
-    virtual void flattenHeaders( std::string *dest );
+    virtual void flattenHeaders( std::string *dest ) const;
 
     std::string m_method;
     std::string m_path;
