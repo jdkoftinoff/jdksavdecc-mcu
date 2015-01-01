@@ -46,15 +46,9 @@ ApsStateMachine::ApsStateMachine( ApsStateMachine::StateVariables *variables,
 {
 }
 
-ApsStateMachine::~ApsStateMachine()
-{
-    m_variables->setOwner( 0 );
-    m_actions->setOwner( 0 );
-    m_events->setOwner( 0 );
-    m_states->setOwner( 0 );
-}
+ApsStateMachine::~ApsStateMachine() {}
 
-void ApsStateMachine::start() { clear(); }
+void ApsStateMachine::setup() { clear(); }
 
 bool ApsStateMachine::run() { return getStates()->run(); }
 

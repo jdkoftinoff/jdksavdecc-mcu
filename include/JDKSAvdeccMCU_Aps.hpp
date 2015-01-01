@@ -1019,9 +1019,13 @@ class ApsStateMachine
     };
 
     StateVariables *getVariables() { return m_variables; }
+    StateVariables const *getVariables() const { return m_variables; }
     StateActions *getActions() { return m_actions; }
+    StateActions const *getActions() const { return m_actions; }
     StateEvents *getEvents() { return m_events; }
+    StateEvents const *getEvents() const { return m_events; }
     States *getStates() { return m_states; }
+    States const *getStates() const { return m_states; }
 
     ApsStateMachine( StateVariables *variables,
                      StateActions *actions,
@@ -1030,11 +1034,19 @@ class ApsStateMachine
 
     virtual ~ApsStateMachine();
 
-    virtual void start();
+    virtual void setup();
 
-    virtual bool run();
+    void setLinkMac( Eui48 mac )
+    {
+        getVariables()->m_linkMac = mac;
+        getVariables()->m_linkStatus = true;
+    }
+
+    Eui48 const &getLinkMac() const { return getVariables()->m_linkMac; }
 
     virtual void clear();
+
+    virtual bool run();
 
     virtual void closeTcpConnection() = 0;
     virtual void closeTcpServer() = 0;

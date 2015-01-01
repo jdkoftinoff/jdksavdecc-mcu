@@ -825,9 +825,13 @@ class ApcStateMachine
     };
 
     StateVariables *getVariables() { return m_variables; }
+    StateVariables const *getVariables() const { return m_variables; }
     StateActions *getActions() { return m_actions; }
+    StateActions const *getActions() const { return m_actions; }
     StateEvents *getEvents() { return m_events; }
+    StateEvents const *getEvents() const { return m_events; }
     States *getStates() { return m_states; }
+    States const *getStates() const { return m_states; }
 
     ApcStateMachine( StateVariables *variables,
                      StateActions *actions,
@@ -836,11 +840,32 @@ class ApcStateMachine
 
     virtual ~ApcStateMachine();
 
-    virtual void start();
+    virtual void setup();
 
-    virtual bool run();
+    void setPrimaryMac( Eui48 mac ) { getVariables()->m_primaryMac = mac; }
+
+    void setEntityId( Eui64 const entity_id )
+    {
+        getVariables()->m_newId = entity_id;
+        getVariables()->m_entityId = entity_id;
+    }
+
+    Eui64 getEntityId() const { return getVariables()->m_newId; }
+
+    void setApsAddress( std::string const &addr )
+    {
+        getVariables()->m_addr = addr;
+    }
+
+    void setPath( std::string const &path )
+    {
+        std::vector<std::string> headers;
+        getVariables()->m_request.setCONNECT( "/", headers );
+    }
 
     virtual void clear();
+
+    virtual bool run();
 
     virtual void closeTcpConnection() = 0;
     virtual void connectToProxy( std::string const &addr ) = 0;

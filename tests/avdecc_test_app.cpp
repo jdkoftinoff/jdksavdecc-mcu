@@ -362,23 +362,15 @@ int test1()
 {
     int r = 255;
 
-    aps->start();
-    apc->start();
+    apc->setup();
 
-    apc->getVariables()->m_primaryMac
-        = Eui48( 0x70, 0xb3, 0xd5, 0xed, 0xcf, 0xf0 );
-    apc->getVariables()->m_entityId
-        = Eui64( 0x70, 0xb3, 0xd5, 0xff, 0xfe, 0xed, 0xcf, 0xf0 );
-    apc->getVariables()->m_addr = "APSADDR";
+    apc->setPrimaryMac( Eui48( 0x70, 0xb3, 0xd5, 0xed, 0xcf, 0xf0 ) );
+    apc->setEntityId( Eui64( 0x70, 0xb3, 0xd5, 0xff, 0xfe, 0xed, 0xcf, 0xf0 ) );
+    apc->setApsAddress( "APSADDR" );
+    apc->setPath( "/" );
 
-    {
-        std::vector<std::string> headers;
-        apc->getVariables()->m_request.setCONNECT( "/", headers );
-    }
-
-    aps->getVariables()->m_linkMac
-        = Eui48( 0x70, 0xb3, 0xd5, 0xed, 0xcf, 0xf1 );
-    aps->getVariables()->m_linkStatus = true;
+    aps->setup();
+    aps->setLinkMac( Eui48( 0x70, 0xb3, 0xd5, 0xed, 0xcf, 0xf1 ) );
 
     aps->run();
     aps->getEvents()->onIncomingTcpConnection();
@@ -407,6 +399,14 @@ int test1()
         formADP( &adp, apc->getVariables()->m_primaryMac, 30 );
         aps->getEvents()->onNetAvdeccMessageReceived( adp );
     }
+
+    tick();
+    tick();
+
+    aps->getEvents()->onNetLinkStatusUpdated( aps->getLinkMac(), false );
+
+    tick();
+    tick();
 
     tick();
     tick();

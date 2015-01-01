@@ -46,15 +46,9 @@ ApcStateMachine::ApcStateMachine( ApcStateMachine::StateVariables *variables,
 {
 }
 
-ApcStateMachine::~ApcStateMachine()
-{
-    m_variables->setOwner( 0 );
-    m_actions->setOwner( 0 );
-    m_events->setOwner( 0 );
-    m_states->setOwner( 0 );
-}
+ApcStateMachine::~ApcStateMachine() {}
 
-void ApcStateMachine::start() { clear(); }
+void ApcStateMachine::setup() { clear(); }
 
 bool ApcStateMachine::run() { return getStates()->run(); }
 
