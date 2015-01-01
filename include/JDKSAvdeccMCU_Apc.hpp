@@ -143,7 +143,7 @@ class ApcStateMachine
         /**
          * See IEEE 1722.1 Annex C.5.3.1.14
          */
-        bool m_nopTimeout;
+        uint32_t m_nopTimeout;
 
         /**
          * See IEEE 1722.1 Annex C.5.3.1.15
