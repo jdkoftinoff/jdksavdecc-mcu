@@ -46,7 +46,7 @@ if (${CXX11} MATCHES "ON")
 
         set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libc++")
     elseif(${CMAKE_MAKE_PROGRAM} MATCHES "(msdev|devenv|nmake|MSBuild)")
-        add_definitions("/W3")
+        add_definitions("/W2")
     else ()
         message(FATAL_ERROR "Your C++ compiler does not support C++11.")
     endif ()
@@ -63,11 +63,8 @@ set(LIBS ${LIBS} ${CHECK_LIBRARIES} ${PROJECT})
 
 include_directories( include  )
 
-set(PROJECT_INCLUDES_GLOBS ${PROJECT_INCLUDES_GLOBS} "include/*.h" "include/*.hpp" "include/*/*.h" "include/*/*.hpp" "include/*/*/*.h" "include/*/*/*.hpp")
-set(PROJECT_SRC_GLOBS ${PROJECT_SRC_GLOBS} "src/*.c" "src/*.cpp" "src/*/*.c" "src/*/*.cpp" "src/*/*/*.c" "src/*/*/*.cpp")
-
-file(GLOB PROJECT_INCLUDES ${PROJECT_INCLUDES_GLOBS} )
-file(GLOB PROJECT_SRC ${PROJECT_SRC_GLOBS} )
+file(GLOB PROJECT_INCLUDES "include/*.h" "include/*.hpp" "include/*/*.h" "include/*/*.hpp" "include/*/*/*.h" "include/*/*/*.hpp")
+file(GLOB PROJECT_SRC "src/*.c" "src/*.cpp" "src/*/*.c" "src/*/*.cpp" "src/*/*/*.c" "src/*/*/*.cpp")
 
 add_library (${PROJECT} ${PROJECT_SRC} ${PROJECT_INCLUDES})
 
