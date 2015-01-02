@@ -2,6 +2,73 @@
 
 using namespace JDKSAvdeccMCU;
 
+void dump( std::ostream &ostr, uint8_t const *buf, uint16_t len )
+{
+    ostr << "Length: " << std::dec << len << std::endl;
+    for ( ssize_t i = 0; i < len; ++i )
+    {
+        ostr << std::hex << ( uint16_t )( buf[i] ) << " ";
+    }
+    ostr << std::dec << std::endl;
+}
+
+void dump( std::ostream &ostr, AppMessage const &msg )
+{
+    ostr << "AppMessage: ";
+    switch ( msg.getMessageType() )
+    {
+    case AppMessage::NOP:
+        ostr << "NOP" << std::endl;
+        break;
+    case AppMessage::AVDECC_FROM_APC:
+        ostr << "AVDECC_FROM_APC" << std::endl;
+        ostr << "Address: " << std::hex << msg.getAddress().convertToUint64()
+             << std::endl;
+        ostr << std::dec;
+        dump( ostr, msg.getPayload(), msg.getPayloadLength() );
+        break;
+    case AppMessage::AVDECC_FROM_APS:
+        ostr << "AVDECC_FROM_APS" << std::endl;
+        ostr << "Address: " << std::hex << msg.getAddress().convertToUint64()
+             << std::endl;
+        ostr << std::dec;
+        dump( ostr, msg.getPayload(), msg.getPayloadLength() );
+        break;
+    case AppMessage::ENTITY_ID_REQUEST:
+        ostr << "ENTITY_ID_REQUEST" << std::endl;
+        ostr << "Address: " << std::hex << msg.getAddress().convertToUint64()
+             << std::endl;
+        ostr << "EntityID: " << std::hex
+             << msg.getEntityIdRequestEntityId().convertToUint64() << std::endl;
+        ostr << std::dec;
+        break;
+    case AppMessage::ENTITY_ID_RESPONSE:
+        ostr << "ENTITY_ID_RESPONSE" << std::endl;
+        ostr << "Address: " << std::hex << msg.getAddress().convertToUint64()
+             << std::endl;
+        ostr << "EntityID: " << std::hex
+             << msg.getEntityIdResponseEntityId().convertToUint64()
+             << std::endl;
+        ostr << std::dec;
+        break;
+    case AppMessage::LINK_UP:
+        ostr << "LINK_UP" << std::endl;
+        ostr << "Address: " << std::hex << msg.getAddress().convertToUint64()
+             << std::endl;
+        break;
+    case AppMessage::LINK_DOWN:
+        ostr << "LINK_DOWN" << std::endl;
+        ostr << "Address: " << std::hex << msg.getAddress().convertToUint64()
+             << std::endl;
+        break;
+    case AppMessage::VENDOR:
+        ostr << "VENDOR" << std::endl;
+        ostr << "vendor message: " << std::hex
+             << msg.getAddress().convertToUint64() << std::endl;
+        break;
+    }
+}
+
 class TestApcStateMachine;
 class TestApsStateMachine;
 
@@ -128,6 +195,7 @@ class TestApcStateMachine : public ApcStateMachine
     {
         std::cout << "APC: processMsg( " << apsMsg.getMessageType() << " )"
                   << std::endl;
+        dump( std::cout, apsMsg );
     }
 
     virtual void notifyNewEntityId( Eui64 const &entity_id )
@@ -258,6 +326,7 @@ class TestApsStateMachine : public ApsStateMachine
     virtual void sendAvdeccToL2( uint8_t const *data, ssize_t len )
     {
         std::cout << "APS: sendAvdeccToL2( " << len << " )" << std::endl;
+        dump( std::cout, data, uint16_t( len ) );
     }
 
     virtual void closeTcpConnection()
@@ -299,9 +368,10 @@ uint32_t time_in_seconds = 0;
 
 void tick()
 {
-    std::cout << "tick()" << std::endl;
-
     ++time_in_seconds;
+
+    std::cout << "tick( " << std::dec << time_in_seconds << " )" << std::endl;
+
     aps->getEvents()->onTimeTick( time_in_seconds );
     apc->getEvents()->onTimeTick( time_in_seconds );
     aps->run();
@@ -373,7 +443,7 @@ int test1()
     aps->setLinkMac( Eui48( 0x70, 0xb3, 0xd5, 0xed, 0xcf, 0xf1 ) );
 
     aps->run();
-    aps->getEvents()->onIncomingTcpConnection();
+    aps->onIncomingTcpConnection();
 
     tick();
     tick();
@@ -388,7 +458,7 @@ int test1()
         FrameWithMTU adp;
         formADP( &adp, apc->getVariables()->m_primaryMac, 30 );
 
-        apc->getEvents()->onNetAvdeccMessageReceived( adp );
+        apc->onNetAvdeccMessageReceived( adp );
     }
 
     tick();
@@ -397,13 +467,21 @@ int test1()
     {
         FrameWithMTU adp;
         formADP( &adp, apc->getVariables()->m_primaryMac, 30 );
-        aps->getEvents()->onNetAvdeccMessageReceived( adp );
+        aps->onNetAvdeccMessageReceived( adp );
     }
 
     tick();
     tick();
+    tick();
+    tick();
+    tick();
+    tick();
+    tick();
+    tick();
+    tick();
+    tick();
 
-    aps->getEvents()->onNetLinkStatusUpdated( aps->getLinkMac(), false );
+    aps->onNetLinkStatusUpdated( aps->getLinkMac(), true );
 
     tick();
     tick();
@@ -412,6 +490,9 @@ int test1()
     tick();
 
     apc->closeTcpConnection();
+
+    tick();
+    tick();
 
     return r;
 }
