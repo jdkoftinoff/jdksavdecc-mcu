@@ -164,23 +164,27 @@ class TestApcStateMachine : public ApcStateMachine
     virtual void closeTcpConnection()
     {
         std::cout << "APC: closeTCPConnection()" << std::endl;
+        ApcStateMachine::closeTcpConnection();
         m_server->getEvents()->onTcpConnectionClosed();
     }
 
     virtual void connectToProxy( std::string const &addr )
     {
         std::cout << "APC: connectToProxy( " << addr << " )" << std::endl;
+        ApcStateMachine::connectToProxy( addr );
         getEvents()->onIncomingTcpConnection();
     }
 
     virtual void notifyProxyAvailable()
     {
         std::cout << "APC: notifyProxyAvailable()" << std::endl;
+        ApcStateMachine::notifyProxyAvailable();
     }
 
     virtual void notifyProxyUnavailable()
     {
         std::cout << "APC: notifyProxyUnavailable()" << std::endl;
+        ApcStateMachine::notifyProxyUnavailable();
     }
 
     virtual void notifyLinkStatus( AppMessage const &linkMsg )
@@ -189,6 +193,7 @@ class TestApcStateMachine : public ApcStateMachine
                   << linkMsg.getAddress().convertToUint64() << " "
                   << ( linkMsg.getMessageType() == AppMessage::LINK_UP ? 1 : 0 )
                   << " )" << std::endl;
+        ApcStateMachine::notifyLinkStatus( linkMsg );
     }
 
     virtual void processMsg( AppMessage const &apsMsg )
@@ -196,17 +201,20 @@ class TestApcStateMachine : public ApcStateMachine
         std::cout << "APC: processMsg( " << apsMsg.getMessageType() << " )"
                   << std::endl;
         dump( std::cout, apsMsg );
+        ApcStateMachine::processMsg( apsMsg );
     }
 
     virtual void notifyNewEntityId( Eui64 const &entity_id )
     {
         std::cout << "APC: notifyNewEntityId( " << std::hex
                   << entity_id.convertToUint64() << " )" << std::endl;
+        ApcStateMachine::notifyNewEntityId( entity_id );
     }
 
     virtual void sendTcpData( uint8_t const *data, ssize_t len )
     {
         std::cout << "APC: sendTcpData( " << len << " )" << std::endl;
+        ApcStateMachine::sendTcpData( data, len );
 
         m_server->getEvents()->onIncomingTcpData( data, len );
     }
@@ -313,12 +321,14 @@ class TestApsStateMachine : public ApsStateMachine
         }
     };
 
-    TestApsStateMachine( uint16_t &assigned_id_count )
+    TestApsStateMachine( uint16_t &assigned_id_count,
+                         active_connections_type &active_connections )
         : ApsStateMachine( &m_test_variables,
                            &m_test_actions,
                            &m_test_events,
                            &m_test_states,
-                           assigned_id_count )
+                           assigned_id_count,
+                           active_connections )
         , m_test_events( &m_http_server_parser, "/" )
         , m_http_server_parser( &m_http_server_request, &m_test_events )
     {
@@ -334,7 +344,7 @@ class TestApsStateMachine : public ApsStateMachine
     {
         std::cout << "APS: closeTcpConnection( "
                   << " )" << std::endl;
-
+        ApsStateMachine::closeTcpConnection();
         m_client->getEvents()->onTcpConnectionClosed();
     }
 
@@ -342,12 +352,13 @@ class TestApsStateMachine : public ApsStateMachine
     {
         std::cout << "APS: closeTcpServer( "
                   << " )" << std::endl;
+        ApsStateMachine::closeTcpServer();
     }
 
     virtual void sendTcpData( uint8_t const *data, ssize_t len )
     {
         std::cout << "APS: sendTcpData( " << len << " )" << std::endl;
-
+        ApsStateMachine::sendTcpData( data, len );
         m_client->getEvents()->onIncomingTcpData( data, len );
     }
 
@@ -517,7 +528,9 @@ int main()
 
     {
         uint16_t assigned_id_count = 0;
-        TestApsStateMachine my_aps( assigned_id_count );
+        TestApsStateMachine::active_connections_type active_connections;
+
+        TestApsStateMachine my_aps( assigned_id_count, active_connections );
         TestApcStateMachine my_apc;
         my_aps.m_client = &my_apc;
         my_apc.m_server = &my_aps;

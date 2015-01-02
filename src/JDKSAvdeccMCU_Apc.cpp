@@ -74,6 +74,22 @@ void ApcStateMachine::setPath( const std::string &path )
 
 bool ApcStateMachine::run() { return getStates()->run(); }
 
+void ApcStateMachine::closeTcpConnection() {}
+
+void ApcStateMachine::connectToProxy( const std::string &addr ) {}
+
+void ApcStateMachine::notifyProxyAvailable() {}
+
+void ApcStateMachine::notifyProxyUnavailable() {}
+
+void ApcStateMachine::notifyLinkStatus( const AppMessage &linkMsg ) {}
+
+void ApcStateMachine::processMsg( const AppMessage &apsMsg ) {}
+
+void ApcStateMachine::notifyNewEntityId( const Eui64 &entity_id ) {}
+
+void ApcStateMachine::sendTcpData( const uint8_t *data, ssize_t len ) {}
+
 void ApcStateMachine::onNetAvdeccMessageReceived( const Frame &frame )
 {
     getEvents()->onNetAvdeccMessageReceived( frame );

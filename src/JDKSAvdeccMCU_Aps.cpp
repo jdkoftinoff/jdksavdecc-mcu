@@ -39,12 +39,14 @@ ApsStateMachine::ApsStateMachine( ApsStateMachine::StateVariables *variables,
                                   ApsStateMachine::StateActions *actions,
                                   ApsStateMachine::StateEvents *events,
                                   ApsStateMachine::States *states,
-                                  uint16_t &active_entity_id_count )
+                                  uint16_t &active_entity_id_count,
+                                  active_connections_type &active_connections )
     : m_variables( variables )
     , m_actions( actions )
     , m_events( events )
     , m_states( states )
     , m_active_entity_id_count( active_entity_id_count )
+    , m_active_connections( active_connections )
 {
 }
 
@@ -65,6 +67,17 @@ void ApsStateMachine::onIncomingTcpConnection()
     getEvents()->onIncomingTcpConnection();
 }
 
+void ApsStateMachine::closeTcpConnection()
+{
+    m_active_connections.erase( m_assigned_count );
+}
+
+void ApsStateMachine::closeTcpServer() {}
+
+void ApsStateMachine::sendTcpData( const uint8_t *data, ssize_t len ) {}
+
+void ApsStateMachine::sendAvdeccToL2( const uint8_t *data, ssize_t len ) {}
+
 void ApsStateMachine::onNetAvdeccMessageReceived( const Frame &frame )
 {
     getEvents()->onNetAvdeccMessageReceived( frame );
@@ -79,7 +92,18 @@ Eui64 ApsStateMachine::assignEntityId( Eui48 server_link_mac,
                                        Eui48 apc_link_mac,
                                        Eui64 requested_entity_id )
 {
+    // increase our count of assigned entity_id's
     ++m_active_entity_id_count;
+
+    // loop and increment while this count still active
+    while ( m_active_connections.count( m_active_entity_id_count ) > 0 )
+    {
+        ++m_active_entity_id_count;
+    }
+
+    m_assigned_count = m_active_entity_id_count;
+    m_active_connections.insert( m_assigned_count );
+
     Eui64 r;
     r.value[0] = server_link_mac.value[0];
     r.value[1] = server_link_mac.value[1];

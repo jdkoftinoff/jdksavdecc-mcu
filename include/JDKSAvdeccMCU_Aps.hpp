@@ -1018,11 +1018,14 @@ class ApsStateMachine
         AppMessageParser m_app_parser;
     };
 
+    typedef std::set<uint16_t> active_connections_type;
+
     ApsStateMachine( StateVariables *variables,
                      StateActions *actions,
                      StateEvents *events,
                      States *states,
-                     uint16_t &active_entity_id_count );
+                     uint16_t &active_entity_id_count,
+                     active_connections_type &active_connections );
 
     virtual ~ApsStateMachine();
 
@@ -1033,10 +1036,10 @@ class ApsStateMachine
     Eui48 const &getLinkMac() const { return getVariables()->m_linkMac; }
     virtual bool run();
     virtual void onIncomingTcpConnection();
-    virtual void closeTcpConnection() = 0;
-    virtual void closeTcpServer() = 0;
-    virtual void sendTcpData( uint8_t const *data, ssize_t len ) = 0;
-    virtual void sendAvdeccToL2( uint8_t const *data, ssize_t len ) = 0;
+    virtual void closeTcpConnection();
+    virtual void closeTcpServer();
+    virtual void sendTcpData( uint8_t const *data, ssize_t len );
+    virtual void sendAvdeccToL2( uint8_t const *data, ssize_t len );
     virtual void onNetAvdeccMessageReceived( Frame const &frame );
     virtual void onNetLinkStatusUpdated( Eui48 link_mac, bool link_status );
     virtual Eui64 assignEntityId( Eui48 server_link_mac,
@@ -1057,6 +1060,8 @@ class ApsStateMachine
     StateActions *m_actions;
     StateEvents *m_events;
     States *m_states;
+    uint16_t m_assigned_count;
     uint16_t &m_active_entity_id_count;
+    active_connections_type &m_active_connections;
 };
 }

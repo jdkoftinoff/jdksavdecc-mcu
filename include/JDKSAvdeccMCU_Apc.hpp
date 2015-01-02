@@ -842,14 +842,14 @@ class ApcStateMachine
 
     virtual bool run();
 
-    virtual void closeTcpConnection() = 0;
-    virtual void connectToProxy( std::string const &addr ) = 0;
-    virtual void notifyProxyAvailable() = 0;
-    virtual void notifyProxyUnavailable() = 0;
-    virtual void notifyLinkStatus( AppMessage const &linkMsg ) = 0;
-    virtual void processMsg( AppMessage const &apsMsg ) = 0;
-    virtual void notifyNewEntityId( Eui64 const &entity_id ) = 0;
-    virtual void sendTcpData( uint8_t const *data, ssize_t len ) = 0;
+    virtual void closeTcpConnection();
+    virtual void connectToProxy( std::string const &addr );
+    virtual void notifyProxyAvailable();
+    virtual void notifyProxyUnavailable();
+    virtual void notifyLinkStatus( AppMessage const &linkMsg );
+    virtual void processMsg( AppMessage const &apsMsg );
+    virtual void notifyNewEntityId( Eui64 const &entity_id );
+    virtual void sendTcpData( uint8_t const *data, ssize_t len );
     virtual void onNetAvdeccMessageReceived( Frame const &frame );
 
     StateVariables *getVariables() { return m_variables; }
