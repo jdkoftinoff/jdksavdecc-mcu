@@ -162,6 +162,7 @@ inline jdksavdecc_timestamp_in_milliseconds getTimeInMilliseconds()
 }
 #elif defined( __APPLE__ ) || defined( __linux__ )
 #include <vector>
+#include <set>
 #include <memory>
 #include <sys/time.h>
 #include <iostream>

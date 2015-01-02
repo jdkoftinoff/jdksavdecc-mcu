@@ -50,7 +50,34 @@ ApcStateMachine::~ApcStateMachine() {}
 
 void ApcStateMachine::setup() { clear(); }
 
+void ApcStateMachine::setPrimaryMac( Eui48 mac )
+{
+    getVariables()->m_primaryMac = mac;
+}
+
+void ApcStateMachine::setEntityId( const Eui64 entity_id )
+{
+    getVariables()->m_newId = entity_id;
+    getVariables()->m_entityId = entity_id;
+}
+
+void ApcStateMachine::setApsAddress( const std::string &addr )
+{
+    getVariables()->m_addr = addr;
+}
+
+void ApcStateMachine::setPath( const std::string &path )
+{
+    std::vector<std::string> headers;
+    getVariables()->m_request.setCONNECT( "/", headers );
+}
+
 bool ApcStateMachine::run() { return getStates()->run(); }
+
+void ApcStateMachine::onNetAvdeccMessageReceived( const Frame &frame )
+{
+    getEvents()->onNetAvdeccMessageReceived( frame );
+}
 
 void ApcStateMachine::clear()
 {

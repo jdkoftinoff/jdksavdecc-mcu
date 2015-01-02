@@ -824,15 +824,6 @@ class ApcStateMachine
         AppMessageParser m_app_parser;
     };
 
-    StateVariables *getVariables() { return m_variables; }
-    StateVariables const *getVariables() const { return m_variables; }
-    StateActions *getActions() { return m_actions; }
-    StateActions const *getActions() const { return m_actions; }
-    StateEvents *getEvents() { return m_events; }
-    StateEvents const *getEvents() const { return m_events; }
-    States *getStates() { return m_states; }
-    States const *getStates() const { return m_states; }
-
     ApcStateMachine( StateVariables *variables,
                      StateActions *actions,
                      StateEvents *events,
@@ -841,29 +832,13 @@ class ApcStateMachine
     virtual ~ApcStateMachine();
 
     virtual void setup();
-
-    void setPrimaryMac( Eui48 mac ) { getVariables()->m_primaryMac = mac; }
-
-    void setEntityId( Eui64 const entity_id )
-    {
-        getVariables()->m_newId = entity_id;
-        getVariables()->m_entityId = entity_id;
-    }
-
-    Eui64 getEntityId() const { return getVariables()->m_newId; }
-
-    void setApsAddress( std::string const &addr )
-    {
-        getVariables()->m_addr = addr;
-    }
-
-    void setPath( std::string const &path )
-    {
-        std::vector<std::string> headers;
-        getVariables()->m_request.setCONNECT( "/", headers );
-    }
-
     virtual void clear();
+
+    void setPrimaryMac( Eui48 mac );
+    void setEntityId( Eui64 const entity_id );
+    Eui64 getEntityId() const { return getVariables()->m_newId; }
+    void setApsAddress( std::string const &addr );
+    void setPath( std::string const &path );
 
     virtual bool run();
 
@@ -875,10 +850,16 @@ class ApcStateMachine
     virtual void processMsg( AppMessage const &apsMsg ) = 0;
     virtual void notifyNewEntityId( Eui64 const &entity_id ) = 0;
     virtual void sendTcpData( uint8_t const *data, ssize_t len ) = 0;
-    virtual void onNetAvdeccMessageReceived( Frame const &frame )
-    {
-        getEvents()->onNetAvdeccMessageReceived( frame );
-    }
+    virtual void onNetAvdeccMessageReceived( Frame const &frame );
+
+    StateVariables *getVariables() { return m_variables; }
+    StateVariables const *getVariables() const { return m_variables; }
+    StateActions *getActions() { return m_actions; }
+    StateActions const *getActions() const { return m_actions; }
+    StateEvents *getEvents() { return m_events; }
+    StateEvents const *getEvents() const { return m_events; }
+    States *getStates() { return m_states; }
+    States const *getStates() const { return m_states; }
 
   protected:
     StateVariables *m_variables;

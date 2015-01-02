@@ -313,11 +313,12 @@ class TestApsStateMachine : public ApsStateMachine
         }
     };
 
-    TestApsStateMachine()
+    TestApsStateMachine( uint16_t &assigned_id_count )
         : ApsStateMachine( &m_test_variables,
                            &m_test_actions,
                            &m_test_events,
-                           &m_test_states )
+                           &m_test_states,
+                           assigned_id_count )
         , m_test_events( &m_http_server_parser, "/" )
         , m_http_server_parser( &m_http_server_request, &m_test_events )
     {
@@ -502,7 +503,8 @@ int main()
     int r = 255;
 
     {
-        TestApsStateMachine my_aps;
+        uint16_t assigned_id_count = 0;
+        TestApsStateMachine my_aps( assigned_id_count );
         TestApcStateMachine my_apc;
         my_aps.m_client = &my_apc;
         my_apc.m_server = &my_aps;

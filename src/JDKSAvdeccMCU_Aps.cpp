@@ -38,11 +38,13 @@ namespace JDKSAvdeccMCU
 ApsStateMachine::ApsStateMachine( ApsStateMachine::StateVariables *variables,
                                   ApsStateMachine::StateActions *actions,
                                   ApsStateMachine::StateEvents *events,
-                                  ApsStateMachine::States *states )
+                                  ApsStateMachine::States *states,
+                                  uint16_t &active_entity_id_count )
     : m_variables( variables )
     , m_actions( actions )
     , m_events( events )
     , m_states( states )
+    , m_active_entity_id_count( active_entity_id_count )
 {
 }
 
@@ -50,7 +52,45 @@ ApsStateMachine::~ApsStateMachine() {}
 
 void ApsStateMachine::setup() { clear(); }
 
+void ApsStateMachine::setLinkMac( Eui48 mac )
+{
+    getVariables()->m_linkMac = mac;
+    getVariables()->m_linkStatus = true;
+}
+
 bool ApsStateMachine::run() { return getStates()->run(); }
+
+void ApsStateMachine::onIncomingTcpConnection()
+{
+    getEvents()->onIncomingTcpConnection();
+}
+
+void ApsStateMachine::onNetAvdeccMessageReceived( const Frame &frame )
+{
+    getEvents()->onNetAvdeccMessageReceived( frame );
+}
+
+void ApsStateMachine::onNetLinkStatusUpdated( Eui48 link_mac, bool link_status )
+{
+    getEvents()->onNetLinkStatusUpdated( link_mac, link_status );
+}
+
+Eui64 ApsStateMachine::assignEntityId( Eui48 server_link_mac,
+                                       Eui48 apc_link_mac,
+                                       Eui64 requested_entity_id )
+{
+    ++m_active_entity_id_count;
+    Eui64 r;
+    r.value[0] = server_link_mac.value[0];
+    r.value[1] = server_link_mac.value[1];
+    r.value[2] = server_link_mac.value[2];
+    r.value[3] = uint8_t( ( m_active_entity_id_count >> 8 ) & 0xff );
+    r.value[4] = uint8_t( ( m_active_entity_id_count >> 0 ) & 0xff );
+    r.value[5] = server_link_mac.value[3];
+    r.value[6] = server_link_mac.value[4];
+    r.value[7] = server_link_mac.value[5];
+    return r;
+}
 
 void ApsStateMachine::clear()
 {
@@ -200,6 +240,8 @@ void ApsStateMachine::StateEvents::onAppEntityIdRequest( const AppMessage &msg )
 {
     getVariables()->m_entity_id = msg.getEntityIdRequestEntityId();
     getVariables()->m_assignEntityIdRequest = true;
+
+    // TODO: assign proper entity_id
 }
 
 void
@@ -308,7 +350,9 @@ void ApsStateMachine::StateActions::sendEntityIdAssignment( Eui48 a,
                                                             Eui64 entity_id )
 {
     AppMessage msg;
-    msg.setEntityIdResponse( a, entity_id );
+    msg.setEntityIdResponse(
+        a,
+        getOwner()->assignEntityId( getVariables()->m_linkMac, a, entity_id ) );
     sendMsgToApc( msg );
 }
 

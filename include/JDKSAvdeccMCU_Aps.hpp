@@ -1018,6 +1018,31 @@ class ApsStateMachine
         AppMessageParser m_app_parser;
     };
 
+    ApsStateMachine( StateVariables *variables,
+                     StateActions *actions,
+                     StateEvents *events,
+                     States *states,
+                     uint16_t &active_entity_id_count );
+
+    virtual ~ApsStateMachine();
+
+    virtual void clear();
+    virtual void setup();
+
+    void setLinkMac( Eui48 mac );
+    Eui48 const &getLinkMac() const { return getVariables()->m_linkMac; }
+    virtual bool run();
+    virtual void onIncomingTcpConnection();
+    virtual void closeTcpConnection() = 0;
+    virtual void closeTcpServer() = 0;
+    virtual void sendTcpData( uint8_t const *data, ssize_t len ) = 0;
+    virtual void sendAvdeccToL2( uint8_t const *data, ssize_t len ) = 0;
+    virtual void onNetAvdeccMessageReceived( Frame const &frame );
+    virtual void onNetLinkStatusUpdated( Eui48 link_mac, bool link_status );
+    virtual Eui64 assignEntityId( Eui48 server_link_mac,
+                                  Eui48 apc_link_mac,
+                                  Eui64 requested_entity_id );
+
     StateVariables *getVariables() { return m_variables; }
     StateVariables const *getVariables() const { return m_variables; }
     StateActions *getActions() { return m_actions; }
@@ -1027,51 +1052,11 @@ class ApsStateMachine
     States *getStates() { return m_states; }
     States const *getStates() const { return m_states; }
 
-    ApsStateMachine( StateVariables *variables,
-                     StateActions *actions,
-                     StateEvents *events,
-                     States *states );
-
-    virtual ~ApsStateMachine();
-
-    virtual void setup();
-
-    void setLinkMac( Eui48 mac )
-    {
-        getVariables()->m_linkMac = mac;
-        getVariables()->m_linkStatus = true;
-    }
-
-    Eui48 const &getLinkMac() const { return getVariables()->m_linkMac; }
-
-    virtual void clear();
-
-    virtual bool run();
-
-    virtual void onIncomingTcpConnection()
-    {
-        getEvents()->onIncomingTcpConnection();
-    }
-
-    virtual void closeTcpConnection() = 0;
-    virtual void closeTcpServer() = 0;
-    virtual void sendTcpData( uint8_t const *data, ssize_t len ) = 0;
-    virtual void sendAvdeccToL2( uint8_t const *data, ssize_t len ) = 0;
-
-    virtual void onNetAvdeccMessageReceived( Frame const &frame )
-    {
-        getEvents()->onNetAvdeccMessageReceived( frame );
-    }
-
-    virtual void onNetLinkStatusUpdated( Eui48 link_mac, bool link_status )
-    {
-        getEvents()->onNetLinkStatusUpdated( link_mac, link_status );
-    }
-
   protected:
     StateVariables *m_variables;
     StateActions *m_actions;
     StateEvents *m_events;
     States *m_states;
+    uint16_t &m_active_entity_id_count;
 };
 }
