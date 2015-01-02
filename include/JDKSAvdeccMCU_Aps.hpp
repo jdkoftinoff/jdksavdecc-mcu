@@ -1048,10 +1048,25 @@ class ApsStateMachine
 
     virtual bool run();
 
+    virtual void onIncomingTcpConnection()
+    {
+        getEvents()->onIncomingTcpConnection();
+    }
+
     virtual void closeTcpConnection() = 0;
     virtual void closeTcpServer() = 0;
     virtual void sendTcpData( uint8_t const *data, ssize_t len ) = 0;
     virtual void sendAvdeccToL2( uint8_t const *data, ssize_t len ) = 0;
+
+    virtual void onNetAvdeccMessageReceived( Frame const &frame )
+    {
+        getEvents()->onNetAvdeccMessageReceived( frame );
+    }
+
+    virtual void onNetLinkStatusUpdated( Eui48 link_mac, bool link_status )
+    {
+        getEvents()->onNetLinkStatusUpdated( link_mac, link_status );
+    }
 
   protected:
     StateVariables *m_variables;

@@ -875,6 +875,10 @@ class ApcStateMachine
     virtual void processMsg( AppMessage const &apsMsg ) = 0;
     virtual void notifyNewEntityId( Eui64 const &entity_id ) = 0;
     virtual void sendTcpData( uint8_t const *data, ssize_t len ) = 0;
+    virtual void onNetAvdeccMessageReceived( Frame const &frame )
+    {
+        getEvents()->onNetAvdeccMessageReceived( frame );
+    }
 
   protected:
     StateVariables *m_variables;
