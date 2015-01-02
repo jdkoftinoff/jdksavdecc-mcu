@@ -67,6 +67,11 @@ void ApsStateMachine::onIncomingTcpConnection()
     getEvents()->onIncomingTcpConnection();
 }
 
+void ApsStateMachine::onTimeTick( uint32_t time_in_seconds )
+{
+    getEvents()->onTimeTick( time_in_seconds );
+}
+
 void ApsStateMachine::closeTcpConnection()
 {
     m_active_connections.erase( m_assigned_count );
@@ -76,7 +81,7 @@ void ApsStateMachine::closeTcpServer() {}
 
 void ApsStateMachine::sendTcpData( const uint8_t *data, ssize_t len ) {}
 
-void ApsStateMachine::sendAvdeccToL2( const uint8_t *data, ssize_t len ) {}
+void ApsStateMachine::sendAvdeccToL2( Frame const &frame ) {}
 
 void ApsStateMachine::onNetAvdeccMessageReceived( const Frame &frame )
 {
@@ -362,7 +367,13 @@ void ApsStateMachine::StateActions::sendLinkStatus( Eui48 link_mac,
 
 void ApsStateMachine::StateActions::sendAvdeccToL2( const AppMessage *msg )
 {
-    getOwner()->sendAvdeccToL2( msg->getPayload(), msg->getPayloadLength() );
+    FrameWithMTU frame( 0,
+                        msg->getAddress(),
+                        getVariables()->m_linkMac,
+                        JDKSAVDECC_AVTP_ETHERTYPE );
+
+    frame.putBuf( msg->getPayload(), msg->getPayloadLength() );
+    getOwner()->sendAvdeccToL2( frame );
 }
 
 void ApsStateMachine::StateActions::sendAvdeccToApc( const AppMessage *msg )

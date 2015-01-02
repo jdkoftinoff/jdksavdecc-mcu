@@ -74,6 +74,11 @@ void ApcStateMachine::setPath( const std::string &path )
 
 bool ApcStateMachine::run() { return getStates()->run(); }
 
+void ApcStateMachine::onTimeTick( uint32_t time_in_seconds )
+{
+    getEvents()->onTimeTick( time_in_seconds );
+}
+
 void ApcStateMachine::closeTcpConnection() {}
 
 void ApcStateMachine::connectToProxy( const std::string &addr ) {}

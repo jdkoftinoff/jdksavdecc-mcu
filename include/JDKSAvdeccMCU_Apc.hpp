@@ -842,6 +842,7 @@ class ApcStateMachine
 
     virtual bool run();
 
+    virtual void onTimeTick( uint32_t time_in_seconds );
     virtual void closeTcpConnection();
     virtual void connectToProxy( std::string const &addr );
     virtual void notifyProxyAvailable();

@@ -334,10 +334,11 @@ class TestApsStateMachine : public ApsStateMachine
     {
     }
 
-    virtual void sendAvdeccToL2( uint8_t const *data, ssize_t len )
+    virtual void sendAvdeccToL2( Frame const &frame )
     {
-        std::cout << "APS: sendAvdeccToL2( " << len << " )" << std::endl;
-        dump( std::cout, data, uint16_t( len ) );
+        std::cout << "APS: sendAvdeccToL2( " << frame.getLength() << " )"
+                  << std::endl;
+        dump( std::cout, frame.getBuf(), frame.getLength() );
     }
 
     virtual void closeTcpConnection()
@@ -384,8 +385,8 @@ void tick()
 
     std::cout << "tick( " << std::dec << time_in_seconds << " )" << std::endl;
 
-    aps->getEvents()->onTimeTick( time_in_seconds );
-    apc->getEvents()->onTimeTick( time_in_seconds );
+    aps->onTimeTick( time_in_seconds );
+    apc->onTimeTick( time_in_seconds );
     aps->run();
     apc->run();
 }

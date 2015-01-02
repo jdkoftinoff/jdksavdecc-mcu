@@ -1036,10 +1036,11 @@ class ApsStateMachine
     Eui48 const &getLinkMac() const { return getVariables()->m_linkMac; }
     virtual bool run();
     virtual void onIncomingTcpConnection();
+    virtual void onTimeTick( uint32_t time_in_seconds );
     virtual void closeTcpConnection();
     virtual void closeTcpServer();
     virtual void sendTcpData( uint8_t const *data, ssize_t len );
-    virtual void sendAvdeccToL2( uint8_t const *data, ssize_t len );
+    virtual void sendAvdeccToL2( Frame const &frame );
     virtual void onNetAvdeccMessageReceived( Frame const &frame );
     virtual void onNetLinkStatusUpdated( Eui48 link_mac, bool link_status );
     virtual Eui64 assignEntityId( Eui48 server_link_mac,
