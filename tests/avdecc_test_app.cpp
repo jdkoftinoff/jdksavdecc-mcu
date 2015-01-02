@@ -433,6 +433,8 @@ int test1()
 {
     int r = 255;
 
+    std::cout << "APC: setup" << std::endl;
+
     apc->setup();
 
     apc->setPrimaryMac( Eui48( 0x70, 0xb3, 0xd5, 0xed, 0xcf, 0xf0 ) );
@@ -440,9 +442,12 @@ int test1()
     apc->setApsAddress( "APSADDR" );
     apc->setPath( "/" );
 
+    std::cout << "APS: setup" << std::endl;
+
     aps->setup();
     aps->setLinkMac( Eui48( 0x70, 0xb3, 0xd5, 0xed, 0xcf, 0xf1 ) );
 
+    std::cout << "APS: run and connect" << std::endl;
     aps->run();
     aps->onIncomingTcpConnection();
 
@@ -455,6 +460,8 @@ int test1()
     tick();
     tick();
 
+    std::cout << "APC: send ADP to APS" << std::endl;
+
     {
         FrameWithMTU adp;
         formADP( &adp, apc->getVariables()->m_primaryMac, 30 );
@@ -465,6 +472,7 @@ int test1()
     tick();
     tick();
 
+    std::cout << "APS: send ADP to APC" << std::endl;
     {
         FrameWithMTU adp;
         formADP( &adp, apc->getVariables()->m_primaryMac, 30 );
@@ -482,6 +490,7 @@ int test1()
     tick();
     tick();
 
+    std::cout << "APS: LINK_UP on link" << std::endl;
     aps->onNetLinkStatusUpdated( aps->getLinkMac(), true );
 
     tick();
@@ -490,7 +499,11 @@ int test1()
     tick();
     tick();
 
+    std::cout << "APC: close the connection" << std::endl;
     apc->closeTcpConnection();
+
+    tick();
+    tick();
 
     tick();
     tick();
