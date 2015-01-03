@@ -562,7 +562,7 @@ bool HttpServerHandler::onIncomingHttpRequest( const HttpRequest &request )
         }
         else if ( request.m_method == "PUT" )
         {
-            r = onIncomingHttpPutRequest( request );
+            r = onIncomingHttpPostRequest( request );
         }
         else if ( request.m_method == "DELETE" )
         {

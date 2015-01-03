@@ -277,12 +277,12 @@ class HttpServerHandler
         return false;
     }
 
-    virtual bool onIncomingHttpPostRequest( HttpRequest const &request )
+    virtual bool onIncomingHttpPutRequest( HttpRequest const &request )
     {
         return false;
     }
 
-    virtual bool onIncomingHttpPutRequest( HttpRequest const &request )
+    virtual bool onIncomingHttpPostRequest( HttpRequest const &request )
     {
         return false;
     }
