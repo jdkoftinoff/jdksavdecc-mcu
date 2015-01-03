@@ -1033,6 +1033,7 @@ class ApsStateMachine
     virtual void setup();
 
     void setLinkMac( Eui48 mac );
+
     Eui48 const &getLinkMac() const { return getVariables()->m_linkMac; }
     virtual bool run();
     virtual void onIncomingTcpConnection();
