@@ -260,7 +260,47 @@ class HttpServerHandler
     /// \brief onIncomingHttpRequest
     ///
     ///
-    virtual bool onIncomingHttpRequest( HttpRequest const &request ) = 0;
+    virtual bool onIncomingHttpRequest( HttpRequest const &request );
+
+    virtual bool onIncomingHttpConnectRequest( HttpRequest const &request )
+    {
+        return false;
+    }
+
+    virtual bool onIncomingHttpHeadRequest( HttpRequest const &request )
+    {
+        return false;
+    }
+
+    virtual bool onIncomingHttpGetRequest( HttpRequest const &request )
+    {
+        return false;
+    }
+
+    virtual bool onIncomingHttpPostRequest( HttpRequest const &request )
+    {
+        return false;
+    }
+
+    virtual bool onIncomingHttpPutRequest( HttpRequest const &request )
+    {
+        return false;
+    }
+
+    virtual bool onIncomingHttpDeleteRequest( HttpRequest const &request )
+    {
+        return false;
+    }
+
+    virtual bool onIncomingHttpOptionsRequest( HttpRequest const &request )
+    {
+        return false;
+    }
+
+    virtual bool onIncomingHttpTraceRequest( HttpRequest const &request )
+    {
+        return false;
+    }
 };
 
 class HttpClientHandler

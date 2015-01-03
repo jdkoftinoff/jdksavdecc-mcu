@@ -917,11 +917,11 @@ class ApsStateMachine
                                                ssize_t len );
 
         ///
-        /// \brief onIncomingHttpRequest
+        /// \brief onIncomingHttpConnectRequest
         /// \param request
         /// \return
         ///
-        virtual bool onIncomingHttpRequest( HttpRequest const &request );
+        virtual bool onIncomingHttpConnectRequest( HttpRequest const &request );
 
         ///
         /// \brief onIncomingTcpAppData

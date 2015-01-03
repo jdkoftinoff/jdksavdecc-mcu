@@ -205,12 +205,11 @@ ssize_t
     return m_http_parser->onIncomingHttpData( data, len );
 }
 
-bool ApsStateMachine::StateEvents::onIncomingHttpRequest(
+bool ApsStateMachine::StateEvents::onIncomingHttpConnectRequest(
     const HttpRequest &request )
 {
     bool r = false;
-    if ( request.m_method == "CONNECT" && request.m_path == m_path
-         && request.m_version == "HTTP/1.1" )
+    if ( request.m_path == m_path )
     {
         m_in_http = false;
         getVariables()->m_requestValid = 200;

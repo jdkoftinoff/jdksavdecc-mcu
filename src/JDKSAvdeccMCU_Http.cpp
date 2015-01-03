@@ -542,4 +542,45 @@ ssize_t HttpClientParserSimple::onIncomingHttpData( const uint8_t *data,
     }
     return r;
 }
+
+bool HttpServerHandler::onIncomingHttpRequest( const HttpRequest &request )
+{
+    bool r = false;
+    if ( request.m_version.substr( 0, 7 ) == "HTTP/1." )
+    {
+        if ( request.m_method == "GET" )
+        {
+            r = onIncomingHttpGetRequest( request );
+        }
+        else if ( request.m_method == "HEAD" )
+        {
+            r = onIncomingHttpHeadRequest( request );
+        }
+        else if ( request.m_method == "POST" )
+        {
+            r = onIncomingHttpPostRequest( request );
+        }
+        else if ( request.m_method == "PUT" )
+        {
+            r = onIncomingHttpPutRequest( request );
+        }
+        else if ( request.m_method == "DELETE" )
+        {
+            r = onIncomingHttpDeleteRequest( request );
+        }
+        else if ( request.m_method == "OPTIONS" )
+        {
+            r = onIncomingHttpOptionsRequest( request );
+        }
+        else if ( request.m_method == "CONNECT" )
+        {
+            r = onIncomingHttpConnectRequest( request );
+        }
+        else if ( request.m_method == "TRACE" )
+        {
+            r = onIncomingHttpTraceRequest( request );
+        }
+    }
+    return r;
+}
 }
