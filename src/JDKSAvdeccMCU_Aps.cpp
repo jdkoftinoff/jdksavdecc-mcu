@@ -67,6 +67,11 @@ void ApsStateMachine::onIncomingTcpConnection()
     getEvents()->onIncomingTcpConnection();
 }
 
+void ApsStateMachine::onTcpConnectionClosed()
+{
+    m_events->onTcpConnectionClosed();
+}
+
 void ApsStateMachine::onTimeTick( uint32_t time_in_seconds )
 {
     getEvents()->onTimeTick( time_in_seconds );
@@ -78,6 +83,11 @@ void ApsStateMachine::closeTcpConnection()
 }
 
 void ApsStateMachine::closeTcpServer() {}
+
+ssize_t ApsStateMachine::onIncomingTcpData( const uint8_t *data, ssize_t len )
+{
+    return m_events->onIncomingTcpData( data, len );
+}
 
 void ApsStateMachine::sendTcpData( const uint8_t *data, ssize_t len ) {}
 

@@ -843,6 +843,7 @@ class ApcStateMachine
     virtual bool run();
 
     virtual void onTimeTick( uint32_t time_in_seconds );
+    virtual void onTcpConnectionClosed();
     virtual void closeTcpConnection();
     virtual void connectToProxy( std::string const &addr );
     virtual void notifyProxyAvailable();
@@ -850,6 +851,8 @@ class ApcStateMachine
     virtual void notifyLinkStatus( AppMessage const &linkMsg );
     virtual void processMsg( AppMessage const &apsMsg );
     virtual void notifyNewEntityId( Eui64 const &entity_id );
+    virtual ssize_t onIncomingTcpData( uint8_t const *data, ssize_t len );
+
     virtual void sendTcpData( uint8_t const *data, ssize_t len );
     virtual void onNetAvdeccMessageReceived( Frame const &frame );
 

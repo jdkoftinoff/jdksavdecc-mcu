@@ -165,7 +165,7 @@ class TestApcStateMachine : public ApcStateMachine
     {
         std::cout << "APC: closeTCPConnection()" << std::endl;
         ApcStateMachine::closeTcpConnection();
-        m_server->getEvents()->onTcpConnectionClosed();
+        m_server->onTcpConnectionClosed();
     }
 
     virtual void connectToProxy( std::string const &addr )
@@ -216,7 +216,7 @@ class TestApcStateMachine : public ApcStateMachine
         std::cout << "APC: sendTcpData( " << len << " )" << std::endl;
         ApcStateMachine::sendTcpData( data, len );
 
-        m_server->getEvents()->onIncomingTcpData( data, len );
+        m_server->onIncomingTcpData( data, len );
     }
 
     StateVariables m_test_variables;
@@ -346,7 +346,7 @@ class TestApsStateMachine : public ApsStateMachine
         std::cout << "APS: closeTcpConnection( "
                   << " )" << std::endl;
         ApsStateMachine::closeTcpConnection();
-        m_client->getEvents()->onTcpConnectionClosed();
+        m_client->onTcpConnectionClosed();
     }
 
     virtual void closeTcpServer()
@@ -360,7 +360,7 @@ class TestApsStateMachine : public ApsStateMachine
     {
         std::cout << "APS: sendTcpData( " << len << " )" << std::endl;
         ApsStateMachine::sendTcpData( data, len );
-        m_client->getEvents()->onIncomingTcpData( data, len );
+        m_client->onIncomingTcpData( data, len );
     }
 
     StateVariables m_test_variables;

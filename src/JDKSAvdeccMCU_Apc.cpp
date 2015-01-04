@@ -79,6 +79,11 @@ void ApcStateMachine::onTimeTick( uint32_t time_in_seconds )
     getEvents()->onTimeTick( time_in_seconds );
 }
 
+void ApcStateMachine::onTcpConnectionClosed()
+{
+    return m_events->onTcpConnectionClosed();
+}
+
 void ApcStateMachine::closeTcpConnection() {}
 
 void ApcStateMachine::connectToProxy( const std::string &addr ) {}
@@ -92,6 +97,11 @@ void ApcStateMachine::notifyLinkStatus( const AppMessage &linkMsg ) {}
 void ApcStateMachine::processMsg( const AppMessage &apsMsg ) {}
 
 void ApcStateMachine::notifyNewEntityId( const Eui64 &entity_id ) {}
+
+ssize_t ApcStateMachine::onIncomingTcpData( const uint8_t *data, ssize_t len )
+{
+    return m_events->onIncomingTcpData( data, len );
+}
 
 void ApcStateMachine::sendTcpData( const uint8_t *data, ssize_t len ) {}
 
