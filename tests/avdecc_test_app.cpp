@@ -170,7 +170,7 @@ class TestApcStateMachine : public ApcStateMachine
 
     virtual void connectToProxy( std::string const &addr )
     {
-        std::cout << "APC: connectToProxy( " << addr << " )" << std::endl;
+        std::cout << "APC: connectToProxy( " << addr.c_str() << " )" << std::endl;
         ApcStateMachine::connectToProxy( addr );
         getEvents()->onIncomingTcpConnection();
     }
