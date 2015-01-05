@@ -187,6 +187,9 @@ inline jdksavdecc_timestamp_in_milliseconds getTimeInMilliseconds()
 #include <memory>
 #include <iostream>
 #include <iomanip>
+#include <vector>
+#include <set>
+#include <memory>
 
 #pragma comment( lib, "Ws2_32.lib" )
 
