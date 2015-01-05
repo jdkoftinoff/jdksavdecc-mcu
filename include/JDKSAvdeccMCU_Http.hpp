@@ -242,6 +242,24 @@ class HttpResponse
 
     virtual void flatten( std::vector<uint8_t> *dest ) const;
 
+    void addHeader( std::string const &line ) { m_headers.push_back( line ); }
+
+    void addHeader( std::string const &name, std::string const &value )
+    {
+        m_headers.push_back( name + ": " + value );
+    }
+
+    void setContent( std::string const &s )
+    {
+        m_content.clear();
+        m_content.resize( s.length() );
+        memcpy( reinterpret_cast<uint8_t *>( m_content.data() ),
+                s.c_str(),
+                s.length() );
+    }
+
+    void setContent( std::vector<uint8_t> const &v ) { m_content = v; }
+
     std::string m_version;
     std::string m_status_code;
     std::string m_reason_phrase;
