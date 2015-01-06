@@ -162,11 +162,14 @@ inline jdksavdecc_timestamp_in_milliseconds getTimeInMilliseconds()
 }
 #elif defined( __APPLE__ ) || defined( __linux__ )
 #include <vector>
-#include <set>
 #include <memory>
-#include <sys/time.h>
 #include <iostream>
 #include <iomanip>
+#include <vector>
+#include <set>
+#include <memory>
+#include <string>
+
 namespace JDKSAvdeccMCU
 {
 inline jdksavdecc_timestamp_in_milliseconds getTimeInMilliseconds()
@@ -190,6 +193,7 @@ inline jdksavdecc_timestamp_in_milliseconds getTimeInMilliseconds()
 #include <vector>
 #include <set>
 #include <memory>
+#include <string>
 
 #pragma comment( lib, "Ws2_32.lib" )
 
