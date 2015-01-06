@@ -86,6 +86,8 @@ class RawSocketMacOSX : public RawSocketTracker
     uint16_t m_ethertype;
     void *m_pcap;
 };
+
+typedef RawSocketMacOSX RawSocketDefault;
 }
 
 #endif

@@ -84,5 +84,7 @@ class RawSocketLinux : public RawSocketTracker
     Eui48 m_default_dest_mac_address;
     uint16_t m_ethertype;
 };
+
+typedef RawSocketLinux RawSocketDefault;
 }
 #endif

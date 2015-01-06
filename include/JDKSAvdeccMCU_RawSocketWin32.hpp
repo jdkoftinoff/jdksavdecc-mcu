@@ -86,6 +86,8 @@ class RawSocketWin32 : public RawSocketTracker
     uint16_t m_ethertype;
     void *m_pcap;
 };
+
+typedef RawSocketWin32 RawSocketDefault;
 }
 
 #endif
