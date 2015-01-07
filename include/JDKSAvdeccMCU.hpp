@@ -52,6 +52,7 @@
 #include "JDKSAvdeccMCU_RawSocketWizNet.hpp"
 #include "JDKSAvdeccMCU_RawSocketMulti.hpp"
 #include "JDKSAvdeccMCU_MDNSRegister.hpp"
+#include "JDKSAvdeccMCU_Http.hpp"
 #include "JDKSAvdeccMCU_AppMessage.hpp"
 #include "JDKSAvdeccMCU_AppMessageParser.hpp"
 #include "JDKSAvdeccMCU_AppMessageHandler.hpp"

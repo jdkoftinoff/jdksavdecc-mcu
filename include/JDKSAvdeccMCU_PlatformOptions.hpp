@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 2014, J.D. Koftinoff Software, Ltd.
+  Copyright (c) 2015, J.D. Koftinoff Software, Ltd.
   All rights reserved.
 
   Redistribution and use in source and binary forms, with or without
@@ -30,16 +30,22 @@
 */
 #pragma once
 
-#include "JDKSAvdeccMCU_PlatformOptions.hpp"
-#include "JDKSAvdeccMCU_Platform.hpp"
+/* This file is to be overridden for special purpose targets */
 
-#include "jdksavdecc.h"
-#include "jdksavdecc_aem_descriptor.h"
-#include "jdksavdecc_aem_command.h"
-#include "JDKSAvdeccMCU_Eui.hpp"
-
-namespace JDKSAvdeccMCU
-{
-}
-
-void jdksavdeccmcu_debug_log( const char *str, uint16_t v );
+#if 0
+#define JDKSAVDECCMCU_BARE_METAL 1
+#define JDKSAVDECCMCU_ENABLE_STDIO 0
+#define JDKSAVDECCMCU_ENABLE_STDLIB 0
+#define JDKSAVDECCMCU_ENABLE_MEMORY 0
+#define JDKSAVDECCMCU_ENABLE_FLOAT 0
+#define JDKSAVDECCMCU_ENABLE_VECTOR 0
+#define JDKSAVDECCMCU_ENABLE_STRING 0
+#define JDKSAVDECCMCU_ENABLE_IOSTREAM 0
+#define JDKSAVDECCMCU_ENABLE_RAWSOCKETWIZNET 0
+#define JDKSAVDECCMCU_ENABLE_PCAP 0
+#define JDKSAVDECCMCU_ENABLE_PCAPFILE 0
+#define JDKSAVDECCMCU_ENABLE_RAWSOCKETPCAPFILE 0
+#define JDKSAVDECCMCU_MAX_RAWSOCKETS 1
+#define JDKSAVDECCMCU_ENABLE_MDNSREGISTER 0
+#define JDKSAVDECCMCU_ENABLE_HTTP 0
+#endif

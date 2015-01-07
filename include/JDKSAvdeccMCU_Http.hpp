@@ -32,6 +32,8 @@
 
 #include "JDKSAvdeccMCU_World.hpp"
 
+#if JDKSAVDECCMCU_ENABLE_HTTP
+
 namespace JDKSAvdeccMCU
 {
 
@@ -422,3 +424,5 @@ class HttpClientParserSimple : public HttpClientParser
     std::string m_cur_line;
 };
 }
+
+#endif

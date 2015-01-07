@@ -32,6 +32,8 @@
 #include "JDKSAvdeccMCU_World.hpp"
 #include "JDKSAvdeccMCU_Http.hpp"
 
+#if JDKSAVDECCMCU_ENABLE_HTTP
+
 namespace JDKSAvdeccMCU
 {
 
@@ -584,3 +586,6 @@ bool HttpServerHandler::onIncomingHttpRequest( const HttpRequest &request )
     return r;
 }
 }
+#else
+extern const char *jdksavdeccmcu_http_file = __FILE__;
+#endif
