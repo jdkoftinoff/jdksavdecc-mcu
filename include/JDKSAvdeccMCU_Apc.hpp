@@ -72,11 +72,13 @@ class ApcStateMachine
 
         /**
          * See IEEE 1722.1 Annex C.5.3.1.1
+         * Contains the host and port of the APS
          */
         std::string m_addr;
 
         /**
-         * See IEEE 1722.1 Cor 1 Annex C
+         * See IEEE 1722.1 Annex C.5.3.1.1
+         * Contains the full HTTP Request
          */
         HttpRequest m_request;
 
