@@ -338,7 +338,11 @@ void ApsStateMachine::StateActions::sendHttpResponse( int requestValid )
         requestValid = 404;
         response.m_reason_phrase = "NOT FOUND";
     }
+#if defined(_WIN32)
+    sprintf_s( statusbuf, sizeof(statusbuf), "%d", requestValid );
+#else
     sprintf( statusbuf, "%d", requestValid );
+#endif
     response.m_version = "HTTP/1.1";
     response.m_status_code = statusbuf;
     response.m_reason_phrase = "OK";
