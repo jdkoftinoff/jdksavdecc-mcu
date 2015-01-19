@@ -26,11 +26,5 @@ else()
     add_definitions("-DJDKSAVDECCMCU_ENABLE_PCAP=0")
 endif()
 
-IF (APPLE)
-    FIND_LIBRARY(COREFOUNDATION_LIBRARY CoreFoundation )
-    set(LIBS ${LIBS} pcap ${COREFOUNDATION_LIBRARY})
-ENDIF (APPLE)
-
-
 INCLUDE (common.cmake)
 
