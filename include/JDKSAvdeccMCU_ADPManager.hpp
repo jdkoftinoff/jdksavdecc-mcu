@@ -40,6 +40,87 @@
 namespace JDKSAvdeccMCU
 {
 
+struct ADPCoreInfo
+{
+    /**
+     * @brief ADPCoreInfo Construct the core information for ADP advertising
+     * @param entity_model_id
+     * @param entity_capabilities
+     * @param controller_capabilities
+     * @param valid_time_in_seconds
+     * @param talker_stream_sources
+     * @param talker_capabilities
+     * @param listener_stream_sinks
+     * @param listener_capabilites
+     */
+    ADPCoreInfo(Eui64 entity_model_id = Eui64(static_cast<uint64_t>(0)),
+                uint32_t entity_capabilities = 0,
+                uint32_t controller_capabilities = 0,
+                uint16_t valid_time_in_seconds = 60,
+                uint16_t talker_stream_sources = 0,
+                uint16_t talker_capabilities = 0,
+                uint16_t listener_stream_sinks = 0,
+                uint16_t listener_capabilites = 0 )
+        : m_entity_model_id( entity_model_id )
+        , m_entity_capabilities( entity_capabilities )
+        , m_controller_capabilities( controller_capabilities )
+        , m_valid_time_in_seconds( valid_time_in_seconds )
+        , m_talker_stream_sources( talker_stream_sources )
+        , m_talker_capabilities( talker_capabilities )
+        , m_listener_stream_sinks( listener_stream_sinks )
+        , m_listener_capabilities( listener_capabilites )
+    {
+    }
+
+    /**
+     * @brief m_entity_model_id entity_model_id The Entity's entity_model_id - See IEEE Std
+     * 1722.1-2013 Clause 6.2.1.9
+     */
+    Eui64 m_entity_model_id;
+
+    /**
+     * @brief m_entity_capabilities The Entity's entity_capabilities - See IEEE
+     * Std 1722.1-2013 Clause 6.2.1.10
+     */
+    uint32_t m_entity_capabilities;
+
+    /**
+     * @brief m_controller_capabilities The valid_time for the announcements - See
+     * IEEE Std 1722.1-2013 Clause 6.2.1.6
+     */
+    uint32_t m_controller_capabilities;
+
+    /**
+     * @brief m_valid_time_in_seconds The valid_time for the announcements - See
+     * IEEE Std 1722.1-2013 Clause 6.2.1.6 expressed in seconds
+     */
+    uint16_t m_valid_time_in_seconds;
+
+    /**
+     * @brief m_talker_stream_sources The number of stream sources - See IEEE Std
+     * 1722.1-2013 Clause 6.2.1.11
+     */
+    uint16_t m_talker_stream_sources;
+
+    /**
+     * @brief m_talker_capabilities The talker capabilities - See IEEE Std
+     * 1722.1-2013 Clause 6.2.1.12
+     */
+    uint16_t m_talker_capabilities;
+
+    /**
+     * @brief m_listener_stream_sinks The number of stream sinks - See IEEE Std
+     * 1722.1-2013 Clause 6.2.1.13
+     */
+    uint16_t m_listener_stream_sinks;
+
+    /**
+     * @brief m_listener_capabilities The listener capabilities - See IEEE Std
+     * 1722.1-2013 Clause 6.2.1.14
+     */
+    uint16_t m_listener_capabilities;
+};
+
 /**
  * @brief The ADPManager class
  *
@@ -61,41 +142,12 @@ class ADPManager : public Handler
      *
      * @param entity_id The Entity's entity_id - See IEEE Std 1722.1-2013 Clause
      * 6.2.1.8
+     * @param adp_info The core ADP information
      *
-     * @param entity_model_id The Entity's entity_model_id - See IEEE Std
-     * 1722.1-2013 Clause 6.2.1.9
-     *
-     * @param entity_capabilities The Entity's entity_capabilities - See IEEE
-     * Std 1722.1-2013 Clause 6.2.1.10
-     *
-     * @param controller_capabilities The Entity's controller_capabilities - See
-     * IEEE Std 1722.1-2013 Clause 6.2.1.15
-     *
-     * @param valid_time_in_seconds The valid_time for the announcements - See
-     * IEEE Std 1722.1-2013 Clause 6.2.1.6
-     *
-     * @param talker_stream_sources The number of stream sources - See IEEE Std
-     * 1722.1-2013 Clause 6.2.1.11
-     *
-     * @param talker_capabilites The talker capabilities - See IEEE Std
-     * 1722.1-2013 Clause 6.2.1.12
-     *
-     * @param listener_stream_sinks The number of stream sinks - See IEEE Std
-     * 1722.1-2013 Clause 6.2.1.13
-     *
-     * @param listener_capabilities The listener capabilities - See IEEE Std
-     * 1722.1-2013 Clause 6.2.1.14
      */
     ADPManager( RawSocket &net,
                 Eui64 const &entity_id,
-                Eui64 const &entity_model_id,
-                uint32_t entity_capabilities,
-                uint32_t controller_capabilities,
-                uint16_t valid_time_in_seconds,
-                uint16_t talker_stream_sources = 0,
-                uint16_t talker_capabilities = 0,
-                uint16_t listener_stream_sinks = 0,
-                uint16_t listener_capabilites = 0 );
+                ADPCoreInfo const &adp_info );
 
     /**
      * @brief tick is called periodically and will call sendADP() when necessary
@@ -160,14 +212,14 @@ class ADPManager : public Handler
      * this entity as defined by IEEE Std 1722.1-2013 Clause 6.2.1.9
      * @return The Entity's entity_model_id as a Eui64
      */
-    Eui64 const &getEntityModelID() const { return m_entity_model_id; }
+    Eui64 const &getEntityModelID() const { return m_adp_info.m_entity_model_id; }
 
     /**
      * @brief getEntityCapabilities is called to get the Entity's
      * entity_capabilities, as defined in IEEE Std 1722.1-2013 Clause 6.2.1.10
      * @return The 32 bit value
      */
-    uint32_t getEntityCapabilities() const { return m_entity_capabilities; }
+    uint32_t getEntityCapabilities() const { return m_adp_info.m_entity_capabilities; }
 
     /**
      * @brief getControllerCapabilities is called to get the Entity's
@@ -177,7 +229,7 @@ class ADPManager : public Handler
      */
     uint32_t getControllerCapabilities() const
     {
-        return m_controller_capabilities;
+        return m_adp_info.m_controller_capabilities;
     }
 
     /**
@@ -185,7 +237,7 @@ class ADPManager : public Handler
      * defined in IEEE Std 1722.1-2013 Clause 6.2.1.6
      * @return
      */
-    uint16_t getValidTimeInSeconds() const { return m_valid_time_in_seconds; }
+    uint16_t getValidTimeInSeconds() const { return m_adp_info.m_valid_time_in_seconds; }
 
     /**
      * @brief getAvailableIndex is called to get the current available_index
@@ -194,25 +246,27 @@ class ADPManager : public Handler
      */
     uint32_t getAvailableIndex() const { return m_available_index; }
 
+    /**
+     * @brief triggerSend trigger a send of ADP as soon as possible
+     */
     void triggerSend();
 
+    /**
+     * @brief setGPTPGrandMasterID Change the reported gPTP grand master ID
+     * triggers a new send as soon as possible
+     *
+     * @param new_gm The new EUI64 GM ID
+     */
     void setGPTPGrandMasterID( Eui64 const &new_gm );
 
   protected:
     RawSocket &m_net;
     Eui64 m_entity_id;
-    Eui64 m_entity_model_id;
-    uint32_t m_entity_capabilities;
-    uint32_t m_controller_capabilities;
-    uint16_t m_valid_time_in_seconds;
-    uint16_t m_talker_stream_sources;
-    uint16_t m_talker_capabilities;
-    uint16_t m_listener_stream_sinks;
-    uint16_t m_listener_capabilities;
     uint32_t m_available_index;
     jdksavdecc_timestamp_in_milliseconds m_last_send_time_in_millis;
     jdksavdecc_timestamp_in_milliseconds m_trigger_send_time;
     bool m_trigger_send;
     Eui64 m_gptp_grandmaster_id;
+    ADPCoreInfo const &m_adp_info;
 };
 }
