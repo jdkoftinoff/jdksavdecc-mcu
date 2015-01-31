@@ -1018,8 +1018,26 @@ class ApsStateMachine
         AppMessageParser m_app_parser;
     };
 
+    ///
+    /// \brief active_connections_type
+    ///
+    /// This container type is used to keep track of
+    /// actively assigned and in use APS connections.
+    ///
     typedef std::set<uint16_t> active_connections_type;
 
+    ///
+    /// \brief ApsStateMachine
+    ///
+    /// Constructor for the Top level ApsStateMachine object.
+    ///
+    /// \param variables The variables object to use
+    /// \param actions The actions object to use
+    /// \param events The events object to use
+    /// \param states The states object to use
+    /// \param active_entity_id_count The shared active entity id count
+    /// \param active_connections The shared active connections set
+    ///
     ApsStateMachine( StateVariables *variables,
                      StateActions *actions,
                      StateEvents *events,
@@ -1027,36 +1045,229 @@ class ApsStateMachine
                      uint16_t &active_entity_id_count,
                      active_connections_type &active_connections );
 
+    ///
+    /// \brief ~ApsStateMachine
+    ///
     virtual ~ApsStateMachine();
 
+    ///
+    /// \brief clear
+    ///
+    /// Clear the state machine and (re)connect all the associated objects
+    /// within
+    ///
     virtual void clear();
+
+    ///
+    /// \brief setup
+    ///
+    /// Do initial setup of the state machine before running
+    ///
     virtual void setup();
 
+    ///
+    /// \brief setLinkMac
+    ///
+    /// Set the primary MAC address of the APS
+    ///
+    /// \param mac
+    ///
     void setLinkMac( Eui48 mac );
 
+    ///
+    /// \brief getLinkMac
+    ///
+    /// Get the primary MAC address of the APS
+    ///
+    /// \return Eui48
+    ///
     Eui48 const &getLinkMac() const { return getVariables()->m_linkMac; }
+
+    ///
+    /// \brief run
+    ///
+    /// Run the state machine in the current context until
+    /// the state stops changing.
+    ///
+    /// \return false if the state machine is done
+    ///
     virtual bool run();
+
+    ///
+    /// \brief onIncomingTcpConnection
+    ///
+    /// Dispatch the IncomingTcpConnection event to the contained
+    /// event handler object
+    ///
     virtual void onIncomingTcpConnection();
+
+    ///
+    /// \brief onTcpConnectionClosed
+    ///
+    /// Dispatch the TcpConnectionClosed event to the contained
+    /// event handler object
+    ///
     virtual void onTcpConnectionClosed();
+
+    ///
+    /// \brief onTimeTick
+    ///
+    /// Notify the state machine about the current system time in seconds
+    ///
+    /// \param time_in_seconds
+    ///
     virtual void onTimeTick( uint32_t time_in_seconds );
+
+    ///
+    /// \brief closeTcpConnection
+    ///
+    /// Notify the state machine that the incoming TcpConnection was closed
+    ///
     virtual void closeTcpConnection();
+
+    ///
+    /// \brief closeTcpServer
+    ///
+    /// Notify the state machine that the TcpServer needs to close
+    ///
     virtual void closeTcpServer();
+
+    ///
+    /// \brief onIncomingTcpData
+    ///
+    /// Notify the state machine that some data was received via the
+    /// incoming TCP Connection from the APS
+    ///
+    /// \param data Pointer to the raw incoming bytes
+    /// \param len Length of the number of bytes
+    /// \return number of bytes that were successfully parsed, or <0 on error
+    ///
     virtual ssize_t onIncomingTcpData( uint8_t const *data, ssize_t len );
-    virtual void sendTcpData( uint8_t const *data, ssize_t len );
-    virtual void sendAvdeccToL2( Frame const &frame );
+
+
+    ///
+    /// \brief sendTcpData
+    ///
+    /// method to be overriden to send data to the APS via TCP
+    ///
+    /// \param data Pointer to the raw bytes to send
+    /// \param len number of bytes to send
+    ///
+    virtual void sendTcpData( uint8_t const *data, ssize_t len ) = 0;
+
+    ///
+    /// \brief sendAvdeccToL2
+    ///
+    /// method to be overriden to send an ethernet frame to the L2 network
+    ///
+    /// \param frame The Frame to send
+    ///
+    virtual void sendAvdeccToL2( Frame const &frame ) = 0;
+
+    ///
+    /// \brief onNetAvdeccMessageReceived
+    ///
+    /// To be called whenever an AVDECC message is received from the L2
+    /// network
+    ///
+    /// \param frame The Frame that was received
+    ///
     virtual void onNetAvdeccMessageReceived( Frame const &frame );
+
+    ///
+    /// \brief onNetLinkStatusUpdated
+    ///
+    /// To be called whenever the network port link status changes
+    ///
+    /// \param link_mac The MAC address of the network port
+    /// \param link_status True is the port has link up
+    ///
     virtual void onNetLinkStatusUpdated( Eui48 link_mac, bool link_status );
+
+    ///
+    /// \brief assignEntityId
+    ///
+    /// Method is called whenever an APC requests an entity_id
+    ///
+    /// \param server_link_mac The primary MAC address of the server
+    /// \param apc_link_mac The primary MAC address of the APC
+    /// \param requested_entity_id The enity_id that the client is requesting
+    /// \return the Eui64 entity_id that the client will be assigned
+    ///
     virtual Eui64 assignEntityId( Eui48 server_link_mac,
                                   Eui48 apc_link_mac,
                                   Eui64 requested_entity_id );
 
+    ///
+    /// \brief getVariables
+    ///
+    /// Get a pointer to the StateVariables object
+    ///
+    /// \return StateVariables *
+    ///
     StateVariables *getVariables() { return m_variables; }
+
+    ///
+    /// \brief getVariables
+    ///
+    /// Get a pointer to the StateVariables object
+    ///
+    /// \return StateVariables *
+    ///
     StateVariables const *getVariables() const { return m_variables; }
+
+    ///
+    /// \brief getActions
+    ///
+    /// Get a pointer to the StateActions object
+    ///
+    /// \return StateActions *
+    ///
     StateActions *getActions() { return m_actions; }
+
+    ///
+    /// \brief getActions
+    ///
+    /// Get a pointer to the StateActions object
+    ///
+    /// \return StateActions *
+    ///
     StateActions const *getActions() const { return m_actions; }
+
+    ///
+    /// \brief getEvents
+    ///
+    /// get a pointer to the StateEvents object
+    ///
+    /// \return StateEvents
+    ///
     StateEvents *getEvents() { return m_events; }
+
+    ///
+    /// \brief getEvents
+    ///
+    /// get a pointer to the StateEvents object
+    ///
+    /// \return StateEvents
+    ///
     StateEvents const *getEvents() const { return m_events; }
+
+    ///
+    /// \brief getStates
+    ///
+    /// Get a pointer to the States object
+    ///
+    /// \return States *
+    ///
     States *getStates() { return m_states; }
+
+    ///
+    /// \brief getStates
+    ///
+    /// Get a pointer to the States object
+    ///
+    /// \return States *
+    ///
     States const *getStates() const { return m_states; }
 
   protected:
