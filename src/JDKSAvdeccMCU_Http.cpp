@@ -161,8 +161,11 @@ void HttpRequest::set( const std::string &method,
 
             {
                 char lenascii[32];
-#if defined(_WIN32)
-                sprintf_s( lenascii, sizeof(lenascii), "%d\r\n", (int)content.size() );
+#if defined( _WIN32 )
+                sprintf_s( lenascii,
+                           sizeof( lenascii ),
+                           "%d\r\n",
+                           (int)content.size() );
 #else
                 sprintf( lenascii, "%d\r\n", (int)content.size() );
 #endif

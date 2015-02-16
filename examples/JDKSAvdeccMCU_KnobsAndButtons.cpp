@@ -82,9 +82,7 @@ class KnobsAndButtonsController : public EntityState
                       JDKSAVDECC_ADP_ENTITY_CAPABILITY_AEM_SUPPORTED,
                       JDKSAVDECC_ADP_CONTROLLER_CAPABILITY_IMPLEMENTED,
                       50 )
-        , m_adp_manager( rawnet,
-                         entity_id,
-                         m_adp_info )
+        , m_adp_manager( rawnet, entity_id, m_adp_info )
         , m_controller_entity( m_adp_manager, this )
         , m_update_rate_in_millis( 50 )
         , m_last_update_time( 0 )
@@ -645,7 +643,6 @@ class KnobsAndButtonsController : public EntityState
     }
 
   private:
-
     ADPCoreInfo m_adp_info;
 
     /// The ADP manager is told about the entity id, model_id, entity

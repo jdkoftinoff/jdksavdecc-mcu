@@ -53,14 +53,14 @@ struct ADPCoreInfo
      * @param listener_stream_sinks
      * @param listener_capabilites
      */
-    ADPCoreInfo(Eui64 entity_model_id = Eui64(static_cast<uint64_t>(0)),
-                uint32_t entity_capabilities = 0,
-                uint32_t controller_capabilities = 0,
-                uint16_t valid_time_in_seconds = 60,
-                uint16_t talker_stream_sources = 0,
-                uint16_t talker_capabilities = 0,
-                uint16_t listener_stream_sinks = 0,
-                uint16_t listener_capabilites = 0 )
+    ADPCoreInfo( Eui64 entity_model_id = Eui64( static_cast<uint64_t>( 0 ) ),
+                 uint32_t entity_capabilities = 0,
+                 uint32_t controller_capabilities = 0,
+                 uint16_t valid_time_in_seconds = 60,
+                 uint16_t talker_stream_sources = 0,
+                 uint16_t talker_capabilities = 0,
+                 uint16_t listener_stream_sinks = 0,
+                 uint16_t listener_capabilites = 0 )
         : m_entity_model_id( entity_model_id )
         , m_entity_capabilities( entity_capabilities )
         , m_controller_capabilities( controller_capabilities )
@@ -73,7 +73,8 @@ struct ADPCoreInfo
     }
 
     /**
-     * @brief m_entity_model_id entity_model_id The Entity's entity_model_id - See IEEE Std
+     * @brief m_entity_model_id entity_model_id The Entity's entity_model_id -
+     * See IEEE Std
      * 1722.1-2013 Clause 6.2.1.9
      */
     Eui64 m_entity_model_id;
@@ -85,7 +86,8 @@ struct ADPCoreInfo
     uint32_t m_entity_capabilities;
 
     /**
-     * @brief m_controller_capabilities The valid_time for the announcements - See
+     * @brief m_controller_capabilities The valid_time for the announcements -
+     * See
      * IEEE Std 1722.1-2013 Clause 6.2.1.6
      */
     uint32_t m_controller_capabilities;
@@ -97,7 +99,8 @@ struct ADPCoreInfo
     uint16_t m_valid_time_in_seconds;
 
     /**
-     * @brief m_talker_stream_sources The number of stream sources - See IEEE Std
+     * @brief m_talker_stream_sources The number of stream sources - See IEEE
+     * Std
      * 1722.1-2013 Clause 6.2.1.11
      */
     uint16_t m_talker_stream_sources;
@@ -212,14 +215,20 @@ class ADPManager : public Handler
      * this entity as defined by IEEE Std 1722.1-2013 Clause 6.2.1.9
      * @return The Entity's entity_model_id as a Eui64
      */
-    Eui64 const &getEntityModelID() const { return m_adp_info.m_entity_model_id; }
+    Eui64 const &getEntityModelID() const
+    {
+        return m_adp_info.m_entity_model_id;
+    }
 
     /**
      * @brief getEntityCapabilities is called to get the Entity's
      * entity_capabilities, as defined in IEEE Std 1722.1-2013 Clause 6.2.1.10
      * @return The 32 bit value
      */
-    uint32_t getEntityCapabilities() const { return m_adp_info.m_entity_capabilities; }
+    uint32_t getEntityCapabilities() const
+    {
+        return m_adp_info.m_entity_capabilities;
+    }
 
     /**
      * @brief getControllerCapabilities is called to get the Entity's
@@ -237,7 +246,10 @@ class ADPManager : public Handler
      * defined in IEEE Std 1722.1-2013 Clause 6.2.1.6
      * @return
      */
-    uint16_t getValidTimeInSeconds() const { return m_adp_info.m_valid_time_in_seconds; }
+    uint16_t getValidTimeInSeconds() const
+    {
+        return m_adp_info.m_valid_time_in_seconds;
+    }
 
     /**
      * @brief getAvailableIndex is called to get the current available_index

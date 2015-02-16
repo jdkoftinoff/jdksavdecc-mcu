@@ -111,7 +111,6 @@ class AppMessageHandler
     ///
     virtual void onAppAvdeccFromApc( AppMessage const &msg ) = 0;
 
-
     ///
     /// \brief onAppVendor
     ///

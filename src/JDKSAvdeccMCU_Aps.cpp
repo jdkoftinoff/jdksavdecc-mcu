@@ -314,7 +314,7 @@ void ApsStateMachine::StateEvents::onAppVendor( const AppMessage &msg )
     // Do nothing
 }
 
-void ApsStateMachine::StateEvents::onAppUnknown(const AppMessage &msg)
+void ApsStateMachine::StateEvents::onAppUnknown( const AppMessage &msg )
 {
     // Do nothing
 }
@@ -343,8 +343,8 @@ void ApsStateMachine::StateActions::sendHttpResponse( int requestValid )
         requestValid = 404;
         response.m_reason_phrase = "NOT FOUND";
     }
-#if defined(_WIN32)
-    sprintf_s( statusbuf, sizeof(statusbuf), "%d", requestValid );
+#if defined( _WIN32 )
+    sprintf_s( statusbuf, sizeof( statusbuf ), "%d", requestValid );
 #else
     sprintf( statusbuf, "%d", requestValid );
 #endif

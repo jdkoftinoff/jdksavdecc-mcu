@@ -321,7 +321,7 @@ struct AppMessage
     ///
     /// \return true if the APPDU fit in the FixedBuffer
     ///
-    bool store( FixedBuffer *dest, uint16_t offset=0 ) const
+    bool store( FixedBuffer *dest, uint16_t offset = 0 ) const
     {
         ssize_t r;
         dest->clear();

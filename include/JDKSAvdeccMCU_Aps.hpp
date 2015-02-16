@@ -1153,7 +1153,6 @@ class ApsStateMachine
     ///
     virtual ssize_t onIncomingTcpData( uint8_t const *data, ssize_t len );
 
-
     ///
     /// \brief sendTcpData
     ///
