@@ -314,6 +314,11 @@ void ApsStateMachine::StateEvents::onAppVendor( const AppMessage &msg )
     // Do nothing
 }
 
+void ApsStateMachine::StateEvents::onAppUnknown(const AppMessage &msg)
+{
+    // Do nothing
+}
+
 void ApsStateMachine::StateActions::initialize()
 {
     StateVariables *v = getVariables();

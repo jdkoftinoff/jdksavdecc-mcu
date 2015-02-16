@@ -221,21 +221,71 @@ struct AppMessage
                                      payload.getBuf() );
     }
 
+    ///
+    /// \brief getPayload
+    ///
+    /// Get a const pointer to the payload
+    ///
+    /// \return uint8_t const pointer to payload
+    ///
     uint8_t const *getPayload() const { return m_appdu.payload_buffer; }
 
+    ///
+    /// \brief getPayload
+    ///
+    /// Get a non-const pointer to the payload
+    ///
+    /// \return uint8_t pointer to the payload
+    ///
     uint8_t *getPayload() { return m_appdu.payload_buffer; }
 
+    ///
+    /// \brief getAddress
+    ///
+    /// Get the address field from the APPDU
+    ///
+    /// \return Eui48
+    ///
     Eui48 getAddress() const { return Eui48( m_appdu.base.address ); }
 
+    ///
+    /// \brief getPayloadLength
+    ///
+    /// Get the payload_length field from the APPDU
+    ///
+    /// \return uint16_t payload_length
+    ///
     uint16_t getPayloadLength() const { return m_appdu.base.payload_length; }
 
+    ///
+    /// \brief getVersion
+    ///
+    /// Get the APPDU protocol version from the APPDU
+    ///
+    /// \return the uint8_t version
+    ///
     uint8_t getVersion() const { return m_appdu.base.version; }
 
+    ///
+    /// \brief getMessageType
+    ///
+    /// Get the message_type field from the APPDU
+    ///
+    /// \return MessageType
+    ///
     MessageType getMessageType() const
     {
         return MessageType( m_appdu.base.message_type );
     }
 
+    ///
+    /// \brief getEntityIdRequestEntityId
+    ///
+    /// Get the entity_id value from the payload if the APPDU
+    /// is a ENTITY_ID_REQUEST message
+    ///
+    /// \return The Eui64 entity_id
+    ///
     Eui64 getEntityIdRequestEntityId() const
     {
         Eui64 r;
@@ -246,6 +296,14 @@ struct AppMessage
         return r;
     }
 
+    ///
+    /// \brief getEntityIdResponseEntityId
+    ///
+    /// Get the entity_id value from the payload if the APPDU
+    /// is a ENTITY_ID_RESPONSE message
+    ///
+    /// \return The Eui64 entity_id
+    ///
     Eui64 getEntityIdResponseEntityId() const
     {
         Eui64 r;
@@ -256,12 +314,19 @@ struct AppMessage
         return r;
     }
 
-    bool store( FixedBuffer *dest ) const
+    ///
+    /// \brief store the APPDU into the destination FixedBuffer
+    /// \param dest Destination FixedBuffer to store to
+    /// \param offset Offset within FixedBuffer to store to
+    ///
+    /// \return true if the APPDU fit in the FixedBuffer
+    ///
+    bool store( FixedBuffer *dest, uint16_t offset=0 ) const
     {
         ssize_t r;
         dest->clear();
         r = jdksavdecc_appdu_write(
-            &m_appdu.base, dest->getBuf(), 0, dest->getMaxLength() );
+            &m_appdu.base, dest->getBuf(), offset, dest->getMaxLength() );
         if ( r > 0 )
         {
             dest->setLength( uint16_t( r ) );

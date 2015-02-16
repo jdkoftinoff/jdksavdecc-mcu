@@ -748,7 +748,7 @@ class ApcStateMachine
         ///
         /// \brief onAppNop
         ///
-        /// Received NOP from APC
+        /// Received NOP from APS
         ///
         /// \param msg
         ///
@@ -757,7 +757,7 @@ class ApcStateMachine
         ///
         /// \brief onAppEntityIdRequest
         ///
-        /// Received ENTITY_ID_REQUEST from APC
+        /// Received ENTITY_ID_REQUEST from APS
         ///
         /// \param msg
         ///
@@ -766,7 +766,7 @@ class ApcStateMachine
         ///
         /// \brief onAppEntityIdResponse
         ///
-        /// Received ENTITY_ID_RESPONSE from APC
+        /// Received ENTITY_ID_RESPONSE from APS
         ///
         /// \param msg
         ///
@@ -775,7 +775,7 @@ class ApcStateMachine
         ///
         /// \brief onAppLinkUp
         ///
-        /// Received LINK_UP from APC
+        /// Received LINK_UP from APS
         ///
         /// \param msg
         ///
@@ -784,7 +784,7 @@ class ApcStateMachine
         ///
         /// \brief onAppLinkDown
         ///
-        /// Received LINK_DOWN from APC
+        /// Received LINK_DOWN from APS
         ///
         /// \param msg
         ///
@@ -793,7 +793,7 @@ class ApcStateMachine
         ///
         /// \brief onAppAvdeccFromAps
         ///
-        /// Received AVDECC_FROM_APS from APC
+        /// Received AVDECC_FROM_APS from APS
         ///
         /// \param msg
         ///
@@ -802,7 +802,7 @@ class ApcStateMachine
         ///
         /// \brief onAppAvdeccFromApc
         ///
-        /// Received AVDECC_FROM_APC from APC
+        /// Received AVDECC_FROM_APC from APS
         ///
         /// \param msg
         ///
@@ -816,6 +816,15 @@ class ApcStateMachine
         /// \param msg
         ///
         virtual void onAppVendor( AppMessage const &msg );
+
+        ///
+        /// \brief onUnknown
+        ///
+        /// Received unknown message from APC
+        ///
+        /// \param msg
+        ///
+        virtual void onAppUnknown( AppMessage const &msg );
 
       protected:
         ApcStateMachine *m_owner;

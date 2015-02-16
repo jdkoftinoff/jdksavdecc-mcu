@@ -65,8 +65,7 @@ int AppMessageParser::dispatchMsg( const AppMessage &msg )
         m_handler.onAppVendor( msg );
         break;
     default:
-        r = -1;
-        m_error_count++;
+        m_handler.onAppUnknown( msg );
         break;
     }
     return r;

@@ -1009,6 +1009,15 @@ class ApsStateMachine
         ///
         virtual void onAppVendor( AppMessage const &msg );
 
+        ///
+        /// \brief onUnknown
+        ///
+        /// Received unknown message from APC
+        ///
+        /// \param msg
+        ///
+        virtual void onAppUnknown( AppMessage const &msg );
+
       protected:
         ApsStateMachine *m_owner;
 

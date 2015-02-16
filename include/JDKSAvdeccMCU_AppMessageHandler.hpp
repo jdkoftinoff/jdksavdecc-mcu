@@ -48,20 +48,86 @@ class AppMessageHandler
     AppMessageHandler() {}
     virtual ~AppMessageHandler() {}
 
+    ///
+    /// \brief onAppNop
+    ///
+    /// Called when the APPDU is NOP
+    ///
+    /// \param msg The AppMessage
+    ///
     virtual void onAppNop( AppMessage const &msg ) = 0;
 
+    ///
+    /// \brief onAppEntityIdRequest
+    ///
+    /// Called when the APPDU is ENTITY_ID_REQUEST
+    ///
+    /// \param msg The AppMessage
+    ///
     virtual void onAppEntityIdRequest( AppMessage const &msg ) = 0;
 
+    ///
+    /// \brief onAppEntityIdResponse
+    ///
+    /// Called when the APPDU is ENTITY_ID_RESPONSE
+    ///
+    /// \param msg The AppMessage
+    ///
     virtual void onAppEntityIdResponse( AppMessage const &msg ) = 0;
 
+    ///
+    /// \brief onAppLinkUp
+    ///
+    /// Called when the APPDU is LINK_UP
+    ///
+    /// \param msg The AppMessage
+    ///
     virtual void onAppLinkUp( AppMessage const &msg ) = 0;
 
+    ///
+    /// \brief onAppLinkDown
+    ///
+    /// Called when the APPDU is LINK_DOWN
+    ///
+    /// \param msg The AppMessage
+    ///
     virtual void onAppLinkDown( AppMessage const &msg ) = 0;
 
+    ///
+    /// \brief onAppAvdeccFromAps
+    ///
+    /// Called when the APPDU is AVDECC_FROM_APS
+    ///
+    /// \param msg The AppMessage
+    ///
     virtual void onAppAvdeccFromAps( AppMessage const &msg ) = 0;
 
+    ///
+    /// \brief onAppAvdeccFromApc
+    ///
+    /// Called when the APPDU is AVDECC_TO_APC
+    ///
+    /// \param msg The AppMessage
+    ///
     virtual void onAppAvdeccFromApc( AppMessage const &msg ) = 0;
 
+
+    ///
+    /// \brief onAppVendor
+    ///
+    /// Called when the APPDU is VENDOR
+    ///
+    /// \param msg The AppMessage
+    ///
     virtual void onAppVendor( AppMessage const &msg ) = 0;
+
+    ///
+    /// \brief onUnknown
+    ///
+    /// Called when the APPDU message type or version is unknown
+    ///
+    /// \param msg The AppMessage
+    ///
+    virtual void onAppUnknown( AppMessage const &msg ) = 0;
 };
 }

@@ -269,6 +269,11 @@ void ApcStateMachine::StateEvents::onAppVendor( const AppMessage &msg )
     // Do nothing
 }
 
+void ApcStateMachine::StateEvents::onAppUnknown(const AppMessage &msg)
+{
+    // Do nothing
+}
+
 void ApcStateMachine::StateActions::clear()
 {
     // Do nothing
