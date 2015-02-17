@@ -5,6 +5,7 @@ project(${PROJECT} C CXX)
 
 option(CXX11 "C++11 mode" "OFF")
 option(PCAP "Enable/Link with PCAP library" "ON")
+option(LIBUV "Enable/Link with uvrawpkt and libuv" "ON")
 
 include_directories( "include" "jdksavdecc-c/include" )
 
@@ -24,6 +25,14 @@ if( PCAP )
     endif()
 else()
     add_definitions("-DJDKSAVDECCMCU_ENABLE_PCAP=0")
+endif()
+
+if( LIBUV )
+    add_definitions("-DJDKSAVDECCMCU_ENABLE_RAWSOCKETLIBUV=1")
+    include_directories("../uvrawpkt/include" "../libuv/include")
+    set(LIBS ${LIBS} uvrawpkt uv)
+else()
+    add_definitions("-DJDKSAVDECCMCU_ENABLE_RAWSOCKETLIBUV=0")
 endif()
 
 INCLUDE (common.cmake)

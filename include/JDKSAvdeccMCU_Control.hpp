@@ -42,6 +42,16 @@
 
 namespace JDKSAvdeccMCU
 {
+
+///
+/// \brief The Control class
+///
+/// The Control class is a Handler. It represents a single control desscriptor
+/// item. It refers to a ControlValueHolder object which actually holds the
+/// control's current value(s).  This class can generate the meta data
+/// for the control descriptor and manages the data transport
+/// for the control data via SET_CONTROL and GET_CONTROL commands
+///
 class Control : public Handler
 {
   public:

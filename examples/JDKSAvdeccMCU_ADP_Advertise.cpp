@@ -4,6 +4,7 @@ using namespace JDKSAvdeccMCU;
 
 int main()
 {
+#if 0
     RawSocketMulti net( JDKSAVDECC_AVTP_ETHERTYPE,
                         jdksavdecc_multicast_adp_acmp );
 
@@ -34,4 +35,5 @@ int main()
 #endif
         }
     }
+#endif
 }
