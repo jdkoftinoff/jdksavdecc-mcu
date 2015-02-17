@@ -28,30 +28,26 @@
   ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
   POSSIBILITY OF SUCH DAMAGE.
 */
-#pragma once
+
 #include "JDKSAvdeccMCU/World.hpp"
-#include "JDKSAvdeccMCU/ADPManager.hpp"
-#include "JDKSAvdeccMCU/ControlReceiver.hpp"
-#include "JDKSAvdeccMCU/ControlSender.hpp"
-#include "JDKSAvdeccMCU/ControlValueHolder.hpp"
-#include "JDKSAvdeccMCU/ControllerEntity.hpp"
-#include "JDKSAvdeccMCU/EEPromStorage.hpp"
-#include "JDKSAvdeccMCU/Entity.hpp"
-#include "JDKSAvdeccMCU/Frame.hpp"
 #include "JDKSAvdeccMCU/Handler.hpp"
 #include "JDKSAvdeccMCU/HandlerGroup.hpp"
-#include "JDKSAvdeccMCU/Helpers.hpp"
-#include "JDKSAvdeccMCU/PcapFile.hpp"
-#include "JDKSAvdeccMCU/PcapFileReader.hpp"
-#include "JDKSAvdeccMCU/PcapFileWriter.hpp"
-#include "JDKSAvdeccMCU/RawSocket.hpp"
-#include "JDKSAvdeccMCU/RawSocketFactory.hpp"
-#include "JDKSAvdeccMCU/RawSocketPcapFile.hpp"
-#include "JDKSAvdeccMCU/RawSocketWizNet.hpp"
-#include "JDKSAvdeccMCU/MDNSRegister.hpp"
-#include "JDKSAvdeccMCU/Http.hpp"
-#include "JDKSAvdeccMCU/AppMessage.hpp"
-#include "JDKSAvdeccMCU/AppMessageParser.hpp"
-#include "JDKSAvdeccMCU/AppMessageHandler.hpp"
-#include "JDKSAvdeccMCU/Apc.hpp"
-#include "JDKSAvdeccMCU/Aps.hpp"
+
+namespace JDKSAvdeccMCU
+{
+
+Handler::~Handler() {}
+
+void Handler::tick( jdksavdecc_timestamp_in_milliseconds time_in_millis )
+{
+    (void)time_in_millis;
+}
+
+bool Handler::receivedPDU( Frame &frame )
+{
+    (void)frame;
+    return false;
+}
+
+void Handler::addToHandlerGroup( HandlerGroup &group ) { group.add( this ); }
+}

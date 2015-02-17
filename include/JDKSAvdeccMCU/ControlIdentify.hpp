@@ -29,29 +29,30 @@
   POSSIBILITY OF SUCH DAMAGE.
 */
 #pragma once
+
 #include "JDKSAvdeccMCU/World.hpp"
-#include "JDKSAvdeccMCU/ADPManager.hpp"
-#include "JDKSAvdeccMCU/ControlReceiver.hpp"
-#include "JDKSAvdeccMCU/ControlSender.hpp"
-#include "JDKSAvdeccMCU/ControlValueHolder.hpp"
-#include "JDKSAvdeccMCU/ControllerEntity.hpp"
-#include "JDKSAvdeccMCU/EEPromStorage.hpp"
-#include "JDKSAvdeccMCU/Entity.hpp"
-#include "JDKSAvdeccMCU/Frame.hpp"
-#include "JDKSAvdeccMCU/Handler.hpp"
-#include "JDKSAvdeccMCU/HandlerGroup.hpp"
-#include "JDKSAvdeccMCU/Helpers.hpp"
-#include "JDKSAvdeccMCU/PcapFile.hpp"
-#include "JDKSAvdeccMCU/PcapFileReader.hpp"
-#include "JDKSAvdeccMCU/PcapFileWriter.hpp"
-#include "JDKSAvdeccMCU/RawSocket.hpp"
-#include "JDKSAvdeccMCU/RawSocketFactory.hpp"
-#include "JDKSAvdeccMCU/RawSocketPcapFile.hpp"
-#include "JDKSAvdeccMCU/RawSocketWizNet.hpp"
-#include "JDKSAvdeccMCU/MDNSRegister.hpp"
-#include "JDKSAvdeccMCU/Http.hpp"
-#include "JDKSAvdeccMCU/AppMessage.hpp"
-#include "JDKSAvdeccMCU/AppMessageParser.hpp"
-#include "JDKSAvdeccMCU/AppMessageHandler.hpp"
-#include "JDKSAvdeccMCU/Apc.hpp"
-#include "JDKSAvdeccMCU/Aps.hpp"
+#include "JDKSAvdeccMCU/Control.hpp"
+
+namespace JDKSAvdeccMCU
+{
+
+class ControlIdentify : public Control
+{
+  public:
+    /// Construct the ControlSenderIdentify object
+    ControlIdentify( ControllerEntity &controller_entity,
+                     uint16_t descriptor_index,
+                     ControlValueHolder *holder,
+                     void ( *received_wink_callback )(
+                         uint16_t descriptor_index, uint8_t value ) );
+
+    /// Send the SET_CONTROL message if it is time to
+    virtual void tick( jdksavdecc_timestamp_in_milliseconds time_in_millis );
+
+  protected:
+    uint8_t m_send_countdown;
+    jdksavdecc_timestamp_in_milliseconds m_time_of_last_sent_unsolicited_msg;
+    void ( *m_received_wink_callback )( uint16_t descriptor_index,
+                                        uint8_t value );
+};
+}

@@ -29,29 +29,46 @@
   POSSIBILITY OF SUCH DAMAGE.
 */
 #pragma once
+
 #include "JDKSAvdeccMCU/World.hpp"
-#include "JDKSAvdeccMCU/ADPManager.hpp"
-#include "JDKSAvdeccMCU/ControlReceiver.hpp"
-#include "JDKSAvdeccMCU/ControlSender.hpp"
-#include "JDKSAvdeccMCU/ControlValueHolder.hpp"
-#include "JDKSAvdeccMCU/ControllerEntity.hpp"
-#include "JDKSAvdeccMCU/EEPromStorage.hpp"
-#include "JDKSAvdeccMCU/Entity.hpp"
-#include "JDKSAvdeccMCU/Frame.hpp"
-#include "JDKSAvdeccMCU/Handler.hpp"
-#include "JDKSAvdeccMCU/HandlerGroup.hpp"
-#include "JDKSAvdeccMCU/Helpers.hpp"
-#include "JDKSAvdeccMCU/PcapFile.hpp"
-#include "JDKSAvdeccMCU/PcapFileReader.hpp"
-#include "JDKSAvdeccMCU/PcapFileWriter.hpp"
 #include "JDKSAvdeccMCU/RawSocket.hpp"
-#include "JDKSAvdeccMCU/RawSocketFactory.hpp"
-#include "JDKSAvdeccMCU/RawSocketPcapFile.hpp"
-#include "JDKSAvdeccMCU/RawSocketWizNet.hpp"
-#include "JDKSAvdeccMCU/MDNSRegister.hpp"
-#include "JDKSAvdeccMCU/Http.hpp"
-#include "JDKSAvdeccMCU/AppMessage.hpp"
-#include "JDKSAvdeccMCU/AppMessageParser.hpp"
-#include "JDKSAvdeccMCU/AppMessageHandler.hpp"
-#include "JDKSAvdeccMCU/Apc.hpp"
-#include "JDKSAvdeccMCU/Aps.hpp"
+
+namespace JDKSAvdeccMCU
+{
+
+class HandlerGroup;
+
+///
+/// \brief The Handler class
+///
+/// Abstract base class for classes that need to be notified
+/// of time traversal and received PDU's
+///
+class Handler
+{
+  public:
+    ///
+    /// \brief ~Handler Virtual destructor
+    ///
+    virtual ~Handler();
+
+    ///
+    /// \brief tick Notification of time passage
+    /// \param timestamp the current monotonic time in milleconds
+    ///
+    virtual void tick( jdksavdecc_timestamp_in_milliseconds timestamp );
+
+    ///
+    /// \brief receivedPDU Notification of received raw PDU.
+    /// \param frame reference to received Frame object
+    /// \return true if the message was handled
+    ///
+    virtual bool receivedPDU( Frame &frame );
+
+    ///
+    /// \brief addToHandlerGroup Register with HandlerGroup
+    /// \param group HandlerGroup to add to
+    ///
+    virtual void addToHandlerGroup( HandlerGroup &group );
+};
+}

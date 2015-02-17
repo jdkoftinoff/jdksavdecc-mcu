@@ -28,30 +28,34 @@
   ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
   POSSIBILITY OF SUCH DAMAGE.
 */
-#pragma once
+
 #include "JDKSAvdeccMCU/World.hpp"
-#include "JDKSAvdeccMCU/ADPManager.hpp"
-#include "JDKSAvdeccMCU/ControlReceiver.hpp"
-#include "JDKSAvdeccMCU/ControlSender.hpp"
-#include "JDKSAvdeccMCU/ControlValueHolder.hpp"
-#include "JDKSAvdeccMCU/ControllerEntity.hpp"
-#include "JDKSAvdeccMCU/EEPromStorage.hpp"
-#include "JDKSAvdeccMCU/Entity.hpp"
-#include "JDKSAvdeccMCU/Frame.hpp"
-#include "JDKSAvdeccMCU/Handler.hpp"
-#include "JDKSAvdeccMCU/HandlerGroup.hpp"
-#include "JDKSAvdeccMCU/Helpers.hpp"
-#include "JDKSAvdeccMCU/PcapFile.hpp"
-#include "JDKSAvdeccMCU/PcapFileReader.hpp"
-#include "JDKSAvdeccMCU/PcapFileWriter.hpp"
-#include "JDKSAvdeccMCU/RawSocket.hpp"
-#include "JDKSAvdeccMCU/RawSocketFactory.hpp"
-#include "JDKSAvdeccMCU/RawSocketPcapFile.hpp"
-#include "JDKSAvdeccMCU/RawSocketWizNet.hpp"
-#include "JDKSAvdeccMCU/MDNSRegister.hpp"
-#include "JDKSAvdeccMCU/Http.hpp"
-#include "JDKSAvdeccMCU/AppMessage.hpp"
-#include "JDKSAvdeccMCU/AppMessageParser.hpp"
-#include "JDKSAvdeccMCU/AppMessageHandler.hpp"
-#include "JDKSAvdeccMCU/Apc.hpp"
-#include "JDKSAvdeccMCU/Aps.hpp"
+#include "JDKSAvdeccMCU/ControlIdentify.hpp"
+
+namespace JDKSAvdeccMCU
+{
+
+ControlIdentify::ControlIdentify(
+    ControllerEntity &controller_entity,
+    uint16_t descriptor_index,
+    ControlValueHolder *holder,
+    void ( *received_wink_callback )( uint16_t descriptor_index,
+                                      uint8_t value ) )
+    : Control( controller_entity,
+               descriptor_index,
+               Eui64( JDKSAVDECC_AEM_CONTROL_TYPE_IDENTIFY ),
+               JDKSAVDECC_CONTROL_VALUE_LINEAR_UINT8,
+               holder )
+    , m_send_countdown( 0 )
+    , m_time_of_last_sent_unsolicited_msg( 0 )
+    , m_received_wink_callback( received_wink_callback )
+{
+}
+
+void
+    ControlIdentify::tick( jdksavdecc_timestamp_in_milliseconds time_in_millis )
+{
+    // TODO: send 3 unsolicited messages when value changes state from 0 to 0xff
+    (void)time_in_millis;
+}
+}

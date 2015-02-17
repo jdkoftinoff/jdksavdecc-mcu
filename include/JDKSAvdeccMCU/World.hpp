@@ -29,29 +29,17 @@
   POSSIBILITY OF SUCH DAMAGE.
 */
 #pragma once
-#include "JDKSAvdeccMCU/World.hpp"
-#include "JDKSAvdeccMCU/ADPManager.hpp"
-#include "JDKSAvdeccMCU/ControlReceiver.hpp"
-#include "JDKSAvdeccMCU/ControlSender.hpp"
-#include "JDKSAvdeccMCU/ControlValueHolder.hpp"
-#include "JDKSAvdeccMCU/ControllerEntity.hpp"
-#include "JDKSAvdeccMCU/EEPromStorage.hpp"
-#include "JDKSAvdeccMCU/Entity.hpp"
-#include "JDKSAvdeccMCU/Frame.hpp"
-#include "JDKSAvdeccMCU/Handler.hpp"
-#include "JDKSAvdeccMCU/HandlerGroup.hpp"
-#include "JDKSAvdeccMCU/Helpers.hpp"
-#include "JDKSAvdeccMCU/PcapFile.hpp"
-#include "JDKSAvdeccMCU/PcapFileReader.hpp"
-#include "JDKSAvdeccMCU/PcapFileWriter.hpp"
-#include "JDKSAvdeccMCU/RawSocket.hpp"
-#include "JDKSAvdeccMCU/RawSocketFactory.hpp"
-#include "JDKSAvdeccMCU/RawSocketPcapFile.hpp"
-#include "JDKSAvdeccMCU/RawSocketWizNet.hpp"
-#include "JDKSAvdeccMCU/MDNSRegister.hpp"
-#include "JDKSAvdeccMCU/Http.hpp"
-#include "JDKSAvdeccMCU/AppMessage.hpp"
-#include "JDKSAvdeccMCU/AppMessageParser.hpp"
-#include "JDKSAvdeccMCU/AppMessageHandler.hpp"
-#include "JDKSAvdeccMCU/Apc.hpp"
-#include "JDKSAvdeccMCU/Aps.hpp"
+
+#include "JDKSAvdeccMCU/PlatformOptions.hpp"
+#include "JDKSAvdeccMCU/Platform.hpp"
+
+#include "jdksavdecc.h"
+#include "jdksavdecc_aem_descriptor.h"
+#include "jdksavdecc_aem_command.h"
+#include "JDKSAvdeccMCU/Eui.hpp"
+
+namespace JDKSAvdeccMCU
+{
+}
+
+void jdksavdeccmcu_debug_log( const char *str, uint16_t v );

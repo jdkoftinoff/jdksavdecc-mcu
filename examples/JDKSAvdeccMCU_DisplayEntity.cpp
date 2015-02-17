@@ -1,5 +1,5 @@
 #ifdef __AVR__
-#include "JDKSAvdeccMCU_Arduino.hpp"
+#include "JDKSAvdeccMCU/Arduino.hpp"
 #include "Picaso_Serial_4DLib.h"
 #include "Picaso_Const4D.h"
 #include "Ethernet.h"
@@ -290,7 +290,7 @@ void loop()
 
 #else
 
-#include "JDKSAvdeccMCU_World.hpp"
+#include "JDKSAvdeccMCU/World.hpp"
 #include "JDKSAvdeccMCU.hpp"
 
 using namespace JDKSAvdeccMCU;

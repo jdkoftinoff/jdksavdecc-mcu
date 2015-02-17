@@ -29,29 +29,70 @@
   POSSIBILITY OF SUCH DAMAGE.
 */
 #pragma once
+
 #include "JDKSAvdeccMCU/World.hpp"
-#include "JDKSAvdeccMCU/ADPManager.hpp"
-#include "JDKSAvdeccMCU/ControlReceiver.hpp"
-#include "JDKSAvdeccMCU/ControlSender.hpp"
-#include "JDKSAvdeccMCU/ControlValueHolder.hpp"
-#include "JDKSAvdeccMCU/ControllerEntity.hpp"
-#include "JDKSAvdeccMCU/EEPromStorage.hpp"
-#include "JDKSAvdeccMCU/Entity.hpp"
-#include "JDKSAvdeccMCU/Frame.hpp"
-#include "JDKSAvdeccMCU/Handler.hpp"
-#include "JDKSAvdeccMCU/HandlerGroup.hpp"
-#include "JDKSAvdeccMCU/Helpers.hpp"
-#include "JDKSAvdeccMCU/PcapFile.hpp"
-#include "JDKSAvdeccMCU/PcapFileReader.hpp"
-#include "JDKSAvdeccMCU/PcapFileWriter.hpp"
+
 #include "JDKSAvdeccMCU/RawSocket.hpp"
-#include "JDKSAvdeccMCU/RawSocketFactory.hpp"
-#include "JDKSAvdeccMCU/RawSocketPcapFile.hpp"
-#include "JDKSAvdeccMCU/RawSocketWizNet.hpp"
-#include "JDKSAvdeccMCU/MDNSRegister.hpp"
-#include "JDKSAvdeccMCU/Http.hpp"
-#include "JDKSAvdeccMCU/AppMessage.hpp"
-#include "JDKSAvdeccMCU/AppMessageParser.hpp"
-#include "JDKSAvdeccMCU/AppMessageHandler.hpp"
-#include "JDKSAvdeccMCU/Apc.hpp"
-#include "JDKSAvdeccMCU/Aps.hpp"
+
+#define JDKSAVDECCWINNETIO_DEBUG 0
+
+#if JDKSAVDECCMCU_ENABLE_RAWSOCKETWIZNET
+namespace JDKSAvdeccMCU
+{
+
+class RawSocketWizNet : public RawSocket
+{
+  public:
+    RawSocketWizNet( Eui48 const &mac_address,
+                     uint16_t ethertype,
+                     const Eui48 *multicast_to_join = 0 )
+        : m_mac_address( mac_address ), m_ethertype( ethertype )
+    {
+        if ( multicast_to_join )
+        {
+            m_multicast = *multicast_to_join;
+        }
+    }
+
+    virtual ~RawSocketWizNet();
+
+    virtual jdksavdecc_timestamp_in_milliseconds getTimeInMilliseconds()
+    {
+        return millis();
+    }
+
+    virtual bool recvFrame( Frame *frame );
+
+    virtual bool sendFrame( Frame const &frame,
+                            uint8_t const *data1,
+                            uint16_t len1,
+                            uint8_t const *data2,
+                            uint16_t len2 );
+
+    virtual bool sendReplyFrame( Frame &frame,
+                                 uint8_t const *data1,
+                                 uint16_t len1,
+                                 uint8_t const *data2,
+                                 uint16_t len2 );
+
+    virtual void initialize();
+
+    virtual bool joinMulticast( const Eui48 &multicast_mac )
+    {
+        m_multicast = multicast_mac;
+    }
+
+    virtual void setNonblocking() {}
+
+    virtual filedescriptor_type getFd() const { return 0; }
+
+    virtual Eui48 const &getMACAddress() const { return m_mac_address; }
+
+  private:
+    Eui48 m_mac_address;
+    uint16_t m_ethertype;
+    Eui48 m_multicast;
+};
+}
+
+#endif

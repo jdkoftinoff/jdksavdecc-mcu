@@ -28,30 +28,60 @@
   ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
   POSSIBILITY OF SUCH DAMAGE.
 */
-#pragma once
+
 #include "JDKSAvdeccMCU/World.hpp"
-#include "JDKSAvdeccMCU/ADPManager.hpp"
-#include "JDKSAvdeccMCU/ControlReceiver.hpp"
-#include "JDKSAvdeccMCU/ControlSender.hpp"
-#include "JDKSAvdeccMCU/ControlValueHolder.hpp"
-#include "JDKSAvdeccMCU/ControllerEntity.hpp"
-#include "JDKSAvdeccMCU/EEPromStorage.hpp"
-#include "JDKSAvdeccMCU/Entity.hpp"
-#include "JDKSAvdeccMCU/Frame.hpp"
-#include "JDKSAvdeccMCU/Handler.hpp"
-#include "JDKSAvdeccMCU/HandlerGroup.hpp"
-#include "JDKSAvdeccMCU/Helpers.hpp"
+
+#if JDKSAVDECCMCU_ENABLE_PCAPFILE == 1
+
 #include "JDKSAvdeccMCU/PcapFile.hpp"
-#include "JDKSAvdeccMCU/PcapFileReader.hpp"
-#include "JDKSAvdeccMCU/PcapFileWriter.hpp"
-#include "JDKSAvdeccMCU/RawSocket.hpp"
-#include "JDKSAvdeccMCU/RawSocketFactory.hpp"
-#include "JDKSAvdeccMCU/RawSocketPcapFile.hpp"
-#include "JDKSAvdeccMCU/RawSocketWizNet.hpp"
-#include "JDKSAvdeccMCU/MDNSRegister.hpp"
-#include "JDKSAvdeccMCU/Http.hpp"
-#include "JDKSAvdeccMCU/AppMessage.hpp"
-#include "JDKSAvdeccMCU/AppMessageParser.hpp"
-#include "JDKSAvdeccMCU/AppMessageHandler.hpp"
-#include "JDKSAvdeccMCU/Apc.hpp"
-#include "JDKSAvdeccMCU/Aps.hpp"
+
+namespace JDKSAvdeccMCU
+{
+
+#ifdef _WIN32
+
+#if defined( _MSC_VER ) || defined( _MSC_EXTENSIONS )
+#define DELTA_EPOCH_IN_MICROSECS 11644473600000000Ui64
+#else
+#define DELTA_EPOCH_IN_MICROSECS 11644473600000000ULL
+#endif
+
+int gettimeofday( struct timeval *tv, struct timezone * );
+
+int gettimeofday( struct timeval *tv, struct timezone * )
+{
+    FILETIME ft;
+    unsigned __int64 tmpres = 0;
+    static int tzflag;
+    if ( NULL != tv )
+    {
+        GetSystemTimeAsFileTime( &ft );
+        tmpres |= ft.dwHighDateTime;
+        tmpres <<= 32;
+        tmpres |= ft.dwLowDateTime;
+        /*converting file time to unix epoch*/
+        tmpres /= 10; /*convert into microseconds*/
+        tmpres -= DELTA_EPOCH_IN_MICROSECS;
+        tv->tv_sec = (long)( tmpres / 1000000UL );
+        tv->tv_usec = (long)( tmpres % 1000000UL );
+    }
+    return 0;
+}
+#endif
+
+uint64_t get_current_time_in_microseconds()
+{
+    uint64_t t = 0;
+    struct timeval tv;
+    if ( gettimeofday( &tv, 0 ) == 0 )
+    {
+        return ( uint64_t )( ( tv.tv_sec * 1000000 ) + ( tv.tv_usec ) );
+    }
+    return t;
+}
+}
+
+#else
+const char *jdksavdeccmcu_pcapfile_file = __FILE__;
+
+#endif
