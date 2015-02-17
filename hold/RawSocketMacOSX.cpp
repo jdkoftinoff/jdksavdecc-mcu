@@ -29,8 +29,8 @@
   POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "JDKSAvdeccMCU_World.hpp"
-#include "JDKSAvdeccMCU_RawSocketMacOSX.hpp"
+#include "JDKSAvdeccMCU/World.hpp"
+#include "JDKSAvdeccMCU/RawSocketMacOSX.hpp"
 
 #if defined( __APPLE__ ) && JDKSAVDECCMCU_ENABLE_RAWSOCKETMACOSX
 

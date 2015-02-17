@@ -29,8 +29,8 @@
   POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "JDKSAvdeccMCU_World.hpp"
-#include "JDKSAvdeccMCU_RawSocketWin32.hpp"
+#include "JDKSAvdeccMCU/World.hpp"
+#include "JDKSAvdeccMCU/RawSocketWin32.hpp"
 
 #if defined( _WIN32 ) && JDKSAVDECCMCU_ENABLE_RAWSOCKETWIN32
 

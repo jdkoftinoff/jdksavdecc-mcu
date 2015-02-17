@@ -30,8 +30,8 @@
 */
 #pragma once
 
-#include "JDKSAvdeccMCU_World.hpp"
-#include "JDKSAvdeccMCU_RawSocket.hpp"
+#include "JDKSAvdeccMCU/World.hpp"
+#include "JDKSAvdeccMCU/RawSocket.hpp"
 
 namespace JDKSAvdeccMCU
 {

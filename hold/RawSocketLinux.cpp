@@ -29,8 +29,8 @@
   POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "JDKSAvdeccMCU_World.hpp"
-#include "JDKSAvdeccMCU_RawSocketLinux.hpp"
+#include "JDKSAvdeccMCU/World.hpp"
+#include "JDKSAvdeccMCU/RawSocketLinux.hpp"
 
 #if defined( __linux__ ) && JDKSAVDECCMCU_ENABLE_RAWSOCKETLINUX
 #include <fcntl.h>

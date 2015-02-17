@@ -39,21 +39,16 @@
 
 namespace JDKSAvdeccMCU
 {
+class HandlerGroup;
 
 class RawSocket
 {
   public:
-#if defined( _WIN32 )
-    typedef SOCKET filedescriptor_type;
-    static const filedescriptor_type bad_filedescriptor = INVALID_SOCKET;
-#else
-    typedef int filedescriptor_type;
-    static const filedescriptor_type bad_filedescriptor = -1;
-#endif
-
     RawSocket() {}
 
     virtual ~RawSocket() {}
+
+    virtual void setHandlerGroup( HandlerGroup *handler_group ) = 0;
 
     virtual jdksavdecc_timestamp_in_milliseconds getTimeInMilliseconds() = 0;
 
@@ -84,11 +79,6 @@ class RawSocket
     virtual void initialize() = 0;
 
     /**
-    * Get the file descriptor
-    */
-    virtual filedescriptor_type getFd() const = 0;
-
-    /**
      * Get the MAC address of the ethernet port
      */
     virtual Eui48 const &getMACAddress() const = 0;
@@ -99,45 +89,6 @@ class RawSocket
     virtual const char *getDeviceName() const = 0;
 };
 
-class RawSocketTracker : public RawSocket
-{
-  public:
-    RawSocketTracker() { net[num_rawsockets++] = this; }
 
-    virtual ~RawSocketTracker() {}
 
-    /**
-     * Ask the first ethernet port for the current time in milliseconds
-     */
-    static jdksavdecc_timestamp_in_milliseconds multiGetTimeInMilliseconds();
-
-    /**
-     * @brief multiRecvFrame Poll all ethernet ports for a received ethernet
-     * frame
-     * @param frame pointer to the frame
-     * @return bool true if the frame was received
-     */
-    static bool multiRecvFrame( Frame *frame );
-
-    static bool multiSendFrame( Frame const &frame,
-                                uint8_t const *data1 = 0,
-                                uint16_t len1 = 0,
-                                uint8_t const *data2 = 0,
-                                uint16_t len2 = 0 );
-
-    static bool multiSendReplyFrame( Frame &frame,
-                                     uint8_t const *data1 = 0,
-                                     uint16_t len1 = 0,
-                                     uint8_t const *data2 = 0,
-                                     uint16_t len2 = 0 );
-
-    static int openAllEthernetPorts( uint16_t ethertype,
-                                     const Eui48 &multicast_to_join );
-
-    static void closeAllEthernetPorts();
-
-    static RawSocket *net[JDKSAVDECCMCU_MAX_RAWSOCKETS];
-    static uint16_t num_rawsockets;
-    static uint16_t last_recv_socket;
-};
 }

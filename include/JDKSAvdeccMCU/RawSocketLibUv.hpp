@@ -35,18 +35,18 @@
 
 #if JDKSAVDECCMCU_ENABLE_RAWSOCKETLIBUV
 
-#include "uvrawpkt/include/uv-rawpkt.h"
+#include "uv-rawpkt.h"
 
 namespace JDKSAvdeccMCU
 {
-class RawSocketLibUv : public RawSocketTracker
+class RawSocketLibUv : public RawSocket
 {
   public:
     RawSocketLibUv( uv_loop_t *loop,
                     uint16_t ethertype,
                     Eui48 const &multicast_to_join );
 
-    virtual ~RawSocketLinux();
+    virtual ~RawSocketLibUv();
 
     virtual jdksavdecc_timestamp_in_milliseconds getTimeInMilliseconds()
     {
@@ -71,11 +71,7 @@ class RawSocketLibUv : public RawSocketTracker
 
     virtual void setNonblocking();
 
-    virtual filedescriptor_type getFd() const { return m_fd; }
-
     virtual Eui48 const &getMACAddress() const { return m_mac_address; }
-
-    virtual const char *getDeviceName() const { return m_device; }
 
     virtual void initialize();
 
@@ -83,6 +79,20 @@ class RawSocketLibUv : public RawSocketTracker
     Eui48 m_mac_address;
     Eui48 m_default_dest_mac_address;
     uint16_t m_ethertype;
+};
+
+class RawSocketRunnerLibUv : public RawSocketRunner
+{
+public:
+    RawSocketRunnerLibUv(uv_loop_t *loop)
+        : m_loop( loop )
+    {}
+    virtual ~RawSocketRunnerLibUv() {}
+    virtual void setTarget( RawSocketRunnerNotification *notification_target ) = 0;
+
+private:
+
+    uv_loop_t *m_loop;
 
     static uv_rawpkt_network_port_iterator_t *network_port_iterator;
 
@@ -124,7 +134,7 @@ class RawSocketLibUv : public RawSocketTracker
     struct port_context
     {
         uv_rawpkt_t rawpkt;
-        RawSocketLibUv port;
+        RawSocketLibUv *port;
         struct port_context_s *next;
         struct port_context_s *prev;
     };
@@ -133,12 +143,12 @@ class RawSocketLibUv : public RawSocketTracker
      * \brief portcontext_first The first entry of the port_context_t object
      * list
      */
-    static port_context_t *portcontext_first = 0;
+    static port_context *portcontext_first;
 
     /**
      * \brief portcontext_last The last entry of the port_context_t object list
      */
-    static port_context_t *portcontext_last = 0;
+    static port_context *portcontext_last;
 
     /**
      * \brief rawpkt_closed callback that is called whenever a uv_rawpkt is
@@ -159,15 +169,7 @@ class RawSocketLibUv : public RawSocketTracker
                                          ssize_t nread,
                                          const uv_buf_t *buf );
 
-    /**
-     * \brief rawpkt_closed callback that is called whenever a uv_rawpkt is
-     *closed
-     *
-     * \param handle The pointer to the uv_rawpkt_t as a uv_handle_t
-     */
-    static void rawpkt_closed( uv_handle_t *handle );
 };
 
-typedef RawSocketLibUv RawSocketDefault;
 }
 #endif

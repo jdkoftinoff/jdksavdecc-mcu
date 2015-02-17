@@ -34,7 +34,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #if JDKSAVDECCMCU_ENABLE_RAWSOCKETPCAPFILE && JDKSAVDECCMCU_ENABLE_PCAPFILE
 namespace JDKSAvdeccMCU
 {
-class RawSocketPcapFile : public RawSocketTracker
+class RawSocketPcapFile : public RawSocket
 {
     uint16_t m_ethertype;
     Eui48 m_my_mac;
@@ -64,6 +64,11 @@ class RawSocketPcapFile : public RawSocketTracker
 
     ~RawSocketPcapFile();
 
+    virtual void setHandlerGroup( HandlerGroup *handler_group )
+    {
+        m_handler_group = handler_group;
+    }
+
     virtual jdksavdecc_timestamp_in_milliseconds getTimeInMilliseconds();
 
     virtual bool recvFrame( Frame *frame );
@@ -84,16 +89,15 @@ class RawSocketPcapFile : public RawSocketTracker
 
     virtual void setNonblocking();
 
-    virtual filedescriptor_type getFd() const;
-
     virtual const Eui48 &getMACAddress() const;
 
-    virtual void initialize(){};
+    virtual void initialize() {}
 
     virtual const char *getDeviceName() const { return "RawSocketPcapFile"; }
 
   private:
     bool readNextIncomingFrame();
+    HandlerGroup *m_handler_group;
 };
 }
 #endif

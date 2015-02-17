@@ -180,8 +180,6 @@ bool RawSocketPcapFile::joinMulticast( const Eui48 &multicast_mac )
 
 void RawSocketPcapFile::setNonblocking() {}
 
-RawSocket::filedescriptor_type RawSocketPcapFile::getFd() const { return 0; }
-
 const Eui48 &RawSocketPcapFile::getMACAddress() const { return m_my_mac; }
 
 bool RawSocketPcapFile::readNextIncomingFrame()

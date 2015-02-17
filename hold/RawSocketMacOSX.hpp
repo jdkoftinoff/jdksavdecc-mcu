@@ -30,20 +30,21 @@
 */
 #pragma once
 
-#include "JDKSAvdeccMCU_World.hpp"
-#include "JDKSAvdeccMCU_RawSocket.hpp"
+#include "JDKSAvdeccMCU/World.hpp"
+#include "JDKSAvdeccMCU/RawSocket.hpp"
 
-#if defined( __linux__ ) && JDKSAVDECCMCU_ENABLE_RAWSOCKETLINUX
+#if defined( __APPLE__ ) && JDKSAVDECCMCU_ENABLE_RAWSOCKETMACOSX
+
 namespace JDKSAvdeccMCU
 {
-class RawSocketLinux : public RawSocketTracker
+class RawSocketMacOSX : public RawSocketTracker
 {
   public:
-    RawSocketLinux( const char *device,
-                    uint16_t ethertype,
-                    Eui48 const &multicast_to_join );
+    RawSocketMacOSX( const char *interface_name,
+                     uint16_t ethertype,
+                     const Eui48 &multicast_to_join );
 
-    virtual ~RawSocketLinux();
+    virtual ~RawSocketMacOSX();
 
     virtual jdksavdecc_timestamp_in_milliseconds getTimeInMilliseconds()
     {
@@ -83,8 +84,10 @@ class RawSocketLinux : public RawSocketTracker
     Eui48 m_mac_address;
     Eui48 m_default_dest_mac_address;
     uint16_t m_ethertype;
+    void *m_pcap;
 };
 
-typedef RawSocketLinux RawSocketDefault;
+typedef RawSocketMacOSX RawSocketDefault;
 }
+
 #endif

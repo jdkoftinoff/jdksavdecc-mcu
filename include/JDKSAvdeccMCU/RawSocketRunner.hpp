@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 2014, J.D. Koftinoff Software, Ltd.
+  Copyright (c) 2015, J.D. Koftinoff Software, Ltd.
   All rights reserved.
 
   Redistribution and use in source and binary forms, with or without
@@ -28,11 +28,72 @@
   ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
   POSSIBILITY OF SUCH DAMAGE.
 */
+#pragma once
 
 #include "JDKSAvdeccMCU/World.hpp"
+#include "JDKSAvdeccMCU/Frame.hpp"
 #include "JDKSAvdeccMCU/RawSocket.hpp"
+#include "JDKSAvdeccMCU/HandlerGroup.hpp"
 
 namespace JDKSAvdeccMCU
 {
+
+class RawSocketRunnerNotification
+{
+public:
+    virtual ~RawSocketRunnerNotification() {}
+
+    virtual bool RawSocketFound( RawSocket *rawsocket ) = 0;
+    virtual void RawSocketRemoved( RawSocket *rawsocket ) = 0;
+};
+
+class RawSocketRunner
+{
+public:
+    RawSocketRunner() {}
+    virtual ~RawSocketRunner() {}
+    virtual void setTarget( RawSocketRunnerNotification *notification_target ) = 0;
+    virtual bool run( int timeout_ms ) = 0;
+};
+
+class SimpleRawSocketRunner : public RawSocketRunner
+{
+public:
+    SimpleRawSocketRunner( RawSocket *the_socket )
+        : m_the_socket( the_socket )
+        , m_notification_target( 0 )
+    {
+    }
+
+    virtual ~SimpleRawSocketRunner()
+    {
+        if( m_notification_target && m_the_socket )
+        {
+            m_notification_target->RawSocketRemoved( m_the_socket );
+        }
+    }
+
+    virtual void setTarget( RawSocketRunnerNotification *notification_target )
+    {
+        m_notification_target=notification_target;
+        if( m_notification_target )
+        {
+            if( !m_notification_target->RawSocketFound( m_the_socket ) )
+            {
+                m_the_socket=0;
+            }
+        }
+    }
+
+    virtual bool run( int timeout_ms )
+    {
+        // TODO: poll socket and dispatch
+        return false;
+    }
+
+private:
+    RawSocket *m_the_socket;
+    RawSocketRunnerNotification *m_notification_target;
+};
 
 }

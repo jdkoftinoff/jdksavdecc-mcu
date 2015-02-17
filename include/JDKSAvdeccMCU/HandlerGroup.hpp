@@ -103,12 +103,6 @@ class HandlerGroup : public Handler
     ///
     uint32_t getHandledCount() const { return m_handled_count; }
 
-    ///
-    /// \brief pollNet Polls the RawSocket objects for an incoming frame
-    /// \return true if a message was received and processed
-    ///
-    virtual bool pollNet();
-
     /// Send Tick() messages to all encapsulated Handlers
     /// and poll incoming network for PDU's and dispatch them
     virtual void tick( jdksavdecc_timestamp_in_milliseconds timestamp );
