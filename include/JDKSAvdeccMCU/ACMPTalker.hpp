@@ -78,17 +78,40 @@ struct ACMPTalkerListenerPair
     uint16_t m_listener_unique_id;
 };
 
-///
-/// See IEEE Std 1722.1-2013 Clause 8.2.2.2.4 TalkerStreamInfo
-///
-struct ACMPTalkerStreamInfo
+
+
+class ACMPTalkerHandlerBase
 {
-    ACMPTalkerStreamInfo()
+public:
+
+    // See IEEE Std 1722.1-2013 Clause 8.2.2.2.4 TalkerStreamInfo
+
+    ACMPTalkerHandlerBase(ACMPTalkerListenerPair *listener_pair_storage, uint16_t max_connected_listeners )
         : m_connection_count(0)
-        , m_connected_listeners(nullptr)
+        , m_connected_listeners(listener_pair_storage)
         , m_stream_vlan_id(0)
-        , m_max_connected_listeners(0)
+        , m_max_connected_listeners(max_connected_listeners)
+        , m_state(STATE_WAITING)
     {}
+
+    ///
+    /// \brief ~Handler Virtual destructor
+    ///
+    virtual ~ACMPTalkerHandlerBase();
+
+    virtual void tick(
+            Entity *entity,
+            uint16_t unique_id,
+            ACMPTalkerEvents *eventTarget,
+            jdksavdecc_timestamp_in_milliseconds timestamp );
+
+    virtual bool receivedPDU(
+            Entity *entity,
+            uint16_t unique_id,
+            ACMPTalkerEvents *eventTarget,
+            Frame &frame );
+
+    void packListeners();
 
     Eui64 m_stream_id;
     Eui48 m_stream_dest_mac;
@@ -98,46 +121,6 @@ struct ACMPTalkerStreamInfo
 
     uint16_t m_max_connected_listeners;
 
-    void packListeners();
-
-    uint16_t getMaxListenersPerTalker() const
-    {
-        return m_max_connected_listeners;
-    }
-};
-
-
-class ACMPTalkerHandlerBase : public Handler
-{
-public:
-    ACMPTalkerHandlerBase( ACMPTalkerStreamInfo *talker_stream_info, Entity *entity = 0 )
-        : m_entity( entity )
-        , m_state(STATE_WAITING)
-        , m_talker_stream_info( talker_stream_info )
-    {}
-
-    virtual void tick( jdksavdecc_timestamp_in_milliseconds timestamp ) override;
-
-    virtual bool receivedPDU( Frame &frame ) override;
-
-    void setEntity( Entity *entity )
-    {
-        m_entity = entity;
-    }
-
-    Entity *getEntity()
-    {
-        return m_entity;
-    }
-
-    Entity const *getEntity() const
-    {
-        return m_entity;
-    }
-
-protected:
-    Entity *m_entity;
-
     enum State
     {
         STATE_WAITING,
@@ -146,24 +129,18 @@ protected:
         STATE_GET_STATE,
         STATE_GET_CONNECTION
     } m_state;
-
-    ACMPTalkerStreamInfo *m_talker_stream_info;
 };
 
 template <uint16_t MaxListenersPerTalker>
 class ACMPTalkerHandler : public ACMPTalkerHandlerBase
 {
 public:
-    ACMPTalkerHandler( Entity *entity = 0 )
-     : ACMPTalkerHandlerBase( &m_stream_info_storage )
+    ACMPTalkerHandler()
+     : ACMPTalkerHandlerBase( &m_listener_pairs_storage[0],  MaxListenersPerTalker )
     {
-        m_stream_info_storage.m_max_connected_listeners = MaxListenersPerTalker;
-        m_stream_info_storage.m_connected_listeners = &m_listener_pairs_storage[0];
     }
 
  protected:
-
-    ACMPTalkerStreamInfo m_stream_info_storage;
     ACMPTalkerListenerPair m_listener_pairs_storage[MaxListenersPerTalker];
 };
 

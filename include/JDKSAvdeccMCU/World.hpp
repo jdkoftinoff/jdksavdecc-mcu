@@ -38,6 +38,19 @@
 #include "jdksavdecc_aem_command.h"
 #include "JDKSAvdeccMCU/Eui.hpp"
 
+#if __cplusplus < 201103L
+
+#ifndef override
+#define override
+#endif
+
+#ifndef final
+#define final
+#endif
+
+#endif
+
+
 namespace JDKSAvdeccMCU
 {
 }
