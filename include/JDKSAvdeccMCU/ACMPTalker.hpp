@@ -148,7 +148,10 @@ public:
 class ACMPTalkerGroupHandlerBase : public Handler
 {
 public:
-    ACMPTalkerGroupHandlerBase( Entity *entity );
+    ACMPTalkerGroupHandlerBase( Entity *entity, ACMPTalkerEvents *event_target )
+        : m_entity( entity )
+        , m_event_target( event_target )
+    {}
 
     virtual void tick( jdksavdecc_timestamp_in_milliseconds timestamp ) override;
 
@@ -159,6 +162,10 @@ public:
     virtual ACMPTalkerHandlerBase const *getTalkerHandler( uint16_t talker_unique_id ) const = 0;
 
     virtual uint16_t getTalkerStreamSourceCount() const = 0;
+
+protected:
+    Entity *m_entity;
+    ACMPTalkerEvents *m_event_target;
 };
 
 template <uint16_t TalkerStreamSourceCount,
@@ -166,13 +173,9 @@ template <uint16_t TalkerStreamSourceCount,
 class ACMPTalkerGroupHandler : public ACMPTalkerGroupHandlerBase
 {
 public:
-    ACMPTalkerGroupHandler( Entity *entity )
-        : ACMPTalkerGroupHandlerBase( entity )
+    ACMPTalkerGroupHandler( Entity *entity, ACMPTalkerEvents *event_target )
+        : ACMPTalkerGroupHandlerBase( entity, event_target )
     {
-        for( uint16_t i=0; i<TalkerStreamSourceCount; ++i )
-        {
-            m_talkers_storage[i].setEntity(entity);
-        }
     }
 
     virtual ACMPTalkerHandlerBase *getTalkerHandler( uint16_t talker_unique_id ) override
