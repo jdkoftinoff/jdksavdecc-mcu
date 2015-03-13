@@ -50,7 +50,6 @@
 
 #endif
 
-
 namespace JDKSAvdeccMCU
 {
 }

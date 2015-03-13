@@ -33,7 +33,6 @@
 #include "JDKSAvdeccMCU/World.hpp"
 #include "JDKSAvdeccMCU/RawSocket.hpp"
 
-
 #include "JDKSAvdeccMCU/Helpers.hpp"
 #include "JDKSAvdeccMCU/Frame.hpp"
 
@@ -41,5 +40,4 @@
 
 namespace JDKSAvdeccMCU
 {
-
 }

@@ -58,8 +58,6 @@ bool HandlerGroup::add( Handler *v )
     return r;
 }
 
-
-
 /// Send Tick() messages to all encapsulated Handlers
 /// and poll incoming network for PDU's and dispatch them
 void HandlerGroup::tick( jdksavdecc_timestamp_in_milliseconds time_in_millis )

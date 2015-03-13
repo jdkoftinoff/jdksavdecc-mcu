@@ -83,15 +83,13 @@ class RawSocketLibUv : public RawSocket
 
 class RawSocketRunnerLibUv : public RawSocketRunner
 {
-public:
-    RawSocketRunnerLibUv(uv_loop_t *loop)
-        : m_loop( loop )
-    {}
+  public:
+    RawSocketRunnerLibUv( uv_loop_t *loop ) : m_loop( loop ) {}
     virtual ~RawSocketRunnerLibUv() {}
-    virtual void setTarget( RawSocketRunnerNotification *notification_target ) = 0;
+    virtual void setTarget( RawSocketRunnerNotification *notification_target )
+        = 0;
 
-private:
-
+  private:
     uv_loop_t *m_loop;
 
     static uv_rawpkt_network_port_iterator_t *network_port_iterator;
@@ -168,8 +166,6 @@ private:
     static void received_ethernet_frame( uv_rawpkt_t *rawpkt,
                                          ssize_t nread,
                                          const uv_buf_t *buf );
-
 };
-
 }
 #endif

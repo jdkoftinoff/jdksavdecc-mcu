@@ -33,7 +33,6 @@
 #include "JDKSAvdeccMCU/World.hpp"
 #include "JDKSAvdeccMCU/RawSocket.hpp"
 
-
 #include "JDKSAvdeccMCU/Helpers.hpp"
 #include "JDKSAvdeccMCU/Frame.hpp"
 
@@ -52,17 +51,46 @@ class ACMPTalkerHandlerBase;
 
 class ACMPTalkerEvents
 {
-public:
+  public:
     virtual ~ACMPTalkerEvents() {}
 
-    virtual void talkerConnected( ACMPTalkerHandlerBase const *talker_handler,
+    ///
+    /// \brief talkerConnected
+    ///
+    /// Notification that ACMP Talker State Machine has successfully connected a
+    /// stream
+    ///
+    /// \param entity
+    /// \param talker_unique_id
+    /// \param talker_handler
+    /// \param stream_info
+    /// \param listener_pair
+    ///
+    virtual void talkerConnected( Entity *entity,
+                                  uint16_t talker_unique_id,
+                                  ACMPTalkerHandlerBase const *talker_handler,
                                   ACMPTalkerStreamInfo const &stream_info,
-                                  ACMPTalkerListenerPair const &listener_pair ) = 0;
+                                  ACMPTalkerListenerPair const &listener_pair )
+        = 0;
 
-    virtual void talkerDisconnected( ACMPTalkerHandlerBase const *talker_handler,
-                                     ACMPTalkerStreamInfo const &stream_info,
-                                     ACMPTalkerListenerPair const &listener_pair ) = 0;
-
+    ///
+    /// \brief talkerDisconnected
+    ///
+    /// Notification that ACMP Talker State Machine has successfully
+    /// disconnected a stream
+    ///
+    /// \param entity
+    /// \param talker_unique_id
+    /// \param talker_handler
+    /// \param stream_info
+    /// \param listener_pair
+    ///
+    virtual void
+        talkerDisconnected( Entity *entity,
+                            uint16_t talker_unique_id,
+                            ACMPTalkerHandlerBase const *talker_handler,
+                            ACMPTalkerStreamInfo const &stream_info,
+                            ACMPTalkerListenerPair const &listener_pair ) = 0;
 };
 
 ///
@@ -70,47 +98,73 @@ public:
 ///
 struct ACMPTalkerListenerPair
 {
-    ACMPTalkerListenerPair()
-        : m_listener_unique_id(0)
-    {}
+    ACMPTalkerListenerPair() : m_listener_unique_id( 0 ) {}
 
     Eui64 m_listener_entity_id;
     uint16_t m_listener_unique_id;
 };
 
-
-
+///
+/// \brief The ACMPTalkerHandlerBase class
+///
+/// Manages a single Talker unique_id state machine
+///
 class ACMPTalkerHandlerBase
 {
-public:
-
-    // See IEEE Std 1722.1-2013 Clause 8.2.2.2.4 TalkerStreamInfo
-
-    ACMPTalkerHandlerBase(ACMPTalkerListenerPair *listener_pair_storage, uint16_t max_connected_listeners )
-        : m_connection_count(0)
-        , m_connected_listeners(listener_pair_storage)
-        , m_stream_vlan_id(0)
-        , m_max_connected_listeners(max_connected_listeners)
-        , m_state(STATE_WAITING)
-    {}
-
+  public:
     ///
-    /// \brief ~Handler Virtual destructor
+    /// \brief ACMPTalkerHandlerBase
     ///
+    /// See IEEE Std 1722.1-2013, "Clause 8.2.2.2.4 TalkerStreamInfo" and
+    /// IEEE Std 1722.1-2013 "Clause 8.2.2.6 ACMP Talker State Machine"
+    ///
+    /// \param listener_pair_storage Pointer to an array of
+    /// ACMPTalkerListenerPair objects,
+    ///        one for each listener
+    ///
+    /// \param max_connected_listeners Size of the array in count of objects
+    ///
+    ACMPTalkerHandlerBase( ACMPTalkerListenerPair *listener_pair_storage,
+                           uint16_t max_connected_listeners )
+        : m_connection_count( 0 )
+        , m_connected_listeners( listener_pair_storage )
+        , m_stream_vlan_id( 0 )
+        , m_max_connected_listeners( max_connected_listeners )
+        , m_state( STATE_WAITING )
+    {
+    }
+
     virtual ~ACMPTalkerHandlerBase();
 
-    virtual void tick(
-            Entity *entity,
-            uint16_t unique_id,
-            ACMPTalkerEvents *eventTarget,
-            jdksavdecc_timestamp_in_milliseconds timestamp );
+    ///
+    /// \brief tick
+    ///
+    /// \param entity
+    /// \param unique_id
+    /// \param eventTarget
+    /// \param timestamp
+    ///
+    virtual void tick( Entity *entity,
+                       uint16_t unique_id,
+                       ACMPTalkerEvents *eventTarget,
+                       jdksavdecc_timestamp_in_milliseconds timestamp );
 
-    virtual bool receivedPDU(
-            Entity *entity,
-            uint16_t unique_id,
-            ACMPTalkerEvents *eventTarget,
-            Frame &frame );
+    ///
+    /// \brief receivedACMPDU
+    /// \param entity
+    /// \param unique_id
+    /// \param eventTarget
+    /// \param frame
+    /// \return
+    ///
+    virtual bool receivedACMPDU( Entity *entity,
+                                 uint16_t unique_id,
+                                 ACMPTalkerEvents *eventTarget,
+                                 Frame &frame );
 
+    ///
+    /// \brief packListeners
+    ///
     void packListeners();
 
     Eui64 m_stream_id;
@@ -134,56 +188,60 @@ public:
 template <uint16_t MaxListenersPerTalker>
 class ACMPTalkerHandler : public ACMPTalkerHandlerBase
 {
-public:
+  public:
     ACMPTalkerHandler()
-     : ACMPTalkerHandlerBase( &m_listener_pairs_storage[0],  MaxListenersPerTalker )
+        : ACMPTalkerHandlerBase( &m_listener_pairs_storage[0],
+                                 MaxListenersPerTalker )
     {
     }
 
- protected:
+  protected:
     ACMPTalkerListenerPair m_listener_pairs_storage[MaxListenersPerTalker];
 };
 
-
 class ACMPTalkerGroupHandlerBase : public Handler
 {
-public:
+  public:
     ACMPTalkerGroupHandlerBase( Entity *entity, ACMPTalkerEvents *event_target )
-        : m_entity( entity )
-        , m_event_target( event_target )
-    {}
+        : m_entity( entity ), m_event_target( event_target )
+    {
+    }
 
-    virtual void tick( jdksavdecc_timestamp_in_milliseconds timestamp ) override;
+    virtual void
+        tick( jdksavdecc_timestamp_in_milliseconds timestamp ) override;
 
     virtual bool receivedPDU( Frame &frame ) override;
 
-    virtual ACMPTalkerHandlerBase *getTalkerHandler( uint16_t talker_unique_id ) = 0;
+    virtual ACMPTalkerHandlerBase *getTalkerHandler( uint16_t talker_unique_id )
+        = 0;
 
-    virtual ACMPTalkerHandlerBase const *getTalkerHandler( uint16_t talker_unique_id ) const = 0;
+    virtual ACMPTalkerHandlerBase const *
+        getTalkerHandler( uint16_t talker_unique_id ) const = 0;
 
     virtual uint16_t getTalkerStreamSourceCount() const = 0;
 
-protected:
+  protected:
     Entity *m_entity;
     ACMPTalkerEvents *m_event_target;
 };
 
-template <uint16_t TalkerStreamSourceCount,
-          uint16_t MaxListenersPerTalker>
+template <uint16_t TalkerStreamSourceCount, uint16_t MaxListenersPerTalker>
 class ACMPTalkerGroupHandler : public ACMPTalkerGroupHandlerBase
 {
-public:
+  public:
     ACMPTalkerGroupHandler( Entity *entity, ACMPTalkerEvents *event_target )
         : ACMPTalkerGroupHandlerBase( entity, event_target )
     {
     }
 
-    virtual ACMPTalkerHandlerBase *getTalkerHandler( uint16_t talker_unique_id ) override
+    virtual ACMPTalkerHandlerBase *
+        getTalkerHandler( uint16_t talker_unique_id ) override
     {
         return &m_talkers_storage[talker_unique_id];
     }
 
-    virtual ACMPTalkerHandlerBase const *getTalkerHandler( uint16_t talker_unique_id ) const override
+    virtual ACMPTalkerHandlerBase const *
+        getTalkerHandler( uint16_t talker_unique_id ) const override
     {
         return &m_talkers_storage[talker_unique_id];
     }
@@ -193,8 +251,8 @@ public:
         return TalkerStreamSourceCount;
     }
 
-private:
-    ACMPTalkerHandler<MaxListenersPerTalker> m_talkers_storage[TalkerStreamSourceCount];
+  private:
+    ACMPTalkerHandler<MaxListenersPerTalker>
+        m_talkers_storage[TalkerStreamSourceCount];
 };
-
 }

@@ -40,7 +40,7 @@ namespace JDKSAvdeccMCU
 
 class RawSocketRunnerNotification
 {
-public:
+  public:
     virtual ~RawSocketRunnerNotification() {}
 
     virtual bool RawSocketFound( RawSocket *rawsocket ) = 0;
@@ -49,25 +49,25 @@ public:
 
 class RawSocketRunner
 {
-public:
+  public:
     RawSocketRunner() {}
     virtual ~RawSocketRunner() {}
-    virtual void setTarget( RawSocketRunnerNotification *notification_target ) = 0;
+    virtual void setTarget( RawSocketRunnerNotification *notification_target )
+        = 0;
     virtual bool run( int timeout_ms ) = 0;
 };
 
 class SimpleRawSocketRunner : public RawSocketRunner
 {
-public:
+  public:
     SimpleRawSocketRunner( RawSocket *the_socket )
-        : m_the_socket( the_socket )
-        , m_notification_target( 0 )
+        : m_the_socket( the_socket ), m_notification_target( 0 )
     {
     }
 
     virtual ~SimpleRawSocketRunner()
     {
-        if( m_notification_target && m_the_socket )
+        if ( m_notification_target && m_the_socket )
         {
             m_notification_target->RawSocketRemoved( m_the_socket );
         }
@@ -75,12 +75,12 @@ public:
 
     virtual void setTarget( RawSocketRunnerNotification *notification_target )
     {
-        m_notification_target=notification_target;
-        if( m_notification_target )
+        m_notification_target = notification_target;
+        if ( m_notification_target )
         {
-            if( !m_notification_target->RawSocketFound( m_the_socket ) )
+            if ( !m_notification_target->RawSocketFound( m_the_socket ) )
             {
-                m_the_socket=0;
+                m_the_socket = 0;
             }
         }
     }
@@ -91,9 +91,8 @@ public:
         return false;
     }
 
-private:
+  private:
     RawSocket *m_the_socket;
     RawSocketRunnerNotification *m_notification_target;
 };
-
 }

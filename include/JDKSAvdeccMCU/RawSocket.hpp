@@ -88,7 +88,4 @@ class RawSocket
      */
     virtual const char *getDeviceName() const = 0;
 };
-
-
-
 }

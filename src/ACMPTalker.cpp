@@ -35,36 +35,29 @@
 namespace JDKSAvdeccMCU
 {
 
-ACMPTalkerHandlerBase::~ACMPTalkerHandlerBase()
-{
+ACMPTalkerHandlerBase::~ACMPTalkerHandlerBase() {}
 
+void ACMPTalkerHandlerBase::tick(
+    Entity *entity,
+    uint16_t unique_id,
+    ACMPTalkerEvents *eventTarget,
+    jdksavdecc_timestamp_in_milliseconds timestamp )
+{
 }
 
-void ACMPTalkerHandlerBase::tick(Entity *entity, uint16_t unique_id, ACMPTalkerEvents *eventTarget, jdksavdecc_timestamp_in_milliseconds timestamp)
+bool ACMPTalkerHandlerBase::receivedACMPDU( Entity *entity,
+                                            uint16_t unique_id,
+                                            ACMPTalkerEvents *eventTarget,
+                                            Frame &frame )
 {
-
 }
 
-bool ACMPTalkerHandlerBase::receivedPDU(Entity *entity, uint16_t unique_id, ACMPTalkerEvents *eventTarget, Frame &frame)
-{
+void ACMPTalkerHandlerBase::packListeners() {}
 
+void ACMPTalkerGroupHandlerBase::tick(
+    jdksavdecc_timestamp_in_milliseconds timestamp )
+{
 }
 
-void ACMPTalkerHandlerBase::packListeners()
-{
-
-}
-
-
-
-void ACMPTalkerGroupHandlerBase::tick(jdksavdecc_timestamp_in_milliseconds timestamp)
-{
-
-}
-
-bool ACMPTalkerGroupHandlerBase::receivedPDU(Frame &frame)
-{
-
-}
-
+bool ACMPTalkerGroupHandlerBase::receivedPDU( Frame &frame ) {}
 }

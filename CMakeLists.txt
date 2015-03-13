@@ -3,7 +3,7 @@ set(PROJECT jdksavdecc-mcu)
 
 project(${PROJECT} C CXX)
 
-option(CXX11 "C++11 mode" "OFF")
+option(CXX11 "C++11 mode" "ON")
 option(PCAP "Enable/Link with PCAP library" "ON")
 option(LIBUV "Enable/Link with uvrawpkt and libuv" "OFF")
 
