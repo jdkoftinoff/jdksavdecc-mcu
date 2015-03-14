@@ -85,7 +85,7 @@ class Value
 #endif
 
   public:
-    using value_type = ValueType;
+    typedef ValueType value_type;
     static const uint8_t units = UnitsValue;
     static const int64_t min_value = MinValue;
     static const int64_t max_value = MaxValue;
