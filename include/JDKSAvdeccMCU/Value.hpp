@@ -409,6 +409,16 @@ class Value
         return r;
     }
 
+    template <typename T>
+    static T valueRound( T v )
+    {
+        return v;
+    }
+
+    static float valueRound( float v ) { return roundf( v ); }
+
+    static double valueRound( double v ) { return round( v ); }
+
     ///
     /// \brief getEncodedValue
     ///
@@ -428,9 +438,12 @@ class Value
         value_type encoding_divider = getEncodingDivider();
         value_type v = ( getValue() * encoding_multiplier / encoding_divider );
         value_type rounded_v;
-        if ( std::numeric_limits<T>::is_integer )
+#if __cplusplus >= 201103L
+
+        if ( !std::is_floating_point<T>::value
+             && std::is_floating_point<value_type>::value )
         {
-            rounded_v = roundf( v );
+            rounded_v = valueRound( v );
         }
         else
         {
@@ -446,6 +459,9 @@ class Value
         {
             throw std::domain_error( "Min Value too small for encoding" );
         }
+#else
+        rounded_v = valueRound( v );
+#endif
         *dest = rounded_v;
     }
 
