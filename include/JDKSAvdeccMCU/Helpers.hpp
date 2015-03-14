@@ -31,7 +31,6 @@
 #pragma once
 
 #include "JDKSAvdeccMCU/World.hpp"
-#include "JDKSAvdeccMCU/Helpers.hpp"
 #include "JDKSAvdeccMCU/Frame.hpp"
 
 namespace JDKSAvdeccMCU
