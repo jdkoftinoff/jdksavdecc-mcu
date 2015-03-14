@@ -44,7 +44,7 @@ void EntityState::tick( jdksavdecc_timestamp_in_milliseconds time_in_millis )
     (void)time_in_millis;
 }
 
-bool EntityState::receivedPDU( Frame &frame )
+bool EntityState::receivedPDU( RawSocket *incoming_socket, Frame &frame )
 {
     (void)frame;
     return false;

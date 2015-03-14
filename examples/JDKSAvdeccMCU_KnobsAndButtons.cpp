@@ -684,10 +684,6 @@ HandlerGroupWithSize<16> all_handlers( &received_frame );
 
 void setup()
 {
-
-    // Initialize the ethernet chip
-    rawnet.initialize();
-
     // Put all the handlers into the HandlerGroup
 
     my_entity_state.addToHandlerGroup( all_handlers );

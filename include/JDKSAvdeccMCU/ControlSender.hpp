@@ -54,10 +54,12 @@ class ControlSender : public Handler
                    ControlValueHolder *holder );
 
     /// Send the SET_CONTROL message if it is time to
-    virtual void tick( jdksavdecc_timestamp_in_milliseconds time_in_millis );
+    virtual void
+        tick( jdksavdecc_timestamp_in_milliseconds time_in_millis ) override;
 
     /// Handle incoming PDU
-    virtual bool receivedPDU( Frame &frame );
+    virtual bool receivedPDU( RawSocket *incoming_socket,
+                              Frame &frame ) override;
 
     /// Formulate the AECPU set control for and send it. Returns true if the
     /// message was

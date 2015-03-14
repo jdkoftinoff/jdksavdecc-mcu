@@ -47,9 +47,11 @@ class EntityState : public Handler
     virtual ~EntityState();
 
     /// Run periodic state machines
-    virtual void tick( jdksavdecc_timestamp_in_milliseconds time_in_millis );
+    virtual void
+        tick( jdksavdecc_timestamp_in_milliseconds time_in_millis ) override;
 
-    virtual bool receivedPDU( Frame &frame );
+    virtual bool receivedPDU( RawSocket *incoming_socket,
+                              Frame &frame ) override;
 
     /// The pdu contains a valid Lock Entity command.
     /// Fill in the response in place in the pdu and return an AECP AEM status

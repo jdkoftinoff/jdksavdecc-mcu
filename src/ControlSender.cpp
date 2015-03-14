@@ -90,7 +90,7 @@ bool ControlSender::sendSetControl( bool wait_for_ack )
     return r;
 }
 
-bool ControlSender::receivedPDU( Frame &frame )
+bool ControlSender::receivedPDU( RawSocket *incoming_socket, Frame &frame )
 {
     (void)frame;
     return false;

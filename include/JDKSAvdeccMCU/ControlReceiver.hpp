@@ -127,20 +127,18 @@ class ControlReceiver : public Handler
     }
 
     /// Handle incoming PDU
-    virtual bool
-        receivedPDU( jdksavdecc_timestamp_in_milliseconds time_in_millis,
-                     uint8_t *buf,
-                     uint16_t len )
+    ///
+
+    virtual bool receivedPDU( RawSocket *incoming_socket,
+                              Frame &frame ) override
     {
         bool r = false;
         // we already know the message is AVTP ethertype and is either directly
         // targetting my MAC address or is a multicast message
 
-        Frame pdu( time_in_millis, buf, len );
-
         // Try see if it is an AEM message
         jdksavdecc_aecpdu_aem aem;
-        if ( parseAEM( &aem, pdu ) )
+        if ( parseAEM( &aem, frame ) )
         {
             // Yes, Is it a command for me?
             if ( isAEMForTarget( aem, m_entity_id ) )
@@ -154,19 +152,19 @@ class ControlReceiver : public Handler
                          == JDKSAVDECC_AEM_COMMAND_GET_CONTROL )
                     {
                         // Handle GET_CONTROL commands
-                        r = receivedGetControlCommand( aem, pdu );
+                        r = receivedGetControlCommand( aem, frame );
                     }
                     else if ( aem.command_type
                               == JDKSAVDECC_AEM_COMMAND_SET_CONTROL )
                     {
                         // Handle SET_CONTROL commands
-                        r = receivedSetControlCommand( aem, pdu );
+                        r = receivedSetControlCommand( aem, frame );
                     }
                     else if ( aem.command_type
                               == JDKSAVDECC_AEM_COMMAND_READ_DESCRIPTOR )
                     {
                         // Handle READ_DESCRIPTOR commands
-                        r = receivedReadDescriptorCommand( aem, pdu );
+                        r = receivedReadDescriptorCommand( aem, frame );
                     }
                 }
             }

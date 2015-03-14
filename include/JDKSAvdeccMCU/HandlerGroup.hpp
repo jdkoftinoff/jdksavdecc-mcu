@@ -103,12 +103,24 @@ class HandlerGroup : public Handler
     ///
     uint32_t getHandledCount() const { return m_handled_count; }
 
+    ///
+    /// \brief tick
     /// Send Tick() messages to all encapsulated Handlers
     /// and poll incoming network for PDU's and dispatch them
-    virtual void tick( jdksavdecc_timestamp_in_milliseconds timestamp );
+    /// \param timestamp
+    ///
+    virtual void
+        tick( jdksavdecc_timestamp_in_milliseconds timestamp ) override;
 
+    ///
+    /// \brief receivedPDU Notification of received raw PDU.
     /// Send ReceivedPDU message to each handler until one returns true.
-    virtual bool receivedPDU( Frame &frame );
+    /// \param incoming_socket The socket that the frame was received on
+    /// \param frame reference to received Frame object which is mutable
+    /// \return true if the message was handled
+    ///
+    virtual bool receivedPDU( RawSocket *incoming_socket,
+                              Frame &frame ) override;
 };
 
 ///

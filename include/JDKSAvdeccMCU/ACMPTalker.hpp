@@ -210,7 +210,8 @@ class ACMPTalkerGroupHandlerBase : public Handler
     virtual void
         tick( jdksavdecc_timestamp_in_milliseconds timestamp ) override;
 
-    virtual bool receivedPDU( Frame &frame ) override;
+    virtual bool receivedPDU( RawSocket *incoming_socket,
+                              Frame &frame ) override;
 
     virtual ACMPTalkerHandlerBase *getTalkerHandler( uint16_t talker_unique_id )
         = 0;

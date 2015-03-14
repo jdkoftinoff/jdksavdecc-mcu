@@ -51,10 +51,12 @@ class Entity : public Handler
     Entity( ADPManager &adp_manager, EntityState *entity_state );
 
     /// Run periodic state machines (from Handler)
-    virtual void tick( jdksavdecc_timestamp_in_milliseconds time_in_millis );
+    virtual void
+        tick( jdksavdecc_timestamp_in_milliseconds time_in_millis ) override;
 
     /// Handle received AECPDU's (from Handler)
-    virtual bool receivedPDU( Frame &frame );
+    virtual bool receivedPDU( RawSocket *incoming_socket,
+                              Frame &frame ) override;
 
     /// Notification that a command to a target entity timed out
     virtual void commandTimedOut( Eui64 const &target_entity_id,

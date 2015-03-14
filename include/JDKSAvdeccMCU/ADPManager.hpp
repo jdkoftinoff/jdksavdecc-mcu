@@ -156,14 +156,16 @@ class ADPManager : public Handler
      * @brief tick is called periodically and will call sendADP() when necessary
      * @param timestamp The current time in milliseconds
      */
-    virtual void tick( jdksavdecc_timestamp_in_milliseconds timestamp );
+    virtual void
+        tick( jdksavdecc_timestamp_in_milliseconds timestamp ) override;
 
     /**
      * @brief receivedPDU is called to handle any incoming ADPDU.
      * @param frame Reference to the incoming frame
      * @return true if handled
      */
-    virtual bool receivedPDU( Frame &frame );
+    virtual bool receivedPDU( RawSocket *incomng_socket,
+                              Frame &frame ) override;
 
     /**
      * @brief receivedEntityAvailable is called when any ENTITY_AVAILABLE ADP

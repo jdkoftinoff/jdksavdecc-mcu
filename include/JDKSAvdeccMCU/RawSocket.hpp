@@ -50,7 +50,8 @@ class RawSocket
 
     virtual void setHandlerGroup( HandlerGroup *handler_group ) = 0;
 
-    virtual jdksavdecc_timestamp_in_milliseconds getTimeInMilliseconds() = 0;
+    virtual jdksavdecc_timestamp_in_milliseconds
+        getTimeInMilliseconds() const = 0;
 
     virtual bool recvFrame( Frame *frame ) = 0;
 
@@ -72,20 +73,8 @@ class RawSocket
     virtual bool joinMulticast( const Eui48 &multicast_mac ) = 0;
 
     /**
-    * Set the socket to non blocking mode
-    */
-    virtual void setNonblocking() = 0;
-
-    virtual void initialize() = 0;
-
-    /**
      * Get the MAC address of the ethernet port
      */
     virtual Eui48 const &getMACAddress() const = 0;
-
-    /**
-     * Get the device's name
-     */
-    virtual const char *getDeviceName() const = 0;
 };
 }

@@ -66,12 +66,12 @@ void HandlerGroup::tick( jdksavdecc_timestamp_in_milliseconds time_in_millis )
 }
 
 /// Send ReceivedPDU message to each handler until one returns true.
-bool HandlerGroup::receivedPDU( Frame &frame )
+bool HandlerGroup::receivedPDU( RawSocket *incoming_socket, Frame &frame )
 {
     bool r = false;
     for ( uint16_t i = 0; i < m_num_items; ++i )
     {
-        if ( m_item[i]->receivedPDU( frame ) )
+        if ( m_item[i]->receivedPDU( incoming_socket, frame ) )
         {
             r = true;
             break;

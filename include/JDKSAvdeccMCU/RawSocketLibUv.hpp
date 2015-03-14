@@ -48,32 +48,32 @@ class RawSocketLibUv : public RawSocket
 
     virtual ~RawSocketLibUv();
 
-    virtual jdksavdecc_timestamp_in_milliseconds getTimeInMilliseconds()
+    virtual jdksavdecc_timestamp_in_milliseconds
+        getTimeInMilliseconds() const override
     {
         return JDKSAvdeccMCU::getTimeInMilliseconds();
     }
 
-    virtual bool recvFrame( Frame *frame );
+    virtual bool recvFrame( Frame *frame ) override;
 
     virtual bool sendFrame( Frame const &frame,
                             uint8_t const *data1,
                             uint16_t len1,
                             uint8_t const *data2,
-                            uint16_t len2 );
+                            uint16_t len2 ) override;
 
     virtual bool sendReplyFrame( Frame &frame,
                                  uint8_t const *data1,
                                  uint16_t len1,
                                  uint8_t const *data2,
-                                 uint16_t len2 );
+                                 uint16_t len2 ) override;
 
-    virtual bool joinMulticast( const Eui48 &multicast_mac );
+    virtual bool joinMulticast( const Eui48 &multicast_mac ) override;
 
-    virtual void setNonblocking();
-
-    virtual Eui48 const &getMACAddress() const { return m_mac_address; }
-
-    virtual void initialize();
+    virtual Eui48 const &getMACAddress() const override
+    {
+        return m_mac_address;
+    }
 
   private:
     Eui48 m_mac_address;

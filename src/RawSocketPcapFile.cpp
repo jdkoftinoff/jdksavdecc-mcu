@@ -62,7 +62,8 @@ RawSocketPcapFile::RawSocketPcapFile(
 
 RawSocketPcapFile::~RawSocketPcapFile() {}
 
-jdksavdecc_timestamp_in_milliseconds RawSocketPcapFile::getTimeInMilliseconds()
+jdksavdecc_timestamp_in_milliseconds
+    RawSocketPcapFile::getTimeInMilliseconds() const
 {
     jdksavdecc_timestamp_in_milliseconds t = m_current_time;
     m_current_time += m_time_granularity_in_ms;
@@ -177,8 +178,6 @@ bool RawSocketPcapFile::joinMulticast( const Eui48 &multicast_mac )
 
     return true;
 }
-
-void RawSocketPcapFile::setNonblocking() {}
 
 const Eui48 &RawSocketPcapFile::getMACAddress() const { return m_my_mac; }
 

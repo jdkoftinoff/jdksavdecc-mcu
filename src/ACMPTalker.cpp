@@ -59,5 +59,8 @@ void ACMPTalkerGroupHandlerBase::tick(
 {
 }
 
-bool ACMPTalkerGroupHandlerBase::receivedPDU( Frame &frame ) {}
+bool ACMPTalkerGroupHandlerBase::receivedPDU( RawSocket *incoming_socket,
+                                              Frame &frame )
+{
+}
 }

@@ -51,7 +51,8 @@ class ControllerEntity : public Entity
     }
 
     /// Handle incoming commands and responses
-    virtual bool receivedPDU( Frame &frame );
+    virtual bool receivedPDU( RawSocket *incoming_socket,
+                              Frame &frame ) override;
 
     virtual bool receivedAAResponse( jdksavdecc_aecp_aa const &aa, Frame &pdu );
 

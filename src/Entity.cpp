@@ -126,7 +126,7 @@ void Entity::commandTimedOut( Eui64 const &target_entity_id,
             sizeof( m_last_sent_command_target_entity_id ) );
 }
 
-bool Entity::receivedPDU( Frame &frame )
+bool Entity::receivedPDU( RawSocket *incoming_socket, Frame &frame )
 {
     // default status code to not implemented, this value is common to all sub
     // protocols

@@ -60,10 +60,11 @@ class Handler
 
     ///
     /// \brief receivedPDU Notification of received raw PDU.
-    /// \param frame reference to received Frame object
+    /// \param incoming_socket The socket that the frame was received on
+    /// \param frame reference to received Frame object which is mutable
     /// \return true if the message was handled
     ///
-    virtual bool receivedPDU( Frame &frame );
+    virtual bool receivedPDU( RawSocket *incoming_socket, Frame &frame );
 
     ///
     /// \brief addToHandlerGroup Register with HandlerGroup

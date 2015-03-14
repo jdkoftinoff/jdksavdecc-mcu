@@ -53,6 +53,14 @@ typedef uint16_t w5100addr_t;
 namespace JDKSAvdeccMCU
 {
 
+void RawSocketWizNet::initialize( Eui48 const &mac_address,
+                                  uint16_t ether_type )
+{
+    W5100.init();
+    W5100.setMACAddress( mac_address.value );
+    socket( 0, SnMR::MACRAW, ether_type, 0 );
+}
+
 RawSocketWizNet::~RawSocketWizNet() { close( 0 ); }
 
 bool RawSocketWizNet::recvFrame( Frame *frame )
@@ -224,14 +232,6 @@ bool RawSocketWizNet::sendReplyFrame( Frame &frame,
             = p[i + JDKSAVDECC_FRAME_HEADER_SA_OFFSET];
         p[i + JDKSAVDECC_FRAME_HEADER_SA_OFFSET] = m_mac_address.value[i];
     }
-}
-
-void RawSocketWizNet::initialize()
-{
-    W5100.init();
-    W5100.setMACAddress( m_mac_address.value );
-    // W5100.setIPAddress(IPAddress(0,0,0,0).raw_address());
-    socket( 0, SnMR::MACRAW, 0x22f0, 0 );
 }
 }
 #else

@@ -53,7 +53,7 @@ void Control::tick( jdksavdecc_timestamp_in_milliseconds time_in_millis )
     (void)time_in_millis;
 }
 
-bool Control::receivedPDU( Frame &frame )
+bool Control::receivedPDU( RawSocket *incoming_socket, Frame &frame )
 {
     // TODO: parse incoming SET_CONTROL and GET_CONTROL command and response
     (void)frame;

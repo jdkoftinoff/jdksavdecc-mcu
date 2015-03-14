@@ -42,7 +42,7 @@ class RawSocketPcapFile : public RawSocket
     Eui48 m_join_multicast;
     PcapFileReader m_pcap_file_reader;
     PcapFileWriter m_pcap_file_writer;
-    jdksavdecc_timestamp_in_milliseconds m_current_time;
+    mutable jdksavdecc_timestamp_in_milliseconds m_current_time;
     jdksavdecc_timestamp_in_milliseconds m_time_granularity_in_ms;
     FrameWithSize<1500> m_next_incoming_frame;
 
@@ -64,36 +64,31 @@ class RawSocketPcapFile : public RawSocket
 
     ~RawSocketPcapFile();
 
-    virtual void setHandlerGroup( HandlerGroup *handler_group )
+    virtual void setHandlerGroup( HandlerGroup *handler_group ) override
     {
         m_handler_group = handler_group;
     }
 
-    virtual jdksavdecc_timestamp_in_milliseconds getTimeInMilliseconds();
+    virtual jdksavdecc_timestamp_in_milliseconds
+        getTimeInMilliseconds() const override;
 
-    virtual bool recvFrame( Frame *frame );
+    virtual bool recvFrame( Frame *frame ) override;
 
     virtual bool sendFrame( Frame const &frame,
                             uint8_t const *data1,
                             uint16_t len1,
                             uint8_t const *data2,
-                            uint16_t len2 );
+                            uint16_t len2 ) override;
 
     virtual bool sendReplyFrame( Frame &frame,
                                  uint8_t const *data1,
                                  uint16_t len1,
                                  uint8_t const *data2,
-                                 uint16_t len2 );
+                                 uint16_t len2 ) override;
 
-    virtual bool joinMulticast( const Eui48 &multicast_mac );
+    virtual bool joinMulticast( const Eui48 &multicast_mac ) override;
 
-    virtual void setNonblocking();
-
-    virtual const Eui48 &getMACAddress() const;
-
-    virtual void initialize() {}
-
-    virtual const char *getDeviceName() const { return "RawSocketPcapFile"; }
+    virtual const Eui48 &getMACAddress() const override;
 
   private:
     bool readNextIncomingFrame();

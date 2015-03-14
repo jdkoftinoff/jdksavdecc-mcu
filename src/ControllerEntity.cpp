@@ -36,7 +36,7 @@
 namespace JDKSAvdeccMCU
 {
 
-bool ControllerEntity::receivedPDU( Frame &frame )
+bool ControllerEntity::receivedPDU( RawSocket *incoming_socket, Frame &frame )
 {
     bool r = false;
     bool done = false;

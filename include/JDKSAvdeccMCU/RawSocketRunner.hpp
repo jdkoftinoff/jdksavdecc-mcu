@@ -43,8 +43,10 @@ class RawSocketRunnerNotification
   public:
     virtual ~RawSocketRunnerNotification() {}
 
-    virtual bool RawSocketFound( RawSocket *rawsocket ) = 0;
-    virtual void RawSocketRemoved( RawSocket *rawsocket ) = 0;
+    virtual bool rawSocketFound( RawSocket *rawsocket ) = 0;
+    virtual void rawSocketRemoved( RawSocket *rawsocket ) = 0;
+    virtual void frameReceived( RawSocket *rawsocket, Frame &incoming_frame )
+        = 0;
 };
 
 class RawSocketRunner
@@ -69,7 +71,7 @@ class SimpleRawSocketRunner : public RawSocketRunner
     {
         if ( m_notification_target && m_the_socket )
         {
-            m_notification_target->RawSocketRemoved( m_the_socket );
+            m_notification_target->rawSocketRemoved( m_the_socket );
         }
     }
 
@@ -78,7 +80,7 @@ class SimpleRawSocketRunner : public RawSocketRunner
         m_notification_target = notification_target;
         if ( m_notification_target )
         {
-            if ( !m_notification_target->RawSocketFound( m_the_socket ) )
+            if ( !m_notification_target->rawSocketFound( m_the_socket ) )
             {
                 m_the_socket = 0;
             }

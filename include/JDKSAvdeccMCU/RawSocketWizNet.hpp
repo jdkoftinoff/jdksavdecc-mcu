@@ -48,6 +48,7 @@ class RawSocketWizNet : public RawSocket
                      const Eui48 *multicast_to_join = 0 )
         : m_mac_address( mac_address ), m_ethertype( ethertype )
     {
+        initialize( mac_address, ethertype );
         if ( multicast_to_join )
         {
             m_multicast = *multicast_to_join;
@@ -56,7 +57,8 @@ class RawSocketWizNet : public RawSocket
 
     virtual ~RawSocketWizNet();
 
-    virtual jdksavdecc_timestamp_in_milliseconds getTimeInMilliseconds()
+    virtual jdksavdecc_timestamp_in_milliseconds
+        getTimeInMilliseconds() const override
     {
         return millis();
     }
@@ -75,18 +77,15 @@ class RawSocketWizNet : public RawSocket
                                  uint8_t const *data2,
                                  uint16_t len2 );
 
-    virtual void initialize();
-
     virtual bool joinMulticast( const Eui48 &multicast_mac )
     {
         m_multicast = multicast_mac;
     }
 
-    virtual void setNonblocking() {}
-
-    virtual filedescriptor_type getFd() const { return 0; }
-
     virtual Eui48 const &getMACAddress() const { return m_mac_address; }
+
+    static void initialize( Eui48 const &mac_address,
+                            uint16_t etherType = 0x22f0 );
 
   private:
     Eui48 m_mac_address;

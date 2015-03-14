@@ -145,7 +145,7 @@ void ADPManager::setGPTPGrandMasterID( const Eui64 &new_gm )
     }
 }
 
-bool ADPManager::receivedPDU( Frame &frame )
+bool ADPManager::receivedPDU( RawSocket *incoming_socket, Frame &frame )
 {
     bool r = false;
     uint8_t *p = frame.getBuf();
