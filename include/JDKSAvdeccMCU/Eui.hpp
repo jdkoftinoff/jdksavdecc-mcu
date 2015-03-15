@@ -180,6 +180,12 @@ class Eui48 : public jdksavdecc_eui48
     {
         return jdksavdecc_eui48_compare( this, &other );
     }
+
+    void clear()
+    {
+        jdksavdecc_eui48_init( this );
+    }
+
 };
 
 ///
@@ -325,6 +331,11 @@ class Eui64 : public jdksavdecc_eui64
     int compare( const Eui64 &other ) const
     {
         return jdksavdecc_eui64_compare( this, &other );
+    }
+
+    void clear()
+    {
+        jdksavdecc_eui64_init( this );
     }
 };
 }

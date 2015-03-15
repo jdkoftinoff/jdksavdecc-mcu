@@ -37,11 +37,12 @@
 namespace JDKSAvdeccMCU
 {
 
-Entity::Entity( ADPManager &adp_manager, EntityState *entity_state )
+Entity::Entity( ADPManager &adp_manager, RegisteredControllers *registered_controllers, EntityState *entity_state )
     : m_adp_manager( adp_manager )
     , m_outgoing_sequence_id( 0 )
     , m_acquire_in_progress_time( 0 )
     , m_locked_time( 0 )
+    , m_registered_controllers( registered_controllers )
     , m_last_sent_command_time( 0 )
     , m_last_sent_command_type( JDKSAVDECC_AEM_COMMAND_EXPANSION )
     , m_entity_state( entity_state )
@@ -53,12 +54,6 @@ Entity::Entity( ADPManager &adp_manager, EntityState *entity_state )
     m_acquire_in_progress_by_controller_entity_id = Eui64();
     m_locked_by_controller_entity_id = Eui64();
     m_acquired_by_controller_mac_address = Eui48();
-
-    for ( uint8_t i = 0; i < JDKSAVDECC_ENTITY_MAX_REGISTERED_CONTROLLERS; ++i )
-    {
-        m_registered_controllers_entity_id[i] = Eui64();
-        m_registered_controllers_mac_address[i] = Eui48();
-    }
 }
 
 void Entity::tick( jdksavdecc_timestamp_in_milliseconds time_in_millis )
@@ -507,37 +502,33 @@ void Entity::sendResponses( bool internally_generated,
             JDKSAVDECC_FRAME_HEADER_LEN );
 
         // Now go through all subscribed entities
-        for ( uint8_t i = 0; i < JDKSAVDECC_ENTITY_MAX_REGISTERED_CONTROLLERS;
+        for ( uint16_t i = 0; i < m_registered_controllers->getControllerCount();
               ++i )
         {
-            // We only care about controllers with entity_id !=
-            // FF:FF:FF:FF:FF:FF:FF:FF
+            RegisteredController const *controller = m_registered_controllers->getController(i);
 
-            if ( isSet( m_registered_controllers_entity_id[i] ) )
+            // and don't send the original requesting controller a double
+            // response
+            if ( original_controller_id != controller->m_entity_id )
             {
-                // and don't send the original requesting controller a double
-                // response
-                if ( original_controller_id
-                     != m_registered_controllers_entity_id[i] )
-                {
-                    // Set the controller_entity_id in the frame
+                // Set the controller_entity_id in the frame
 
-                    m_registered_controllers_entity_id[i].store(
-                        pdu.getBuf(),
-                        JDKSAVDECC_FRAME_HEADER_LEN
-                        + JDKSAVDECC_AECPDU_COMMON_OFFSET_CONTROLLER_ENTITY_ID );
+                controller->m_entity_id.store(
+                            pdu.getBuf(),
+                            JDKSAVDECC_FRAME_HEADER_LEN
+                            + JDKSAVDECC_AECPDU_COMMON_OFFSET_CONTROLLER_ENTITY_ID );
 
-                    // Set the destination mac address
-                    pdu.setDA( m_registered_controllers_mac_address[i] );
+                // Set the destination mac address
+                pdu.setDA( controller->m_mac_address );
 
-                    // Send the frame to that controller
-                    getRawSocket().sendFrame( pdu,
-                                              additional_data1,
-                                              additional_data_length1,
-                                              additional_data2,
-                                              additional_data_length2 );
-                }
+                // Send the frame to that controller
+                getRawSocket().sendFrame( pdu,
+                                          additional_data1,
+                                          additional_data_length1,
+                                          additional_data2,
+                                          additional_data_length2 );
             }
+
         }
     }
 }
