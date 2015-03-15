@@ -83,7 +83,7 @@ class KnobsAndButtonsController : public EntityState
                       JDKSAVDECC_ADP_CONTROLLER_CAPABILITY_IMPLEMENTED,
                       50 )
         , m_adp_manager( rawnet, entity_id, m_adp_info )
-        , m_controller_entity( m_adp_manager, this )
+        , m_controller_entity( m_adp_manager, &m_registered_controllers_storage, this )
         , m_update_rate_in_millis( 50 )
         , m_last_update_time( 0 )
         , m_knobs_sender( m_controller_entity,
@@ -110,7 +110,7 @@ class KnobsAndButtonsController : public EntityState
         pinMode( A5, OUTPUT );
     }
 
-    virtual void addToHandlerGroup( HandlerGroup &group )
+    virtual void addToHandlerGroup( HandlerGroup &group ) override
     {
         group.add( &m_adp_manager );
         group.add( &m_knobs_sender );
@@ -119,7 +119,7 @@ class KnobsAndButtonsController : public EntityState
         group.add( this );
     }
 
-    virtual void tick( jdksavdecc_timestamp_in_milliseconds time_in_millis )
+    virtual void tick( jdksavdecc_timestamp_in_milliseconds time_in_millis ) override
     {
         if ( wasTimeOutHit(
                  time_in_millis, m_last_update_time, m_update_rate_in_millis ) )
@@ -147,7 +147,7 @@ class KnobsAndButtonsController : public EntityState
 
     virtual uint8_t readDescriptorEntity( Frame &pdu,
                                           uint16_t configuration_index,
-                                          uint16_t descriptor_index )
+                                          uint16_t descriptor_index ) override
     {
         uint8_t status = JDKSAVDECC_AEM_STATUS_BAD_ARGUMENTS;
 
@@ -181,7 +181,7 @@ class KnobsAndButtonsController : public EntityState
 
     virtual uint8_t readDescriptorAvbInterface( Frame &pdu,
                                                 uint16_t configuration_index,
-                                                uint16_t descriptor_index )
+                                                uint16_t descriptor_index ) override
     {
         uint8_t status = JDKSAVDECC_AEM_STATUS_BAD_ARGUMENTS;
 
@@ -244,7 +244,7 @@ class KnobsAndButtonsController : public EntityState
 
     virtual uint8_t readDescriptorConfiguration( Frame &pdu,
                                                  uint16_t configuration_index,
-                                                 uint16_t descriptor_index )
+                                                 uint16_t descriptor_index ) override
     {
         uint8_t status = JDKSAVDECC_AEM_STATUS_BAD_ARGUMENTS;
 
@@ -549,7 +549,7 @@ class KnobsAndButtonsController : public EntityState
 
     virtual uint8_t readDescriptorControl( Frame &pdu,
                                            uint16_t configuration_index,
-                                           uint16_t descriptor_index )
+                                           uint16_t descriptor_index ) override
     {
         uint8_t status = JDKSAVDECC_AEM_STATUS_NO_SUCH_DESCRIPTOR;
 
@@ -589,7 +589,7 @@ class KnobsAndButtonsController : public EntityState
     }
 
     virtual uint8_t receiveGetControlCommand( Frame &pdu,
-                                              uint16_t descriptor_index )
+                                              uint16_t descriptor_index ) override
     {
         uint8_t status = JDKSAVDECC_AEM_STATUS_NO_SUCH_DESCRIPTOR;
 
@@ -651,6 +651,8 @@ class KnobsAndButtonsController : public EntityState
     ADPManager m_adp_manager;
 
     ControllerEntity m_controller_entity;
+
+    RegisteredControllersStorage<4> m_registered_controllers_storage;
 
     /// The update rate in milliseconds
     uint32_t m_update_rate_in_millis;

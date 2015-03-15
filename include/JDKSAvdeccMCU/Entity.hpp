@@ -36,19 +36,103 @@
 #include "JDKSAvdeccMCU/Helpers.hpp"
 #include "JDKSAvdeccMCU/Frame.hpp"
 #include "JDKSAvdeccMCU/ADPManager.hpp"
+#include "JDKSAvdeccMCU/EntityState.hpp"
 
 namespace JDKSAvdeccMCU
 {
 class EntityState;
+struct RegisteredController;
+class RegisteredControllers;
 
-#ifndef JDKSAVDECC_ENTITY_MAX_REGISTERED_CONTROLLERS
-#define JDKSAVDECC_ENTITY_MAX_REGISTERED_CONTROLLERS ( 4 )
-#endif
+struct RegisteredController
+{
+    /// Controller's entity_id
+    /// The entity id is FF:FF:FF:FF:FF:FF:FF:FF If the the slot is not
+    /// in use
+    Eui64 m_entity_id;
+
+    /// Controller's MAC address
+    Eui48 m_mac_address;
+};
+
+class RegisteredControllers
+{
+public:
+    virtual uint16_t getControllerCount() const = 0;
+    virtual RegisteredController *getController( uint16_t i ) = 0;
+    virtual RegisteredController const *getController( uint16_t i ) const = 0;
+    virtual bool addController( Eui64 entity_id, Eui48 mac_address ) = 0;
+    virtual void removeController( Eui64 entity_id ) = 0;
+};
+
+
+template <uint16_t MaxControllers>
+class RegisteredControllersStorage : public RegisteredControllers
+{
+public:
+    RegisteredControllersStorage()
+        : m_num_controllers(0)
+    {
+    }
+
+    virtual uint16_t getControllerCount() const override
+    {
+        return m_num_controllers;
+    }
+
+    virtual RegisteredController *getController( uint16_t i ) override
+    {
+        return &m_controller[i];
+    }
+    virtual RegisteredController const *getController( uint16_t i ) const override
+    {
+        return &m_controller[i];
+    }
+    virtual bool addController( Eui64 entity_id, Eui48 mac_address ) override
+    {
+        bool r=false;
+        if( m_num_controllers<MaxControllers)
+        {
+            m_controller[m_num_controllers].m_entity_id = entity_id;
+            m_controller[m_num_controllers].m_mac_address = mac_address;
+            r=true;
+        }
+        return r;
+    }
+    virtual void removeController( Eui64 entity_id ) override
+    {
+        for( uint16_t i=0; i<m_num_controllers; ++i )
+        {
+            // find the controller
+            if( m_controller[i].m_entity_id == entity_id )
+            {
+                // found it; is it the last one in the list?
+                if( i==m_num_controllers-1 )
+                {
+                    // yes, just erase it
+                    m_controller[i].m_entity_id.clear();
+                    m_controller[i].m_mac_address.clear();
+                }
+                else
+                {
+                    // it is not the last one in the list, so swap it with the last one in the list
+                    using namespace std;
+                    swap( m_controller[i], m_controller[m_num_controllers-1] );
+                }
+                m_num_controllers--;
+                break;
+            }
+        }
+    }
+private:
+    uint16_t m_num_controllers;
+    RegisteredController m_controller[MaxControllers];
+};
 
 class Entity : public Handler
 {
   public:
-    Entity( ADPManager &adp_manager, EntityState *entity_state );
+    Entity( ADPManager &adp_manager, RegisteredControllers *registered_controllers, EntityState *entity_state );
 
     /// Run periodic state machines (from Handler)
     virtual void tick( jdksavdecc_timestamp_in_milliseconds time_in_millis );
@@ -229,17 +313,8 @@ class Entity : public Handler
     /// when the lock first ocurred
     jdksavdecc_timestamp_in_milliseconds m_locked_time;
 
-    /// This contains the unordered list of controller entity id's that are
-    /// currently registered via the register for unsolicited notifications
-    /// command. The entity id is FF:FF:FF:FF:FF:FF:FF:FF If the the slot is not
-    /// in use
-    Eui64 m_registered_controllers_entity_id
-        [JDKSAVDECC_ENTITY_MAX_REGISTERED_CONTROLLERS];
-
-    /// This contains the associated MAC address of the controller's that are
-    /// currently registered
-    Eui48 m_registered_controllers_mac_address
-        [JDKSAVDECC_ENTITY_MAX_REGISTERED_CONTROLLERS];
+    /// The list of registered controllers
+    RegisteredControllers *m_registered_controllers;
 
     /// This is the timestamp of the last command that we sent to another entity
     jdksavdecc_timestamp_in_milliseconds m_last_sent_command_time;
