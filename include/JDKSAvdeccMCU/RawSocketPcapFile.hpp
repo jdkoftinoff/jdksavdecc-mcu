@@ -53,37 +53,25 @@ class RawSocketPcapFile : public RawSocket
     *  Open a raw socket connected to the specified interface name and join the
     *  specified multicast address
     */
-    RawSocketPcapFile(
-        uint16_t ethertype,
-        Eui48 my_mac,
-        Eui48 default_dest_mac,
-        Eui48 join_multicast,
-        const std::string &input_file,
-        const std::string &output_file,
-        jdksavdecc_timestamp_in_milliseconds time_granularity_in_ms );
+    RawSocketPcapFile( uint16_t ethertype,
+                       Eui48 my_mac,
+                       Eui48 default_dest_mac,
+                       Eui48 join_multicast,
+                       const std::string &input_file,
+                       const std::string &output_file,
+                       jdksavdecc_timestamp_in_milliseconds time_granularity_in_ms );
 
     ~RawSocketPcapFile();
 
-    virtual void setHandlerGroup( HandlerGroup *handler_group )
-    {
-        m_handler_group = handler_group;
-    }
+    virtual void setHandlerGroup( HandlerGroup *handler_group ) { m_handler_group = handler_group; }
 
     virtual jdksavdecc_timestamp_in_milliseconds getTimeInMilliseconds();
 
     virtual bool recvFrame( Frame *frame );
 
-    virtual bool sendFrame( Frame const &frame,
-                            uint8_t const *data1,
-                            uint16_t len1,
-                            uint8_t const *data2,
-                            uint16_t len2 );
+    virtual bool sendFrame( Frame const &frame, uint8_t const *data1, uint16_t len1, uint8_t const *data2, uint16_t len2 );
 
-    virtual bool sendReplyFrame( Frame &frame,
-                                 uint8_t const *data1,
-                                 uint16_t len1,
-                                 uint8_t const *data2,
-                                 uint16_t len2 );
+    virtual bool sendReplyFrame( Frame &frame, uint8_t const *data1, uint16_t len1, uint8_t const *data2, uint16_t len2 );
 
     virtual bool joinMulticast( const Eui48 &multicast_mac );
 

@@ -45,11 +45,9 @@ static void append_to_vector( std::vector<uint8_t> *dest, std::string const &s )
     }
 }
 
-static void append_to_vector( std::vector<uint8_t> *dest,
-                              std::vector<uint8_t> const &b )
+static void append_to_vector( std::vector<uint8_t> *dest, std::vector<uint8_t> const &b )
 {
-    for ( std::vector<uint8_t>::const_iterator i = b.begin(); i != b.end();
-          ++i )
+    for ( std::vector<uint8_t>::const_iterator i = b.begin(); i != b.end(); ++i )
     {
         dest->push_back( *i );
     }
@@ -64,8 +62,7 @@ void HttpRequest::clear()
     m_content.clear();
 }
 
-void HttpRequest::setCONNECT( const std::string &path,
-                              const std::vector<std::string> &headers )
+void HttpRequest::setCONNECT( const std::string &path, const std::vector<std::string> &headers )
 {
     m_method = "CONNECT";
     m_path = path;
@@ -73,9 +70,7 @@ void HttpRequest::setCONNECT( const std::string &path,
 
     m_headers.clear();
 
-    for ( std::vector<std::string>::const_iterator i = headers.begin();
-          i != headers.end();
-          ++i )
+    for ( std::vector<std::string>::const_iterator i = headers.begin(); i != headers.end(); ++i )
     {
         m_headers.push_back( *i );
     }
@@ -109,9 +104,7 @@ void HttpRequest::set( const std::string &method,
         m_headers.push_back( s );
     }
 
-    for ( std::vector<std::string>::const_iterator i = headers.begin();
-          i != headers.end();
-          ++i )
+    for ( std::vector<std::string>::const_iterator i = headers.begin(); i != headers.end(); ++i )
     {
         m_headers.push_back( *i );
     }
@@ -162,10 +155,7 @@ void HttpRequest::set( const std::string &method,
             {
                 char lenascii[32];
 #if defined( _WIN32 )
-                sprintf_s( lenascii,
-                           sizeof( lenascii ),
-                           "%d\r\n",
-                           (int)content.size() );
+                sprintf_s( lenascii, sizeof( lenascii ), "%d\r\n", (int)content.size() );
 #else
                 sprintf( lenascii, "%d\r\n", (int)content.size() );
 #endif
@@ -175,9 +165,7 @@ void HttpRequest::set( const std::string &method,
         }
     }
 
-    for ( std::vector<std::string>::const_iterator i = headers.begin();
-          i != headers.end();
-          ++i )
+    for ( std::vector<std::string>::const_iterator i = headers.begin(); i != headers.end(); ++i )
     {
         m_headers.push_back( *i );
     }
@@ -195,9 +183,7 @@ void HttpRequest::flatten( std::string *dest ) const
     dest->append( m_version );
     dest->append( "\r\n" );
 
-    for ( std::vector<std::string>::const_iterator i = m_headers.begin();
-          i != m_headers.end();
-          ++i )
+    for ( std::vector<std::string>::const_iterator i = m_headers.begin(); i != m_headers.end(); ++i )
     {
         dest->append( *i );
         dest->append( "\r\n" );
@@ -225,9 +211,7 @@ void HttpResponse::flatten( std::vector<uint8_t> *dest ) const
     dest->push_back( '\r' );
     dest->push_back( '\n' );
 
-    for ( std::vector<std::string>::const_iterator i = m_headers.begin();
-          i != m_headers.end();
-          ++i )
+    for ( std::vector<std::string>::const_iterator i = m_headers.begin(); i != m_headers.end(); ++i )
     {
         append_to_vector( dest, *i );
         dest->push_back( '\r' );
@@ -245,8 +229,7 @@ void HttpServerParserSimple::clear()
     m_cur_line.clear();
 }
 
-ssize_t HttpServerParserSimple::onIncomingHttpData( const uint8_t *data,
-                                                    ssize_t len )
+ssize_t HttpServerParserSimple::onIncomingHttpData( const uint8_t *data, ssize_t len )
 {
     ssize_t r = 0;
 
@@ -356,8 +339,7 @@ ssize_t HttpServerParserSimple::onIncomingHttpData( const uint8_t *data,
                         // The HTTP header is delimited by a blank line
                         // If the method is POST or PUT then we have content
                         // to parse too
-                        if ( m_request->m_method == "POST"
-                             || m_request->m_method == "PUT" )
+                        if ( m_request->m_method == "POST" || m_request->m_method == "PUT" )
                         {
                             m_parse_state = ParsingContentUntilClose;
                             m_request->m_content.clear();
@@ -372,8 +354,7 @@ ssize_t HttpServerParserSimple::onIncomingHttpData( const uint8_t *data,
                             m_request->m_content.clear();
 
                             // give the request to the handler
-                            if ( !m_handler->onIncomingHttpRequest(
-                                     *m_request ) )
+                            if ( !m_handler->onIncomingHttpRequest( *m_request ) )
                             {
                                 // the handler returned false, so we will
                                 // error out here
@@ -423,8 +404,7 @@ void HttpClientParserSimple::clear()
     m_parse_state = ParsingVersion;
 }
 
-ssize_t HttpClientParserSimple::onIncomingHttpData( const uint8_t *data,
-                                                    ssize_t len )
+ssize_t HttpClientParserSimple::onIncomingHttpData( const uint8_t *data, ssize_t len )
 {
     ssize_t r = 0;
 

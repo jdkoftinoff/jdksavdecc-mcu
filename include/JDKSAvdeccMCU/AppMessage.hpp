@@ -78,10 +78,7 @@ struct AppMessage
     /// \brief AppMessage Copy Constructor
     /// \param other the AppMessage to copy
     ///
-    AppMessage( const AppMessage &other ) : m_appdu( other.m_appdu )
-    {
-        m_appdu.base.payload = m_appdu.payload_buffer;
-    }
+    AppMessage( const AppMessage &other ) : m_appdu( other.m_appdu ) { m_appdu.base.payload = m_appdu.payload_buffer; }
 
     ///
     /// \brief operator =
@@ -120,11 +117,9 @@ struct AppMessage
     /// \param apc_primary_mac
     /// \param requested_entity_id
     ///
-    void setEntityIdRequest( const Eui48 &apc_primary_mac,
-                             const Eui64 &requested_entity_id )
+    void setEntityIdRequest( const Eui48 &apc_primary_mac, const Eui64 &requested_entity_id )
     {
-        jdksavdecc_appdu_set_entity_id_request(
-            &m_appdu.base, apc_primary_mac, requested_entity_id );
+        jdksavdecc_appdu_set_entity_id_request( &m_appdu.base, apc_primary_mac, requested_entity_id );
     }
 
     ///
@@ -136,11 +131,9 @@ struct AppMessage
     /// \param apc_primary_mac
     /// \param requested_entity_id
     ///
-    void setEntityIdResponse( const Eui48 &apc_primary_mac,
-                              const Eui64 &requested_entity_id )
+    void setEntityIdResponse( const Eui48 &apc_primary_mac, const Eui64 &requested_entity_id )
     {
-        jdksavdecc_appdu_set_entity_id_response(
-            &m_appdu.base, apc_primary_mac, requested_entity_id );
+        jdksavdecc_appdu_set_entity_id_response( &m_appdu.base, apc_primary_mac, requested_entity_id );
     }
 
     ///
@@ -151,10 +144,7 @@ struct AppMessage
     ///
     /// \param network_port_mac
     ///
-    void setLinkUp( const Eui48 &network_port_mac )
-    {
-        jdksavdecc_appdu_set_link_up( &m_appdu.base, network_port_mac );
-    }
+    void setLinkUp( const Eui48 &network_port_mac ) { jdksavdecc_appdu_set_link_up( &m_appdu.base, network_port_mac ); }
 
     ///
     /// \brief setLinkDown
@@ -164,10 +154,7 @@ struct AppMessage
     ///
     /// \param network_port_mac
     ///
-    void setLinkDown( const Eui48 &network_port_mac )
-    {
-        jdksavdecc_appdu_set_link_down( &m_appdu.base, network_port_mac );
-    }
+    void setLinkDown( const Eui48 &network_port_mac ) { jdksavdecc_appdu_set_link_down( &m_appdu.base, network_port_mac ); }
 
     ///
     /// \brief setAvdeccFromAps
@@ -180,10 +167,7 @@ struct AppMessage
     ///
     void setAvdeccFromAps( const Frame &frame )
     {
-        jdksavdecc_appdu_set_avdecc_from_aps( &m_appdu.base,
-                                              frame.getSA(),
-                                              frame.getPayloadLength(),
-                                              frame.getPayload() );
+        jdksavdecc_appdu_set_avdecc_from_aps( &m_appdu.base, frame.getSA(), frame.getPayloadLength(), frame.getPayload() );
     }
 
     ///
@@ -197,10 +181,7 @@ struct AppMessage
     ///
     void setAvdeccFromApc( const Frame &frame )
     {
-        jdksavdecc_appdu_set_avdecc_from_apc( &m_appdu.base,
-                                              frame.getSA(),
-                                              frame.getPayloadLength(),
-                                              frame.getPayload() );
+        jdksavdecc_appdu_set_avdecc_from_apc( &m_appdu.base, frame.getSA(), frame.getPayloadLength(), frame.getPayload() );
     }
 
     ///
@@ -212,13 +193,9 @@ struct AppMessage
     /// \param vendor_message_type Eui48 code
     /// \param payload the vendor specific message data
     ///
-    void setVendor( const Eui48 &vendor_message_type,
-                    const FixedBuffer &payload )
+    void setVendor( const Eui48 &vendor_message_type, const FixedBuffer &payload )
     {
-        jdksavdecc_appdu_set_vendor( &m_appdu.base,
-                                     vendor_message_type,
-                                     payload.getLength(),
-                                     payload.getBuf() );
+        jdksavdecc_appdu_set_vendor( &m_appdu.base, vendor_message_type, payload.getLength(), payload.getBuf() );
     }
 
     ///
@@ -273,10 +250,7 @@ struct AppMessage
     ///
     /// \return MessageType
     ///
-    MessageType getMessageType() const
-    {
-        return MessageType( m_appdu.base.message_type );
-    }
+    MessageType getMessageType() const { return MessageType( m_appdu.base.message_type ); }
 
     ///
     /// \brief getEntityIdRequestEntityId
@@ -325,8 +299,7 @@ struct AppMessage
     {
         ssize_t r;
         dest->clear();
-        r = jdksavdecc_appdu_write(
-            &m_appdu.base, dest->getBuf(), offset, dest->getMaxLength() );
+        r = jdksavdecc_appdu_write( &m_appdu.base, dest->getBuf(), offset, dest->getMaxLength() );
         if ( r > 0 )
         {
             dest->setLength( uint16_t( r ) );

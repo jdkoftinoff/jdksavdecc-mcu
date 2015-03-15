@@ -77,30 +77,24 @@ class EntityState : public Handler
     /// The pdu contains a valid Set Name Command
     /// Fill in the response in place in the pdu and return an AECP AEM status
     /// code
-    virtual uint8_t receiveSetNameCommand( Frame &pdu,
-                                           uint16_t configuration_index,
-                                           uint16_t descriptor_type,
-                                           uint16_t descriptor_index );
+    virtual uint8_t
+        receiveSetNameCommand( Frame &pdu, uint16_t configuration_index, uint16_t descriptor_type, uint16_t descriptor_index );
 
     /// The pdu contains a valid Get Name Command
     /// Fill in the response in place in the pdu and return an AECP AEM status
     /// code
-    virtual uint8_t receiveGetNameCommand( Frame &pdu,
-                                           uint16_t configuration_index,
-                                           uint16_t descriptor_type,
-                                           uint16_t descriptor_index );
+    virtual uint8_t
+        receiveGetNameCommand( Frame &pdu, uint16_t configuration_index, uint16_t descriptor_type, uint16_t descriptor_index );
 
     /// The pdu contains a valid Set Control Command
     /// Fill in the response in place in the pdu and return an AECP AEM status
     /// code
-    virtual uint8_t receiveSetControlCommand( Frame &pdu,
-                                              uint16_t descriptor_index );
+    virtual uint8_t receiveSetControlCommand( Frame &pdu, uint16_t descriptor_index );
 
     /// The pdu contains a valid Get Control Command
     /// Fill in the response in place in the pdu and return an AECP AEM status
     /// code
-    virtual uint8_t receiveGetControlCommand( Frame &pdu,
-                                              uint16_t descriptor_index );
+    virtual uint8_t receiveGetControlCommand( Frame &pdu, uint16_t descriptor_index );
 
     uint8_t fillDescriptorEntity( Frame &pdu,
                                   Eui64 const &entity_id,
@@ -121,9 +115,7 @@ class EntityState : public Handler
                                   uint16_t configurations_count,
                                   uint16_t current_configuration )
     {
-        pdu.setLength(
-            JDKSAVDECC_FRAME_HEADER_LEN
-            + JDKSAVDECC_AEM_COMMAND_READ_DESCRIPTOR_COMMAND_OFFSET_DESCRIPTOR_TYPE );
+        pdu.setLength( JDKSAVDECC_FRAME_HEADER_LEN + JDKSAVDECC_AEM_COMMAND_READ_DESCRIPTOR_COMMAND_OFFSET_DESCRIPTOR_TYPE );
 
         // descriptor_type
         pdu.putDoublet( JDKSAVDECC_DESCRIPTOR_ENTITY );
@@ -152,78 +144,57 @@ class EntityState : public Handler
         pdu.putDoublet( configurations_count );
         pdu.putDoublet( current_configuration );
 
-        return pdu.isFull() ? JDKSAVDECC_AEM_STATUS_ENTITY_MISBEHAVING
-                            : JDKSAVDECC_AEM_STATUS_SUCCESS;
+        return pdu.isFull() ? JDKSAVDECC_AEM_STATUS_ENTITY_MISBEHAVING : JDKSAVDECC_AEM_STATUS_SUCCESS;
     }
 
     /// The pdu contains a valid Read Entity Descriptor command
     /// Fill in the response in place in the pdu and return an AECP AEM status
     /// code
-    virtual uint8_t readDescriptorEntity( Frame &pdu,
-                                          uint16_t configuration_index,
-                                          uint16_t descriptor_index );
+    virtual uint8_t readDescriptorEntity( Frame &pdu, uint16_t configuration_index, uint16_t descriptor_index );
 
     /// The pdu contains a valid Read AVB_INTERFACE descriptor command
     /// Fill in the response in place in the pdu and return an AECP AEM status
     /// code
-    virtual uint8_t readDescriptorAvbInterface( Frame &pdu,
-                                                uint16_t configuration_index,
-                                                uint16_t descriptor_index );
+    virtual uint8_t readDescriptorAvbInterface( Frame &pdu, uint16_t configuration_index, uint16_t descriptor_index );
 
     /// The pdu contains a valid Read Configuration Descriptor command
     /// Fill in the response in place in the pdu and return an AECP AEM status
     /// code
-    virtual uint8_t readDescriptorConfiguration( Frame &pdu,
-                                                 uint16_t configuration_index,
-                                                 uint16_t descriptor_index );
+    virtual uint8_t readDescriptorConfiguration( Frame &pdu, uint16_t configuration_index, uint16_t descriptor_index );
 
     /// The pdu contains a valid Read Control Descriptor command
     /// Fill in the response in place in the pdu and return an AECP AEM status
     /// code
-    virtual uint8_t readDescriptorControl( Frame &pdu,
-                                           uint16_t configuration_index,
-                                           uint16_t descriptor_index );
+    virtual uint8_t readDescriptorControl( Frame &pdu, uint16_t configuration_index, uint16_t descriptor_index );
 
     /// The pdu contains a valid Read Locale Descriptor command
     /// Fill in the response in place in the pdu and return an AECP AEM status
     /// code
-    virtual uint8_t readDescriptorLocale( Frame &pdu,
-                                          uint16_t configuration_index,
-                                          uint16_t descriptor_index );
+    virtual uint8_t readDescriptorLocale( Frame &pdu, uint16_t configuration_index, uint16_t descriptor_index );
 
     /// The pdu contains a valid Read Strings Descriptor command
     /// Fill in the response in place in the pdu and return an AECP AEM status
     /// code
-    virtual uint8_t readDescriptorStrings( Frame &pdu,
-                                           uint16_t configuration_index,
-                                           uint16_t descriptor_index );
+    virtual uint8_t readDescriptorStrings( Frame &pdu, uint16_t configuration_index, uint16_t descriptor_index );
 
     /// The pdu contains a valid Read Memory Object Descriptor command
     /// Fill in the response in place in the pdu and return an AECP AEM status
     /// code
-    virtual uint8_t readDescriptorMemoryObject( Frame &pdu,
-                                                uint16_t configuration_index,
-                                                uint16_t descriptor_index );
+    virtual uint8_t readDescriptorMemoryObject( Frame &pdu, uint16_t configuration_index, uint16_t descriptor_index );
 
     /// The pdu contains a valid Read Address Access TLV command
     /// Fill in the response in place in the pdu and return an AECP AA status
     /// code
-    virtual uint8_t receiveAARead( uint32_t virtual_base_address,
-                                   uint16_t length,
-                                   uint8_t *response );
+    virtual uint8_t receiveAARead( uint32_t virtual_base_address, uint16_t length, uint8_t *response );
 
     /// The pdu contains a valid Write Address Access TLV command
     /// Fill in the response in place in the pdu and return an AECP AA status
     /// code
-    virtual uint8_t receiveAAWrite( uint32_t virtual_base_address,
-                                    uint16_t length,
-                                    uint8_t const *request );
+    virtual uint8_t receiveAAWrite( uint32_t virtual_base_address, uint16_t length, uint8_t const *request );
 
     /// The pdu contains a valid Execute Address Access TLV command
     /// Fill in the response in place in the pdu and return an AECP AA status
     /// code
-    virtual uint8_t receiveAAExecute( uint32_t virtual_base_address,
-                                      uint16_t length,
-                                      uint8_t const *request );
+    virtual uint8_t receiveAAExecute( uint32_t virtual_base_address, uint16_t length, uint8_t const *request );
 };
 }

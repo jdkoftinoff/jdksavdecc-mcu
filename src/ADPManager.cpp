@@ -36,9 +36,7 @@
 namespace JDKSAvdeccMCU
 {
 
-ADPManager::ADPManager( RawSocket &net,
-                        Eui64 const &entity_id,
-                        ADPCoreInfo const &adp_info )
+ADPManager::ADPManager( RawSocket &net, Eui64 const &entity_id, ADPCoreInfo const &adp_info )
     : m_net( net )
     , m_entity_id( entity_id )
     , m_available_index( 0 )
@@ -53,15 +51,10 @@ ADPManager::ADPManager( RawSocket &net,
 void ADPManager::tick( jdksavdecc_timestamp_in_milliseconds time_in_millis )
 {
     // figure out if it is a scheduled time to send
-    bool timeouthit
-        = wasTimeOutHit( time_in_millis,
-                         m_last_send_time_in_millis,
-                         ( getValidTimeInSeconds() * ( 1000 / 4 ) ) );
+    bool timeouthit = wasTimeOutHit( time_in_millis, m_last_send_time_in_millis, ( getValidTimeInSeconds() * ( 1000 / 4 ) ) );
 
     // figure out if we were triggered to send
-    bool triggered
-        = m_trigger_send
-          && wasTimeOutHit( time_in_millis, m_trigger_send_time, 1000 );
+    bool triggered = m_trigger_send && wasTimeOutHit( time_in_millis, m_trigger_send_time, 1000 );
 
     if ( triggered || timeouthit )
     {
@@ -76,10 +69,7 @@ void ADPManager::sendADP()
     Eui48 adp_multicast_addr = JDKSAVDECC_MULTICAST_ADP_ACMP_MAC;
 
     // DA, SA, EtherType, ADPDU = 82 bytes
-    FrameWithSize<82> adp( 0,
-                           adp_multicast_addr,
-                           m_net.getMACAddress(),
-                           JDKSAVDECC_AVTP_ETHERTYPE );
+    FrameWithSize<82> adp( 0, adp_multicast_addr, m_net.getMACAddress(), JDKSAVDECC_AVTP_ETHERTYPE );
 
     // avtpdu common control header
     // cd=1, subtype=0x7a (ADP)
@@ -150,27 +140,21 @@ bool ADPManager::receivedPDU( Frame &frame )
     bool r = false;
     uint8_t *p = frame.getBuf();
     jdksavdecc_adpdu_common_control_header header;
-    if ( jdksavdecc_adpdu_common_control_header_read(
-             &header, p, JDKSAVDECC_FRAME_HEADER_LEN, frame.getLength() ) > 0 )
+    if ( jdksavdecc_adpdu_common_control_header_read( &header, p, JDKSAVDECC_FRAME_HEADER_LEN, frame.getLength() ) > 0 )
     {
         r = true;
-        if ( header.message_type
-             == JDKSAVDECC_ADP_MESSAGE_TYPE_ENTITY_DISCOVER )
+        if ( header.message_type == JDKSAVDECC_ADP_MESSAGE_TYPE_ENTITY_DISCOVER )
         {
-            if ( header.entity_id == m_entity_id || isUnset( header.entity_id )
-                 || isZero( header.entity_id ) )
+            if ( header.entity_id == m_entity_id || isUnset( header.entity_id ) || isZero( header.entity_id ) )
             {
-                m_last_send_time_in_millis
-                    -= ( getValidTimeInSeconds() * ( 1000 / 4 ) );
+                m_last_send_time_in_millis -= ( getValidTimeInSeconds() * ( 1000 / 4 ) );
             }
         }
-        else if ( header.message_type
-                  == JDKSAVDECC_ADP_MESSAGE_TYPE_ENTITY_AVAILABLE )
+        else if ( header.message_type == JDKSAVDECC_ADP_MESSAGE_TYPE_ENTITY_AVAILABLE )
         {
             receivedEntityAvailable( header, frame );
         }
-        else if ( header.message_type
-                  == JDKSAVDECC_ADP_MESSAGE_TYPE_ENTITY_DEPARTING )
+        else if ( header.message_type == JDKSAVDECC_ADP_MESSAGE_TYPE_ENTITY_DEPARTING )
         {
             receivedEntityDeparting( header, frame );
         }

@@ -78,10 +78,8 @@ template <uint8_t UnitsValue,
 class Value
 {
 #if __cplusplus >= 201103L
-    static_assert( MinValue <= DefaultValue,
-                   "MinValue is not less than or equal to DefaultValue" );
-    static_assert( DefaultValue <= MaxValue,
-                   "DefaultValue is not less than or equal to MaxValue" );
+    static_assert( MinValue <= DefaultValue, "MinValue is not less than or equal to DefaultValue" );
+    static_assert( DefaultValue <= MaxValue, "DefaultValue is not less than or equal to MaxValue" );
 #endif
 
   public:
@@ -276,8 +274,7 @@ class Value
     {
         value_type decoding_multiplier = getDecodingMultiplier();
         value_type decoding_divider = getDecodingDivider();
-        value_type v = value_type( min_value ) * decoding_multiplier
-                       / decoding_divider;
+        value_type v = value_type( min_value ) * decoding_multiplier / decoding_divider;
         return v;
     }
 
@@ -292,8 +289,7 @@ class Value
     {
         value_type decoding_multiplier = getDecodingMultiplier();
         value_type decoding_divider = getDecodingDivider();
-        value_type v = value_type( max_value ) * decoding_multiplier
-                       / decoding_divider;
+        value_type v = value_type( max_value ) * decoding_multiplier / decoding_divider;
         return v;
     }
 
@@ -308,8 +304,7 @@ class Value
     {
         value_type decoding_multiplier = getDecodingMultiplier();
         value_type decoding_divider = getDecodingDivider();
-        value_type v = value_type( default_value ) * decoding_multiplier
-                       / decoding_divider;
+        value_type v = value_type( default_value ) * decoding_multiplier / decoding_divider;
         return v;
     }
 
@@ -324,8 +319,7 @@ class Value
     {
         value_type decoding_multiplier = getDecodingMultiplier();
         value_type decoding_divider = getDecodingDivider();
-        value_type v = value_type( step_value ) * decoding_multiplier
-                       / decoding_divider;
+        value_type v = value_type( step_value ) * decoding_multiplier / decoding_divider;
         return v;
     }
 
@@ -440,8 +434,7 @@ class Value
         value_type rounded_v;
 #if __cplusplus >= 201103L
 
-        if ( !std::is_floating_point<T>::value
-             && std::is_floating_point<value_type>::value )
+        if ( !std::is_floating_point<T>::value && std::is_floating_point<value_type>::value )
         {
             rounded_v = valueRound( v );
         }
@@ -449,13 +442,11 @@ class Value
         {
             rounded_v = v;
         }
-        if ( getMaxValue() * encoding_multiplier
-             > (value_type)std::numeric_limits<T>::max() )
+        if ( getMaxValue() * encoding_multiplier > (value_type)std::numeric_limits<T>::max() )
         {
             throw std::domain_error( "Max Value too large for encoding" );
         }
-        if ( getMinValue() * encoding_multiplier
-             < (value_type)std::numeric_limits<T>::min() )
+        if ( getMinValue() * encoding_multiplier < (value_type)std::numeric_limits<T>::min() )
         {
             throw std::domain_error( "Min Value too small for encoding" );
         }
@@ -478,8 +469,7 @@ class Value
     {
         value_type decoding_multiplier = getDecodingMultiplier();
         value_type decoding_divider = getDecodingDivider();
-        value_type v = value_type( encoded_v ) * decoding_multiplier
-                       / decoding_divider;
+        value_type v = value_type( encoded_v ) * decoding_multiplier / decoding_divider;
         return setValue( v );
     }
 
@@ -497,8 +487,7 @@ class Value
     {
         value_type decoding_multiplier = getDecodingMultiplier();
         value_type decoding_divider = getDecodingDivider();
-        value_type v = value_type( encoded_v ) * decoding_multiplier
-                       / decoding_divider;
+        value_type v = value_type( encoded_v ) * decoding_multiplier / decoding_divider;
         return setValueWithClamp( v );
     }
 

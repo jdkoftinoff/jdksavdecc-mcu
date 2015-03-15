@@ -39,10 +39,7 @@ namespace JDKSAvdeccMCU
 
 EntityState::~EntityState() {}
 
-void EntityState::tick( jdksavdecc_timestamp_in_milliseconds time_in_millis )
-{
-    (void)time_in_millis;
-}
+void EntityState::tick( jdksavdecc_timestamp_in_milliseconds time_in_millis ) { (void)time_in_millis; }
 
 bool EntityState::receivedPDU( Frame &frame )
 {
@@ -67,32 +64,25 @@ uint8_t EntityState::receiveReadDescriptorCommand( Frame &pdu,
     switch ( descriptor_type )
     {
     case JDKSAVDECC_DESCRIPTOR_ENTITY:
-        status = readDescriptorEntity(
-            pdu, configuration_index, descriptor_index );
+        status = readDescriptorEntity( pdu, configuration_index, descriptor_index );
         break;
     case JDKSAVDECC_DESCRIPTOR_CONFIGURATION:
-        status = readDescriptorConfiguration(
-            pdu, configuration_index, descriptor_index );
+        status = readDescriptorConfiguration( pdu, configuration_index, descriptor_index );
         break;
     case JDKSAVDECC_DESCRIPTOR_AVB_INTERFACE:
-        status = readDescriptorAvbInterface(
-            pdu, configuration_index, descriptor_index );
+        status = readDescriptorAvbInterface( pdu, configuration_index, descriptor_index );
         break;
     case JDKSAVDECC_DESCRIPTOR_CONTROL:
-        status = readDescriptorControl(
-            pdu, configuration_index, descriptor_index );
+        status = readDescriptorControl( pdu, configuration_index, descriptor_index );
         break;
     case JDKSAVDECC_DESCRIPTOR_LOCALE:
-        status = readDescriptorLocale(
-            pdu, configuration_index, descriptor_index );
+        status = readDescriptorLocale( pdu, configuration_index, descriptor_index );
         break;
     case JDKSAVDECC_DESCRIPTOR_STRINGS:
-        status = readDescriptorStrings(
-            pdu, configuration_index, descriptor_index );
+        status = readDescriptorStrings( pdu, configuration_index, descriptor_index );
         break;
     case JDKSAVDECC_DESCRIPTOR_MEMORY_OBJECT:
-        status = readDescriptorMemoryObject(
-            pdu, configuration_index, descriptor_index );
+        status = readDescriptorMemoryObject( pdu, configuration_index, descriptor_index );
         break;
     }
     return status;
@@ -138,8 +128,7 @@ uint8_t EntityState::receiveGetNameCommand( Frame &pdu,
     return JDKSAVDECC_AECP_STATUS_NOT_IMPLEMENTED;
 }
 
-uint8_t EntityState::receiveSetControlCommand( Frame &pdu,
-                                               uint16_t descriptor_index )
+uint8_t EntityState::receiveSetControlCommand( Frame &pdu, uint16_t descriptor_index )
 {
     (void)pdu;
     (void)descriptor_index;
@@ -147,8 +136,7 @@ uint8_t EntityState::receiveSetControlCommand( Frame &pdu,
     return JDKSAVDECC_AECP_STATUS_NOT_IMPLEMENTED;
 }
 
-uint8_t EntityState::receiveGetControlCommand( Frame &pdu,
-                                               uint16_t descriptor_index )
+uint8_t EntityState::receiveGetControlCommand( Frame &pdu, uint16_t descriptor_index )
 {
     (void)pdu;
     (void)descriptor_index;
@@ -156,9 +144,7 @@ uint8_t EntityState::receiveGetControlCommand( Frame &pdu,
     return JDKSAVDECC_AECP_STATUS_NOT_IMPLEMENTED;
 }
 
-uint8_t EntityState::readDescriptorEntity( Frame &pdu,
-                                           uint16_t configuration_index,
-                                           uint16_t descriptor_index )
+uint8_t EntityState::readDescriptorEntity( Frame &pdu, uint16_t configuration_index, uint16_t descriptor_index )
 {
     (void)pdu;
     (void)configuration_index;
@@ -167,9 +153,7 @@ uint8_t EntityState::readDescriptorEntity( Frame &pdu,
     return JDKSAVDECC_AEM_STATUS_NO_SUCH_DESCRIPTOR;
 }
 
-uint8_t EntityState::readDescriptorAvbInterface( Frame &pdu,
-                                                 uint16_t configuration_index,
-                                                 uint16_t descriptor_index )
+uint8_t EntityState::readDescriptorAvbInterface( Frame &pdu, uint16_t configuration_index, uint16_t descriptor_index )
 {
     (void)pdu;
     (void)configuration_index;
@@ -178,9 +162,7 @@ uint8_t EntityState::readDescriptorAvbInterface( Frame &pdu,
     return JDKSAVDECC_AEM_STATUS_NO_SUCH_DESCRIPTOR;
 }
 
-uint8_t EntityState::readDescriptorConfiguration( Frame &pdu,
-                                                  uint16_t configuration_index,
-                                                  uint16_t descriptor_index )
+uint8_t EntityState::readDescriptorConfiguration( Frame &pdu, uint16_t configuration_index, uint16_t descriptor_index )
 {
     (void)pdu;
     (void)configuration_index;
@@ -189,9 +171,7 @@ uint8_t EntityState::readDescriptorConfiguration( Frame &pdu,
     return JDKSAVDECC_AEM_STATUS_NO_SUCH_DESCRIPTOR;
 }
 
-uint8_t EntityState::readDescriptorControl( Frame &pdu,
-                                            uint16_t configuration_index,
-                                            uint16_t descriptor_index )
+uint8_t EntityState::readDescriptorControl( Frame &pdu, uint16_t configuration_index, uint16_t descriptor_index )
 {
     (void)pdu;
     (void)configuration_index;
@@ -200,9 +180,7 @@ uint8_t EntityState::readDescriptorControl( Frame &pdu,
     return JDKSAVDECC_AEM_STATUS_NO_SUCH_DESCRIPTOR;
 }
 
-uint8_t EntityState::readDescriptorLocale( Frame &pdu,
-                                           uint16_t configuration_index,
-                                           uint16_t descriptor_index )
+uint8_t EntityState::readDescriptorLocale( Frame &pdu, uint16_t configuration_index, uint16_t descriptor_index )
 {
     (void)pdu;
     (void)configuration_index;
@@ -211,9 +189,7 @@ uint8_t EntityState::readDescriptorLocale( Frame &pdu,
     return JDKSAVDECC_AEM_STATUS_NO_SUCH_DESCRIPTOR;
 }
 
-uint8_t EntityState::readDescriptorStrings( Frame &pdu,
-                                            uint16_t configuration_index,
-                                            uint16_t descriptor_index )
+uint8_t EntityState::readDescriptorStrings( Frame &pdu, uint16_t configuration_index, uint16_t descriptor_index )
 {
     (void)pdu;
     (void)configuration_index;
@@ -222,9 +198,7 @@ uint8_t EntityState::readDescriptorStrings( Frame &pdu,
     return JDKSAVDECC_AEM_STATUS_NO_SUCH_DESCRIPTOR;
 }
 
-uint8_t EntityState::readDescriptorMemoryObject( Frame &pdu,
-                                                 uint16_t configuration_index,
-                                                 uint16_t descriptor_index )
+uint8_t EntityState::readDescriptorMemoryObject( Frame &pdu, uint16_t configuration_index, uint16_t descriptor_index )
 {
     (void)pdu;
     (void)configuration_index;
@@ -233,9 +207,7 @@ uint8_t EntityState::readDescriptorMemoryObject( Frame &pdu,
     return JDKSAVDECC_AEM_STATUS_NO_SUCH_DESCRIPTOR;
 }
 
-uint8_t EntityState::receiveAARead( uint32_t virtual_base_address,
-                                    uint16_t length,
-                                    uint8_t *response )
+uint8_t EntityState::receiveAARead( uint32_t virtual_base_address, uint16_t length, uint8_t *response )
 {
     (void)virtual_base_address;
     (void)length;
@@ -244,9 +216,7 @@ uint8_t EntityState::receiveAARead( uint32_t virtual_base_address,
     return JDKSAVDECC_AECP_STATUS_NOT_IMPLEMENTED;
 }
 
-uint8_t EntityState::receiveAAWrite( uint32_t virtual_base_address,
-                                     uint16_t length,
-                                     const uint8_t *request )
+uint8_t EntityState::receiveAAWrite( uint32_t virtual_base_address, uint16_t length, const uint8_t *request )
 {
     (void)virtual_base_address;
     (void)length;
@@ -255,9 +225,7 @@ uint8_t EntityState::receiveAAWrite( uint32_t virtual_base_address,
     return JDKSAVDECC_AECP_STATUS_NOT_IMPLEMENTED;
 }
 
-uint8_t EntityState::receiveAAExecute( uint32_t virtual_base_address,
-                                       uint16_t length,
-                                       const uint8_t *request )
+uint8_t EntityState::receiveAAExecute( uint32_t virtual_base_address, uint16_t length, const uint8_t *request )
 {
     (void)virtual_base_address;
     (void)length;

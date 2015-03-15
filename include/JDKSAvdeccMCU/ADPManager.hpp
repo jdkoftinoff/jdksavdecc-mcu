@@ -148,9 +148,7 @@ class ADPManager : public Handler
      * @param adp_info The core ADP information
      *
      */
-    ADPManager( RawSocket &net,
-                Eui64 const &entity_id,
-                ADPCoreInfo const &adp_info );
+    ADPManager( RawSocket &net, Eui64 const &entity_id, ADPCoreInfo const &adp_info );
 
     /**
      * @brief tick is called periodically and will call sendADP() when necessary
@@ -171,8 +169,7 @@ class ADPManager : public Handler
      * @param header The parsed ADPDU common control header
      * @param frame The reference to the entire received ethernet frame
      */
-    virtual void receivedEntityAvailable(
-        jdksavdecc_adpdu_common_control_header const &header, Frame &frame )
+    virtual void receivedEntityAvailable( jdksavdecc_adpdu_common_control_header const &header, Frame &frame )
     {
         (void)frame;
         (void)header;
@@ -184,8 +181,7 @@ class ADPManager : public Handler
      * @param header The parsed ADPDU common control header
      * @param frame The reference to the entire received ethernet frame
      */
-    virtual void receivedEntityDeparting(
-        jdksavdecc_adpdu_common_control_header const &header, Frame &frame )
+    virtual void receivedEntityDeparting( jdksavdecc_adpdu_common_control_header const &header, Frame &frame )
     {
         (void)frame;
         (void)header;
@@ -215,20 +211,14 @@ class ADPManager : public Handler
      * this entity as defined by IEEE Std 1722.1-2013 Clause 6.2.1.9
      * @return The Entity's entity_model_id as a Eui64
      */
-    Eui64 const &getEntityModelID() const
-    {
-        return m_adp_info.m_entity_model_id;
-    }
+    Eui64 const &getEntityModelID() const { return m_adp_info.m_entity_model_id; }
 
     /**
      * @brief getEntityCapabilities is called to get the Entity's
      * entity_capabilities, as defined in IEEE Std 1722.1-2013 Clause 6.2.1.10
      * @return The 32 bit value
      */
-    uint32_t getEntityCapabilities() const
-    {
-        return m_adp_info.m_entity_capabilities;
-    }
+    uint32_t getEntityCapabilities() const { return m_adp_info.m_entity_capabilities; }
 
     /**
      * @brief getControllerCapabilities is called to get the Entity's
@@ -236,20 +226,14 @@ class ADPManager : public Handler
      * 6.2.1.15
      * @return The 32 bit value
      */
-    uint32_t getControllerCapabilities() const
-    {
-        return m_adp_info.m_controller_capabilities;
-    }
+    uint32_t getControllerCapabilities() const { return m_adp_info.m_controller_capabilities; }
 
     /**
      * @brief getValidTimeInSeconds is called to get the Entity's valid_time, as
      * defined in IEEE Std 1722.1-2013 Clause 6.2.1.6
      * @return
      */
-    uint16_t getValidTimeInSeconds() const
-    {
-        return m_adp_info.m_valid_time_in_seconds;
-    }
+    uint16_t getValidTimeInSeconds() const { return m_adp_info.m_valid_time_in_seconds; }
 
     /**
      * @brief getAvailableIndex is called to get the current available_index

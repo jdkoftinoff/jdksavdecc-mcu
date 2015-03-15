@@ -80,9 +80,7 @@ void yield( void );
 #define min( a, b ) ( ( a ) < ( b ) ? ( a ) : ( b ) )
 #define max( a, b ) ( ( a ) > ( b ) ? ( a ) : ( b ) )
 #define abs( x ) ( ( x ) > 0 ? ( x ) : -( x ) )
-#define constrain( amt, low, high )                                            \
-    ( ( amt ) < ( low ) ? ( low )                                              \
-                        : ( ( amt ) > ( high ) ? ( high ) : ( amt ) ) )
+#define constrain( amt, low, high ) ( ( amt ) < ( low ) ? ( low ) : ( ( amt ) > ( high ) ? ( high ) : ( amt ) ) )
 #define round( x ) ( ( x ) >= 0 ? (long)( (x)+0.5 ) : (long)( (x)-0.5 ) )
 #define radians( deg ) ( (deg)*DEG_TO_RAD )
 #define degrees( rad ) ( (rad)*RAD_TO_DEG )
@@ -101,13 +99,12 @@ void yield( void );
 #define bitRead( value, bit ) ( ( ( value ) >> ( bit ) ) & 0x01 )
 #define bitSet( value, bit ) ( ( value ) |= ( 1UL << ( bit ) ) )
 #define bitClear( value, bit ) ( ( value ) &= ~( 1UL << ( bit ) ) )
-#define bitWrite( value, bit, bitvalue )                                       \
-    ( bitvalue ? bitSet( value, bit ) : bitClear( value, bit ) )
+#define bitWrite( value, bit, bitvalue ) ( bitvalue ? bitSet( value, bit ) : bitClear( value, bit ) )
 
 #ifndef _NOP
-#define _NOP()                                                                 \
-    do                                                                         \
-    {                                                                          \
+#define _NOP()                                                                                                                     \
+    do                                                                                                                             \
+    {                                                                                                                              \
     } while ( 0 )
 #endif
 
@@ -134,10 +131,7 @@ void delay( unsigned int );
 void delayMicroseconds( unsigned int us );
 unsigned long pulseIn( uint8_t pin, uint8_t state, unsigned long timeout );
 
-void shiftOut( uint8_t dataPin,
-               uint8_t clockPin,
-               uint8_t bitOrder,
-               uint8_t val );
+void shiftOut( uint8_t dataPin, uint8_t clockPin, uint8_t bitOrder, uint8_t val );
 uint8_t shiftIn( uint8_t dataPin, uint8_t clockPin, uint8_t bitOrder );
 
 void attachInterrupt( uint8_t, void ( * )( void ), int mode );
@@ -169,8 +163,7 @@ void loop( void );
 #define TIMER5B 17
 #define TIMER5C 18
 
-unsigned long
-    pulseIn( uint8_t pin, uint8_t state, unsigned long timeout = 1000000L );
+unsigned long pulseIn( uint8_t pin, uint8_t state, unsigned long timeout = 1000000L );
 
 void tone( uint8_t _pin, unsigned int frequency, unsigned long duration = 0 );
 void noTone( uint8_t _pin );
@@ -182,8 +175,7 @@ void noTone( uint8_t _pin );
 #define NUM_DIGITAL_PINS 70
 #define NUM_ANALOG_INPUTS 16
 #define analogInputToDigitalPin( p ) ( ( p < 16 ) ? (p)+54 : -1 )
-#define digitalPinHasPWM( p )                                                  \
-    ( ( ( p ) >= 2 && ( p ) <= 13 ) || ( ( p ) >= 44 && ( p ) <= 46 ) )
+#define digitalPinHasPWM( p ) ( ( ( p ) >= 2 && ( p ) <= 13 ) || ( ( p ) >= 44 && ( p ) <= 46 ) )
 
 static const uint8_t SS = 53;
 static const uint8_t MOSI = 51;
@@ -212,10 +204,7 @@ static const uint8_t A14 = 68;
 static const uint8_t A15 = 69;
 
 inline uint16_t makeWord( uint16_t w ) { return w; }
-inline uint16_t makeWord( byte h, byte l )
-{
-    return ( ( (uint16_t)h ) << 8 ) + l;
-}
+inline uint16_t makeWord( byte h, byte l ) { return ( ( (uint16_t)h ) << 8 ) + l; }
 
 class Serial_
 {

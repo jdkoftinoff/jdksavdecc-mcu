@@ -79,8 +79,7 @@ bool ControllerEntity::receivedPDU( Frame &frame )
     return r;
 }
 
-bool ControllerEntity::receivedAEMResponse( jdksavdecc_aecpdu_aem const &aem,
-                                            Frame &pdu )
+bool ControllerEntity::receivedAEMResponse( jdksavdecc_aecpdu_aem const &aem, Frame &pdu )
 {
     bool r = false;
     // figure out if it is unsolicited from the high bit of command_type
@@ -94,8 +93,7 @@ bool ControllerEntity::receivedAEMResponse( jdksavdecc_aecpdu_aem const &aem,
     if ( !unsolicited )
     {
         // First, is it from the entity we sent the command to?
-        if ( m_last_sent_command_target_entity_id
-             == aem.aecpdu_header.header.target_entity_id )
+        if ( m_last_sent_command_target_entity_id == aem.aecpdu_header.header.target_entity_id )
         {
             // yes, does the command type match?
             if ( actual_command_type == m_last_sent_command_type )
@@ -163,7 +161,7 @@ bool ControllerEntity::receivedAEMResponse( jdksavdecc_aecpdu_aem const &aem,
     return r;
 }
 
-void ControllerEntity::sendAcquireEntity(const Eui64 &target_entity_id, const Eui48 &target_mac_address, uint32_t flags)
+void ControllerEntity::sendAcquireEntity( const Eui64 &target_entity_id, const Eui48 &target_mac_address, uint32_t flags )
 {
     FixedBufferWithSize<16> additional1;
 
@@ -187,23 +185,21 @@ void ControllerEntity::sendAcquireEntity(const Eui64 &target_entity_id, const Eu
                  additional1.getLength() );
 }
 
-bool ControllerEntity::receivedAAResponse( jdksavdecc_aecp_aa const &aa,
-                                           Frame &pdu )
+bool ControllerEntity::receivedAAResponse( jdksavdecc_aecp_aa const &aa, Frame &pdu )
 {
     (void)aa;
     (void)pdu;
     return false;
 }
 
-bool ControllerEntity::receiveAcquireEntityResponse(
-        jdksavdecc_aecpdu_aem const &aem, Frame &pdu )
+bool ControllerEntity::receiveAcquireEntityResponse( jdksavdecc_aecpdu_aem const &aem, Frame &pdu )
 {
     (void)aem;
     (void)pdu;
     return false;
 }
 
-void ControllerEntity::sendLockEntity(const Eui64 &target_entity_id, const Eui48 &target_mac_address, uint32_t flags)
+void ControllerEntity::sendLockEntity( const Eui64 &target_entity_id, const Eui48 &target_mac_address, uint32_t flags )
 {
     FixedBufferWithSize<16> additional1;
 
@@ -227,92 +223,84 @@ void ControllerEntity::sendLockEntity(const Eui64 &target_entity_id, const Eui48
                  additional1.getLength() );
 }
 
-bool ControllerEntity::receiveLockEntityResponse(
-        jdksavdecc_aecpdu_aem const &aem, Frame &pdu )
+bool ControllerEntity::receiveLockEntityResponse( jdksavdecc_aecpdu_aem const &aem, Frame &pdu )
 {
     (void)aem;
     (void)pdu;
     return false;
 }
 
-void ControllerEntity::sendEntityAvailable(const Eui64 &target_entity_id, const Eui48 &target_mac_address)
+void ControllerEntity::sendEntityAvailable( const Eui64 &target_entity_id, const Eui48 &target_mac_address )
 {
-    sendCommand( target_entity_id,
-                 target_mac_address,
-                 JDKSAVDECC_AEM_COMMAND_ENTITY_AVAILABLE );
+    sendCommand( target_entity_id, target_mac_address, JDKSAVDECC_AEM_COMMAND_ENTITY_AVAILABLE );
 }
 
-bool ControllerEntity::receiveEntityAvailableResponse(
-        jdksavdecc_aecpdu_aem const &aem, Frame &pdu )
+bool ControllerEntity::receiveEntityAvailableResponse( jdksavdecc_aecpdu_aem const &aem, Frame &pdu )
 {
     (void)aem;
     (void)pdu;
     return false;
 }
 
-void ControllerEntity::sendReadDescriptor(const Eui64 &target_entity_id, const Eui48 &target_mac_address, uint16_t configuration_index, uint16_t descriptor_type, uint16_t descriptor_index)
+void ControllerEntity::sendReadDescriptor( const Eui64 &target_entity_id,
+                                           const Eui48 &target_mac_address,
+                                           uint16_t configuration_index,
+                                           uint16_t descriptor_type,
+                                           uint16_t descriptor_index )
 {
     uint8_t additional1[8];
-    jdksavdecc_uint16_set(
-                configuration_index, additional1, 0 );  // offset 12 in Figure 7.36
-    jdksavdecc_uint16_set( 0, additional1, 2 ); // offset 14 in Figure 7.36
-    jdksavdecc_uint16_set(
-                descriptor_type, additional1, 4 ); // offset 16 in Figure 7.36
-    jdksavdecc_uint16_set(
-                descriptor_index, additional1, 6 ); // offset 20 in Figure 7.35
-    sendCommand( target_entity_id,
-                 target_mac_address,
-                 JDKSAVDECC_AEM_COMMAND_READ_DESCRIPTOR,
-                 true,
-                 additional1,
-                 sizeof( additional1 ) );
+    jdksavdecc_uint16_set( configuration_index, additional1, 0 ); // offset 12 in Figure 7.36
+    jdksavdecc_uint16_set( 0, additional1, 2 );                   // offset 14 in Figure 7.36
+    jdksavdecc_uint16_set( descriptor_type, additional1, 4 );     // offset 16 in Figure 7.36
+    jdksavdecc_uint16_set( descriptor_index, additional1, 6 );    // offset 20 in Figure 7.35
+    sendCommand(
+        target_entity_id, target_mac_address, JDKSAVDECC_AEM_COMMAND_READ_DESCRIPTOR, true, additional1, sizeof( additional1 ) );
 }
 
-bool ControllerEntity::receiveReadDescriptorResponse(
-        jdksavdecc_aecpdu_aem const &aem, Frame &pdu )
+bool ControllerEntity::receiveReadDescriptorResponse( jdksavdecc_aecpdu_aem const &aem, Frame &pdu )
 {
     (void)aem;
     (void)pdu;
     return false;
 }
 
-void ControllerEntity::sendSetConfiguration(const Eui64 &target_entity_id, const Eui48 &target_mac_address, uint16_t configuration_index)
+void ControllerEntity::sendSetConfiguration( const Eui64 &target_entity_id,
+                                             const Eui48 &target_mac_address,
+                                             uint16_t configuration_index )
 {
     uint8_t additional1[4];
     jdksavdecc_uint16_set( 0, additional1, 0 );
     jdksavdecc_uint16_set( configuration_index, additional1, 2 );
-    sendCommand( target_entity_id,
-                 target_mac_address,
-                 JDKSAVDECC_AEM_COMMAND_SET_CONFIGURATION,
-                 true,
-                 additional1,
-                 sizeof( additional1 ) );
+    sendCommand(
+        target_entity_id, target_mac_address, JDKSAVDECC_AEM_COMMAND_SET_CONFIGURATION, true, additional1, sizeof( additional1 ) );
 }
 
-bool ControllerEntity::receiveSetConfigurationResponse(
-        jdksavdecc_aecpdu_aem const &aem, Frame &pdu )
+bool ControllerEntity::receiveSetConfigurationResponse( jdksavdecc_aecpdu_aem const &aem, Frame &pdu )
 {
     (void)aem;
     (void)pdu;
     return false;
 }
 
-void ControllerEntity::sendGetConfiguration(const Eui64 &target_entity_id, const Eui48 &target_mac_address)
+void ControllerEntity::sendGetConfiguration( const Eui64 &target_entity_id, const Eui48 &target_mac_address )
 {
-    sendCommand( target_entity_id,
-                 target_mac_address,
-                 JDKSAVDECC_AEM_COMMAND_GET_CONFIGURATION );
+    sendCommand( target_entity_id, target_mac_address, JDKSAVDECC_AEM_COMMAND_GET_CONFIGURATION );
 }
 
-bool ControllerEntity::receiveGetConfigurationResponse(
-        jdksavdecc_aecpdu_aem const &aem, Frame &pdu )
+bool ControllerEntity::receiveGetConfigurationResponse( jdksavdecc_aecpdu_aem const &aem, Frame &pdu )
 {
     (void)aem;
     (void)pdu;
     return false;
 }
 
-void ControllerEntity::sendSetName(const Eui64 &target_entity_id, const Eui48 &target_mac_address, uint16_t target_descriptor_type, uint16_t target_descriptor_index, uint16_t name_index, uint16_t configuration_index, const jdksavdecc_string &name)
+void ControllerEntity::sendSetName( const Eui64 &target_entity_id,
+                                    const Eui48 &target_mac_address,
+                                    uint16_t target_descriptor_type,
+                                    uint16_t target_descriptor_index,
+                                    uint16_t name_index,
+                                    uint16_t configuration_index,
+                                    const jdksavdecc_string &name )
 {
     uint8_t additional1[8];
     jdksavdecc_uint16_set( target_descriptor_type, additional1, 0 );
@@ -329,35 +317,41 @@ void ControllerEntity::sendSetName(const Eui64 &target_entity_id, const Eui48 &t
                  sizeof( name.value ) );
 }
 
-bool ControllerEntity::receiveSetNameResponse( jdksavdecc_aecpdu_aem const &aem,
-                                               Frame &pdu )
+bool ControllerEntity::receiveSetNameResponse( jdksavdecc_aecpdu_aem const &aem, Frame &pdu )
 {
     (void)aem;
     (void)pdu;
     return false;
 }
 
-void ControllerEntity::sendGetName(const Eui64 &target_entity_id, const Eui48 &target_mac_address, uint16_t target_descriptor_type, uint16_t target_descriptor_index, uint16_t name_index, uint16_t configuration_index)
+void ControllerEntity::sendGetName( const Eui64 &target_entity_id,
+                                    const Eui48 &target_mac_address,
+                                    uint16_t target_descriptor_type,
+                                    uint16_t target_descriptor_index,
+                                    uint16_t name_index,
+                                    uint16_t configuration_index )
 {
     uint8_t additional1[8];
     jdksavdecc_uint16_set( target_descriptor_type, additional1, 0 );
     jdksavdecc_uint16_set( target_descriptor_index, additional1, 2 );
     jdksavdecc_uint16_set( name_index, additional1, 4 );
     jdksavdecc_uint16_set( configuration_index, additional1, 6 );
-    sendCommand( target_entity_id,
-                 target_mac_address,
-                 JDKSAVDECC_AEM_COMMAND_GET_NAME );
+    sendCommand( target_entity_id, target_mac_address, JDKSAVDECC_AEM_COMMAND_GET_NAME );
 }
 
-bool ControllerEntity::receiveGetNameResponse( jdksavdecc_aecpdu_aem const &aem,
-                                               Frame &pdu )
+bool ControllerEntity::receiveGetNameResponse( jdksavdecc_aecpdu_aem const &aem, Frame &pdu )
 {
     (void)aem;
     (void)pdu;
     return false;
 }
 
-void ControllerEntity::sendSetControl(const Eui64 &target_entity_id, const Eui48 &target_mac_address, uint16_t target_descriptor_index, uint8_t *control_value, uint16_t control_value_len, bool track_for_ack)
+void ControllerEntity::sendSetControl( const Eui64 &target_entity_id,
+                                       const Eui48 &target_mac_address,
+                                       uint16_t target_descriptor_index,
+                                       uint8_t *control_value,
+                                       uint16_t control_value_len,
+                                       bool track_for_ack )
 {
     uint8_t additional1[4];
     jdksavdecc_uint16_set( JDKSAVDECC_DESCRIPTOR_CONTROL, additional1, 0 );
@@ -372,25 +366,19 @@ void ControllerEntity::sendSetControl(const Eui64 &target_entity_id, const Eui48
                  control_value_len );
 }
 
-bool ControllerEntity::receiveSetControlResponse(
-        jdksavdecc_aecpdu_aem const &aem, Frame &pdu )
+bool ControllerEntity::receiveSetControlResponse( jdksavdecc_aecpdu_aem const &aem, Frame &pdu )
 {
     (void)aem;
     (void)pdu;
     return false;
 }
 
-void ControllerEntity::sendRegisterUnsolicitedNotification(const Eui64 &target_entity_id, const Eui48 &target_mac_address)
+void ControllerEntity::sendRegisterUnsolicitedNotification( const Eui64 &target_entity_id, const Eui48 &target_mac_address )
 {
-    sendCommand( target_entity_id,
-                 target_mac_address,
-                 JDKSAVDECC_AEM_COMMAND_REGISTER_UNSOLICITED_NOTIFICATION,
-                 0,
-                 0 );
+    sendCommand( target_entity_id, target_mac_address, JDKSAVDECC_AEM_COMMAND_REGISTER_UNSOLICITED_NOTIFICATION, 0, 0 );
 }
 
-bool ControllerEntity::receiveGetControlResponse(
-        jdksavdecc_aecpdu_aem const &aem, Frame &pdu )
+bool ControllerEntity::receiveGetControlResponse( jdksavdecc_aecpdu_aem const &aem, Frame &pdu )
 {
     (void)aem;
     (void)pdu;
@@ -409,38 +397,30 @@ uint8_t ControllerEntity::receiveControlValue( Eui64 const &target_entity_id,
     return JDKSAVDECC_AECP_STATUS_NOT_IMPLEMENTED;
 }
 
-void ControllerEntity::sendGetControl(const Eui64 &target_entity_id, const Eui48 &target_mac_address, uint16_t target_descriptor_index)
+void ControllerEntity::sendGetControl( const Eui64 &target_entity_id,
+                                       const Eui48 &target_mac_address,
+                                       uint16_t target_descriptor_index )
 {
     uint8_t additional1[4];
     jdksavdecc_uint16_set( JDKSAVDECC_DESCRIPTOR_CONTROL, additional1, 0 );
     jdksavdecc_uint16_set( target_descriptor_index, additional1, 2 );
-    sendCommand( target_entity_id,
-                 target_mac_address,
-                 JDKSAVDECC_AEM_COMMAND_GET_CONTROL,
-                 true,
-                 additional1,
-                 sizeof( additional1 ) );
+    sendCommand(
+        target_entity_id, target_mac_address, JDKSAVDECC_AEM_COMMAND_GET_CONTROL, true, additional1, sizeof( additional1 ) );
 }
 
-bool ControllerEntity::receiveRegisterUnsolicitedNotificationResponse(
-        jdksavdecc_aecpdu_aem const &aem, Frame &pdu )
+bool ControllerEntity::receiveRegisterUnsolicitedNotificationResponse( jdksavdecc_aecpdu_aem const &aem, Frame &pdu )
 {
     (void)aem;
     (void)pdu;
     return false;
 }
 
-void ControllerEntity::sendDeRegisterUnsolicitedNotification(const Eui64 &target_entity_id, const Eui48 &target_mac_address)
+void ControllerEntity::sendDeRegisterUnsolicitedNotification( const Eui64 &target_entity_id, const Eui48 &target_mac_address )
 {
-    sendCommand( target_entity_id,
-                 target_mac_address,
-                 JDKSAVDECC_AEM_COMMAND_DEREGISTER_UNSOLICITED_NOTIFICATION,
-                 0,
-                 0 );
+    sendCommand( target_entity_id, target_mac_address, JDKSAVDECC_AEM_COMMAND_DEREGISTER_UNSOLICITED_NOTIFICATION, 0, 0 );
 }
 
-bool ControllerEntity::receiveDeRegisterUnsolicitedNotificationResponse(
-        jdksavdecc_aecpdu_aem const &aem, Frame &pdu )
+bool ControllerEntity::receiveDeRegisterUnsolicitedNotificationResponse( jdksavdecc_aecpdu_aem const &aem, Frame &pdu )
 {
     (void)aem;
     (void)pdu;

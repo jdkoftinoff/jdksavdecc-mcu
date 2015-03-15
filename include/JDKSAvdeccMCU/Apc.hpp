@@ -253,8 +253,7 @@ class ApcStateMachine
         /**
          * See IEEE Std 1722.1 Annex C.5.3.2.7
          */
-        virtual void sendIdRequest( Eui48 const &primaryMac,
-                                    Eui64 const &entity_id );
+        virtual void sendIdRequest( Eui48 const &primaryMac, Eui64 const &entity_id );
 
         /**
          * See IEEE Std 1722.1 Annex C.5.3.2.8
@@ -601,10 +600,7 @@ class ApcStateMachine
     {
       public:
         StateEvents( HttpClientParser *http_parser, std::string path )
-            : m_owner( 0 )
-            , m_http_parser( http_parser )
-            , m_path( path )
-            , m_app_parser( *this )
+            : m_owner( 0 ), m_http_parser( http_parser ), m_path( path ), m_app_parser( *this )
         {
         }
 
@@ -721,8 +717,7 @@ class ApcStateMachine
         /// \param len lenth of data in octets
         /// \return length of consumed data
         ///
-        virtual ssize_t onIncomingTcpHttpData( uint8_t const *data,
-                                               ssize_t len );
+        virtual ssize_t onIncomingTcpHttpData( uint8_t const *data, ssize_t len );
 
         ///
         /// \brief onIncomingHttpResponse
@@ -741,8 +736,7 @@ class ApcStateMachine
         /// \param len lenth of data in octets
         /// \return length of consumed data
         ///
-        virtual ssize_t onIncomingTcpAppData( uint8_t const *data,
-                                              ssize_t len );
+        virtual ssize_t onIncomingTcpAppData( uint8_t const *data, ssize_t len );
 
       protected:
         ///
@@ -835,10 +829,7 @@ class ApcStateMachine
         AppMessageParser m_app_parser;
     };
 
-    ApcStateMachine( StateVariables *variables,
-                     StateActions *actions,
-                     StateEvents *events,
-                     States *states );
+    ApcStateMachine( StateVariables *variables, StateActions *actions, StateEvents *events, States *states );
 
     virtual ~ApcStateMachine();
 

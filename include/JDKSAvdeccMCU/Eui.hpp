@@ -68,19 +68,13 @@ class Eui48 : public jdksavdecc_eui48
     /// \brief Eui48 Construct via pointer to 6 octet values
     /// \param p pointer to 6 octets
     ///
-    Eui48( uint8_t const *p )
-    {
-        jdksavdecc_eui48_copy( this, (jdksavdecc_eui48 const *)p );
-    }
+    Eui48( uint8_t const *p ) { jdksavdecc_eui48_copy( this, (jdksavdecc_eui48 const *)p ); }
 
     ///
     /// \brief Eui48 copy constructor from jdksavdecc_eui48 base class
     /// \param other
     ///
-    Eui48( jdksavdecc_eui48 const &other )
-    {
-        jdksavdecc_eui48_copy( this, &other );
-    }
+    Eui48( jdksavdecc_eui48 const &other ) { jdksavdecc_eui48_copy( this, &other ); }
 
     ///
     /// \brief Eui48 construct with right justified uint64_t
@@ -107,10 +101,7 @@ class Eui48 : public jdksavdecc_eui48
     ///
     /// \param s std::string reference
     ///
-    Eui48( std::string const &s )
-    {
-        jdksavdecc_eui48_init_from_cstr( this, s.c_str() );
-    }
+    Eui48( std::string const &s ) { jdksavdecc_eui48_init_from_cstr( this, s.c_str() ); }
 #endif
 
     ///
@@ -128,20 +119,14 @@ class Eui48 : public jdksavdecc_eui48
     /// \brief convertToUint64 convert to uint64_t
     /// \return uint64_t with lower 48 bits containing EUI48
     ///
-    uint64_t convertToUint64() const
-    {
-        return jdksavdecc_eui48_convert_to_uint64( this );
-    }
+    uint64_t convertToUint64() const { return jdksavdecc_eui48_convert_to_uint64( this ); }
 
     ///
     /// \brief store Store octets into buffer
     /// \param p destination buffer pointer
     /// \param pos offset from start of buffer
     ///
-    void store( uint8_t *p, size_t pos ) const
-    {
-        memcpy( p + pos, &value[0], 6 );
-    }
+    void store( uint8_t *p, size_t pos ) const { memcpy( p + pos, &value[0], 6 ); }
 
     ///
     /// \brief isSet checks if Eui48 has been initialized
@@ -165,10 +150,7 @@ class Eui48 : public jdksavdecc_eui48
     /// \brief isNotZero checks if Eui48 is not set to 00:00:00:00:00:00
     /// \return true if EUI48 is not 00:00:00:00:00:00
     ///
-    bool isNotZero() const
-    {
-        return jdksavdecc_eui48_is_not_zero( *this ) != 0;
-    }
+    bool isNotZero() const { return jdksavdecc_eui48_is_not_zero( *this ) != 0; }
 
     ///
     /// \brief compare Numeric compare with other Eui48
@@ -176,16 +158,9 @@ class Eui48 : public jdksavdecc_eui48
     /// \return -1 if less than other, 0 if equal to other, 1 if greater than
     /// other
     ///
-    int compare( const jdksavdecc_eui48 &other ) const
-    {
-        return jdksavdecc_eui48_compare( this, &other );
-    }
+    int compare( const jdksavdecc_eui48 &other ) const { return jdksavdecc_eui48_compare( this, &other ); }
 
-    void clear()
-    {
-        jdksavdecc_eui48_init( this );
-    }
-
+    void clear() { jdksavdecc_eui48_init( this ); }
 };
 
 ///
@@ -205,14 +180,7 @@ class Eui64 : public jdksavdecc_eui64
     /// \brief Eui48 Construct with 8 octet values
     /// \param a-h The 8 octets that make up the EUI48
     ///
-    Eui64( uint8_t a,
-           uint8_t b,
-           uint8_t c,
-           uint8_t d,
-           uint8_t e,
-           uint8_t f,
-           uint8_t g,
-           uint8_t h )
+    Eui64( uint8_t a, uint8_t b, uint8_t c, uint8_t d, uint8_t e, uint8_t f, uint8_t g, uint8_t h )
     {
         value[0] = a;
         value[1] = b;
@@ -228,19 +196,13 @@ class Eui64 : public jdksavdecc_eui64
     /// \brief Eui64 Construct via pointer to 8 octet values
     /// \param p pointer to 8 octets
     ///
-    Eui64( uint8_t const *p )
-    {
-        jdksavdecc_eui64_copy( this, (jdksavdecc_eui64 const *)p );
-    }
+    Eui64( uint8_t const *p ) { jdksavdecc_eui64_copy( this, (jdksavdecc_eui64 const *)p ); }
 
     ///
     /// \brief Eui64 copy constructor from jdksavdecc_eui64 base class
     /// \param other
     ///
-    Eui64( jdksavdecc_eui64 const &other )
-    {
-        jdksavdecc_eui64_copy( this, &other );
-    }
+    Eui64( jdksavdecc_eui64 const &other ) { jdksavdecc_eui64_copy( this, &other ); }
 
     ///
     /// \brief Eui48 construct with right justified uint64_t
@@ -268,10 +230,7 @@ class Eui64 : public jdksavdecc_eui64
     ///
     /// \param s std::string reference
     ///
-    Eui64( std::string const &s )
-    {
-        jdksavdecc_eui64_init_from_cstr( this, s.c_str() );
-    }
+    Eui64( std::string const &s ) { jdksavdecc_eui64_init_from_cstr( this, s.c_str() ); }
 #endif
 
     ///
@@ -289,20 +248,14 @@ class Eui64 : public jdksavdecc_eui64
     /// \brief convertToUint64 convert to uint64_t
     /// \return uint64_t containing EUI48
     ///
-    uint64_t convertToUint64() const
-    {
-        return jdksavdecc_eui64_convert_to_uint64( this );
-    }
+    uint64_t convertToUint64() const { return jdksavdecc_eui64_convert_to_uint64( this ); }
 
     ///
     /// \brief store Store octets into buffer
     /// \param p destination buffer pointer
     /// \param pos offset from start of buffer
     ///
-    void store( uint8_t *p, size_t pos ) const
-    {
-        memcpy( p + pos, &value[0], 8 );
-    }
+    void store( uint8_t *p, size_t pos ) const { memcpy( p + pos, &value[0], 8 ); }
 
     ///
     /// \brief isSet checks is Eui48 has been initialized
@@ -328,116 +281,80 @@ class Eui64 : public jdksavdecc_eui64
     /// \return -1 if less than other, 0 if equal to other, 1 if greater than
     /// other
     ///
-    int compare( const Eui64 &other ) const
-    {
-        return jdksavdecc_eui64_compare( this, &other );
-    }
+    int compare( const Eui64 &other ) const { return jdksavdecc_eui64_compare( this, &other ); }
 
-    void clear()
-    {
-        jdksavdecc_eui64_init( this );
-    }
+    void clear() { jdksavdecc_eui64_init( this ); }
 };
 }
 
-inline bool isSet( jdksavdecc_eui48 const &v )
-{
-    return jdksavdecc_eui48_is_set( v ) != 0;
-}
+inline bool isSet( jdksavdecc_eui48 const &v ) { return jdksavdecc_eui48_is_set( v ) != 0; }
 
-inline bool isUnset( jdksavdecc_eui48 const &v )
-{
-    return jdksavdecc_eui48_is_unset( v ) != 0;
-}
+inline bool isUnset( jdksavdecc_eui48 const &v ) { return jdksavdecc_eui48_is_unset( v ) != 0; }
 
-inline bool isZero( jdksavdecc_eui48 const &v )
-{
-    return jdksavdecc_eui48_is_zero( v ) != 0;
-}
+inline bool isZero( jdksavdecc_eui48 const &v ) { return jdksavdecc_eui48_is_zero( v ) != 0; }
 
-inline bool isSet( jdksavdecc_eui64 const &v )
-{
-    return jdksavdecc_eui64_is_set( v ) != 0;
-}
+inline bool isSet( jdksavdecc_eui64 const &v ) { return jdksavdecc_eui64_is_set( v ) != 0; }
 
-inline bool isUnset( jdksavdecc_eui64 const &v )
-{
-    return jdksavdecc_eui64_is_unset( v ) != 0;
-}
+inline bool isUnset( jdksavdecc_eui64 const &v ) { return jdksavdecc_eui64_is_unset( v ) != 0; }
 
-inline bool isZero( jdksavdecc_eui64 const &v )
-{
-    return jdksavdecc_eui64_is_zero( v ) != 0;
-}
+inline bool isZero( jdksavdecc_eui64 const &v ) { return jdksavdecc_eui64_is_zero( v ) != 0; }
 
-inline bool operator<( const jdksavdecc_eui48 &lhs,
-                       const jdksavdecc_eui48 &rhs )
+inline bool operator<( const jdksavdecc_eui48 &lhs, const jdksavdecc_eui48 &rhs )
 {
     return jdksavdecc_eui48_compare( &lhs, &rhs ) < 0;
 }
 
-inline bool operator<=( const jdksavdecc_eui48 &lhs,
-                        const jdksavdecc_eui48 &rhs )
+inline bool operator<=( const jdksavdecc_eui48 &lhs, const jdksavdecc_eui48 &rhs )
 {
     return jdksavdecc_eui48_compare( &lhs, &rhs ) <= 0;
 }
 
-inline bool operator==( const jdksavdecc_eui48 &lhs,
-                        const jdksavdecc_eui48 &rhs )
+inline bool operator==( const jdksavdecc_eui48 &lhs, const jdksavdecc_eui48 &rhs )
 {
     return jdksavdecc_eui48_compare( &lhs, &rhs ) == 0;
 }
 
-inline bool operator>=( const jdksavdecc_eui48 &lhs,
-                        const jdksavdecc_eui48 &rhs )
+inline bool operator>=( const jdksavdecc_eui48 &lhs, const jdksavdecc_eui48 &rhs )
 {
     return jdksavdecc_eui48_compare( &lhs, &rhs ) >= 0;
 }
 
-inline bool operator>( const jdksavdecc_eui48 &lhs,
-                       const jdksavdecc_eui48 &rhs )
+inline bool operator>( const jdksavdecc_eui48 &lhs, const jdksavdecc_eui48 &rhs )
 {
     return jdksavdecc_eui48_compare( &lhs, &rhs ) > 0;
 }
 
-inline bool operator!=( const jdksavdecc_eui48 &lhs,
-                        const jdksavdecc_eui48 &rhs )
+inline bool operator!=( const jdksavdecc_eui48 &lhs, const jdksavdecc_eui48 &rhs )
 {
     return jdksavdecc_eui48_compare( &lhs, &rhs ) != 0;
 }
 
-inline bool operator<( const jdksavdecc_eui64 &lhs,
-                       const jdksavdecc_eui64 &rhs )
+inline bool operator<( const jdksavdecc_eui64 &lhs, const jdksavdecc_eui64 &rhs )
 {
     return jdksavdecc_eui64_compare( &lhs, &rhs ) < 0;
 }
 
-inline bool operator<=( const jdksavdecc_eui64 &lhs,
-                        const jdksavdecc_eui64 &rhs )
+inline bool operator<=( const jdksavdecc_eui64 &lhs, const jdksavdecc_eui64 &rhs )
 {
     return jdksavdecc_eui64_compare( &lhs, &rhs ) <= 0;
 }
 
-inline bool operator==( const jdksavdecc_eui64 &lhs,
-                        const jdksavdecc_eui64 &rhs )
+inline bool operator==( const jdksavdecc_eui64 &lhs, const jdksavdecc_eui64 &rhs )
 {
     return jdksavdecc_eui64_compare( &lhs, &rhs ) == 0;
 }
 
-inline bool operator>=( const jdksavdecc_eui64 &lhs,
-                        const jdksavdecc_eui64 &rhs )
+inline bool operator>=( const jdksavdecc_eui64 &lhs, const jdksavdecc_eui64 &rhs )
 {
     return jdksavdecc_eui64_compare( &lhs, &rhs ) >= 0;
 }
 
-inline bool operator>( const jdksavdecc_eui64 &lhs,
-                       const jdksavdecc_eui64 &rhs )
+inline bool operator>( const jdksavdecc_eui64 &lhs, const jdksavdecc_eui64 &rhs )
 {
     return jdksavdecc_eui64_compare( &lhs, &rhs ) > 0;
 }
 
-inline bool operator!=( const jdksavdecc_eui64 &lhs,
-                        const jdksavdecc_eui64 &rhs )
+inline bool operator!=( const jdksavdecc_eui64 &lhs, const jdksavdecc_eui64 &rhs )
 {
     return jdksavdecc_eui64_compare( &lhs, &rhs ) != 0;
 }

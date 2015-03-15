@@ -25,8 +25,7 @@ Eui48 my_mac = Eui48( 0x70, 0xb3, 0xd5, 0xed, 0xcf, 0xf0 );
 
 #if JDKSAVDECCMCU_ENABLE_RAWSOCKETWIZNET == 1
 // for embedded systems using the WizNet ethernet chip
-RawSocketWizNet
-    rawnet( my_mac, JDKSAVDECC_AVTP_ETHERTYPE, &jdksavdecc_multicast_adp_acmp );
+RawSocketWizNet rawnet( my_mac, JDKSAVDECC_AVTP_ETHERTYPE, &jdksavdecc_multicast_adp_acmp );
 #elif JDKSAVDECCMCU_ENABLE_RAWSOCKETPCAPFILE == 1
 // for unit tests using pcap files for input and output
 RawSocketPcapFile rawnet( JDKSAVDECC_AVTP_ETHERTYPE,
@@ -38,13 +37,11 @@ RawSocketPcapFile rawnet( JDKSAVDECC_AVTP_ETHERTYPE,
                           50 );
 #elif JDKSAVDECCMCU_ENABLE_RAWSOCKETLINUX == 1
 // for Raw sockets on linux
-RawSocketLinux
-    rawnet( "en0", JDKSAVDECC_AVTP_ETHERTYPE, &jdksavdecc_multicast_adp_acmp );
+RawSocketLinux rawnet( "en0", JDKSAVDECC_AVTP_ETHERTYPE, &jdksavdecc_multicast_adp_acmp );
 #elif JDKSAVDECCMCU_ENABLE_RAWSOCKETMACOSX == 1
 
 // for Raw sockets on Mac OSX
-RawSocketMacOSX
-    rawnet( "en0", JDKSAVDECC_AVTP_ETHERTYPE, &jdksavdecc_multicast_adp_acmp );
+RawSocketMacOSX rawnet( "en0", JDKSAVDECC_AVTP_ETHERTYPE, &jdksavdecc_multicast_adp_acmp );
 #endif
 
 /// This AVDECC Entity is based on the mac address (insert ff ff)
@@ -52,13 +49,11 @@ Eui64 my_entity_id = Eui64( 0x70, 0xb3, 0xd5, 0xff, 0xff, 0xed, 0xcf, 0xf0 );
 
 /// This AVDECC Entity Model ID is based on the J.D. Koftinoff Software, Ltd.
 /// assigned MAC-S (OUI36): 70:b3:d5:ed:c
-Eui64 my_entity_model_id
-    = Eui64( 0x70, 0xb3, 0xd5, 0xed, 0xc0, 0x00, 0x00, 0x00 );
+Eui64 my_entity_model_id = Eui64( 0x70, 0xb3, 0xd5, 0xed, 0xc0, 0x00, 0x00, 0x00 );
 
 /// All of the controls are targetting the entity of the second JDKS
 /// Experimental MAC address
-Eui64 target_entity_id
-    = Eui64( 0x70, 0xb3, 0xd5, 0xff, 0xff, 0xed, 0xcf, 0xf1 );
+Eui64 target_entity_id = Eui64( 0x70, 0xb3, 0xd5, 0xff, 0xff, 0xed, 0xcf, 0xf1 );
 
 /// All of the controls are targetting the second JDKS experimental MAC address
 /// 70:b3:d5:ed:cf:f1
@@ -76,8 +71,7 @@ class KnobsAndButtonsController : public EntityState
         NUM_CONTROL_DESCRIPTORS
     };
 
-    KnobsAndButtonsController( Eui64 const &entity_id,
-                               Eui64 const &entity_model_id )
+    KnobsAndButtonsController( Eui64 const &entity_id, Eui64 const &entity_model_id )
         : m_adp_info( entity_model_id,
                       JDKSAVDECC_ADP_ENTITY_CAPABILITY_AEM_SUPPORTED,
                       JDKSAVDECC_ADP_CONTROLLER_CAPABILITY_IMPLEMENTED,
@@ -86,18 +80,8 @@ class KnobsAndButtonsController : public EntityState
         , m_controller_entity( m_adp_manager, &m_registered_controllers_storage, this )
         , m_update_rate_in_millis( 50 )
         , m_last_update_time( 0 )
-        , m_knobs_sender( m_controller_entity,
-                          target_entity_id,
-                          target_mac_address,
-                          0x0000,
-                          REFRESH_TIME,
-                          &m_knobs_storage )
-        , m_buttons_sender( m_controller_entity,
-                            target_entity_id,
-                            target_mac_address,
-                            0x0001,
-                            REFRESH_TIME,
-                            &m_buttons_storage )
+        , m_knobs_sender( m_controller_entity, target_entity_id, target_mac_address, 0x0000, REFRESH_TIME, &m_knobs_storage )
+        , m_buttons_sender( m_controller_entity, target_entity_id, target_mac_address, 0x0001, REFRESH_TIME, &m_buttons_storage )
     {
         // Set up the I/O pins for 3 knobs, 5 buttons, and 2 LED's
         pinMode( 9, OUTPUT );
@@ -121,8 +105,7 @@ class KnobsAndButtonsController : public EntityState
 
     virtual void tick( jdksavdecc_timestamp_in_milliseconds time_in_millis ) override
     {
-        if ( wasTimeOutHit(
-                 time_in_millis, m_last_update_time, m_update_rate_in_millis ) )
+        if ( wasTimeOutHit( time_in_millis, m_last_update_time, m_update_rate_in_millis ) )
         {
             m_last_update_time = time_in_millis;
 
@@ -145,33 +128,30 @@ class KnobsAndButtonsController : public EntityState
         }
     }
 
-    virtual uint8_t readDescriptorEntity( Frame &pdu,
-                                          uint16_t configuration_index,
-                                          uint16_t descriptor_index ) override
+    virtual uint8_t readDescriptorEntity( Frame &pdu, uint16_t configuration_index, uint16_t descriptor_index ) override
     {
         uint8_t status = JDKSAVDECC_AEM_STATUS_BAD_ARGUMENTS;
 
         if ( configuration_index == 0 && descriptor_index == 0 )
         {
-            status = fillDescriptorEntity(
-                pdu,
-                m_controller_entity.getEntityID(),
-                m_adp_manager.getEntityModelID(),
-                JDKSAVDECC_ADP_ENTITY_CAPABILITY_AEM_SUPPORTED,
-                0,
-                0,
-                0,
-                0,
-                JDKSAVDECC_ADP_CONTROLLER_CAPABILITY_IMPLEMENTED,
-                m_adp_manager.getAvailableIndex(),
-                "JDKSAvdecc-MCU",
-                JDKSAVDECC_NO_STRING,
-                JDKSAVDECC_NO_STRING,
-                "V2.0",
-                "",
-                "12345678",
-                1,
-                0 );
+            status = fillDescriptorEntity( pdu,
+                                           m_controller_entity.getEntityID(),
+                                           m_adp_manager.getEntityModelID(),
+                                           JDKSAVDECC_ADP_ENTITY_CAPABILITY_AEM_SUPPORTED,
+                                           0,
+                                           0,
+                                           0,
+                                           0,
+                                           JDKSAVDECC_ADP_CONTROLLER_CAPABILITY_IMPLEMENTED,
+                                           m_adp_manager.getAvailableIndex(),
+                                           "JDKSAvdecc-MCU",
+                                           JDKSAVDECC_NO_STRING,
+                                           JDKSAVDECC_NO_STRING,
+                                           "V2.0",
+                                           "",
+                                           "12345678",
+                                           1,
+                                           0 );
 
             m_controller_entity.sendResponses( false, false, status, pdu );
         }
@@ -179,17 +159,13 @@ class KnobsAndButtonsController : public EntityState
         return status;
     }
 
-    virtual uint8_t readDescriptorAvbInterface( Frame &pdu,
-                                                uint16_t configuration_index,
-                                                uint16_t descriptor_index ) override
+    virtual uint8_t readDescriptorAvbInterface( Frame &pdu, uint16_t configuration_index, uint16_t descriptor_index ) override
     {
         uint8_t status = JDKSAVDECC_AEM_STATUS_BAD_ARGUMENTS;
 
         if ( configuration_index == 0 && descriptor_index == 0 )
         {
-            pdu.setLength(
-                JDKSAVDECC_FRAME_HEADER_LEN
-                + JDKSAVDECC_AEM_COMMAND_READ_DESCRIPTOR_COMMAND_LEN );
+            pdu.setLength( JDKSAVDECC_FRAME_HEADER_LEN + JDKSAVDECC_AEM_COMMAND_READ_DESCRIPTOR_COMMAND_LEN );
 
             // object_name
             pdu.putAvdeccString();
@@ -242,17 +218,13 @@ class KnobsAndButtonsController : public EntityState
         return status;
     }
 
-    virtual uint8_t readDescriptorConfiguration( Frame &pdu,
-                                                 uint16_t configuration_index,
-                                                 uint16_t descriptor_index ) override
+    virtual uint8_t readDescriptorConfiguration( Frame &pdu, uint16_t configuration_index, uint16_t descriptor_index ) override
     {
         uint8_t status = JDKSAVDECC_AEM_STATUS_BAD_ARGUMENTS;
 
         if ( configuration_index == 0 && descriptor_index == 0 )
         {
-            pdu.setLength(
-                JDKSAVDECC_FRAME_HEADER_LEN
-                + JDKSAVDECC_AEM_COMMAND_READ_DESCRIPTOR_COMMAND_LEN );
+            pdu.setLength( JDKSAVDECC_FRAME_HEADER_LEN + JDKSAVDECC_AEM_COMMAND_READ_DESCRIPTOR_COMMAND_LEN );
 
             // object_name
             pdu.putAvdeccString();
@@ -282,9 +254,7 @@ class KnobsAndButtonsController : public EntityState
         return status;
     }
 
-    uint8_t fillDescriptorControlJdksLog( Frame &pdu,
-                                          uint16_t configuration_index,
-                                          uint16_t descriptor_index )
+    uint8_t fillDescriptorControlJdksLog( Frame &pdu, uint16_t configuration_index, uint16_t descriptor_index )
     {
         (void)configuration_index;
         (void)descriptor_index;
@@ -329,9 +299,7 @@ class KnobsAndButtonsController : public EntityState
         return JDKSAVDECC_AEM_STATUS_ENTITY_MISBEHAVING;
     }
 
-    uint8_t fillDescriptorControlIdentify( Frame &pdu,
-                                           uint16_t configuration_index,
-                                           uint16_t descriptor_index )
+    uint8_t fillDescriptorControlIdentify( Frame &pdu, uint16_t configuration_index, uint16_t descriptor_index )
     {
         (void)configuration_index;
         (void)descriptor_index;
@@ -396,9 +364,7 @@ class KnobsAndButtonsController : public EntityState
         return JDKSAVDECC_AEM_STATUS_ENTITY_MISBEHAVING;
     }
 
-    uint8_t fillDescriptorControlKnobsValue( Frame &pdu,
-                                             uint16_t configuration_index,
-                                             uint16_t descriptor_index )
+    uint8_t fillDescriptorControlKnobsValue( Frame &pdu, uint16_t configuration_index, uint16_t descriptor_index )
     {
         (void)configuration_index;
         (void)descriptor_index;
@@ -471,9 +437,7 @@ class KnobsAndButtonsController : public EntityState
         return JDKSAVDECC_AEM_STATUS_SUCCESS;
     }
 
-    uint8_t fillDescriptorControlButtonsValue( Frame &pdu,
-                                               uint16_t configuration_index,
-                                               uint16_t descriptor_index )
+    uint8_t fillDescriptorControlButtonsValue( Frame &pdu, uint16_t configuration_index, uint16_t descriptor_index )
     {
         (void)configuration_index;
         (void)descriptor_index;
@@ -547,36 +511,27 @@ class KnobsAndButtonsController : public EntityState
         return JDKSAVDECC_AEM_STATUS_SUCCESS;
     }
 
-    virtual uint8_t readDescriptorControl( Frame &pdu,
-                                           uint16_t configuration_index,
-                                           uint16_t descriptor_index ) override
+    virtual uint8_t readDescriptorControl( Frame &pdu, uint16_t configuration_index, uint16_t descriptor_index ) override
     {
         uint8_t status = JDKSAVDECC_AEM_STATUS_NO_SUCH_DESCRIPTOR;
 
-        if ( configuration_index == 0
-             && descriptor_index < NUM_CONTROL_DESCRIPTORS )
+        if ( configuration_index == 0 && descriptor_index < NUM_CONTROL_DESCRIPTORS )
         {
-            pdu.setLength(
-                JDKSAVDECC_FRAME_HEADER_LEN
-                + JDKSAVDECC_AEM_COMMAND_READ_DESCRIPTOR_COMMAND_LEN );
+            pdu.setLength( JDKSAVDECC_FRAME_HEADER_LEN + JDKSAVDECC_AEM_COMMAND_READ_DESCRIPTOR_COMMAND_LEN );
 
             switch ( descriptor_index )
             {
             case CONTROL_LOG_DESCRIPTOR:
-                status = fillDescriptorControlJdksLog(
-                    pdu, configuration_index, descriptor_index );
+                status = fillDescriptorControlJdksLog( pdu, configuration_index, descriptor_index );
                 break;
             case CONTROL_IDENTIFY_DESCRIPTOR:
-                status = fillDescriptorControlIdentify(
-                    pdu, configuration_index, descriptor_index );
+                status = fillDescriptorControlIdentify( pdu, configuration_index, descriptor_index );
                 break;
             case CONTROL_KNOBS_VALUE_DESCRIPTOR:
-                status = fillDescriptorControlKnobsValue(
-                    pdu, configuration_index, descriptor_index );
+                status = fillDescriptorControlKnobsValue( pdu, configuration_index, descriptor_index );
                 break;
             case CONTROL_BUTTONS_VALUE_DESCRIPTOR:
-                status = fillDescriptorControlButtonsValue(
-                    pdu, configuration_index, descriptor_index );
+                status = fillDescriptorControlButtonsValue( pdu, configuration_index, descriptor_index );
                 break;
             default:
                 status = JDKSAVDECC_AEM_STATUS_ENTITY_MISBEHAVING;
@@ -588,15 +543,13 @@ class KnobsAndButtonsController : public EntityState
         return status;
     }
 
-    virtual uint8_t receiveGetControlCommand( Frame &pdu,
-                                              uint16_t descriptor_index ) override
+    virtual uint8_t receiveGetControlCommand( Frame &pdu, uint16_t descriptor_index ) override
     {
         uint8_t status = JDKSAVDECC_AEM_STATUS_NO_SUCH_DESCRIPTOR;
 
         if ( descriptor_index < NUM_CONTROL_DESCRIPTORS )
         {
-            pdu.setLength( JDKSAVDECC_FRAME_HEADER_LEN
-                           + JDKSAVDECC_AEM_COMMAND_GET_CONTROL_COMMAND_LEN );
+            pdu.setLength( JDKSAVDECC_FRAME_HEADER_LEN + JDKSAVDECC_AEM_COMMAND_GET_CONTROL_COMMAND_LEN );
 
             switch ( descriptor_index )
             {
@@ -713,8 +666,7 @@ void jdksavdeccmcu_debug_log( const char *str, uint16_t v )
     if ( r > 0 )
     {
         pdu.setLength( r );
-        memcpy(
-            pdu.getBuf( JDKSAVDECC_FRAME_HEADER_SA_OFFSET ), my_mac.value, 6 );
+        memcpy( pdu.getBuf( JDKSAVDECC_FRAME_HEADER_SA_OFFSET ), my_mac.value, 6 );
         // TODO: RawSocketTracker::multiSendFrame( pdu );
     }
 }

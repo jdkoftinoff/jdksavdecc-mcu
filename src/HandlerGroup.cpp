@@ -35,15 +35,8 @@
 namespace JDKSAvdeccMCU
 {
 
-HandlerGroup::HandlerGroup( Frame *frame,
-                            Handler **item_storage,
-                            uint16_t max_items )
-    : m_num_items( 0 )
-    , m_max_items( max_items )
-    , m_item( item_storage )
-    , m_rx_count( 0 )
-    , m_handled_count( 0 )
-    , m_frame( frame )
+HandlerGroup::HandlerGroup( Frame *frame, Handler **item_storage, uint16_t max_items )
+    : m_num_items( 0 ), m_max_items( max_items ), m_item( item_storage ), m_rx_count( 0 ), m_handled_count( 0 ), m_frame( frame )
 {
 }
 

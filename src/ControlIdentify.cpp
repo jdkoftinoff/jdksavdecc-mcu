@@ -35,12 +35,10 @@
 namespace JDKSAvdeccMCU
 {
 
-ControlIdentify::ControlIdentify(
-    ControllerEntity &controller_entity,
-    uint16_t descriptor_index,
-    ControlValueHolder *holder,
-    void ( *received_wink_callback )( uint16_t descriptor_index,
-                                      uint8_t value ) )
+ControlIdentify::ControlIdentify( ControllerEntity &controller_entity,
+                                  uint16_t descriptor_index,
+                                  ControlValueHolder *holder,
+                                  void ( *received_wink_callback )( uint16_t descriptor_index, uint8_t value ) )
     : Control( controller_entity,
                descriptor_index,
                Eui64( JDKSAVDECC_AEM_CONTROL_TYPE_IDENTIFY ),
@@ -52,8 +50,7 @@ ControlIdentify::ControlIdentify(
 {
 }
 
-void
-    ControlIdentify::tick( jdksavdecc_timestamp_in_milliseconds time_in_millis )
+void ControlIdentify::tick( jdksavdecc_timestamp_in_milliseconds time_in_millis )
 {
     // TODO: send 3 unsolicited messages when value changes state from 0 to 0xff
     (void)time_in_millis;

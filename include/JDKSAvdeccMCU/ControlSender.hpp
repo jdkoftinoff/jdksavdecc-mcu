@@ -68,10 +68,7 @@ class ControlSender : public Handler
 
     RawSocket &getRawSocket() { return m_controller_entity.getRawSocket(); }
 
-    Eui64 const &getEntityID() const
-    {
-        return m_controller_entity.getEntityID();
-    }
+    Eui64 const &getEntityID() const { return m_controller_entity.getEntityID(); }
 
     Eui64 const &getTargetEntityID() const { return m_target_entity_id; }
 

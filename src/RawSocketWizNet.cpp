@@ -72,31 +72,21 @@ bool RawSocketWizNet::recvFrame( Frame *frame )
         data_len = head[0];
         data_len = ( data_len << 8 ) + head[1] - 2;
         // read the frame header to make sure we care
-        W5100.read_data(
-            0, (w5100addr_t)ptr, frame->getBuf(), JDKSAVDECC_FRAME_HEADER_LEN );
+        W5100.read_data( 0, (w5100addr_t)ptr, frame->getBuf(), JDKSAVDECC_FRAME_HEADER_LEN );
         ptr += JDKSAVDECC_FRAME_HEADER_LEN;
         // we care if it is ethertype 0x22f0
-        if ( ( data[JDKSAVDECC_FRAME_HEADER_ETHERTYPE_OFFSET + 0]
-               == ( ( m_ethertype >> 8 ) & 0xff ) )
-             && ( data[JDKSAVDECC_FRAME_HEADER_ETHERTYPE_OFFSET + 1]
-                  == ( ( m_ethertype >> 0 ) & 0xff ) ) )
+        if ( ( data[JDKSAVDECC_FRAME_HEADER_ETHERTYPE_OFFSET + 0] == ( ( m_ethertype >> 8 ) & 0xff ) )
+             && ( data[JDKSAVDECC_FRAME_HEADER_ETHERTYPE_OFFSET + 1] == ( ( m_ethertype >> 0 ) & 0xff ) ) )
         {
 
             // we care if it is for me or the multicast address
-            if ( memcmp( &data[JDKSAVDECC_FRAME_HEADER_DA_OFFSET],
-                         m_mac_address.value,
-                         6 ) == 0
-                 || memcmp( &data[JDKSAVDECC_FRAME_HEADER_DA_OFFSET],
-                            m_multicast.value,
-                            6 ) == 0 )
+            if ( memcmp( &data[JDKSAVDECC_FRAME_HEADER_DA_OFFSET], m_mac_address.value, 6 ) == 0
+                 || memcmp( &data[JDKSAVDECC_FRAME_HEADER_DA_OFFSET], m_multicast.value, 6 ) == 0 )
             {
                 // ok, then read the rest of the data
                 if ( data_len <= max_len )
                 {
-                    W5100.read_data( 0,
-                                     (w5100addr_t)ptr,
-                                     data,
-                                     max_len - JDKSAVDECC_FRAME_HEADER_LEN );
+                    W5100.read_data( 0, (w5100addr_t)ptr, data, max_len - JDKSAVDECC_FRAME_HEADER_LEN );
                     r = data_len;
                     frame->setLength( r );
                 }
@@ -115,11 +105,7 @@ bool RawSocketWizNet::recvFrame( Frame *frame )
     return r > JDKSAVDECC_FRAME_HEADER_LEN;
 }
 
-bool RawSocketWizNet::sendFrame( Frame const &frame,
-                                 uint8_t const *data1,
-                                 uint16_t len1,
-                                 uint8_t const *data2,
-                                 uint16_t len2 )
+bool RawSocketWizNet::sendFrame( Frame const &frame, uint8_t const *data1, uint16_t len1, uint8_t const *data2, uint16_t len2 )
 {
     uint8_t try_count = 0;
     bool done = false;
@@ -131,9 +117,7 @@ bool RawSocketWizNet::sendFrame( Frame const &frame,
         uint8_t wait_count = 0;
 
         // Tell W5100 the destination hardware address
-        W5100.writeSnDHAR( 0,
-                           const_cast<uint8_t *>( frame.getBuf(
-                               JDKSAVDECC_FRAME_HEADER_DA_OFFSET ) ) );
+        W5100.writeSnDHAR( 0, const_cast<uint8_t *>( frame.getBuf( JDKSAVDECC_FRAME_HEADER_DA_OFFSET ) ) );
 
         // Send the data chunk
         W5100.send_data_processing( 0, frame.getBuf(), frame.getLength() );
@@ -160,8 +144,7 @@ bool RawSocketWizNet::sendFrame( Frame const &frame,
 
             while ( total_sent < JDKSAVDECCMCU_RAWSOCKET_MIN_FRAME_LENGTH )
             {
-                uint16_t todo = JDKSAVDECCMCU_RAWSOCKET_MIN_FRAME_LENGTH
-                                - total_sent;
+                uint16_t todo = JDKSAVDECCMCU_RAWSOCKET_MIN_FRAME_LENGTH - total_sent;
                 if ( todo > sizeof( zeros ) )
                 {
                     todo = sizeof( zeros );
@@ -202,26 +185,20 @@ bool RawSocketWizNet::sendFrame( Frame const &frame,
     return done;
 }
 
-bool RawSocketWizNet::sendReplyFrame( Frame &frame,
-                                      uint8_t const *data1,
-                                      uint16_t len1,
-                                      uint8_t const *data2,
-                                      uint16_t len2 )
+bool RawSocketWizNet::sendReplyFrame( Frame &frame, uint8_t const *data1, uint16_t len1, uint8_t const *data2, uint16_t len2 )
 {
     bool r = false;
     uint8_t *p = frame.getBuf();
     // Set DA to what was SA, set SA to m_mac_address
     for ( uint8_t i = 0; i < 6; ++i )
     {
-        p[i + JDKSAVDECC_FRAME_HEADER_DA_OFFSET]
-            = p[i + JDKSAVDECC_FRAME_HEADER_SA_OFFSET];
+        p[i + JDKSAVDECC_FRAME_HEADER_DA_OFFSET] = p[i + JDKSAVDECC_FRAME_HEADER_SA_OFFSET];
         p[i + JDKSAVDECC_FRAME_HEADER_SA_OFFSET] = m_mac_address.value[i];
     }
     r = sendFrame( frame, data1, len1, data2, len2 );
     for ( uint8_t i = 0; i < 6; ++i )
     {
-        p[i + JDKSAVDECC_FRAME_HEADER_DA_OFFSET]
-            = p[i + JDKSAVDECC_FRAME_HEADER_SA_OFFSET];
+        p[i + JDKSAVDECC_FRAME_HEADER_DA_OFFSET] = p[i + JDKSAVDECC_FRAME_HEADER_SA_OFFSET];
         p[i + JDKSAVDECC_FRAME_HEADER_SA_OFFSET] = m_mac_address.value[i];
     }
 }

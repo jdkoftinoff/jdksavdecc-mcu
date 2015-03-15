@@ -43,9 +43,7 @@ namespace JDKSAvdeccMCU
 class RawSocketWizNet : public RawSocket
 {
   public:
-    RawSocketWizNet( Eui48 const &mac_address,
-                     uint16_t ethertype,
-                     const Eui48 *multicast_to_join = 0 )
+    RawSocketWizNet( Eui48 const &mac_address, uint16_t ethertype, const Eui48 *multicast_to_join = 0 )
         : m_mac_address( mac_address ), m_ethertype( ethertype )
     {
         if ( multicast_to_join )
@@ -56,31 +54,17 @@ class RawSocketWizNet : public RawSocket
 
     virtual ~RawSocketWizNet();
 
-    virtual jdksavdecc_timestamp_in_milliseconds getTimeInMilliseconds()
-    {
-        return millis();
-    }
+    virtual jdksavdecc_timestamp_in_milliseconds getTimeInMilliseconds() { return millis(); }
 
     virtual bool recvFrame( Frame *frame );
 
-    virtual bool sendFrame( Frame const &frame,
-                            uint8_t const *data1,
-                            uint16_t len1,
-                            uint8_t const *data2,
-                            uint16_t len2 );
+    virtual bool sendFrame( Frame const &frame, uint8_t const *data1, uint16_t len1, uint8_t const *data2, uint16_t len2 );
 
-    virtual bool sendReplyFrame( Frame &frame,
-                                 uint8_t const *data1,
-                                 uint16_t len1,
-                                 uint8_t const *data2,
-                                 uint16_t len2 );
+    virtual bool sendReplyFrame( Frame &frame, uint8_t const *data1, uint16_t len1, uint8_t const *data2, uint16_t len2 );
 
     virtual void initialize();
 
-    virtual bool joinMulticast( const Eui48 &multicast_mac )
-    {
-        m_multicast = multicast_mac;
-    }
+    virtual bool joinMulticast( const Eui48 &multicast_mac ) { m_multicast = multicast_mac; }
 
     virtual void setNonblocking() {}
 

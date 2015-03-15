@@ -58,28 +58,19 @@ class ControllerEntity : public Entity
     bool receivedAEMResponse( jdksavdecc_aecpdu_aem const &aem, Frame &pdu );
 
     // Formulate and send a ACQUIRE_ENTITY command to a target entity
-    void sendAcquireEntity( Eui64 const &target_entity_id,
-                            Eui48 const &target_mac_address,
-                            uint32_t flags );
+    void sendAcquireEntity( Eui64 const &target_entity_id, Eui48 const &target_mac_address, uint32_t flags );
 
-    virtual bool receiveAcquireEntityResponse( jdksavdecc_aecpdu_aem const &aem,
-                                               Frame &pdu );
+    virtual bool receiveAcquireEntityResponse( jdksavdecc_aecpdu_aem const &aem, Frame &pdu );
 
     // Formulate and send a LOCK_ENTITY command to a target entity
-    void sendLockEntity( Eui64 const &target_entity_id,
-                         Eui48 const &target_mac_address,
-                         uint32_t flags );
+    void sendLockEntity( Eui64 const &target_entity_id, Eui48 const &target_mac_address, uint32_t flags );
 
-    virtual bool receiveLockEntityResponse( jdksavdecc_aecpdu_aem const &aem,
-                                            Frame &pdu );
+    virtual bool receiveLockEntityResponse( jdksavdecc_aecpdu_aem const &aem, Frame &pdu );
 
     // Formulate and send an ENTITY_AVAILABLE command to a target entity
-    void sendEntityAvailable( Eui64 const &target_entity_id,
-                              Eui48 const &target_mac_address );
+    void sendEntityAvailable( Eui64 const &target_entity_id, Eui48 const &target_mac_address );
 
-    virtual bool
-        receiveEntityAvailableResponse( jdksavdecc_aecpdu_aem const &aem,
-                                        Frame &pdu );
+    virtual bool receiveEntityAvailableResponse( jdksavdecc_aecpdu_aem const &aem, Frame &pdu );
 
     // Formulate and send a READ_DESCRIPTOR command to a target entity
     void sendReadDescriptor( Eui64 const &target_entity_id,
@@ -88,26 +79,17 @@ class ControllerEntity : public Entity
                              uint16_t descriptor_type,
                              uint16_t descriptor_index );
 
-    virtual bool
-        receiveReadDescriptorResponse( jdksavdecc_aecpdu_aem const &aem,
-                                       Frame &pdu );
+    virtual bool receiveReadDescriptorResponse( jdksavdecc_aecpdu_aem const &aem, Frame &pdu );
 
     // Formulate and send a SET_CONFIGURATION command to a target entity
-    void sendSetConfiguration( Eui64 const &target_entity_id,
-                               Eui48 const &target_mac_address,
-                               uint16_t configuration_index );
+    void sendSetConfiguration( Eui64 const &target_entity_id, Eui48 const &target_mac_address, uint16_t configuration_index );
 
-    virtual bool
-        receiveSetConfigurationResponse( jdksavdecc_aecpdu_aem const &aem,
-                                         Frame &pdu );
+    virtual bool receiveSetConfigurationResponse( jdksavdecc_aecpdu_aem const &aem, Frame &pdu );
 
     // Formulate and send a GET_CONFIGURATION command to a target entity
-    void sendGetConfiguration( Eui64 const &target_entity_id,
-                               Eui48 const &target_mac_address );
+    void sendGetConfiguration( Eui64 const &target_entity_id, Eui48 const &target_mac_address );
 
-    virtual bool
-        receiveGetConfigurationResponse( jdksavdecc_aecpdu_aem const &aem,
-                                         Frame &pdu );
+    virtual bool receiveGetConfigurationResponse( jdksavdecc_aecpdu_aem const &aem, Frame &pdu );
 
     // Formulate and send a SET_NAME command to a target entity
     void sendSetName( Eui64 const &target_entity_id,
@@ -118,8 +100,7 @@ class ControllerEntity : public Entity
                       uint16_t configuration_index,
                       jdksavdecc_string const &name );
 
-    virtual bool receiveSetNameResponse( jdksavdecc_aecpdu_aem const &aem,
-                                         Frame &pdu );
+    virtual bool receiveSetNameResponse( jdksavdecc_aecpdu_aem const &aem, Frame &pdu );
 
     // Formulate and send a GET_NAME command to a target entity
     void sendGetName( Eui64 const &target_entity_id,
@@ -129,8 +110,7 @@ class ControllerEntity : public Entity
                       uint16_t name_index,
                       uint16_t configuration_index );
 
-    virtual bool receiveGetNameResponse( jdksavdecc_aecpdu_aem const &aem,
-                                         Frame &pdu );
+    virtual bool receiveGetNameResponse( jdksavdecc_aecpdu_aem const &aem, Frame &pdu );
 
     // Formulate and send a SET_CONTROL command to a target entity
     void sendSetControl( Eui64 const &target_entity_id,
@@ -140,24 +120,19 @@ class ControllerEntity : public Entity
                          uint16_t control_value_len,
                          bool track_for_ack );
 
-    virtual bool receiveSetControlResponse( jdksavdecc_aecpdu_aem const &aem,
-                                            Frame &pdu );
+    virtual bool receiveSetControlResponse( jdksavdecc_aecpdu_aem const &aem, Frame &pdu );
 
     // Formulate and send an REGISTER_UNSOLICITED_NOTIFICATION command to a
     // target entity
-    void sendRegisterUnsolicitedNotification( Eui64 const &target_entity_id,
-                                              Eui48 const &target_mac_address );
+    void sendRegisterUnsolicitedNotification( Eui64 const &target_entity_id, Eui48 const &target_mac_address );
 
-    virtual bool receiveRegisterUnsolicitedNotificationResponse(
-        jdksavdecc_aecpdu_aem const &aem, Frame &pdu );
+    virtual bool receiveRegisterUnsolicitedNotificationResponse( jdksavdecc_aecpdu_aem const &aem, Frame &pdu );
 
     // Formulate and send a DEREGISTER_UNSOLICITED_NOTIFICATION command to a
     // target entity
-    void sendDeRegisterUnsolicitedNotification( Eui64 const &target_entity_id,
-                                               Eui48 const &target_mac_address );
+    void sendDeRegisterUnsolicitedNotification( Eui64 const &target_entity_id, Eui48 const &target_mac_address );
 
-    virtual bool receiveDeRegisterUnsolicitedNotificationResponse(
-        jdksavdecc_aecpdu_aem const &aem, Frame &pdu );
+    virtual bool receiveDeRegisterUnsolicitedNotificationResponse( jdksavdecc_aecpdu_aem const &aem, Frame &pdu );
 
     // Notification that a new control value was received from the target
     // entity, either because of a solicited or unsolicited SET_CONTROL response
@@ -168,12 +143,9 @@ class ControllerEntity : public Entity
                                          uint16_t control_value_len );
 
     // Formulate and send a GET_CONTROL command to a target entity
-    void sendGetControl( Eui64 const &target_entity_id,
-                         Eui48 const &target_mac_address,
-                         uint16_t target_descriptor_index );
+    void sendGetControl( Eui64 const &target_entity_id, Eui48 const &target_mac_address, uint16_t target_descriptor_index );
 
-    virtual bool receiveGetControlResponse( jdksavdecc_aecpdu_aem const &aem,
-                                            Frame &pdu );
+    virtual bool receiveGetControlResponse( jdksavdecc_aecpdu_aem const &aem, Frame &pdu );
 
   protected:
 };

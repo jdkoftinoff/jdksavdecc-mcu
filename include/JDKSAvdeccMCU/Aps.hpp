@@ -913,8 +913,7 @@ class ApsStateMachine
         /// \param len lenth of data in octets
         /// \return length of consumed data
         ///
-        virtual ssize_t onIncomingTcpHttpData( uint8_t const *data,
-                                               ssize_t len );
+        virtual ssize_t onIncomingTcpHttpData( uint8_t const *data, ssize_t len );
 
         ///
         /// \brief onIncomingHttpConnectRequest
@@ -933,8 +932,7 @@ class ApsStateMachine
         /// \param len lenth of data in octets
         /// \return length of consumed data
         ///
-        virtual ssize_t onIncomingTcpAppData( uint8_t const *data,
-                                              ssize_t len );
+        virtual ssize_t onIncomingTcpAppData( uint8_t const *data, ssize_t len );
 
       protected:
         ///
@@ -1202,9 +1200,7 @@ class ApsStateMachine
     /// \param requested_entity_id The enity_id that the client is requesting
     /// \return the Eui64 entity_id that the client will be assigned
     ///
-    virtual Eui64 assignEntityId( Eui48 server_link_mac,
-                                  Eui48 apc_link_mac,
-                                  Eui64 requested_entity_id );
+    virtual Eui64 assignEntityId( Eui48 server_link_mac, Eui48 apc_link_mac, Eui64 requested_entity_id );
 
     ///
     /// \brief getVariables

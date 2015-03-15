@@ -35,13 +35,12 @@
 namespace JDKSAvdeccMCU
 {
 
-ControlSender::ControlSender(
-    ControllerEntity &controller_entity,
-    Eui64 const &target_entity_id,
-    Eui48 const &target_mac_address,
-    uint16_t target_descriptor_index,
-    jdksavdecc_timestamp_in_milliseconds update_rate_in_millis,
-    ControlValueHolder *holder )
+ControlSender::ControlSender( ControllerEntity &controller_entity,
+                              Eui64 const &target_entity_id,
+                              Eui48 const &target_mac_address,
+                              uint16_t target_descriptor_index,
+                              jdksavdecc_timestamp_in_milliseconds update_rate_in_millis,
+                              ControlValueHolder *holder )
     : m_controller_entity( controller_entity )
     , m_target_entity_id( target_entity_id )
     , m_target_mac_address( target_mac_address )
@@ -54,9 +53,7 @@ ControlSender::ControlSender(
 
 void ControlSender::tick( jdksavdecc_timestamp_in_milliseconds time_in_millis )
 {
-    if ( m_holder->isDirty() || wasTimeOutHit( time_in_millis,
-                                               m_last_send_time_in_millis,
-                                               m_update_rate_in_millis ) )
+    if ( m_holder->isDirty() || wasTimeOutHit( time_in_millis, m_last_send_time_in_millis, m_update_rate_in_millis ) )
     {
         sendSetControl();
         m_holder->clearDirty();
@@ -69,8 +66,7 @@ bool ControlSender::sendSetControl( bool wait_for_ack )
     bool r = false;
     // If we are told to wait for an ACK, then we have to wait until we can send
     // a command that can be tracked
-    if ( ( !wait_for_ack )
-         || ( wait_for_ack && m_controller_entity.canSendCommand() ) )
+    if ( ( !wait_for_ack ) || ( wait_for_ack && m_controller_entity.canSendCommand() ) )
     {
         FrameWithSize<4> pdufragment;
 

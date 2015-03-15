@@ -53,24 +53,19 @@ class MDNSServiceRegister
                          const char *host = 0 )
     {
         TXTRecordCreate( &m_txt, 0, 0 );
-        for ( MDNSTextRecord::const_iterator i = txt_record_items.begin();
-              i != txt_record_items.end();
-              ++i )
+        for ( MDNSTextRecord::const_iterator i = txt_record_items.begin(); i != txt_record_items.end(); ++i )
         {
-            TXTRecordSetValue( &m_txt,
-                               i->first.c_str(),
-                               i->second.length(),
-                               i->second.data() );
+            TXTRecordSetValue( &m_txt, i->first.c_str(), i->second.length(), i->second.data() );
         }
 
-        DNSServiceRegister( &m_serv,               // DNSServiceRef
-                            0,                     // Service Flags
-                            0,                     // interfaceIndex (all)
-                            0,                     // name
-                            service_name,          // regtype
-                            domain,                // domain
-                            host,                  // host
-                            htons( service_port ), // port
+        DNSServiceRegister( &m_serv,                        // DNSServiceRef
+                            0,                              // Service Flags
+                            0,                              // interfaceIndex (all)
+                            0,                              // name
+                            service_name,                   // regtype
+                            domain,                         // domain
+                            host,                           // host
+                            htons( service_port ),          // port
                             TXTRecordGetLength( &m_txt ),   // txtlen
                             TXTRecordGetBytesPtr( &m_txt ), // txtRecord
                             0,                              // callback

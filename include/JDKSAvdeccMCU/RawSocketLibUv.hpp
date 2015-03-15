@@ -42,30 +42,17 @@ namespace JDKSAvdeccMCU
 class RawSocketLibUv : public RawSocket
 {
   public:
-    RawSocketLibUv( uv_loop_t *loop,
-                    uint16_t ethertype,
-                    Eui48 const &multicast_to_join );
+    RawSocketLibUv( uv_loop_t *loop, uint16_t ethertype, Eui48 const &multicast_to_join );
 
     virtual ~RawSocketLibUv();
 
-    virtual jdksavdecc_timestamp_in_milliseconds getTimeInMilliseconds()
-    {
-        return JDKSAvdeccMCU::getTimeInMilliseconds();
-    }
+    virtual jdksavdecc_timestamp_in_milliseconds getTimeInMilliseconds() { return JDKSAvdeccMCU::getTimeInMilliseconds(); }
 
     virtual bool recvFrame( Frame *frame );
 
-    virtual bool sendFrame( Frame const &frame,
-                            uint8_t const *data1,
-                            uint16_t len1,
-                            uint8_t const *data2,
-                            uint16_t len2 );
+    virtual bool sendFrame( Frame const &frame, uint8_t const *data1, uint16_t len1, uint8_t const *data2, uint16_t len2 );
 
-    virtual bool sendReplyFrame( Frame &frame,
-                                 uint8_t const *data1,
-                                 uint16_t len1,
-                                 uint8_t const *data2,
-                                 uint16_t len2 );
+    virtual bool sendReplyFrame( Frame &frame, uint8_t const *data1, uint16_t len1, uint8_t const *data2, uint16_t len2 );
 
     virtual bool joinMulticast( const Eui48 &multicast_mac );
 
@@ -86,8 +73,7 @@ class RawSocketRunnerLibUv : public RawSocketRunner
   public:
     RawSocketRunnerLibUv( uv_loop_t *loop ) : m_loop( loop ) {}
     virtual ~RawSocketRunnerLibUv() {}
-    virtual void setTarget( RawSocketRunnerNotification *notification_target )
-        = 0;
+    virtual void setTarget( RawSocketRunnerNotification *notification_target ) = 0;
 
   private:
     uv_loop_t *m_loop;
@@ -103,8 +89,7 @@ class RawSocketRunnerLibUv : public RawSocketRunner
      * \param iter the network port iterator that owns this network port
      * \param port_info the network port
      */
-    static void found_interface( uv_rawpkt_network_port_iterator_t *iter,
-                                 uv_rawpkt_network_port_t *port_info );
+    static void found_interface( uv_rawpkt_network_port_iterator_t *iter, uv_rawpkt_network_port_t *port_info );
 
     /**
      * \brief removed_interface
@@ -115,8 +100,7 @@ class RawSocketRunnerLibUv : public RawSocketRunner
      * \param iter the network port iterator that owns this network port
      * \param port_info the network port
      */
-    static void removed_interface( uv_rawpkt_network_port_iterator_t *iter,
-                                   uv_rawpkt_network_port_t *port_info );
+    static void removed_interface( uv_rawpkt_network_port_iterator_t *iter, uv_rawpkt_network_port_t *port_info );
 
     /**
      * \brief The port_context_s struct
@@ -163,9 +147,7 @@ class RawSocketRunnerLibUv : public RawSocketRunner
      * \param nread The number of ethernet frames received
      * \param buf The list of nread uv_buf_t's containing the ethernet frames
      */
-    static void received_ethernet_frame( uv_rawpkt_t *rawpkt,
-                                         ssize_t nread,
-                                         const uv_buf_t *buf );
+    static void received_ethernet_frame( uv_rawpkt_t *rawpkt, ssize_t nread, const uv_buf_t *buf );
 };
 }
 #endif

@@ -17,13 +17,11 @@ using namespace JDKSAvdeccMCU;
 jdksavdecc_eui48 my_mac = {{0x70, 0xb3, 0xd5, 0xed, 0xcf, 0xf1}};
 
 /// This AVDECC Entity is based on the mac address (insert ff ff)
-jdksavdecc_eui64 my_entity_id
-    = {{0x70, 0xb3, 0xd5, 0xff, 0xff, 0xed, 0xcf, 0xf1}};
+jdksavdecc_eui64 my_entity_id = {{0x70, 0xb3, 0xd5, 0xff, 0xff, 0xed, 0xcf, 0xf1}};
 
 /// This AVDECC Entity Model ID is based on the J.D. Koftinoff Software, Ltd.
 /// assigned MAC-S (OUI36): 70:b3:d5:ed:c
-jdksavdecc_eui64 my_entity_model_id
-    = {{0x70, 0xb3, 0xd5, 0xed, 0xc0, 0x00, 0x00, 0x01}};
+jdksavdecc_eui64 my_entity_model_id = {{0x70, 0xb3, 0xd5, 0xed, 0xc0, 0x00, 0x00, 0x01}};
 
 /// the W5100 chip Raw Ethernet handler object
 WizNetIO rawnet( my_mac );
@@ -55,12 +53,7 @@ class VisualHandler : public ControlValueHolder
     uint16_t m_max_update_rate_millis;
 
   public:
-    VisualHandler( uint8_t value_length,
-                   uint16_t x,
-                   uint16_t y,
-                   uint16_t w,
-                   uint16_t h,
-                   uint16_t max_update_rate_millis = 50 )
+    VisualHandler( uint8_t value_length, uint16_t x, uint16_t y, uint16_t w, uint16_t h, uint16_t max_update_rate_millis = 50 )
         : ControlValueHolder( value_length )
         , m_x( x )
         , m_y( y )
@@ -73,8 +66,7 @@ class VisualHandler : public ControlValueHolder
 
     virtual void tick( jdksavdecc_timestamp_in_milliseconds time_in_millis )
     {
-        if ( time_in_millis > m_last_update_time_millis
-                              + m_max_update_rate_millis )
+        if ( time_in_millis > m_last_update_time_millis + m_max_update_rate_millis )
         {
             if ( isDirty() )
             {
@@ -94,39 +86,22 @@ class VisualSlider : public VisualHandler
     uint16_t m_scale;
 
   public:
-    VisualSlider( uint8_t value_length,
-                  uint16_t x,
-                  uint16_t y,
-                  uint16_t w,
-                  uint16_t h,
-                  uint16_t scale,
-                  uint16_t max_update_rate_millis = 50 )
-        : VisualHandler( value_length, x, y, w, h, max_update_rate_millis )
-        , m_scale( scale )
+    VisualSlider(
+        uint8_t value_length, uint16_t x, uint16_t y, uint16_t w, uint16_t h, uint16_t scale, uint16_t max_update_rate_millis = 50 )
+        : VisualHandler( value_length, x, y, w, h, max_update_rate_millis ), m_scale( scale )
     {
     }
 
     virtual void Draw()
     {
-        Display.gfx_Slider( SLIDER_RAISED,
-                            m_x,
-                            m_y,
-                            m_x + m_w,
-                            m_y + m_h,
-                            GRAY,
-                            m_scale,
-                            m_scale - getValueDoublet() );
+        Display.gfx_Slider( SLIDER_RAISED, m_x, m_y, m_x + m_w, m_y + m_h, GRAY, m_scale, m_scale - getValueDoublet() );
     }
 };
 
 class VisualLight : public VisualHandler
 {
   public:
-    VisualLight( uint8_t value_length,
-                 uint16_t x,
-                 uint16_t y,
-                 uint16_t w,
-                 uint16_t max_update_rate_millis = 50 )
+    VisualLight( uint8_t value_length, uint16_t x, uint16_t y, uint16_t w, uint16_t max_update_rate_millis = 50 )
         : VisualHandler( value_length, x, y, w, w, max_update_rate_millis )
     {
     }
@@ -134,11 +109,7 @@ class VisualLight : public VisualHandler
     virtual void Draw()
     {
         Display.gfx_Rectangle( m_x, m_y, m_x + m_w, m_y + m_h, WHITE );
-        Display.gfx_RectangleFilled( m_x + 1,
-                                     m_y + 1,
-                                     m_x + m_w - 1,
-                                     m_y + m_h - 1,
-                                     getValue() == 0 ? BLACK : LIGHTBLUE );
+        Display.gfx_RectangleFilled( m_x + 1, m_y + 1, m_x + m_w - 1, m_y + m_h - 1, getValue() == 0 ? BLACK : LIGHTBLUE );
     }
 };
 
@@ -148,34 +119,16 @@ class VisualLight : public VisualHandler
 #define PANEL_Y ( 50 )
 #define PANEL_X ( 50 )
 
-VisualSlider slider1(
-    2, PANEL_X + WIDGET_H_SPACING * 0, PANEL_Y, WIDGET_W, SLIDER_H, 0x400 );
-VisualSlider slider2(
-    2, PANEL_X + WIDGET_H_SPACING * 1, PANEL_Y, WIDGET_W, SLIDER_H, 0x400 );
-VisualSlider slider3(
-    2, PANEL_X + WIDGET_H_SPACING * 2, PANEL_Y, WIDGET_W, SLIDER_H, 0x400 );
+VisualSlider slider1( 2, PANEL_X + WIDGET_H_SPACING * 0, PANEL_Y, WIDGET_W, SLIDER_H, 0x400 );
+VisualSlider slider2( 2, PANEL_X + WIDGET_H_SPACING * 1, PANEL_Y, WIDGET_W, SLIDER_H, 0x400 );
+VisualSlider slider3( 2, PANEL_X + WIDGET_H_SPACING * 2, PANEL_Y, WIDGET_W, SLIDER_H, 0x400 );
 
-VisualLight light1( 1,
-                    PANEL_X + WIDGET_H_SPACING * 0,
-                    SLIDER_H + PANEL_Y + 20,
-                    WIDGET_W );
-VisualLight light2( 1,
-                    PANEL_X + WIDGET_H_SPACING * 1,
-                    SLIDER_H + PANEL_Y + 20,
-                    WIDGET_W );
-VisualLight light3( 1,
-                    PANEL_X + WIDGET_H_SPACING * 2,
-                    SLIDER_H + PANEL_Y + 20,
-                    WIDGET_W );
+VisualLight light1( 1, PANEL_X + WIDGET_H_SPACING * 0, SLIDER_H + PANEL_Y + 20, WIDGET_W );
+VisualLight light2( 1, PANEL_X + WIDGET_H_SPACING * 1, SLIDER_H + PANEL_Y + 20, WIDGET_W );
+VisualLight light3( 1, PANEL_X + WIDGET_H_SPACING * 2, SLIDER_H + PANEL_Y + 20, WIDGET_W );
 
-VisualLight light4( 1,
-                    PANEL_X + WIDGET_H_SPACING * 0,
-                    SLIDER_H + PANEL_Y + 20 + WIDGET_H_SPACING,
-                    WIDGET_W );
-VisualLight light5( 1,
-                    PANEL_X + WIDGET_H_SPACING * 1,
-                    SLIDER_H + PANEL_Y + 20 + WIDGET_H_SPACING,
-                    WIDGET_W );
+VisualLight light4( 1, PANEL_X + WIDGET_H_SPACING * 0, SLIDER_H + PANEL_Y + 20 + WIDGET_H_SPACING, WIDGET_W );
+VisualLight light5( 1, PANEL_X + WIDGET_H_SPACING * 1, SLIDER_H + PANEL_Y + 20 + WIDGET_H_SPACING, WIDGET_W );
 
 ControlReceiver<16> control_receiver( rawnet, my_entity_id );
 
@@ -217,8 +170,7 @@ void setup()
     control_receiver.addDescriptor( &slider1 );
     control_receiver.addDescriptor( &slider2 );
     control_receiver.addDescriptor( &slider3 );
-    control_receiver.addDescriptor(
-        &light3 ); // Board layout has them in this order
+    control_receiver.addDescriptor( &light3 ); // Board layout has them in this order
     control_receiver.addDescriptor( &light2 );
     control_receiver.addDescriptor( &light1 );
     control_receiver.addDescriptor( &light4 );
