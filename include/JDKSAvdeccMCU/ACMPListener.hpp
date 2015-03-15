@@ -141,7 +141,7 @@ class ACMPListenerGroupHandlerBase
 
     virtual void tick( jdksavdecc_timestamp_in_milliseconds timestamp );
 
-    virtual uint8_t receivedACMPDU(  RawSocket *incoming_socket, const jdksavdecc_acmpdu &acmpdu, Frame &frame );
+    virtual uint8_t receivedACMPDU( RawSocket *incoming_socket, const jdksavdecc_acmpdu &acmpdu, Frame &frame );
 
     virtual ACMPListenerHandlerBase *getTalkerHandler( uint16_t talker_unique_id ) = 0;
 

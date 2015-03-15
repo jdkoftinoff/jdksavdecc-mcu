@@ -59,11 +59,9 @@ class Control : public Handler
     Control(
         Entity &entity, uint16_t descriptor_index, Eui64 control_type, uint16_t control_value_type, ControlValueHolder *holder );
 
-    virtual void
-        tick( jdksavdecc_timestamp_in_milliseconds time_in_millis ) override;
+    virtual void tick( jdksavdecc_timestamp_in_milliseconds time_in_millis ) override;
 
-    virtual bool receivedPDU( RawSocket *incoming_socket,
-                              Frame &frame ) override;
+    virtual bool receivedPDU( RawSocket *incoming_socket, Frame &frame ) override;
 
     virtual uint8_t formControlValueMetaData( Frame &pdu );
 

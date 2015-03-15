@@ -62,12 +62,10 @@ class Entity : public Handler
             ACMPListenerGroupHandlerBase *acmp_listener_group_handler = 0 );
 
     /// Run periodic state machines (from Handler)
-    virtual void
-        tick( jdksavdecc_timestamp_in_milliseconds time_in_millis ) override;
+    virtual void tick( jdksavdecc_timestamp_in_milliseconds time_in_millis ) override;
 
     /// Handle received AECPDU's (from Handler)
-    virtual bool receivedPDU( RawSocket *incoming_socket,
-                              Frame &frame ) override;
+    virtual bool receivedPDU( RawSocket *incoming_socket, Frame &frame ) override;
 
     /// Notification that a command to a target entity timed out
     virtual void commandTimedOut( Eui64 const &target_entity_id, uint16_t command_type, uint16_t sequence_id );

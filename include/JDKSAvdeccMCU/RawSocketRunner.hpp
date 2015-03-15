@@ -45,8 +45,7 @@ class RawSocketRunnerNotification
 
     virtual bool rawSocketFound( RawSocket *rawsocket ) = 0;
     virtual void rawSocketRemoved( RawSocket *rawsocket ) = 0;
-    virtual void frameReceived( RawSocket *rawsocket, Frame &incoming_frame )
-        = 0;
+    virtual void frameReceived( RawSocket *rawsocket, Frame &incoming_frame ) = 0;
 };
 
 class RawSocketRunner

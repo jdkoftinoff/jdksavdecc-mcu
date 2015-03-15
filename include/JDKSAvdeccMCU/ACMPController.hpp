@@ -48,7 +48,7 @@ class ACMPControllerGroupHandlerBase
 
     virtual void tick( jdksavdecc_timestamp_in_milliseconds timestamp ) = 0;
 
-    virtual uint8_t receivedACMPDU(  RawSocket *incoming_socket, const jdksavdecc_acmpdu &acmpdu, Frame &frame ) = 0;
+    virtual uint8_t receivedACMPDU( RawSocket *incoming_socket, const jdksavdecc_acmpdu &acmpdu, Frame &frame ) = 0;
 
   protected:
     Entity *m_entity;

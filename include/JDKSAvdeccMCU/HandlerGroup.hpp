@@ -103,8 +103,7 @@ class HandlerGroup : public Handler
     /// and poll incoming network for PDU's and dispatch them
     /// \param timestamp
     ///
-    virtual void
-        tick( jdksavdecc_timestamp_in_milliseconds timestamp ) override;
+    virtual void tick( jdksavdecc_timestamp_in_milliseconds timestamp ) override;
 
     ///
     /// \brief receivedPDU Notification of received raw PDU.
@@ -113,8 +112,7 @@ class HandlerGroup : public Handler
     /// \param frame reference to received Frame object which is mutable
     /// \return true if the message was handled
     ///
-    virtual bool receivedPDU( RawSocket *incoming_socket,
-                              Frame &frame ) override;
+    virtual bool receivedPDU( RawSocket *incoming_socket, Frame &frame ) override;
 };
 
 ///

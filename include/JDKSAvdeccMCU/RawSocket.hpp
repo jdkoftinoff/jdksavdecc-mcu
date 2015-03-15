@@ -49,8 +49,7 @@ class RawSocket
 
     virtual void setHandlerGroup( HandlerGroup *handler_group ) = 0;
 
-    virtual jdksavdecc_timestamp_in_milliseconds
-        getTimeInMilliseconds() const = 0;
+    virtual jdksavdecc_timestamp_in_milliseconds getTimeInMilliseconds() const = 0;
 
     virtual bool recvFrame( Frame *frame ) = 0;
 

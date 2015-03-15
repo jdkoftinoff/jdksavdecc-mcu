@@ -53,8 +53,7 @@ typedef uint16_t w5100addr_t;
 namespace JDKSAvdeccMCU
 {
 
-void RawSocketWizNet::initialize( Eui48 const &mac_address,
-                                  uint16_t ether_type )
+void RawSocketWizNet::initialize( Eui48 const &mac_address, uint16_t ether_type )
 {
     W5100.init();
     W5100.setMACAddress( mac_address.value );

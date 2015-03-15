@@ -63,27 +63,15 @@ class RawSocketPcapFile : public RawSocket
 
     ~RawSocketPcapFile();
 
-    virtual void setHandlerGroup( HandlerGroup *handler_group ) override
-    {
-        m_handler_group = handler_group;
-    }
+    virtual void setHandlerGroup( HandlerGroup *handler_group ) override { m_handler_group = handler_group; }
 
-    virtual jdksavdecc_timestamp_in_milliseconds
-        getTimeInMilliseconds() const override;
+    virtual jdksavdecc_timestamp_in_milliseconds getTimeInMilliseconds() const override;
 
     virtual bool recvFrame( Frame *frame ) override;
 
-    virtual bool sendFrame( Frame const &frame,
-                            uint8_t const *data1,
-                            uint16_t len1,
-                            uint8_t const *data2,
-                            uint16_t len2 ) override;
+    virtual bool sendFrame( Frame const &frame, uint8_t const *data1, uint16_t len1, uint8_t const *data2, uint16_t len2 ) override;
 
-    virtual bool sendReplyFrame( Frame &frame,
-                                 uint8_t const *data1,
-                                 uint16_t len1,
-                                 uint8_t const *data2,
-                                 uint16_t len2 ) override;
+    virtual bool sendReplyFrame( Frame &frame, uint8_t const *data1, uint16_t len1, uint8_t const *data2, uint16_t len2 ) override;
 
     virtual bool joinMulticast( const Eui48 &multicast_mac ) override;
 

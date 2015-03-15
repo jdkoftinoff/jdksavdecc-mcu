@@ -55,11 +55,7 @@ class RawSocketWizNet : public RawSocket
 
     virtual ~RawSocketWizNet();
 
-    virtual jdksavdecc_timestamp_in_milliseconds
-        getTimeInMilliseconds() const override
-    {
-        return millis();
-    }
+    virtual jdksavdecc_timestamp_in_milliseconds getTimeInMilliseconds() const override { return millis(); }
 
     virtual bool recvFrame( Frame *frame );
 
@@ -67,15 +63,11 @@ class RawSocketWizNet : public RawSocket
 
     virtual bool sendReplyFrame( Frame &frame, uint8_t const *data1, uint16_t len1, uint8_t const *data2, uint16_t len2 );
 
-    virtual bool joinMulticast( const Eui48 &multicast_mac )
-    {
-        m_multicast = multicast_mac;
-    }
+    virtual bool joinMulticast( const Eui48 &multicast_mac ) { m_multicast = multicast_mac; }
 
     virtual Eui48 const &getMACAddress() const { return m_mac_address; }
 
-    static void initialize( Eui48 const &mac_address,
-                            uint16_t etherType = 0x22f0 );
+    static void initialize( Eui48 const &mac_address, uint16_t etherType = 0x22f0 );
 
   private:
     Eui48 m_mac_address;

@@ -61,8 +61,7 @@ RawSocketPcapFile::RawSocketPcapFile( uint16_t ethertype,
 
 RawSocketPcapFile::~RawSocketPcapFile() {}
 
-jdksavdecc_timestamp_in_milliseconds
-    RawSocketPcapFile::getTimeInMilliseconds() const
+jdksavdecc_timestamp_in_milliseconds RawSocketPcapFile::getTimeInMilliseconds() const
 {
     jdksavdecc_timestamp_in_milliseconds t = m_current_time;
     m_current_time += m_time_granularity_in_ms;

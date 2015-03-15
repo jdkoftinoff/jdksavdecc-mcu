@@ -113,8 +113,7 @@ class ControlReceiver : public Handler
     }
 
     /// Handle incoming PDU
-    virtual bool receivedPDU( RawSocket *incoming_socket,
-                              Frame &frame ) override
+    virtual bool receivedPDU( RawSocket *incoming_socket, Frame &frame ) override
     {
         bool r = false;
         // we already know the message is AVTP ethertype and is either directly

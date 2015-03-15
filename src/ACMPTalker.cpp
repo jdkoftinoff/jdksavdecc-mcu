@@ -50,9 +50,5 @@ void ACMPTalkerHandlerBase::packListeners() {}
 
 void ACMPTalkerGroupHandlerBase::tick( jdksavdecc_timestamp_in_milliseconds timestamp ) {}
 
-uint8_t ACMPTalkerGroupHandlerBase::receivedACMPDU( RawSocket *incoming_socket,
-                                                    const jdksavdecc_acmpdu &acmpdu,
-                                                    Frame &frame )
-{
-}
+uint8_t ACMPTalkerGroupHandlerBase::receivedACMPDU( RawSocket *incoming_socket, const jdksavdecc_acmpdu &acmpdu, Frame &frame ) {}
 }
