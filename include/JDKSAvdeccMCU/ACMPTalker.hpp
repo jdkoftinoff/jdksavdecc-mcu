@@ -152,7 +152,7 @@ class ACMPTalkerHandlerBase
     /// \param frame
     /// \return
     ///
-    virtual bool receivedACMPDU( Entity *entity, uint16_t unique_id, ACMPTalkerEvents *eventTarget, Frame &frame );
+    virtual uint8_t receivedACMPDU( Entity *entity, uint16_t unique_id, ACMPTalkerEvents *eventTarget, Frame &frame );
 
     ///
     /// \brief packListeners
@@ -187,7 +187,7 @@ class ACMPTalkerHandler : public ACMPTalkerHandlerBase
     ACMPTalkerListenerPair m_listener_pairs_storage[MaxListenersPerTalker];
 };
 
-class ACMPTalkerGroupHandlerBase : public Handler
+class ACMPTalkerGroupHandlerBase
 {
   public:
     ACMPTalkerGroupHandlerBase( Entity *entity, ACMPTalkerEvents *event_target )
@@ -195,9 +195,9 @@ class ACMPTalkerGroupHandlerBase : public Handler
     {
     }
 
-    virtual void tick( jdksavdecc_timestamp_in_milliseconds timestamp ) override;
+    virtual void tick( jdksavdecc_timestamp_in_milliseconds timestamp );
 
-    virtual bool receivedPDU( Frame &frame ) override;
+    virtual uint8_t receivedACMPDU( const jdksavdecc_acmpdu &acmpdu, Frame &frame );
 
     virtual ACMPTalkerHandlerBase *getTalkerHandler( uint16_t talker_unique_id ) = 0;
 

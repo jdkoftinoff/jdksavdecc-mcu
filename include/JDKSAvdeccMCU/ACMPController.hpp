@@ -37,7 +37,20 @@
 #include "JDKSAvdeccMCU/Frame.hpp"
 
 #include "JDKSAvdeccMCU/Handler.hpp"
+#include "JDKSAvdeccMCU/Entity.hpp"
 
 namespace JDKSAvdeccMCU
 {
+class ACMPControllerGroupHandlerBase
+{
+  public:
+    ACMPControllerGroupHandlerBase( Entity *entity ) : m_entity( entity ) {}
+
+    virtual void tick( jdksavdecc_timestamp_in_milliseconds timestamp ) = 0;
+
+    virtual uint8_t receivedACMPDU( const jdksavdecc_acmpdu &acmpdu, Frame &frame ) = 0;
+
+  protected:
+    Entity *m_entity;
+};
 }

@@ -37,7 +37,145 @@
 #include "JDKSAvdeccMCU/Frame.hpp"
 
 #include "JDKSAvdeccMCU/Handler.hpp"
+#include "JDKSAvdeccMCU/ADPManager.hpp"
+#include "JDKSAvdeccMCU/Entity.hpp"
+#include "JDKSAvdeccMCU/EntityState.hpp"
 
 namespace JDKSAvdeccMCU
 {
+
+class ACMPListenerEvents;
+
+struct ACMPListenerStreamInfo;
+class ACMPListenerHandlerBase;
+
+class ACMPListenerEvents
+{
+  public:
+    virtual ~ACMPListenerEvents() {}
+
+    ///
+    /// \brief listenerConnected
+    ///
+    /// Notification that ACMP Talker State Machine has successfully connected a
+    /// stream
+    ///
+    /// \param entity
+    /// \param talker_unique_id
+    /// \param talker_handler
+    /// \param stream_info
+    /// \param listener_pair
+    ///
+    virtual void listenerConnected( Entity *entity, uint16_t listener_unique_id, ACMPListenerHandlerBase const *listener_handler )
+        = 0;
+
+    ///
+    /// \brief listenerDisconnected
+    ///
+    /// Notification that ACMP Talker State Machine has successfully
+    /// disconnected a stream
+    ///
+    /// \param entity
+    /// \param talker_unique_id
+    /// \param talker_handler
+    /// \param stream_info
+    /// \param listener_pair
+    ///
+    virtual void
+        listenerDisconnected( Entity *entity, uint16_t listener_unique_id, ACMPListenerHandlerBase const *listener_handler ) = 0;
+};
+
+///
+/// \brief The ACMPListenerHandlerBase class
+///
+/// Manages a single Listener unique_id state machine
+///
+class ACMPListenerHandler
+{
+  public:
+    ///
+    /// \brief ACMPListenerHandler
+    ///
+    /// See IEEE Std 1722.1-2013, "Clause 8.2.2.2.4 TalkerStreamInfo" and
+    /// IEEE Std 1722.1-2013 "Clause 8.2.2.6 ACMP Talker State Machine"
+    ///
+    /// \param listener_pair_storage Pointer to an array of
+    /// ACMPListenerListenerPair objects,
+    ///        one for each listener
+    ///
+    /// \param max_connected_listeners Size of the array in count of objects
+    ///
+    ACMPListenerHandler() {}
+
+    virtual ~ACMPListenerHandler();
+
+    ///
+    /// \brief tick
+    ///
+    /// \param entity
+    /// \param unique_id
+    /// \param eventTarget
+    /// \param timestamp
+    ///
+    virtual void
+        tick( Entity *entity, uint16_t unique_id, ACMPListenerEvents *eventTarget, jdksavdecc_timestamp_in_milliseconds timestamp );
+
+    ///
+    /// \brief receivedACMPDU
+    /// \param entity
+    /// \param unique_id
+    /// \param eventTarget
+    /// \param frame
+    /// \return
+    ///
+    virtual uint8_t receivedACMPDU( Entity *entity, uint16_t unique_id, ACMPListenerEvents *eventTarget, Frame &frame );
+};
+
+class ACMPListenerGroupHandlerBase
+{
+  public:
+    ACMPListenerGroupHandlerBase( Entity *entity, ACMPListenerEvents *event_target )
+        : m_entity( entity ), m_event_target( event_target )
+    {
+    }
+
+    virtual void tick( jdksavdecc_timestamp_in_milliseconds timestamp );
+
+    virtual uint8_t receivedACMPDU( const jdksavdecc_acmpdu &acmpdu, Frame &frame );
+
+    virtual ACMPListenerHandlerBase *getTalkerHandler( uint16_t talker_unique_id ) = 0;
+
+    virtual ACMPListenerHandlerBase const *getTalkerHandler( uint16_t talker_unique_id ) const = 0;
+
+    virtual uint16_t getListenerStreamSinkCount() const = 0;
+
+  protected:
+    Entity *m_entity;
+    ACMPListenerEvents *m_event_target;
+};
+
+template <uint16_t ListenerStreamSinkCount>
+class ACMPListenerGroupHandler : public ACMPListenerGroupHandlerBase
+{
+  public:
+    ACMPListenerGroupHandler( Entity *entity, ACMPListenerEvents *event_target )
+        : ACMPListenerGroupHandlerBase( entity, event_target )
+    {
+    }
+
+    virtual ACMPListenerHandlerBase *getTalkerHandler( uint16_t listener_unique_id ) override
+    {
+        return &m_listener_storage[listener_unique_id];
+    }
+
+    virtual ACMPListenerHandlerBase const *getTalkerHandler( uint16_t listener_unique_id ) const override
+    {
+        return &m_listener_storage[listener_unique_id];
+    }
+
+    virtual uint16_t getListenerStreamSinkCount() const override { return ListenerStreamSinkCount; }
+
+  private:
+    ACMPListenerHandler m_listener_storage[ListenerStreamSinkCount];
+};
 }

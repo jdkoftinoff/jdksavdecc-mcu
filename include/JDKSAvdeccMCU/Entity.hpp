@@ -36,6 +36,10 @@
 #include "JDKSAvdeccMCU/Helpers.hpp"
 #include "JDKSAvdeccMCU/Frame.hpp"
 #include "JDKSAvdeccMCU/ADPManager.hpp"
+#include "JDKSAvdeccMCU/ACMPListener.hpp"
+#include "JDKSAvdeccMCU/ACMPTalker.hpp"
+#include "JDKSAvdeccMCU/ACMPController.hpp"
+#include "JDKSAvdeccMCU/RegisteredController.hpp"
 #include "JDKSAvdeccMCU/EntityState.hpp"
 
 namespace JDKSAvdeccMCU
@@ -43,90 +47,25 @@ namespace JDKSAvdeccMCU
 class EntityState;
 struct RegisteredController;
 class RegisteredControllers;
-
-struct RegisteredController
-{
-    /// Controller's entity_id
-    /// The entity id is FF:FF:FF:FF:FF:FF:FF:FF If the the slot is not
-    /// in use
-    Eui64 m_entity_id;
-
-    /// Controller's MAC address
-    Eui48 m_mac_address;
-};
-
-class RegisteredControllers
-{
-  public:
-    virtual uint16_t getControllerCount() const = 0;
-    virtual RegisteredController *getController( uint16_t i ) = 0;
-    virtual RegisteredController const *getController( uint16_t i ) const = 0;
-    virtual bool addController( Eui64 entity_id, Eui48 mac_address ) = 0;
-    virtual void removeController( Eui64 entity_id ) = 0;
-};
-
-template <uint16_t MaxControllers>
-class RegisteredControllersStorage : public RegisteredControllers
-{
-  public:
-    RegisteredControllersStorage() : m_num_controllers( 0 ) {}
-
-    virtual uint16_t getControllerCount() const override { return m_num_controllers; }
-
-    virtual RegisteredController *getController( uint16_t i ) override { return &m_controller[i]; }
-    virtual RegisteredController const *getController( uint16_t i ) const override { return &m_controller[i]; }
-    virtual bool addController( Eui64 entity_id, Eui48 mac_address ) override
-    {
-        bool r = false;
-        if ( m_num_controllers < MaxControllers )
-        {
-            m_controller[m_num_controllers].m_entity_id = entity_id;
-            m_controller[m_num_controllers].m_mac_address = mac_address;
-            r = true;
-        }
-        return r;
-    }
-    virtual void removeController( Eui64 entity_id ) override
-    {
-        for ( uint16_t i = 0; i < m_num_controllers; ++i )
-        {
-            // find the controller
-            if ( m_controller[i].m_entity_id == entity_id )
-            {
-                // found it; is it the last one in the list?
-                if ( i == m_num_controllers - 1 )
-                {
-                    // yes, just erase it
-                    m_controller[i].m_entity_id.clear();
-                    m_controller[i].m_mac_address.clear();
-                }
-                else
-                {
-                    // it is not the last one in the list, so swap it with the last one in the list
-                    using namespace std;
-                    swap( m_controller[i], m_controller[m_num_controllers - 1] );
-                }
-                m_num_controllers--;
-                break;
-            }
-        }
-    }
-
-  private:
-    uint16_t m_num_controllers;
-    RegisteredController m_controller[MaxControllers];
-};
+class ACMPTalkerGroupHandlerBase;
+class ACMPListenerGroupHandlerBase;
+class ACMPControllerGroupHandlerBase;
 
 class Entity : public Handler
 {
   public:
-    Entity( ADPManager &adp_manager, RegisteredControllers *registered_controllers, EntityState *entity_state );
+    Entity( ADPManager &adp_manager,
+            RegisteredControllers *registered_controllers,
+            EntityState *entity_state,
+            ACMPControllerGroupHandlerBase *acmp_controller_group_handler = 0,
+            ACMPTalkerGroupHandlerBase *acmp_talker_group_handler = 0,
+            ACMPListenerGroupHandlerBase *acmp_listener_group_handler = 0 );
 
     /// Run periodic state machines (from Handler)
-    virtual void tick( jdksavdecc_timestamp_in_milliseconds time_in_millis );
+    virtual void tick( jdksavdecc_timestamp_in_milliseconds time_in_millis ) override;
 
     /// Handle received AECPDU's (from Handler)
-    virtual bool receivedPDU( Frame &frame );
+    virtual bool receivedPDU( Frame &frame ) override;
 
     /// Notification that a command to a target entity timed out
     virtual void commandTimedOut( Eui64 const &target_entity_id, uint16_t command_type, uint16_t sequence_id );
@@ -297,5 +236,14 @@ class Entity : public Handler
 
     /// The entity state object, if any
     EntityState *m_entity_state;
+
+    /// The ACMP Controller state machines (if any)
+    ACMPControllerGroupHandlerBase *m_acmp_controller_group_handler;
+
+    /// The ACMP Talker state machines (if any)
+    ACMPTalkerGroupHandlerBase *m_acmp_talker_group_handler;
+
+    /// The ACMP Listener state machines (if any)
+    ACMPListenerGroupHandlerBase *m_acmp_listener_group_handler;
 };
 }
