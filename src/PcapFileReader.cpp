@@ -51,8 +51,7 @@ PcapFileReader::PcapFileReader( std::string const &filename )
         pcap_hdr_t header;
         if ( fread( &header, sizeof( header ), 1, m_file.get() ) != 1 )
         {
-            throw std::runtime_error(
-                std::string( "Error reading pcap file header: " ) + filename );
+            throw std::runtime_error( std::string( "Error reading pcap file header: " ) + filename );
         }
 
         if ( header.magic_number == 0xa1b2c3d4 )
@@ -65,17 +64,14 @@ PcapFileReader::PcapFileReader( std::string const &filename )
         }
         else
         {
-            throw std::runtime_error(
-                std::string( "Error pcap file header is incompatible: " )
-                + filename );
+            throw std::runtime_error( std::string( "Error pcap file header is incompatible: " ) + filename );
         }
     }
 }
 
 PcapFileReader::~PcapFileReader() {}
 
-bool PcapFileReader::ReadPacket( uint64_t *timestamp_in_microseconds,
-                                 PcapFilePacket &results )
+bool PcapFileReader::ReadPacket( uint64_t *timestamp_in_microseconds, PcapFilePacket &results )
 {
     bool r = false;
     pcaprec_hdr_t packet_header;
@@ -85,8 +81,7 @@ bool PcapFileReader::ReadPacket( uint64_t *timestamp_in_microseconds,
         {
             return false;
         }
-        if ( fread( &packet_header, sizeof( packet_header ), 1, m_file.get() )
-             != 1 )
+        if ( fread( &packet_header, sizeof( packet_header ), 1, m_file.get() ) != 1 )
         {
             if ( feof( m_file.get() ) )
             {
@@ -94,9 +89,7 @@ bool PcapFileReader::ReadPacket( uint64_t *timestamp_in_microseconds,
             }
             else
             {
-                throw std::runtime_error(
-                    std::string( "Error reading pcap file packet from: " )
-                    + m_filename );
+                throw std::runtime_error( std::string( "Error reading pcap file packet from: " ) + m_filename );
             }
         }
 
@@ -112,37 +105,29 @@ bool PcapFileReader::ReadPacket( uint64_t *timestamp_in_microseconds,
         /* read the payload */
         if ( packet_header.incl_len > 32768 )
         {
-            throw std::runtime_error(
-                std::string( "Error reading packet from: " ) + m_filename );
+            throw std::runtime_error( std::string( "Error reading packet from: " ) + m_filename );
         }
 
-        *timestamp_in_microseconds = ( packet_header.ts_sec * 1000000 )
-                                     + ( packet_header.ts_usec );
+        *timestamp_in_microseconds = ( packet_header.ts_sec * 1000000 ) + ( packet_header.ts_usec );
 
         results.resize( (size_t)packet_header.incl_len );
         if ( fread( &results[0], results.size(), 1, m_file.get() ) != 1 )
         {
-            throw std::runtime_error(
-                std::string( "Error reading pcap file packet data from: " )
-                + m_filename );
+            throw std::runtime_error( std::string( "Error reading pcap file packet data from: " ) + m_filename );
         }
         if ( !m_seen_first_timestamp )
         {
             m_seen_first_timestamp = true;
             m_first_timestamp_in_microseconds = *timestamp_in_microseconds;
         }
-        *timestamp_in_microseconds = *timestamp_in_microseconds
-                                     - m_first_timestamp_in_microseconds;
+        *timestamp_in_microseconds = *timestamp_in_microseconds - m_first_timestamp_in_microseconds;
         r = true;
     }
     return r;
 }
 
-bool PcapFileReader::ReadPacket( uint64_t *timestamp_in_microseconds,
-                                 uint8_t da[6],
-                                 uint8_t sa[6],
-                                 uint16_t *ethertype,
-                                 PcapFilePacket *packet_payload )
+bool PcapFileReader::ReadPacket(
+    uint64_t *timestamp_in_microseconds, uint8_t da[6], uint8_t sa[6], uint16_t *ethertype, PcapFilePacket *packet_payload )
 {
     bool r;
     std::vector<uint8_t> tmp;
@@ -160,8 +145,7 @@ bool PcapFileReader::ReadPacket( uint64_t *timestamp_in_microseconds,
             {
                 size_t packet_payload_length = ( uint16_t )( tmp.size() - 14 );
                 packet_payload->resize( packet_payload_length );
-                memcpy(
-                    &( *packet_payload )[0], &tmp[14], packet_payload_length );
+                memcpy( &( *packet_payload )[0], &tmp[14], packet_payload_length );
             }
             else
             {

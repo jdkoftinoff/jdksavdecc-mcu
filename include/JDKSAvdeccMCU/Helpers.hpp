@@ -58,8 +58,7 @@ bool parseAEM( jdksavdecc_aecpdu_aem *aem, Frame const &rx );
 /// \param expected_target_entity_id Eui64 to test for
 /// \return true if the AEM message is for the entity
 ///
-bool isAEMForTarget( jdksavdecc_aecpdu_aem const &aem,
-                     Eui64 const &expected_target_entity_id );
+bool isAEMForTarget( jdksavdecc_aecpdu_aem const &aem, Eui64 const &expected_target_entity_id );
 
 ///
 /// \brief isAEMForController Test if AEM message is response for a controller
@@ -68,8 +67,7 @@ bool isAEMForTarget( jdksavdecc_aecpdu_aem const &aem,
 /// \return true if the message is AEM response for the specified controller
 /// entity id
 ///
-bool isAEMForController( jdksavdecc_aecpdu_aem const &aem,
-                         Eui64 const &expected_controller_entity_id );
+bool isAEMForController( jdksavdecc_aecpdu_aem const &aem, Eui64 const &expected_controller_entity_id );
 
 ///
 /// \brief setAEMReply Convert AEM command packet to an AEM response
@@ -84,11 +82,7 @@ bool isAEMForController( jdksavdecc_aecpdu_aem const &aem,
 /// \param pos The position of the packet payload
 /// \param len The length of the entire packet
 ///
-void setAEMReply( uint8_t status_code,
-                  uint16_t new_length,
-                  uint8_t *buf,
-                  uint16_t pos,
-                  uint16_t len );
+void setAEMReply( uint8_t status_code, uint16_t new_length, uint8_t *buf, uint16_t pos, uint16_t len );
 
 ///
 /// \brief parseAA Helper function to parse AECP AA message
@@ -100,19 +94,16 @@ bool parseAA( jdksavdecc_aecp_aa *aa, Frame const &pdu );
 
 /// Test to see if AECPDU AA message is a command for the specified target
 /// entity
-bool isAAForTarget( jdksavdecc_aecp_aa const &aa,
-                    Eui64 const &expected_target_entity_id );
+bool isAAForTarget( jdksavdecc_aecp_aa const &aa, Eui64 const &expected_target_entity_id );
 
 /// Test to see if AECPDU AA message is a response for the specified controller
 /// entity
-bool isAAForController( jdksavdecc_aecp_aa const &aa,
-                        Eui64 const &expected_controller_entity_id );
+bool isAAForController( jdksavdecc_aecp_aa const &aa, Eui64 const &expected_controller_entity_id );
 
 /// Twiddle the header bytes to convert this message from ADDRESS_ACCESS_COMMAND
 /// to ADDRESS_ACCESS_RESPONSE in place with the new status code, and the new
 /// control_data_length to match the new_length
-void
-    setAAReply( uint16_t new_length, uint8_t *buf, uint16_t pos, uint16_t len );
+void setAAReply( uint16_t new_length, uint8_t *buf, uint16_t pos, uint16_t len );
 
 ///
 /// \brief formAEMSetControl Formulate an AEM SET_CONTROL style message with
@@ -147,14 +138,12 @@ inline bool formAEMSetControl( Frame *frame,
     frame->setLength( JDKSAVDECC_FRAME_HEADER_LEN );
     frame->putOctet( JDKSAVDECC_1722A_SUBTYPE_AECP );
     frame->putOctet( JDKSAVDECC_AECP_MESSAGE_TYPE_AEM_COMMAND );
-    frame->putDoublet( ( JDKSAVDECC_AEM_COMMAND_SET_CONTROL_COMMAND_LEN
-                         + value_data_length
-                         - JDKSAVDECC_COMMON_CONTROL_HEADER_LEN ) & 0x7ff );
+    frame->putDoublet( ( JDKSAVDECC_AEM_COMMAND_SET_CONTROL_COMMAND_LEN + value_data_length - JDKSAVDECC_COMMON_CONTROL_HEADER_LEN )
+                       & 0x7ff );
     frame->putEUI64( destination_entity_id );
     frame->putEUI64( my_controller_entity_id );
     frame->putDoublet( sequence_id );
-    frame->putDoublet( JDKSAVDECC_AEM_COMMAND_SET_CONTROL
-                       + ( unsolicited ? 0x8000 : 0 ) );
+    frame->putDoublet( JDKSAVDECC_AEM_COMMAND_SET_CONTROL + ( unsolicited ? 0x8000 : 0 ) );
     frame->putDoublet( JDKSAVDECC_DESCRIPTOR_CONTROL );
     frame->putDoublet( descriptor_index );
     r = frame->canPut( value_data_length );
@@ -189,8 +178,7 @@ inline bool formAEMGetControl( Frame *frame,
     frame->setLength( JDKSAVDECC_FRAME_HEADER_LEN );
     frame->putOctet( JDKSAVDECC_1722A_SUBTYPE_AECP );
     frame->putOctet( JDKSAVDECC_AECP_MESSAGE_TYPE_AEM_COMMAND );
-    frame->putDoublet( ( JDKSAVDECC_AEM_COMMAND_GET_CONTROL_COMMAND_LEN
-                         - JDKSAVDECC_COMMON_CONTROL_HEADER_LEN ) & 0x7ff );
+    frame->putDoublet( ( JDKSAVDECC_AEM_COMMAND_GET_CONTROL_COMMAND_LEN - JDKSAVDECC_COMMON_CONTROL_HEADER_LEN ) & 0x7ff );
     frame->putEUI64( destination_entity_id );
     frame->putEUI64( my_controller_entity_id );
     frame->putDoublet( sequence_id );
@@ -234,14 +222,12 @@ inline bool formAEMSetControlResponse( Frame *frame,
     frame->setLength( JDKSAVDECC_FRAME_HEADER_LEN );
     frame->putOctet( JDKSAVDECC_1722A_SUBTYPE_AECP );
     frame->putOctet( JDKSAVDECC_AECP_MESSAGE_TYPE_AEM_RESPONSE );
-    frame->putDoublet( ( JDKSAVDECC_AEM_COMMAND_SET_CONTROL_COMMAND_LEN
-                         + value_data_length
-                         - JDKSAVDECC_COMMON_CONTROL_HEADER_LEN ) & 0x7ff );
+    frame->putDoublet( ( JDKSAVDECC_AEM_COMMAND_SET_CONTROL_COMMAND_LEN + value_data_length - JDKSAVDECC_COMMON_CONTROL_HEADER_LEN )
+                       & 0x7ff );
     frame->putEUI64( destination_entity_id );
     frame->putEUI64( controller_entity_id );
     frame->putDoublet( sequence_id );
-    frame->putDoublet( JDKSAVDECC_AEM_COMMAND_SET_CONTROL
-                       + ( unsolicited ? 0x8000 : 0 ) );
+    frame->putDoublet( JDKSAVDECC_AEM_COMMAND_SET_CONTROL + ( unsolicited ? 0x8000 : 0 ) );
     frame->putDoublet( JDKSAVDECC_DESCRIPTOR_CONTROL );
     frame->putDoublet( descriptor_index );
     r = frame->canPut( value_data_length );
@@ -282,14 +268,12 @@ inline bool formAEMGetControlResponse( Frame *frame,
     frame->setLength( JDKSAVDECC_FRAME_HEADER_LEN );
     frame->putOctet( JDKSAVDECC_1722A_SUBTYPE_AECP );
     frame->putOctet( JDKSAVDECC_AECP_MESSAGE_TYPE_AEM_RESPONSE );
-    frame->putDoublet( ( JDKSAVDECC_AEM_COMMAND_GET_CONTROL_COMMAND_LEN
-                         + value_data_length
-                         - JDKSAVDECC_COMMON_CONTROL_HEADER_LEN ) & 0x7ff );
+    frame->putDoublet( ( JDKSAVDECC_AEM_COMMAND_GET_CONTROL_COMMAND_LEN + value_data_length - JDKSAVDECC_COMMON_CONTROL_HEADER_LEN )
+                       & 0x7ff );
     frame->putEUI64( destination_entity_id );
     frame->putEUI64( controller_entity_id );
     frame->putDoublet( sequence_id );
-    frame->putDoublet( JDKSAVDECC_AEM_COMMAND_GET_CONTROL
-                       + ( unsolicited ? 0x8000 : 0 ) );
+    frame->putDoublet( JDKSAVDECC_AEM_COMMAND_GET_CONTROL + ( unsolicited ? 0x8000 : 0 ) );
     frame->putDoublet( JDKSAVDECC_DESCRIPTOR_CONTROL );
     frame->putDoublet( descriptor_index );
     r = frame->canPut( value_data_length );
@@ -313,11 +297,7 @@ void setAEMReply( uint8_t status_code, uint16_t new_length, Frame &pdu );
 /// \param pos
 /// \param len
 ///
-void setAAReply( uint8_t status_code,
-                 uint16_t new_length,
-                 uint8_t *buf,
-                 uint16_t pos,
-                 uint16_t len );
+void setAAReply( uint8_t status_code, uint16_t new_length, uint8_t *buf, uint16_t pos, uint16_t len );
 
 ///
 /// \brief parseACMP
@@ -333,6 +313,5 @@ bool parseACMP( jdksavdecc_acmpdu *acmpdu, Frame const &pdu );
 /// \param entity_id
 /// \return
 ///
-bool isACMPInvolvingTarget( jdksavdecc_acmpdu const &acmpdu,
-                            Eui64 const &entity_id );
+bool isACMPInvolvingTarget( jdksavdecc_acmpdu const &acmpdu, Eui64 const &entity_id );
 }

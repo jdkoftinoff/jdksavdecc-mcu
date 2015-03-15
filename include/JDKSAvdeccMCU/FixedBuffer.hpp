@@ -55,10 +55,7 @@ class FixedBuffer
     /// \param buf pointer to buffer
     /// \param max_length length of buffer
     ///
-    FixedBuffer( uint8_t *buf, uint16_t max_length )
-        : m_buf( buf ), m_length( 0 ), m_max_length( max_length )
-    {
-    }
+    FixedBuffer( uint8_t *buf, uint16_t max_length ) : m_buf( buf ), m_length( 0 ), m_max_length( max_length ) {}
 
     ///
     /// \brief isFull test if the buffer is full or would be full with
@@ -66,20 +63,14 @@ class FixedBuffer
     /// \param additional additional octet count
     /// \return true if the buffer is or would be full
     ///
-    bool isFull( uint16_t additional = 0 ) const
-    {
-        return ( m_length + additional ) >= m_max_length;
-    }
+    bool isFull( uint16_t additional = 0 ) const { return ( m_length + additional ) >= m_max_length; }
 
     ///
     /// \brief canPut test if the buffer can accept more octets
     /// \param additional octet count
     /// \return true if there is enough buffer space
     ///
-    bool canPut( uint16_t additional = 1 ) const
-    {
-        return ( m_length + additional ) <= m_max_length;
-    }
+    bool canPut( uint16_t additional = 1 ) const { return ( m_length + additional ) <= m_max_length; }
 
     ///
     /// \brief getMaxLength get maximum buffer length
@@ -276,40 +267,28 @@ class FixedBuffer
     /// \param val Doublet value
     /// \param pos Position within buffer
     ///
-    void setDoublet( uint16_t v, uint16_t pos )
-    {
-        jdksavdecc_uint16_set( v, m_buf, pos );
-    }
+    void setDoublet( uint16_t v, uint16_t pos ) { jdksavdecc_uint16_set( v, m_buf, pos ); }
 
     ///
     /// \brief getDoublet Get an Doublet from the buffer
     /// \param pos Position within buffer
     /// \return the Doublet value
     ///
-    uint16_t getDoublet( uint16_t pos ) const
-    {
-        return jdksavdecc_uint16_get( m_buf, pos );
-    }
+    uint16_t getDoublet( uint16_t pos ) const { return jdksavdecc_uint16_get( m_buf, pos ); }
 
     ///
     /// \brief setQuadlet Set an Quadlet in the buffer
     /// \param val Quadlet value
     /// \param pos Position within buffer
     ///
-    void setQuadlet( uint32_t v, uint16_t pos )
-    {
-        jdksavdecc_uint32_set( v, m_buf, pos );
-    }
+    void setQuadlet( uint32_t v, uint16_t pos ) { jdksavdecc_uint32_set( v, m_buf, pos ); }
 
     ///
     /// \brief getQuadlet Get an Quadlet from the buffer
     /// \param pos Position within buffer
     /// \return the Quadlet value
     ///
-    uint32_t getQuadlet( uint16_t pos ) const
-    {
-        return jdksavdecc_uint32_get( m_buf, pos );
-    }
+    uint32_t getQuadlet( uint16_t pos ) const { return jdksavdecc_uint32_get( m_buf, pos ); }
 
     ///
     /// \brief setEUI48 set an EUI48 value in the buffer

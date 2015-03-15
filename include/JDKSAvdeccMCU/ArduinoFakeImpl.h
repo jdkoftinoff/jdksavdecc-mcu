@@ -2,8 +2,7 @@
 
 #include "JDKSAvdeccMCU/Arduino.hpp"
 
-#if JDKSAVDECCMCU_ARDUINO == 1 && JDKSAVDECCMCU_BARE_METAL == 0                \
-    && !defined( _WIN32 )
+#if JDKSAVDECCMCU_ARDUINO == 1 && JDKSAVDECCMCU_BARE_METAL == 0 && !defined( _WIN32 )
 
 Serial_ Serial( stdin, stdout );
 
@@ -28,10 +27,7 @@ void analogReference( uint8_t mode ) { (void)mode; }
 void analogWrite( uint8_t, int ) {}
 
 unsigned long millis( void ) { return JDKSAvdeccMCU::getTimeInMilliseconds(); }
-unsigned long micros( void )
-{
-    return JDKSAvdeccMCU::getTimeInMilliseconds() * 1000;
-}
+unsigned long micros( void ) { return JDKSAvdeccMCU::getTimeInMilliseconds() * 1000; }
 void delay( unsigned int t ) { usleep( t * 1000 ); }
 void delayMicroseconds( unsigned int us ) { usleep( us ); }
 unsigned long pulseIn( uint8_t pin, uint8_t state, unsigned long timeout )
@@ -42,8 +38,7 @@ unsigned long pulseIn( uint8_t pin, uint8_t state, unsigned long timeout )
     return 0;
 }
 
-void
-    shiftOut( uint8_t dataPin, uint8_t clockPin, uint8_t bitOrder, uint8_t val )
+void shiftOut( uint8_t dataPin, uint8_t clockPin, uint8_t bitOrder, uint8_t val )
 {
     (void)dataPin;
     (void)clockPin;

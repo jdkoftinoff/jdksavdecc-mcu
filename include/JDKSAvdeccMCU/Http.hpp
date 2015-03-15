@@ -60,8 +60,7 @@ class HttpRequest
     /// \param path
     /// \param headers
     ///
-    void setCONNECT( std::string const &path,
-                     std::vector<std::string> const &headers );
+    void setCONNECT( std::string const &path, std::vector<std::string> const &headers );
 
     ///
     /// \brief setGET
@@ -73,10 +72,8 @@ class HttpRequest
     /// \param path
     /// \param headers
     ///
-    void setGET( std::string const &host,
-                 std::string const &port,
-                 std::string const &path,
-                 std::vector<std::string> const &headers )
+    void
+        setGET( std::string const &host, std::string const &port, std::string const &path, std::vector<std::string> const &headers )
     {
         set( "GET", host, port, path, headers );
     }
@@ -246,18 +243,13 @@ class HttpResponse
 
     void addHeader( std::string const &line ) { m_headers.push_back( line ); }
 
-    void addHeader( std::string const &name, std::string const &value )
-    {
-        m_headers.push_back( name + ": " + value );
-    }
+    void addHeader( std::string const &name, std::string const &value ) { m_headers.push_back( name + ": " + value ); }
 
     void setContent( std::string const &s )
     {
         m_content.clear();
         m_content.resize( s.length() );
-        memcpy( reinterpret_cast<uint8_t *>( m_content.data() ),
-                s.c_str(),
-                s.length() );
+        memcpy( reinterpret_cast<uint8_t *>( m_content.data() ), s.c_str(), s.length() );
     }
 
     void setContent( std::vector<uint8_t> const &v ) { m_content = v; }
@@ -282,45 +274,21 @@ class HttpServerHandler
     ///
     virtual bool onIncomingHttpRequest( HttpRequest const &request );
 
-    virtual bool onIncomingHttpConnectRequest( HttpRequest const &request )
-    {
-        return false;
-    }
+    virtual bool onIncomingHttpConnectRequest( HttpRequest const &request ) { return false; }
 
-    virtual bool onIncomingHttpHeadRequest( HttpRequest const &request )
-    {
-        return false;
-    }
+    virtual bool onIncomingHttpHeadRequest( HttpRequest const &request ) { return false; }
 
-    virtual bool onIncomingHttpGetRequest( HttpRequest const &request )
-    {
-        return false;
-    }
+    virtual bool onIncomingHttpGetRequest( HttpRequest const &request ) { return false; }
 
-    virtual bool onIncomingHttpPutRequest( HttpRequest const &request )
-    {
-        return false;
-    }
+    virtual bool onIncomingHttpPutRequest( HttpRequest const &request ) { return false; }
 
-    virtual bool onIncomingHttpPostRequest( HttpRequest const &request )
-    {
-        return false;
-    }
+    virtual bool onIncomingHttpPostRequest( HttpRequest const &request ) { return false; }
 
-    virtual bool onIncomingHttpDeleteRequest( HttpRequest const &request )
-    {
-        return false;
-    }
+    virtual bool onIncomingHttpDeleteRequest( HttpRequest const &request ) { return false; }
 
-    virtual bool onIncomingHttpOptionsRequest( HttpRequest const &request )
-    {
-        return false;
-    }
+    virtual bool onIncomingHttpOptionsRequest( HttpRequest const &request ) { return false; }
 
-    virtual bool onIncomingHttpTraceRequest( HttpRequest const &request )
-    {
-        return false;
-    }
+    virtual bool onIncomingHttpTraceRequest( HttpRequest const &request ) { return false; }
 };
 
 class HttpClientHandler
@@ -335,10 +303,7 @@ class HttpClientHandler
 class HttpServerParser
 {
   public:
-    HttpServerParser( HttpRequest *request, HttpServerHandler *handler )
-        : m_request( request ), m_handler( handler )
-    {
-    }
+    HttpServerParser( HttpRequest *request, HttpServerHandler *handler ) : m_request( request ), m_handler( handler ) {}
 
     virtual ~HttpServerParser() {}
 
@@ -354,10 +319,7 @@ class HttpServerParser
 class HttpServerParserSimple : public HttpServerParser
 {
   public:
-    HttpServerParserSimple( HttpRequest *request, HttpServerHandler *handler )
-        : HttpServerParser( request, handler )
-    {
-    }
+    HttpServerParserSimple( HttpRequest *request, HttpServerHandler *handler ) : HttpServerParser( request, handler ) {}
 
     virtual ~HttpServerParserSimple() {}
 
@@ -382,10 +344,7 @@ class HttpServerParserSimple : public HttpServerParser
 class HttpClientParser
 {
   public:
-    HttpClientParser( HttpResponse *response, HttpClientHandler *handler )
-        : m_response( response ), m_handler( handler )
-    {
-    }
+    HttpClientParser( HttpResponse *response, HttpClientHandler *handler ) : m_response( response ), m_handler( handler ) {}
 
     virtual ~HttpClientParser() {}
 
@@ -401,10 +360,7 @@ class HttpClientParser
 class HttpClientParserSimple : public HttpClientParser
 {
   public:
-    HttpClientParserSimple( HttpResponse *response, HttpClientHandler *handler )
-        : HttpClientParser( response, handler )
-    {
-    }
+    HttpClientParserSimple( HttpResponse *response, HttpClientHandler *handler ) : HttpClientParser( response, handler ) {}
 
     virtual ~HttpClientParserSimple() {}
 

@@ -120,20 +120,15 @@ AppMessage *AppMessageParser::parseHeader( uint8_t octet )
 
         jdksavdecc_appdu *p = &m_current_message.m_appdu.base;
 
-        p->version
-            = m_header_buffer.getOctet( JDKSAVDECC_APPDU_OFFSET_VERSION );
+        p->version = m_header_buffer.getOctet( JDKSAVDECC_APPDU_OFFSET_VERSION );
 
-        p->message_type
-            = m_header_buffer.getOctet( JDKSAVDECC_APPDU_OFFSET_MESSAGE_TYPE );
+        p->message_type = m_header_buffer.getOctet( JDKSAVDECC_APPDU_OFFSET_MESSAGE_TYPE );
 
-        p->payload_length = m_header_buffer.getDoublet(
-            JDKSAVDECC_APPDU_OFFSET_PAYLOAD_LENGTH );
+        p->payload_length = m_header_buffer.getDoublet( JDKSAVDECC_APPDU_OFFSET_PAYLOAD_LENGTH );
 
-        p->address
-            = m_header_buffer.getEUI48( JDKSAVDECC_APPDU_OFFSET_ADDRESS );
+        p->address = m_header_buffer.getEUI48( JDKSAVDECC_APPDU_OFFSET_ADDRESS );
 
-        p->reserved
-            = m_header_buffer.getDoublet( JDKSAVDECC_APPDU_OFFSET_RESERVED );
+        p->reserved = m_header_buffer.getDoublet( JDKSAVDECC_APPDU_OFFSET_RESERVED );
 
         // and validate the header
         msg = validateHeader();
@@ -154,8 +149,7 @@ AppMessage *AppMessageParser::validateHeader()
         {
         case AppMessage::NOP:
             /// See IEEE Std 1722.1-2013 Annex C.5.1.1
-            if ( p->payload_length == 0 && p->reserved == 0
-                 && Eui48( p->address ).isZero() )
+            if ( p->payload_length == 0 && p->reserved == 0 && Eui48( p->address ).isZero() )
             {
                 // Yes, we parsed the entire NOP message now.
                 msg = &m_current_message;
@@ -225,8 +219,7 @@ AppMessage *AppMessageParser::validateHeader()
             break;
         case AppMessage::AVDECC_FROM_APS:
             /// See IEEE Std 1722.1-2013 Annex C.5.1.6
-            if ( p->payload_length <= JDKSAVDECC_APPDU_MAX_PAYLOAD_LENGTH
-                 && p->reserved == 0 )
+            if ( p->payload_length <= JDKSAVDECC_APPDU_MAX_PAYLOAD_LENGTH && p->reserved == 0 )
             {
                 // we have some payload to read now
                 m_octets_left_in_payload = p->payload_length;
@@ -240,8 +233,7 @@ AppMessage *AppMessageParser::validateHeader()
             break;
         case AppMessage::AVDECC_FROM_APC:
             /// See IEEE Std 1722.1-2013 Annex C.5.1.7
-            if ( p->payload_length <= JDKSAVDECC_APPDU_MAX_PAYLOAD_LENGTH
-                 && p->reserved == 0 )
+            if ( p->payload_length <= JDKSAVDECC_APPDU_MAX_PAYLOAD_LENGTH && p->reserved == 0 )
             {
                 // we have some payload to read now
                 m_octets_left_in_payload = p->payload_length;
@@ -255,8 +247,7 @@ AppMessage *AppMessageParser::validateHeader()
             break;
         case AppMessage::VENDOR:
             /// See IEEE Std 1722.1-2013 Annex C.5.1.8
-            if ( p->payload_length <= JDKSAVDECC_APPDU_MAX_PAYLOAD_LENGTH
-                 && p->reserved == 0 )
+            if ( p->payload_length <= JDKSAVDECC_APPDU_MAX_PAYLOAD_LENGTH && p->reserved == 0 )
             {
                 // we have some payload to read now
                 m_octets_left_in_payload = p->payload_length;

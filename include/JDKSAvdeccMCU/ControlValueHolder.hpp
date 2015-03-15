@@ -42,13 +42,8 @@ namespace JDKSAvdeccMCU
 class ControlValueHolder : public FixedBuffer
 {
   public:
-    ControlValueHolder( uint8_t *buf,
-                        uint16_t value_length,
-                        uint16_t num_items = 1 )
-        : FixedBuffer( buf, value_length * num_items )
-        , m_value_length( value_length )
-        , m_num_items( num_items )
-        , m_dirty( true )
+    ControlValueHolder( uint8_t *buf, uint16_t value_length, uint16_t num_items = 1 )
+        : FixedBuffer( buf, value_length * num_items ), m_value_length( value_length ), m_num_items( num_items ), m_dirty( true )
     {
         memset( buf, 0, m_value_length * m_num_items );
         setLength( m_value_length * m_num_items );
@@ -61,20 +56,11 @@ class ControlValueHolder : public FixedBuffer
 
     uint16_t getNumItems() const { return m_num_items; }
 
-    uint8_t getValueOctet( uint8_t item = 0 ) const
-    {
-        return getOctet( item * sizeof( uint8_t ) );
-    }
+    uint8_t getValueOctet( uint8_t item = 0 ) const { return getOctet( item * sizeof( uint8_t ) ); }
 
-    uint16_t getValueDoublet( uint8_t item = 0 ) const
-    {
-        return getDoublet( item * sizeof( uint16_t ) );
-    }
+    uint16_t getValueDoublet( uint8_t item = 0 ) const { return getDoublet( item * sizeof( uint16_t ) ); }
 
-    uint32_t getValueQuadlet( uint8_t item = 0 ) const
-    {
-        return getQuadlet( item * sizeof( uint32_t ) );
-    }
+    uint32_t getValueQuadlet( uint8_t item = 0 ) const { return getQuadlet( item * sizeof( uint32_t ) ); }
 
     template <typename T>
     T getValueAs( uint8_t item = 0 ) const
@@ -185,11 +171,7 @@ class ControlValueHolderWithStorage : public ControlValueHolder
     typedef BaseValueType value_type;
     static const uint8_t num_items = NumItems;
 
-    ControlValueHolderWithStorage()
-        : ControlValueHolder(
-              m_value_storage, sizeof( BaseValueType ), NumItems )
-    {
-    }
+    ControlValueHolderWithStorage() : ControlValueHolder( m_value_storage, sizeof( BaseValueType ), NumItems ) {}
 
   protected:
     uint8_t m_value_storage[sizeof( BaseValueType ) * NumItems];

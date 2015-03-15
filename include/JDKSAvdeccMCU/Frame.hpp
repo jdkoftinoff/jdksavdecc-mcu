@@ -80,9 +80,7 @@ class Frame : public FixedBuffer
     /// \param buf The buffer storage area to use
     /// \param len The buffer storage area length
     ///
-    Frame( jdksavdecc_timestamp_in_milliseconds time_in_ms,
-           uint8_t *buf,
-           uint16_t len )
+    Frame( jdksavdecc_timestamp_in_milliseconds time_in_ms, uint8_t *buf, uint16_t len )
         : FixedBuffer( buf, len ), m_time_in_ms( time_in_ms )
     {
     }
@@ -91,57 +89,39 @@ class Frame : public FixedBuffer
     /// \brief getDA Get the Frame's Destination Address
     /// \return The Eui48
     ///
-    Eui48 getDA() const
-    {
-        return getEUI48( JDKSAVDECC_FRAME_HEADER_DA_OFFSET );
-    }
+    Eui48 getDA() const { return getEUI48( JDKSAVDECC_FRAME_HEADER_DA_OFFSET ); }
 
     ///
     /// \brief setDA Set the Frame's Destination Address
     /// \param da The Eui48
     ///
-    void setDA( Eui48 const &da )
-    {
-        setEUI48( da, JDKSAVDECC_FRAME_HEADER_DA_OFFSET );
-    }
+    void setDA( Eui48 const &da ) { setEUI48( da, JDKSAVDECC_FRAME_HEADER_DA_OFFSET ); }
 
     ///
     /// \brief getDA Get the Frame's Source Address
     /// \return The Eui48
     ///
-    Eui48 getSA() const
-    {
-        return getEUI48( JDKSAVDECC_FRAME_HEADER_SA_OFFSET );
-    }
+    Eui48 getSA() const { return getEUI48( JDKSAVDECC_FRAME_HEADER_SA_OFFSET ); }
 
     ///
     /// \brief setDA Set the Frame's Source Address
     /// \param sa The Eui48
     ///
-    void setSA( Eui48 const &sa )
-    {
-        setEUI48( sa, JDKSAVDECC_FRAME_HEADER_SA_OFFSET );
-    }
+    void setSA( Eui48 const &sa ) { setEUI48( sa, JDKSAVDECC_FRAME_HEADER_SA_OFFSET ); }
 
     ///
     /// \brief getEtherType Get the Frame's EtherType
     /// Note: does not manage tagged frames
     /// \return The EtherType value
     ///
-    uint16_t getEtherType() const
-    {
-        return getDoublet( JDKSAVDECC_FRAME_HEADER_ETHERTYPE_OFFSET );
-    }
+    uint16_t getEtherType() const { return getDoublet( JDKSAVDECC_FRAME_HEADER_ETHERTYPE_OFFSET ); }
 
     ///
     /// \brief setEtherType Set the Frame's EtherType
     /// Note: does not manage tagged frames
     /// \param et The EtherType value
     ///
-    void setEtherType( uint16_t et )
-    {
-        setDoublet( et, JDKSAVDECC_FRAME_HEADER_ETHERTYPE_OFFSET );
-    }
+    void setEtherType( uint16_t et ) { setDoublet( et, JDKSAVDECC_FRAME_HEADER_ETHERTYPE_OFFSET ); }
 
     ///
     /// \brief getPayload Get the Frame's Payload
@@ -154,10 +134,7 @@ class Frame : public FixedBuffer
     /// \brief getPayload Get The Frame's const Payload
     /// \return The raw uint8_t const pointer to the payload
     ///
-    uint8_t const *getPayload() const
-    {
-        return &m_buf[JDKSAVDECC_FRAME_HEADER_LEN];
-    }
+    uint8_t const *getPayload() const { return &m_buf[JDKSAVDECC_FRAME_HEADER_LEN]; }
 
     ///
     /// \brief getPayloadLength Get the length of the payload
@@ -181,19 +158,13 @@ class Frame : public FixedBuffer
     /// \brief getTimeInMilliseconds Get the timestamp in milliseconds
     /// \return The timestamp
     ///
-    jdksavdecc_timestamp_in_milliseconds getTimeInMilliseconds() const
-    {
-        return m_time_in_ms;
-    }
+    jdksavdecc_timestamp_in_milliseconds getTimeInMilliseconds() const { return m_time_in_ms; }
 
     ///
     /// \brief setTimeInMilliseconds Set the timestamp in milliseconds
     /// \param v The timestamp
     ///
-    void setTimeInMilliseconds( jdksavdecc_timestamp_in_milliseconds v )
-    {
-        m_time_in_ms = v;
-    }
+    void setTimeInMilliseconds( jdksavdecc_timestamp_in_milliseconds v ) { m_time_in_ms = v; }
 };
 
 ///
@@ -221,10 +192,7 @@ class FrameWithSize : public Frame
     /// \brief FrameWithSize Constructor of an empty frame with timestamp
     /// \param time_in_ms The timestamp in milliseconds
     ///
-    FrameWithSize( jdksavdecc_timestamp_in_milliseconds time_in_ms )
-        : Frame( time_in_ms, m_buf_storage, MaxSize )
-    {
-    }
+    FrameWithSize( jdksavdecc_timestamp_in_milliseconds time_in_ms ) : Frame( time_in_ms, m_buf_storage, MaxSize ) {}
 
     ///
     /// \brief FrameWithSize Constructor of a frame with header and timestamp
@@ -237,25 +205,17 @@ class FrameWithSize : public Frame
                    Eui48 const &dest_mac,
                    Eui48 const &src_mac,
                    uint16_t ethertype )
-        : Frame(
-              time_in_ms, m_buf_storage, MaxSize, dest_mac, src_mac, ethertype )
+        : Frame( time_in_ms, m_buf_storage, MaxSize, dest_mac, src_mac, ethertype )
     {
     }
 };
 
-class FrameWithMTU
-    : public FrameWithSize<( 1500 + JDKSAVDECC_FRAME_HEADER_LEN )>
+class FrameWithMTU : public FrameWithSize<( 1500 + JDKSAVDECC_FRAME_HEADER_LEN )>
 {
   public:
     FrameWithMTU() {}
-    FrameWithMTU( jdksavdecc_timestamp_in_milliseconds time_in_ms )
-        : FrameWithSize( time_in_ms )
-    {
-    }
-    FrameWithMTU( jdksavdecc_timestamp_in_milliseconds time_in_ms,
-                  Eui48 const &dest_mac,
-                  Eui48 const &src_mac,
-                  uint16_t ethertype )
+    FrameWithMTU( jdksavdecc_timestamp_in_milliseconds time_in_ms ) : FrameWithSize( time_in_ms ) {}
+    FrameWithMTU( jdksavdecc_timestamp_in_milliseconds time_in_ms, Eui48 const &dest_mac, Eui48 const &src_mac, uint16_t ethertype )
         : FrameWithSize( time_in_ms, dest_mac, src_mac, ethertype )
     {
     }

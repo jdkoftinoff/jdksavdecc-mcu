@@ -57,7 +57,7 @@ struct RegisteredController
 
 class RegisteredControllers
 {
-public:
+  public:
     virtual uint16_t getControllerCount() const = 0;
     virtual RegisteredController *getController( uint16_t i ) = 0;
     virtual RegisteredController const *getController( uint16_t i ) const = 0;
@@ -65,49 +65,36 @@ public:
     virtual void removeController( Eui64 entity_id ) = 0;
 };
 
-
 template <uint16_t MaxControllers>
 class RegisteredControllersStorage : public RegisteredControllers
 {
-public:
-    RegisteredControllersStorage()
-        : m_num_controllers(0)
-    {
-    }
+  public:
+    RegisteredControllersStorage() : m_num_controllers( 0 ) {}
 
-    virtual uint16_t getControllerCount() const override
-    {
-        return m_num_controllers;
-    }
+    virtual uint16_t getControllerCount() const override { return m_num_controllers; }
 
-    virtual RegisteredController *getController( uint16_t i ) override
-    {
-        return &m_controller[i];
-    }
-    virtual RegisteredController const *getController( uint16_t i ) const override
-    {
-        return &m_controller[i];
-    }
+    virtual RegisteredController *getController( uint16_t i ) override { return &m_controller[i]; }
+    virtual RegisteredController const *getController( uint16_t i ) const override { return &m_controller[i]; }
     virtual bool addController( Eui64 entity_id, Eui48 mac_address ) override
     {
-        bool r=false;
-        if( m_num_controllers<MaxControllers)
+        bool r = false;
+        if ( m_num_controllers < MaxControllers )
         {
             m_controller[m_num_controllers].m_entity_id = entity_id;
             m_controller[m_num_controllers].m_mac_address = mac_address;
-            r=true;
+            r = true;
         }
         return r;
     }
     virtual void removeController( Eui64 entity_id ) override
     {
-        for( uint16_t i=0; i<m_num_controllers; ++i )
+        for ( uint16_t i = 0; i < m_num_controllers; ++i )
         {
             // find the controller
-            if( m_controller[i].m_entity_id == entity_id )
+            if ( m_controller[i].m_entity_id == entity_id )
             {
                 // found it; is it the last one in the list?
-                if( i==m_num_controllers-1 )
+                if ( i == m_num_controllers - 1 )
                 {
                     // yes, just erase it
                     m_controller[i].m_entity_id.clear();
@@ -117,14 +104,15 @@ public:
                 {
                     // it is not the last one in the list, so swap it with the last one in the list
                     using namespace std;
-                    swap( m_controller[i], m_controller[m_num_controllers-1] );
+                    swap( m_controller[i], m_controller[m_num_controllers - 1] );
                 }
                 m_num_controllers--;
                 break;
             }
         }
     }
-private:
+
+  private:
     uint16_t m_num_controllers;
     RegisteredController m_controller[MaxControllers];
 };
@@ -143,9 +131,7 @@ class Entity : public Handler
                               Frame &frame ) override;
 
     /// Notification that a command to a target entity timed out
-    virtual void commandTimedOut( Eui64 const &target_entity_id,
-                                  uint16_t command_type,
-                                  uint16_t sequence_id );
+    virtual void commandTimedOut( Eui64 const &target_entity_id, uint16_t command_type, uint16_t sequence_id );
 
     /// Get the ADP Manager
     ADPManager &getADPManager() { return m_adp_manager; }
@@ -170,8 +156,7 @@ class Entity : public Handler
     /// code
     uint8_t receivedAACommand( jdksavdecc_aecp_aa const &aa, Frame &pdu );
 
-    virtual uint8_t receivedACMPMessage( jdksavdecc_acmpdu const &acmpdu,
-                                         Frame &pdu );
+    virtual uint8_t receivedACMPMessage( jdksavdecc_acmpdu const &acmpdu, Frame &pdu );
 
     /// Can we send a command now? i.e. are there no in-flight commands waiting
     /// to be acknowledged?
@@ -214,71 +199,54 @@ class Entity : public Handler
     /// The pdu contains a valid Acquire Entity command.
     /// Fill in the response in place in the pdu and return an AECP AEM status
     /// code
-    uint8_t receiveAcquireEntityCommand( jdksavdecc_aecpdu_aem const &aem,
-                                         Frame &pdu );
+    uint8_t receiveAcquireEntityCommand( jdksavdecc_aecpdu_aem const &aem, Frame &pdu );
 
     /// The pdu contains a valid Lock Entity command.
     /// Fill in the response in place in the pdu and return an AECP AEM status
     /// code
-    virtual uint8_t receiveLockEntityCommand( jdksavdecc_aecpdu_aem const &aem,
-                                              Frame &pdu );
+    virtual uint8_t receiveLockEntityCommand( jdksavdecc_aecpdu_aem const &aem, Frame &pdu );
 
     /// The pdu contains a valid Entity Available command.
     /// Fill in the response in place in the pdu and return an AECP AEM status
     /// code
-    uint8_t receiveEntityAvailableCommand( jdksavdecc_aecpdu_aem const &aem,
-                                           Frame &pdu );
+    uint8_t receiveEntityAvailableCommand( jdksavdecc_aecpdu_aem const &aem, Frame &pdu );
 
     // Formulate and send a CONTROLLER_AVAILABLE command to a target controller
-    void sendControllerAvailable( Eui64 const &target_controller_entity_id,
-                                  Eui48 const &target_mac_address )
+    void sendControllerAvailable( Eui64 const &target_controller_entity_id, Eui48 const &target_mac_address )
     {
-        sendCommand( target_controller_entity_id,
-                     target_mac_address,
-                     JDKSAVDECC_AEM_COMMAND_CONTROLLER_AVAILABLE );
+        sendCommand( target_controller_entity_id, target_mac_address, JDKSAVDECC_AEM_COMMAND_CONTROLLER_AVAILABLE );
     }
 
     /// The pdu contains a valid Controller Available command.
     /// Fill in the response in place in the pdu and return an AECP AEM status
     /// code
-    virtual uint8_t
-        receiveControllerAvailableCommand( jdksavdecc_aecpdu_aem const &aem,
-                                           Frame &pdu );
+    virtual uint8_t receiveControllerAvailableCommand( jdksavdecc_aecpdu_aem const &aem, Frame &pdu );
 
     /// The pdu contains a valid Controller Available response.
     /// return true if the response is handled
-    virtual bool
-        receiveControllerAvailableResponse( jdksavdecc_aecpdu_aem const &aem,
-                                            Frame &pdu );
+    virtual bool receiveControllerAvailableResponse( jdksavdecc_aecpdu_aem const &aem, Frame &pdu );
 
     // Formulate and send a SET_CONTROL unsolicited response to all subscribed
     // controllers
-    void sendSetControlUnsolicitedResponse( uint16_t target_descriptor_index,
-                                            uint8_t *control_value,
-                                            uint16_t control_value_len )
+    void sendSetControlUnsolicitedResponse( uint16_t target_descriptor_index, uint8_t *control_value, uint16_t control_value_len )
     {
         uint8_t additional1[4];
         jdksavdecc_uint16_set( JDKSAVDECC_DESCRIPTOR_CONTROL, additional1, 0 );
         jdksavdecc_uint16_set( target_descriptor_index, additional1, 2 );
-        sendUnsolicitedResponses( JDKSAVDECC_AEM_COMMAND_SET_CONTROL,
-                                  additional1,
-                                  sizeof( additional1 ),
-                                  control_value,
-                                  control_value_len );
+        sendUnsolicitedResponses(
+            JDKSAVDECC_AEM_COMMAND_SET_CONTROL, additional1, sizeof( additional1 ), control_value, control_value_len );
     }
 
     /// The pdu contains a valid Register for Unsolicited Notifications Command
     /// Fill in the response in place in the pdu and return an AECP AEM status
     /// code
-    uint8_t receiveRegisterUnsolicitedNotificationCommand(
-        jdksavdecc_aecpdu_aem const &aem, Frame &pdu );
+    uint8_t receiveRegisterUnsolicitedNotificationCommand( jdksavdecc_aecpdu_aem const &aem, Frame &pdu );
 
     /// The pdu contains a valid De-Register for Unsolicited Notifications
     /// Command
     /// Fill in the response in place in the pdu and return an AECP AEM status
     /// code
-    uint8_t receiveDeRegisterUnsolicitedNotificationCommand(
-        jdksavdecc_aecpdu_aem const &aem, Frame &pdu );
+    uint8_t receiveDeRegisterUnsolicitedNotificationCommand( jdksavdecc_aecpdu_aem const &aem, Frame &pdu );
 
   protected:
     /// The advertising manager, also contains capabilities, entity_id, and

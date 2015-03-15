@@ -76,20 +76,14 @@ class HandlerGroup : public Handler
     /// \param additional number of items
     /// \return true if it is or would be full
     ///
-    bool isFull( uint16_t additional = 0 ) const
-    {
-        return ( m_num_items + additional ) >= m_max_items;
-    }
+    bool isFull( uint16_t additional = 0 ) const { return ( m_num_items + additional ) >= m_max_items; }
 
     ///
     /// \brief canPut test if the handler list has room for additional items
     /// \param additional count of additional items
     /// \return true if there is room
     ///
-    bool canPut( uint16_t additional = 1 ) const
-    {
-        return ( m_num_items + additional ) <= m_max_items;
-    }
+    bool canPut( uint16_t additional = 1 ) const { return ( m_num_items + additional ) <= m_max_items; }
 
     ///
     /// \brief getRxCount get the count of received packets
@@ -137,9 +131,6 @@ class HandlerGroupWithSize : public HandlerGroup
     Handler *m_item_storage[MaxItems];
 
   public:
-    HandlerGroupWithSize( Frame *frame )
-        : HandlerGroup( frame, m_item_storage, MaxItems )
-    {
-    }
+    HandlerGroupWithSize( Frame *frame ) : HandlerGroup( frame, m_item_storage, MaxItems ) {}
 };
 }

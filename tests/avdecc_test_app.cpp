@@ -22,49 +22,39 @@ void dump( std::ostream &ostr, AppMessage const &msg )
         break;
     case AppMessage::AVDECC_FROM_APC:
         ostr << "AVDECC_FROM_APC" << std::endl;
-        ostr << "Address: " << std::hex << msg.getAddress().convertToUint64()
-             << std::endl;
+        ostr << "Address: " << std::hex << msg.getAddress().convertToUint64() << std::endl;
         ostr << std::dec;
         dump( ostr, msg.getPayload(), msg.getPayloadLength() );
         break;
     case AppMessage::AVDECC_FROM_APS:
         ostr << "AVDECC_FROM_APS" << std::endl;
-        ostr << "Address: " << std::hex << msg.getAddress().convertToUint64()
-             << std::endl;
+        ostr << "Address: " << std::hex << msg.getAddress().convertToUint64() << std::endl;
         ostr << std::dec;
         dump( ostr, msg.getPayload(), msg.getPayloadLength() );
         break;
     case AppMessage::ENTITY_ID_REQUEST:
         ostr << "ENTITY_ID_REQUEST" << std::endl;
-        ostr << "Address: " << std::hex << msg.getAddress().convertToUint64()
-             << std::endl;
-        ostr << "EntityID: " << std::hex
-             << msg.getEntityIdRequestEntityId().convertToUint64() << std::endl;
+        ostr << "Address: " << std::hex << msg.getAddress().convertToUint64() << std::endl;
+        ostr << "EntityID: " << std::hex << msg.getEntityIdRequestEntityId().convertToUint64() << std::endl;
         ostr << std::dec;
         break;
     case AppMessage::ENTITY_ID_RESPONSE:
         ostr << "ENTITY_ID_RESPONSE" << std::endl;
-        ostr << "Address: " << std::hex << msg.getAddress().convertToUint64()
-             << std::endl;
-        ostr << "EntityID: " << std::hex
-             << msg.getEntityIdResponseEntityId().convertToUint64()
-             << std::endl;
+        ostr << "Address: " << std::hex << msg.getAddress().convertToUint64() << std::endl;
+        ostr << "EntityID: " << std::hex << msg.getEntityIdResponseEntityId().convertToUint64() << std::endl;
         ostr << std::dec;
         break;
     case AppMessage::LINK_UP:
         ostr << "LINK_UP" << std::endl;
-        ostr << "Address: " << std::hex << msg.getAddress().convertToUint64()
-             << std::endl;
+        ostr << "Address: " << std::hex << msg.getAddress().convertToUint64() << std::endl;
         break;
     case AppMessage::LINK_DOWN:
         ostr << "LINK_DOWN" << std::endl;
-        ostr << "Address: " << std::hex << msg.getAddress().convertToUint64()
-             << std::endl;
+        ostr << "Address: " << std::hex << msg.getAddress().convertToUint64() << std::endl;
         break;
     case AppMessage::VENDOR:
         ostr << "VENDOR" << std::endl;
-        ostr << "vendor message: " << std::hex
-             << msg.getAddress().convertToUint64() << std::endl;
+        ostr << "vendor message: " << std::hex << msg.getAddress().convertToUint64() << std::endl;
         break;
     }
 }
@@ -152,10 +142,7 @@ class TestApcStateMachine : public ApcStateMachine
     };
 
     TestApcStateMachine()
-        : ApcStateMachine( &m_test_variables,
-                           &m_test_actions,
-                           &m_test_events,
-                           &m_test_states )
+        : ApcStateMachine( &m_test_variables, &m_test_actions, &m_test_events, &m_test_states )
         , m_test_events( &m_http_parser_simple, "/" )
         , m_http_parser_simple( &m_http_response, &m_test_events )
     {
@@ -189,25 +176,21 @@ class TestApcStateMachine : public ApcStateMachine
 
     virtual void notifyLinkStatus( AppMessage const &linkMsg )
     {
-        std::cout << "APC: notifyLinkStatus( " << std::hex
-                  << linkMsg.getAddress().convertToUint64() << " "
-                  << ( linkMsg.getMessageType() == AppMessage::LINK_UP ? 1 : 0 )
-                  << " )" << std::endl;
+        std::cout << "APC: notifyLinkStatus( " << std::hex << linkMsg.getAddress().convertToUint64() << " "
+                  << ( linkMsg.getMessageType() == AppMessage::LINK_UP ? 1 : 0 ) << " )" << std::endl;
         ApcStateMachine::notifyLinkStatus( linkMsg );
     }
 
     virtual void processMsg( AppMessage const &apsMsg )
     {
-        std::cout << "APC: processMsg( " << apsMsg.getMessageType() << " )"
-                  << std::endl;
+        std::cout << "APC: processMsg( " << apsMsg.getMessageType() << " )" << std::endl;
         dump( std::cout, apsMsg );
         ApcStateMachine::processMsg( apsMsg );
     }
 
     virtual void notifyNewEntityId( Eui64 const &entity_id )
     {
-        std::cout << "APC: notifyNewEntityId( " << std::hex
-                  << entity_id.convertToUint64() << " )" << std::endl;
+        std::cout << "APC: notifyNewEntityId( " << std::hex << entity_id.convertToUint64() << " )" << std::endl;
         ApcStateMachine::notifyNewEntityId( entity_id );
     }
 
@@ -321,14 +304,9 @@ class TestApsStateMachine : public ApsStateMachine
         }
     };
 
-    TestApsStateMachine( uint16_t &assigned_id_count,
-                         active_connections_type &active_connections )
-        : ApsStateMachine( &m_test_variables,
-                           &m_test_actions,
-                           &m_test_events,
-                           &m_test_states,
-                           assigned_id_count,
-                           active_connections )
+    TestApsStateMachine( uint16_t &assigned_id_count, active_connections_type &active_connections )
+        : ApsStateMachine(
+              &m_test_variables, &m_test_actions, &m_test_events, &m_test_states, assigned_id_count, active_connections )
         , m_test_events( &m_http_server_parser, "/" )
         , m_http_server_parser( &m_http_server_request, &m_test_events )
     {
@@ -336,8 +314,7 @@ class TestApsStateMachine : public ApsStateMachine
 
     virtual void sendAvdeccToL2( Frame const &frame )
     {
-        std::cout << "APS: sendAvdeccToL2( " << frame.getLength() << " )"
-                  << std::endl;
+        std::cout << "APS: sendAvdeccToL2( " << frame.getLength() << " )" << std::endl;
         dump( std::cout, frame.getBuf(), frame.getLength() );
     }
 
@@ -393,8 +370,7 @@ void tick()
 
 void formADP( Frame *adp, Eui48 sa, uint16_t valid_time_in_seconds )
 {
-    uint32_t entity_capabilities
-        = JDKSAVDECC_ADP_ENTITY_CAPABILITY_AEM_SUPPORTED;
+    uint32_t entity_capabilities = JDKSAVDECC_ADP_ENTITY_CAPABILITY_AEM_SUPPORTED;
     uint16_t talker_stream_sources = 0;
     uint16_t talker_capabilities = 0;
     uint16_t listener_stream_sinks = 0;
@@ -416,8 +392,7 @@ void formADP( Frame *adp, Eui48 sa, uint16_t valid_time_in_seconds )
     adp->putOctet( ( valid_time_in_seconds / 2 ) << 3 );
 
     // control_data_length field is 56 - See 1722.1 Clause 6.2.1.7
-    adp->putOctet( JDKSAVDECC_ADPDU_LEN
-                   - JDKSAVDECC_COMMON_CONTROL_HEADER_LEN );
+    adp->putOctet( JDKSAVDECC_ADPDU_LEN - JDKSAVDECC_COMMON_CONTROL_HEADER_LEN );
 
     adp->putEUI64( apc->getVariables()->m_entityId );
     adp->putEUI64( Eui64( 0x70, 0xb3, 0xd5, 0xff, 0xfe, 0xed, 0xcf, 0xf7 ) );

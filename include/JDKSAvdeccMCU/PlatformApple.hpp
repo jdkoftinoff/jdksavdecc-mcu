@@ -117,8 +117,7 @@ inline jdksavdecc_timestamp_in_milliseconds getTimeInMilliseconds()
     timeval tv;
 
     gettimeofday( &tv, 0 );
-    return jdksavdecc_timestamp_in_milliseconds( tv.tv_usec / 1000 )
-           + jdksavdecc_timestamp_in_milliseconds( tv.tv_sec * 1000 );
+    return jdksavdecc_timestamp_in_milliseconds( tv.tv_usec / 1000 ) + jdksavdecc_timestamp_in_milliseconds( tv.tv_sec * 1000 );
 }
 }
 

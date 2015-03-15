@@ -38,10 +38,7 @@ namespace JDKSAvdeccMCU
 
 Handler::~Handler() {}
 
-void Handler::tick( jdksavdecc_timestamp_in_milliseconds time_in_millis )
-{
-    (void)time_in_millis;
-}
+void Handler::tick( jdksavdecc_timestamp_in_milliseconds time_in_millis ) { (void)time_in_millis; }
 
 bool Handler::receivedPDU( RawSocket *incoming_socket, Frame &frame )
 {

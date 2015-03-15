@@ -117,18 +117,14 @@
 
 namespace JDKSAvdeccMCU
 {
-inline jdksavdecc_timestamp_in_milliseconds getTimeInMilliseconds()
-{
-    return millis();
-}
+inline jdksavdecc_timestamp_in_milliseconds getTimeInMilliseconds() { return millis(); }
 }
 #elif defined( JDKSAVDECCMCU_PLATFORM_GET_TIME_IN_MILLISECONDS )
 namespace JDKSAvdeccMCU
 {
 jdksavdecc_timestamp_in_milliseconds getTimeInMilliseconds()
 {
-    return (jdksavdecc_timestamp_in_milliseconds)
-        JDKSAVDECCMCU_PLATFORM_GET_TIME_IN_MILLISECONDS();
+    return (jdksavdecc_timestamp_in_milliseconds)JDKSAVDECCMCU_PLATFORM_GET_TIME_IN_MILLISECONDS();
 }
 }
 #else

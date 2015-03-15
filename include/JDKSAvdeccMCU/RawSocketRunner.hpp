@@ -54,18 +54,14 @@ class RawSocketRunner
   public:
     RawSocketRunner() {}
     virtual ~RawSocketRunner() {}
-    virtual void setTarget( RawSocketRunnerNotification *notification_target )
-        = 0;
+    virtual void setTarget( RawSocketRunnerNotification *notification_target ) = 0;
     virtual bool run( int timeout_ms ) = 0;
 };
 
 class SimpleRawSocketRunner : public RawSocketRunner
 {
   public:
-    SimpleRawSocketRunner( RawSocket *the_socket )
-        : m_the_socket( the_socket ), m_notification_target( 0 )
-    {
-    }
+    SimpleRawSocketRunner( RawSocket *the_socket ) : m_the_socket( the_socket ), m_notification_target( 0 ) {}
 
     virtual ~SimpleRawSocketRunner()
     {

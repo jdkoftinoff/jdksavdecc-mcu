@@ -37,14 +37,13 @@
 namespace JDKSAvdeccMCU
 {
 
-RawSocketPcapFile::RawSocketPcapFile(
-    uint16_t ethertype,
-    Eui48 my_mac,
-    Eui48 default_dest_mac,
-    Eui48 join_multicast,
-    const std::string &input_file,
-    const std::string &output_file,
-    jdksavdecc_timestamp_in_milliseconds time_granularity_in_ms )
+RawSocketPcapFile::RawSocketPcapFile( uint16_t ethertype,
+                                      Eui48 my_mac,
+                                      Eui48 default_dest_mac,
+                                      Eui48 join_multicast,
+                                      const std::string &input_file,
+                                      const std::string &output_file,
+                                      jdksavdecc_timestamp_in_milliseconds time_granularity_in_ms )
     : m_ethertype( ethertype )
     , m_my_mac( my_mac )
     , m_default_dest_mac( default_dest_mac )
@@ -93,11 +92,7 @@ bool RawSocketPcapFile::recvFrame( Frame *frame )
     return r;
 }
 
-bool RawSocketPcapFile::sendFrame( const Frame &frame,
-                                   const uint8_t *data1,
-                                   uint16_t len1,
-                                   const uint8_t *data2,
-                                   uint16_t len2 )
+bool RawSocketPcapFile::sendFrame( const Frame &frame, const uint8_t *data1, uint16_t len1, const uint8_t *data2, uint16_t len2 )
 {
     Eui48 da = frame.getDA();
     Eui48 sa = m_my_mac;
@@ -106,8 +101,7 @@ bool RawSocketPcapFile::sendFrame( const Frame &frame,
         da = m_default_dest_mac;
     }
     PcapFilePacket packet;
-    packet.reserve( frame.getLength() + len1 + len2
-                    - JDKSAVDECC_FRAME_HEADER_LEN );
+    packet.reserve( frame.getLength() + len1 + len2 - JDKSAVDECC_FRAME_HEADER_LEN );
     for ( size_t i = JDKSAVDECC_FRAME_HEADER_LEN; i < frame.getLength(); ++i )
     {
         packet.push_back( frame.getOctet( i ) );
@@ -127,16 +121,11 @@ bool RawSocketPcapFile::sendFrame( const Frame &frame,
         }
     }
 
-    m_pcap_file_writer.WritePacket(
-        m_current_time * 1000, da.value, sa.value, m_ethertype, packet );
+    m_pcap_file_writer.WritePacket( m_current_time * 1000, da.value, sa.value, m_ethertype, packet );
     return true;
 }
 
-bool RawSocketPcapFile::sendReplyFrame( Frame &frame,
-                                        const uint8_t *data1,
-                                        uint16_t len1,
-                                        const uint8_t *data2,
-                                        uint16_t len2 )
+bool RawSocketPcapFile::sendReplyFrame( Frame &frame, const uint8_t *data1, uint16_t len1, const uint8_t *data2, uint16_t len2 )
 {
     Eui48 da = frame.getSA();
     Eui48 sa = m_my_mac;
@@ -146,8 +135,7 @@ bool RawSocketPcapFile::sendReplyFrame( Frame &frame,
         da.value[0] &= 0xfe;
     }
     PcapFilePacket packet;
-    packet.resize( frame.getLength() + len1 + len2
-                   - JDKSAVDECC_FRAME_HEADER_LEN );
+    packet.resize( frame.getLength() + len1 + len2 - JDKSAVDECC_FRAME_HEADER_LEN );
     for ( size_t i = JDKSAVDECC_FRAME_HEADER_LEN; i < frame.getLength(); ++i )
     {
         packet.push_back( frame.getOctet( i ) );
@@ -167,8 +155,7 @@ bool RawSocketPcapFile::sendReplyFrame( Frame &frame,
         }
     }
 
-    m_pcap_file_writer.WritePacket(
-        m_current_time * 1000, da.value, sa.value, m_ethertype, packet );
+    m_pcap_file_writer.WritePacket( m_current_time * 1000, da.value, sa.value, m_ethertype, packet );
     return true;
 }
 
@@ -187,19 +174,15 @@ bool RawSocketPcapFile::readNextIncomingFrame()
     uint64_t timestamp_in_microseconds = 0;
     PcapFilePacket frame_data;
     // try read the pcap file
-    if ( m_pcap_file_reader.ReadPacket( &timestamp_in_microseconds,
-                                        frame_data ) )
+    if ( m_pcap_file_reader.ReadPacket( &timestamp_in_microseconds, frame_data ) )
     {
         // we got a frame fromt he file, does it fit?
         if ( frame_data.size() <= m_next_incoming_frame.getMaxLength() )
         {
             // yes, so copy the frame into the next incoming frame buffer and
             // track the time
-            m_next_incoming_frame.setTimeInMilliseconds(
-                timestamp_in_microseconds / 1000 );
-            memcpy( m_next_incoming_frame.getBuf(),
-                    &frame_data[0],
-                    m_next_incoming_frame.getMaxLength() );
+            m_next_incoming_frame.setTimeInMilliseconds( timestamp_in_microseconds / 1000 );
+            memcpy( m_next_incoming_frame.getBuf(), &frame_data[0], m_next_incoming_frame.getMaxLength() );
 
             // make sure it is an ethertype that we care about
             if ( m_next_incoming_frame.getEtherType() == m_ethertype )

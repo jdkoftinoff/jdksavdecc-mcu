@@ -34,8 +34,7 @@
 #include "JDKSAvdeccMCU/Frame.hpp"
 
 #define JDKSAVDECCMCU_RAWSOCKET_MIN_PAYLOAD_LENGTH ( 64 )
-#define JDKSAVDECCMCU_RAWSOCKET_MIN_FRAME_LENGTH                               \
-    ( JDKSAVDECC_FRAME_HEADER_LEN + JDKSAVDECCMCU_RAWSOCKET_MIN_PAYLOAD_LENGTH )
+#define JDKSAVDECCMCU_RAWSOCKET_MIN_FRAME_LENGTH ( JDKSAVDECC_FRAME_HEADER_LEN + JDKSAVDECCMCU_RAWSOCKET_MIN_PAYLOAD_LENGTH )
 
 namespace JDKSAvdeccMCU
 {
@@ -55,17 +54,13 @@ class RawSocket
 
     virtual bool recvFrame( Frame *frame ) = 0;
 
-    virtual bool sendFrame( Frame const &frame,
-                            uint8_t const *data1 = 0,
-                            uint16_t len1 = 0,
-                            uint8_t const *data2 = 0,
-                            uint16_t len2 = 0 ) = 0;
+    virtual bool
+        sendFrame( Frame const &frame, uint8_t const *data1 = 0, uint16_t len1 = 0, uint8_t const *data2 = 0, uint16_t len2 = 0 )
+        = 0;
 
-    virtual bool sendReplyFrame( Frame &frame,
-                                 uint8_t const *data1 = 0,
-                                 uint16_t len1 = 0,
-                                 uint8_t const *data2 = 0,
-                                 uint16_t len2 = 0 ) = 0;
+    virtual bool
+        sendReplyFrame( Frame &frame, uint8_t const *data1 = 0, uint16_t len1 = 0, uint8_t const *data2 = 0, uint16_t len2 = 0 )
+        = 0;
 
     /**
     * Attempt to join an additional multicast mac address group

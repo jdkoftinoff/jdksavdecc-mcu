@@ -35,11 +35,8 @@
 namespace JDKSAvdeccMCU
 {
 
-Control::Control( Entity &entity,
-                  uint16_t descriptor_index,
-                  Eui64 control_type,
-                  uint16_t control_value_type,
-                  ControlValueHolder *holder )
+Control::Control(
+    Entity &entity, uint16_t descriptor_index, Eui64 control_type, uint16_t control_value_type, ControlValueHolder *holder )
     : m_entity( entity )
     , m_descriptor_index( descriptor_index )
     , m_control_type( control_type )
@@ -48,10 +45,7 @@ Control::Control( Entity &entity,
 {
 }
 
-void Control::tick( jdksavdecc_timestamp_in_milliseconds time_in_millis )
-{
-    (void)time_in_millis;
-}
+void Control::tick( jdksavdecc_timestamp_in_milliseconds time_in_millis ) { (void)time_in_millis; }
 
 bool Control::receivedPDU( RawSocket *incoming_socket, Frame &frame )
 {
@@ -123,8 +117,7 @@ uint8_t Control::formControlValueMetaData( Frame &pdu )
 
 uint8_t Control::formControlPayload( Frame &pdu )
 {
-    pdu.putBuf( getControlValueHolder()->getBuf(),
-                getControlValueHolder()->getLength() );
+    pdu.putBuf( getControlValueHolder()->getBuf(), getControlValueHolder()->getLength() );
     return JDKSAVDECC_AECP_STATUS_SUCCESS;
 }
 
