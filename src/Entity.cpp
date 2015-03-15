@@ -37,7 +37,12 @@
 namespace JDKSAvdeccMCU
 {
 
-Entity::Entity( ADPManager &adp_manager, RegisteredControllers *registered_controllers, EntityState *entity_state )
+Entity::Entity( ADPManager &adp_manager,
+                RegisteredControllers *registered_controllers,
+                EntityState *entity_state,
+                ACMPControllerGroupHandlerBase *acmp_controller_group_handler,
+                ACMPTalkerGroupHandlerBase *acmp_talker_group_handler,
+                ACMPListenerGroupHandlerBase *acmp_listener_group_handler )
     : m_adp_manager( adp_manager )
     , m_outgoing_sequence_id( 0 )
     , m_acquire_in_progress_time( 0 )
@@ -46,14 +51,17 @@ Entity::Entity( ADPManager &adp_manager, RegisteredControllers *registered_contr
     , m_last_sent_command_time( 0 )
     , m_last_sent_command_type( JDKSAVDECC_AEM_COMMAND_EXPANSION )
     , m_entity_state( entity_state )
+    , m_acmp_controller_group_handler( acmp_controller_group_handler )
+    , m_acmp_talker_group_handler( acmp_talker_group_handler )
+    , m_acmp_listener_group_handler( acmp_listener_group_handler )
 {
     // clear info on sent command state
-    m_last_sent_command_target_entity_id = Eui64();
+    m_last_sent_command_target_entity_id.clear();
     // clear info on acquired state
-    m_acquired_by_controller_entity_id = Eui64();
-    m_acquire_in_progress_by_controller_entity_id = Eui64();
-    m_locked_by_controller_entity_id = Eui64();
-    m_acquired_by_controller_mac_address = Eui48();
+    m_acquired_by_controller_entity_id.clear();
+    m_acquire_in_progress_by_controller_entity_id.clear();
+    m_locked_by_controller_entity_id.clear();
+    m_acquired_by_controller_mac_address.clear();
 }
 
 void Entity::tick( jdksavdecc_timestamp_in_milliseconds time_in_millis )
@@ -64,7 +72,7 @@ void Entity::tick( jdksavdecc_timestamp_in_milliseconds time_in_millis )
     {
         if ( wasTimeOutHit( time_in_millis, m_locked_time, JDKSAVDECC_AEM_LOCK_TIMEOUT_MS ) )
         {
-            m_locked_by_controller_entity_id = Eui64();
+            m_locked_by_controller_entity_id.clear();
         }
     }
 
@@ -98,6 +106,22 @@ void Entity::tick( jdksavdecc_timestamp_in_milliseconds time_in_millis )
             commandTimedOut( m_last_sent_command_target_entity_id, cmd, m_outgoing_sequence_id );
         }
     }
+
+    // Run periodic state machine events for ACMP Controller
+    if ( m_acmp_controller_group_handler )
+    {
+        m_acmp_controller_group_handler->tick( time_in_millis );
+    }
+    // Run periodic state machine events for ACMP Talker
+    if ( m_acmp_talker_group_handler )
+    {
+        m_acmp_talker_group_handler->tick( time_in_millis );
+    }
+    // Run periodic state machine events for ACMP Listener
+    if ( m_acmp_listener_group_handler )
+    {
+        m_acmp_listener_group_handler->tick( time_in_millis );
+    }
 }
 
 void Entity::commandTimedOut( Eui64 const &target_entity_id, uint16_t command_type, uint16_t sequence_id )
@@ -126,7 +150,7 @@ bool Entity::receivedPDU( RawSocket *incoming_socket, Frame &frame )
         {
             if ( isAEMForTarget( aem, getEntityID() ) )
             {
-                status_code = receivedAEMCommand( aem, frame );
+                status_code = receivedAEMCommand( incoming_socket, aem, frame );
                 r = true;
             }
         }
@@ -142,7 +166,7 @@ bool Entity::receivedPDU( RawSocket *incoming_socket, Frame &frame )
             // Yes, is it a command to read/write data?
             if ( isAAForTarget( aa, getEntityID() ) )
             {
-                status_code = receivedAACommand( aa, frame );
+                status_code = receivedAACommand( incoming_socket, aa, frame );
                 r = true;
             }
         }
@@ -157,7 +181,7 @@ bool Entity::receivedPDU( RawSocket *incoming_socket, Frame &frame )
         {
             if ( isACMPInvolvingTarget( acmpdu, getEntityID() ) )
             {
-                status_code = receivedACMPMessage( acmpdu, frame );
+                status_code = receivedACMPMessage( incoming_socket, acmpdu, frame );
                 r = true;
             }
         }
@@ -168,7 +192,7 @@ bool Entity::receivedPDU( RawSocket *incoming_socket, Frame &frame )
     return r;
 }
 
-uint8_t Entity::receivedAEMCommand( jdksavdecc_aecpdu_aem const &aem, Frame &pdu )
+uint8_t Entity::receivedAEMCommand( RawSocket *incoming_socket, jdksavdecc_aecpdu_aem const &aem, Frame &pdu )
 {
     // The low 15 bits of command_type is the command. High bit is the 'u' bit.
     uint16_t actual_command_type = aem.command_type & 0x7fff;
@@ -332,7 +356,7 @@ uint8_t Entity::validatePermissions( jdksavdecc_aecpdu_aem const &aem )
     return response_status;
 }
 
-uint8_t Entity::receivedAACommand( jdksavdecc_aecp_aa const &aa, Frame &pdu )
+uint8_t Entity::receivedAACommand( RawSocket *incoming_socket, jdksavdecc_aecp_aa const &aa, Frame &pdu )
 {
     // Yes go through the TLV's and dispatch the read/writes and respond
     uint8_t *p = pdu.getBuf() + JDKSAVDECC_FRAME_HEADER_LEN + JDKSAVDECC_AECPDU_AA_LEN;
@@ -390,11 +414,42 @@ uint8_t Entity::receivedAACommand( jdksavdecc_aecp_aa const &aa, Frame &pdu )
     return aa_status;
 }
 
-uint8_t Entity::receivedACMPMessage( const jdksavdecc_acmpdu &acmpdu, Frame &pdu )
+uint8_t Entity::receivedACMPMessage( RawSocket *incoming_socket, const jdksavdecc_acmpdu &acmpdu, Frame &pdu )
 {
-    (void)acmpdu;
-    (void)pdu;
-    return JDKSAVDECC_ACMP_STATUS_NOT_SUPPORTED;
+    uint8_t status = JDKSAVDECC_ACMP_STATUS_NOT_SUPPORTED;
+
+    if ( m_acmp_controller_group_handler && acmpdu.controller_entity_id == getEntityID() )
+    {
+        if ( acmpdu.header.message_type == JDKSAVDECC_ACMP_MESSAGE_TYPE_CONNECT_RX_RESPONSE
+             || acmpdu.header.message_type == JDKSAVDECC_ACMP_MESSAGE_TYPE_CONNECT_TX_RESPONSE
+             || acmpdu.header.message_type == JDKSAVDECC_ACMP_MESSAGE_TYPE_DISCONNECT_RX_RESPONSE
+             || acmpdu.header.message_type == JDKSAVDECC_ACMP_MESSAGE_TYPE_GET_RX_STATE_RESPONSE
+             || acmpdu.header.message_type == JDKSAVDECC_ACMP_MESSAGE_TYPE_GET_TX_CONNECTION_RESPONSE
+             || acmpdu.header.message_type == JDKSAVDECC_ACMP_MESSAGE_TYPE_GET_TX_STATE_RESPONSE )
+        {
+            status = m_acmp_controller_group_handler->receivedACMPDU( incoming_socket, acmpdu, pdu );
+        }
+    }
+    if ( m_acmp_talker_group_handler && acmpdu.talker_entity_id == getEntityID() )
+    {
+        if ( acmpdu.header.message_type == JDKSAVDECC_ACMP_MESSAGE_TYPE_CONNECT_TX_COMMAND
+             || acmpdu.header.message_type == JDKSAVDECC_ACMP_MESSAGE_TYPE_GET_TX_CONNECTION_COMMAND
+             || acmpdu.header.message_type == JDKSAVDECC_ACMP_MESSAGE_TYPE_GET_TX_STATE_COMMAND )
+        {
+            status = m_acmp_talker_group_handler->receivedACMPDU( incoming_socket, acmpdu, pdu );
+        }
+    }
+    if ( m_acmp_listener_group_handler && acmpdu.listener_entity_id == getEntityID() )
+    {
+        if ( acmpdu.header.message_type == JDKSAVDECC_ACMP_MESSAGE_TYPE_CONNECT_RX_COMMAND
+             || acmpdu.header.message_type == JDKSAVDECC_ACMP_MESSAGE_TYPE_DISCONNECT_RX_COMMAND
+             || acmpdu.header.message_type == JDKSAVDECC_ACMP_MESSAGE_TYPE_GET_RX_STATE_COMMAND )
+        {
+            status = m_acmp_listener_group_handler->receivedACMPDU( incoming_socket, acmpdu, pdu );
+        }
+    }
+
+    return status;
 }
 
 void Entity::sendResponses( bool internally_generated,
@@ -440,9 +495,11 @@ void Entity::sendResponses( bool internally_generated,
         {
             RegisteredController const *controller = m_registered_controllers->getController( i );
 
-            // and don't send the original requesting controller a double
+            // don't send the original requesting controller a double
             // response
-            if ( original_controller_id != controller->m_entity_id )
+            // and skip sending a second message to the acquiring controller even it if also registered explicitely
+            if ( original_controller_id != controller->m_entity_id
+                 && controller->m_entity_id != m_acquired_by_controller_entity_id )
             {
                 // Set the controller_entity_id in the frame
 
@@ -456,6 +513,17 @@ void Entity::sendResponses( bool internally_generated,
                 getRawSocket().sendFrame(
                     pdu, additional_data1, additional_data_length1, additional_data2, additional_data_length2 );
             }
+        }
+
+        // If the message is internally generated, also send it to the controller that acquired the entity
+        if ( internally_generated && m_acquired_by_controller_entity_id.isSet() )
+        {
+            m_acquired_by_controller_entity_id.store(
+                pdu.getBuf(), JDKSAVDECC_FRAME_HEADER_LEN + JDKSAVDECC_AECPDU_COMMON_OFFSET_CONTROLLER_ENTITY_ID );
+            pdu.setDA( m_acquired_by_controller_mac_address );
+
+            // Send the frame to that controller
+            getRawSocket().sendFrame( pdu, additional_data1, additional_data_length1, additional_data2, additional_data_length2 );
         }
     }
 }
@@ -693,17 +761,21 @@ bool Entity::receiveControllerAvailableResponse( jdksavdecc_aecpdu_aem const &ae
 
 uint8_t Entity::receiveRegisterUnsolicitedNotificationCommand( jdksavdecc_aecpdu_aem const &aem, Frame &pdu )
 {
-    (void)aem;
-    (void)pdu;
-
-    return JDKSAVDECC_AECP_STATUS_NOT_IMPLEMENTED;
+    uint8_t status = JDKSAVDECC_AEM_STATUS_NO_RESOURCES;
+    bool registered = m_registered_controllers->addController( aem.aecpdu_header.controller_entity_id, pdu.getSA() );
+    if ( registered )
+    {
+        status = JDKSAVDECC_AECP_STATUS_SUCCESS;
+    }
+    return status;
 }
 
 uint8_t Entity::receiveDeRegisterUnsolicitedNotificationCommand( jdksavdecc_aecpdu_aem const &aem, Frame &pdu )
 {
-    (void)aem;
-    (void)pdu;
+    uint8_t status = JDKSAVDECC_AECP_STATUS_SUCCESS;
 
-    return JDKSAVDECC_AECP_STATUS_NOT_IMPLEMENTED;
+    m_registered_controllers->removeController( aem.aecpdu_header.controller_entity_id );
+
+    return status;
 }
 }

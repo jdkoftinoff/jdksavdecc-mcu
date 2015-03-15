@@ -47,12 +47,7 @@ bool ControllerEntity::receivedPDU( RawSocket *incoming_socket, Frame &frame )
     jdksavdecc_aecpdu_aem aem;
     if ( parseAEM( &aem, frame ) )
     {
-        if ( isAEMForTarget( aem, getEntityID() ) )
-        {
-            receivedAEMCommand( aem, frame );
-            r = true;
-        }
-        else if ( isAEMForController( aem, getEntityID() ) )
+        if ( isAEMForController( aem, getEntityID() ) )
         {
             r = receivedAEMResponse( aem, frame );
         }
@@ -61,19 +56,7 @@ bool ControllerEntity::receivedPDU( RawSocket *incoming_socket, Frame &frame )
 
     if ( !done )
     {
-        // Try see if it is an Address Access message
-        jdksavdecc_aecp_aa aa;
-        memset( &aa, 0, sizeof( aa ) );
-        if ( parseAA( &aa, frame ) )
-        {
-            // Yes, is it a command to read/write data?
-            if ( isAAForTarget( aa, getEntityID() ) )
-            {
-                receivedAACommand( aa, frame );
-                r = true;
-                // TODO: fill in response code in PDU and send reply
-            }
-        }
+        r = Entity::receivedPDU( incoming_socket, frame );
     }
 
     return r;

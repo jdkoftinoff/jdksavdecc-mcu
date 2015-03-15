@@ -44,14 +44,15 @@ void ACMPTalkerHandlerBase::tick( Entity *entity,
 {
 }
 
-bool ACMPTalkerHandlerBase::receivedACMPDU( Entity *entity, uint16_t unique_id, ACMPTalkerEvents *eventTarget, Frame &frame ) {}
+uint8_t ACMPTalkerHandlerBase::receivedACMPDU( Entity *entity, uint16_t unique_id, ACMPTalkerEvents *eventTarget, Frame &frame ) {}
 
 void ACMPTalkerHandlerBase::packListeners() {}
 
 void ACMPTalkerGroupHandlerBase::tick( jdksavdecc_timestamp_in_milliseconds timestamp ) {}
 
-bool ACMPTalkerGroupHandlerBase::receivedPDU( RawSocket *incoming_socket,
-                                              Frame &frame )
+uint8_t ACMPTalkerGroupHandlerBase::receivedACMPDU( RawSocket *incoming_socket,
+                                                    const jdksavdecc_acmpdu &acmpdu,
+                                                    Frame &frame )
 {
 }
 }
