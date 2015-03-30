@@ -65,79 +65,79 @@ class TestApsStateMachine;
 class TestApcStateMachine : public ApcStateMachine
 {
   public:
-    class TestStates : public States
+    class TestStates : public ApcStates
     {
       protected:
         virtual void goToInitialize()
         {
             std::cout << "APC: INITIALIZE" << std::endl;
-            States::goToInitialize();
+            ApcStates::goToInitialize();
         }
 
         virtual void goToWaitForConnect()
         {
             std::cout << "APC: WAIT_FOR_CONNECT" << std::endl;
-            States::goToWaitForConnect();
+            ApcStates::goToWaitForConnect();
         }
 
         virtual void goToConnected()
         {
             std::cout << "APC: CONNECTED" << std::endl;
-            States::goToConnected();
+            ApcStates::goToConnected();
         }
 
         virtual void goToStartTransfer()
         {
             std::cout << "APC: START_TRANSFER" << std::endl;
-            States::goToStartTransfer();
+            ApcStates::goToStartTransfer();
         }
 
         virtual void goToWaiting()
         {
             std::cout << "APC: WAITING" << std::endl;
-            States::goToWaiting();
+            ApcStates::goToWaiting();
         }
 
         virtual void goToClosed()
         {
             std::cout << "APC: CLOSED" << std::endl;
-            States::goToClosed();
+            ApcStates::goToClosed();
         }
 
         virtual void goToLinkStatus()
         {
             std::cout << "APC: LINK_STATUS" << std::endl;
-            States::goToLinkStatus();
+            ApcStates::goToLinkStatus();
         }
 
         virtual void goToReceiveMsg()
         {
             std::cout << "APC: RECEIVE_MSG" << std::endl;
-            States::goToReceiveMsg();
+            ApcStates::goToReceiveMsg();
         }
 
         virtual void goToSendMsg()
         {
             std::cout << "APC: SEND_MSG" << std::endl;
-            States::goToSendMsg();
+            ApcStates::goToSendMsg();
         }
 
         virtual void goToEntityIdAssigned()
         {
             std::cout << "APC: ENTITY_ID_ASSIGNED" << std::endl;
-            States::goToEntityIdAssigned();
+            ApcStates::goToEntityIdAssigned();
         }
 
         virtual void goToSendNop()
         {
             std::cout << "APC: SEND_NOP" << std::endl;
-            States::goToSendNop();
+            ApcStates::goToSendNop();
         }
 
         virtual void goToFinish()
         {
             std::cout << "APC: FINISH" << std::endl;
-            States::goToFinish();
+            ApcStates::goToFinish();
         }
     };
 
@@ -202,10 +202,10 @@ class TestApcStateMachine : public ApcStateMachine
         m_server->onIncomingTcpData( data, len );
     }
 
-    StateVariables m_test_variables;
-    StateActions m_test_actions;
+    ApcStateVariables m_test_variables;
+    ApcStateActions m_test_actions;
     TestStates m_test_states;
-    StateEvents m_test_events;
+    ApcStateEvents m_test_events;
 
     HttpClientParserSimple m_http_parser_simple;
     HttpResponse m_http_response;

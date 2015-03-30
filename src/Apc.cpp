@@ -35,10 +35,10 @@
 namespace JDKSAvdeccMCU
 {
 
-ApcStateMachine::ApcStateMachine( ApcStateMachine::StateVariables *variables,
-                                  ApcStateMachine::StateActions *actions,
-                                  ApcStateMachine::StateEvents *events,
-                                  ApcStateMachine::States *states )
+ApcStateMachine::ApcStateMachine( ApcStateVariables *variables,
+                                  ApcStateActions *actions,
+                                  ApcStateEvents *events,
+                                  ApcStates *states )
     : m_variables( variables ), m_actions( actions ), m_events( events ), m_states( states )
 {
 }
@@ -54,6 +54,8 @@ void ApcStateMachine::setEntityId( const Eui64 entity_id )
     getVariables()->m_newId = entity_id;
     getVariables()->m_entityId = entity_id;
 }
+
+Eui64 ApcStateMachine::getEntityId() const { return getVariables()->m_newId; }
 
 void ApcStateMachine::setApsAddress( const std::string &addr ) { getVariables()->m_addr = addr; }
 
@@ -101,27 +103,27 @@ void ApcStateMachine::clear()
     m_states->clear();
 }
 
-void ApcStateMachine::StateEvents::clear()
+void ApcStateEvents::clear()
 {
     m_in_http = true;
     m_http_parser->clear();
     m_app_parser.clear();
 }
 
-void ApcStateMachine::StateEvents::onIncomingTcpConnection()
+void ApcStateEvents::onIncomingTcpConnection()
 {
     m_in_http = true;
     m_http_parser->clear();
     getVariables()->m_tcpConnected = true;
 }
 
-void ApcStateMachine::StateEvents::onTcpConnectionClosed()
+void ApcStateEvents::onTcpConnectionClosed()
 {
     clear();
     getVariables()->m_incomingTcpClosed = true;
 }
 
-ssize_t ApcStateMachine::StateEvents::onIncomingTcpData( const uint8_t *data, ssize_t len )
+ssize_t ApcStateEvents::onIncomingTcpData( const uint8_t *data, ssize_t len )
 {
     ssize_t r = -1;
     if ( m_in_http )
@@ -149,23 +151,23 @@ ssize_t ApcStateMachine::StateEvents::onIncomingTcpData( const uint8_t *data, ss
     return r;
 }
 
-void ApcStateMachine::StateEvents::onNetAvdeccMessageReceived( const Frame &frame )
+void ApcStateEvents::onNetAvdeccMessageReceived( const Frame &frame )
 {
     getVariables()->m_apcMsg.clear();
     getVariables()->m_apcMsg.setAvdeccFromApc( frame );
     getVariables()->m_apcMsgOut = true;
 }
 
-void ApcStateMachine::StateEvents::onTimeTick( uint32_t time_in_seconds ) { getVariables()->m_currentTime = time_in_seconds; }
+void ApcStateEvents::onTimeTick( uint32_t time_in_seconds ) { getVariables()->m_currentTime = time_in_seconds; }
 
-void ApcStateMachine::StateEvents::sendTcpData( const uint8_t *data, ssize_t len ) { getOwner()->sendTcpData( data, len ); }
+void ApcStateEvents::sendTcpData( const uint8_t *data, ssize_t len ) { getOwner()->sendTcpData( data, len ); }
 
-ssize_t ApcStateMachine::StateEvents::onIncomingTcpHttpData( const uint8_t *data, ssize_t len )
+ssize_t ApcStateEvents::onIncomingTcpHttpData( const uint8_t *data, ssize_t len )
 {
     return m_http_parser->onIncomingHttpData( data, len );
 }
 
-bool ApcStateMachine::StateEvents::onIncomingHttpResponse( const HttpResponse &request )
+bool ApcStateEvents::onIncomingHttpResponse( const HttpResponse &request )
 {
     bool r = false;
     if ( request.m_status_code == "200" )
@@ -178,7 +180,7 @@ bool ApcStateMachine::StateEvents::onIncomingHttpResponse( const HttpResponse &r
     return r;
 }
 
-ssize_t ApcStateMachine::StateEvents::onIncomingTcpAppData( const uint8_t *data, ssize_t len )
+ssize_t ApcStateEvents::onIncomingTcpAppData( const uint8_t *data, ssize_t len )
 {
     ssize_t r = 0;
 
@@ -190,75 +192,75 @@ ssize_t ApcStateMachine::StateEvents::onIncomingTcpAppData( const uint8_t *data,
     return r;
 }
 
-void ApcStateMachine::StateEvents::onAppNop( const AppMessage &msg )
+void ApcStateEvents::onAppNop( const AppMessage &msg )
 {
     // Do nothing
 }
 
-void ApcStateMachine::StateEvents::onAppEntityIdRequest( const AppMessage &msg )
+void ApcStateEvents::onAppEntityIdRequest( const AppMessage &msg )
 {
     // Do nothing
 }
 
-void ApcStateMachine::StateEvents::onAppEntityIdResponse( const AppMessage &msg )
+void ApcStateEvents::onAppEntityIdResponse( const AppMessage &msg )
 {
     getVariables()->m_newId = msg.getEntityIdResponseEntityId();
     getVariables()->m_idAssigned = true;
 }
 
-void ApcStateMachine::StateEvents::onAppLinkUp( const AppMessage &msg )
+void ApcStateEvents::onAppLinkUp( const AppMessage &msg )
 {
     getVariables()->m_linkMsg = msg;
     getVariables()->m_linkStatusMsg = true;
 }
 
-void ApcStateMachine::StateEvents::onAppLinkDown( const AppMessage &msg )
+void ApcStateEvents::onAppLinkDown( const AppMessage &msg )
 {
     getVariables()->m_linkMsg = msg;
     getVariables()->m_linkStatusMsg = true;
 }
 
-void ApcStateMachine::StateEvents::onAppAvdeccFromAps( const AppMessage &msg )
+void ApcStateEvents::onAppAvdeccFromAps( const AppMessage &msg )
 {
     getVariables()->m_apsMsg = msg;
     getVariables()->m_apsMsgIn = true;
 }
 
-void ApcStateMachine::StateEvents::onAppAvdeccFromApc( const AppMessage &msg )
+void ApcStateEvents::onAppAvdeccFromApc( const AppMessage &msg )
 {
     // Do nothing
 }
 
-void ApcStateMachine::StateEvents::onAppVendor( const AppMessage &msg )
+void ApcStateEvents::onAppVendor( const AppMessage &msg )
 {
     // Do nothing
 }
 
-void ApcStateMachine::StateEvents::onAppUnknown( const AppMessage &msg )
+void ApcStateEvents::onAppUnknown( const AppMessage &msg )
 {
     // Do nothing
 }
 
-void ApcStateMachine::StateActions::clear()
+void ApcStateActions::clear()
 {
     // Do nothing
 }
 
-void ApcStateMachine::StateActions::closeTcpConnection() { getOwner()->closeTcpConnection(); }
+void ApcStateActions::closeTcpConnection() { getOwner()->closeTcpConnection(); }
 
-void ApcStateMachine::StateActions::connectToProxy( const std::string &addr ) { getOwner()->connectToProxy( addr ); }
+void ApcStateActions::connectToProxy( const std::string &addr ) { getOwner()->connectToProxy( addr ); }
 
-void ApcStateMachine::StateActions::notifyProxyAvailable() { getOwner()->notifyProxyAvailable(); }
+void ApcStateActions::notifyProxyAvailable() { getOwner()->notifyProxyAvailable(); }
 
-void ApcStateMachine::StateActions::notifyProxyUnavailable() { getOwner()->notifyProxyUnavailable(); }
+void ApcStateActions::notifyProxyUnavailable() { getOwner()->notifyProxyUnavailable(); }
 
-void ApcStateMachine::StateActions::notifyLinkStatus( const AppMessage &linkMsg ) { getOwner()->notifyLinkStatus( linkMsg ); }
+void ApcStateActions::notifyLinkStatus( const AppMessage &linkMsg ) { getOwner()->notifyLinkStatus( linkMsg ); }
 
-void ApcStateMachine::StateActions::processMsg( const AppMessage &apsMsg ) { getOwner()->processMsg( apsMsg ); }
+void ApcStateActions::processMsg( const AppMessage &apsMsg ) { getOwner()->processMsg( apsMsg ); }
 
-void ApcStateMachine::StateActions::notifyNewEntityId( const Eui64 &entity_id ) { getOwner()->notifyNewEntityId( entity_id ); }
+void ApcStateActions::notifyNewEntityId( const Eui64 &entity_id ) { getOwner()->notifyNewEntityId( entity_id ); }
 
-void ApcStateMachine::StateActions::initialize()
+void ApcStateActions::initialize()
 {
     getVariables()->m_apcMsgOut = false;
     getVariables()->m_apsMsgIn = false;
@@ -271,7 +273,7 @@ void ApcStateMachine::StateActions::initialize()
     getVariables()->m_tcpConnected = false;
 }
 
-void ApcStateMachine::StateActions::sendIdRequest( const Eui48 &primaryMac, const Eui64 &entity_id )
+void ApcStateActions::sendIdRequest( const Eui48 &primaryMac, const Eui64 &entity_id )
 {
     AppMessage outmsg;
     getVariables()->m_primaryMac = primaryMac;
@@ -281,14 +283,14 @@ void ApcStateMachine::StateActions::sendIdRequest( const Eui48 &primaryMac, cons
     sendMsgToAps( outmsg );
 }
 
-void ApcStateMachine::StateActions::sendHttpRequest( const HttpRequest &request )
+void ApcStateActions::sendHttpRequest( const HttpRequest &request )
 {
     std::string buf;
     request.flatten( &buf );
     getEvents()->sendTcpData( reinterpret_cast<const uint8_t *>( buf.data() ), buf.length() );
 }
 
-void ApcStateMachine::StateActions::sendMsgToAps( const AppMessage &apcMsg )
+void ApcStateActions::sendMsgToAps( const AppMessage &apcMsg )
 {
     FixedBufferWithSize<1500> msg_as_octets;
     if ( apcMsg.store( &msg_as_octets ) )
@@ -297,19 +299,19 @@ void ApcStateMachine::StateActions::sendMsgToAps( const AppMessage &apcMsg )
     }
 }
 
-void ApcStateMachine::StateActions::sendNopToAps()
+void ApcStateActions::sendNopToAps()
 {
     AppMessage msg;
     msg.setNOP();
     sendMsgToAps( msg );
 }
 
-ApcStateMachine::StateVariables::~StateVariables()
+ApcStateVariables::~ApcStateVariables()
 {
     // Do nothing
 }
 
-void ApcStateMachine::StateVariables::clear()
+void ApcStateVariables::clear()
 {
     m_addr.clear();
     m_request.clear();
@@ -332,9 +334,9 @@ void ApcStateMachine::StateVariables::clear()
     m_tcpConnected = false;
 }
 
-void ApcStateMachine::States::clear() { m_current_state = &States::doBegin; }
+void ApcStates::clear() { m_current_state = &ApcStates::doBegin; }
 
-bool ApcStateMachine::States::run()
+bool ApcStates::run()
 {
     bool r = false;
 
@@ -360,20 +362,20 @@ bool ApcStateMachine::States::run()
     return r;
 }
 
-void ApcStateMachine::States::doBegin() { goToInitialize(); }
+void ApcStates::doBegin() { goToInitialize(); }
 
-void ApcStateMachine::States::goToInitialize()
+void ApcStates::goToInitialize()
 {
-    m_current_state = &States::doInitialize;
+    m_current_state = &ApcStates::doInitialize;
     getActions()->initialize();
     getActions()->connectToProxy( getVariables()->m_addr );
 }
 
-void ApcStateMachine::States::doInitialize() { goToWaitForConnect(); }
+void ApcStates::doInitialize() { goToWaitForConnect(); }
 
-void ApcStateMachine::States::goToWaitForConnect() { m_current_state = &States::doWaitForConnect; }
+void ApcStates::goToWaitForConnect() { m_current_state = &ApcStates::doWaitForConnect; }
 
-void ApcStateMachine::States::doWaitForConnect()
+void ApcStates::doWaitForConnect()
 {
     if ( getVariables()->m_finished )
     {
@@ -385,16 +387,16 @@ void ApcStateMachine::States::doWaitForConnect()
     }
 }
 
-void ApcStateMachine::States::goToConnected()
+void ApcStates::goToConnected()
 {
-    m_current_state = &States::doConnected;
+    m_current_state = &ApcStates::doConnected;
 
     getVariables()->m_responseValid = false;
     getVariables()->m_responseReceived = false;
     getActions()->sendHttpRequest( getVariables()->m_request );
 }
 
-void ApcStateMachine::States::doConnected()
+void ApcStates::doConnected()
 {
     if ( getVariables()->m_responseReceived && getVariables()->m_responseValid == false )
     {
@@ -406,18 +408,18 @@ void ApcStateMachine::States::doConnected()
     }
 }
 
-void ApcStateMachine::States::goToStartTransfer()
+void ApcStates::goToStartTransfer()
 {
-    m_current_state = &States::doStartTransfer;
+    m_current_state = &ApcStates::doStartTransfer;
     getActions()->sendIdRequest( getVariables()->m_primaryMac, getVariables()->m_entityId );
     getVariables()->m_nopTimeout = getVariables()->m_currentTime + 10;
 }
 
-void ApcStateMachine::States::doStartTransfer() { goToWaiting(); }
+void ApcStates::doStartTransfer() { goToWaiting(); }
 
-void ApcStateMachine::States::goToWaiting() { m_current_state = &States::doWaiting; }
+void ApcStates::goToWaiting() { m_current_state = &ApcStates::doWaiting; }
 
-void ApcStateMachine::States::doWaiting()
+void ApcStates::doWaiting()
 {
     if ( getVariables()->m_incomingTcpClosed )
     {
@@ -449,42 +451,42 @@ void ApcStateMachine::States::doWaiting()
     }
 }
 
-void ApcStateMachine::States::goToClosed()
+void ApcStates::goToClosed()
 {
-    m_current_state = &States::doClosed;
+    m_current_state = &ApcStates::doClosed;
     getActions()->notifyProxyUnavailable();
 }
 
-void ApcStateMachine::States::doClosed() { goToFinish(); }
+void ApcStates::doClosed() { goToFinish(); }
 
-void ApcStateMachine::States::goToLinkStatus()
+void ApcStates::goToLinkStatus()
 {
-    m_current_state = &States::doLinkStatus;
+    m_current_state = &ApcStates::doLinkStatus;
     getActions()->notifyLinkStatus( getVariables()->m_linkMsg );
     getVariables()->m_nopTimeout = getVariables()->m_currentTime + 10;
     getVariables()->m_linkStatusMsg = false;
 }
 
-void ApcStateMachine::States::doLinkStatus() { goToWaiting(); }
+void ApcStates::doLinkStatus() { goToWaiting(); }
 
-void ApcStateMachine::States::goToReceiveMsg()
+void ApcStates::goToReceiveMsg()
 {
     getActions()->processMsg( getVariables()->m_apsMsg );
     getVariables()->m_apsMsgIn = false;
 }
 
-void ApcStateMachine::States::doReceiveMsg() { goToWaiting(); }
+void ApcStates::doReceiveMsg() { goToWaiting(); }
 
-void ApcStateMachine::States::goToSendMsg()
+void ApcStates::goToSendMsg()
 {
     getActions()->sendMsgToAps( getVariables()->m_apcMsg );
     getVariables()->m_nopTimeout = getVariables()->m_currentTime + 10;
     getVariables()->m_apcMsgOut = false;
 }
 
-void ApcStateMachine::States::doSendMsg() { goToWaiting(); }
+void ApcStates::doSendMsg() { goToWaiting(); }
 
-void ApcStateMachine::States::goToEntityIdAssigned()
+void ApcStates::goToEntityIdAssigned()
 {
     getVariables()->m_entityId = getVariables()->m_newId;
     getActions()->notifyNewEntityId( getVariables()->m_newId );
@@ -493,21 +495,21 @@ void ApcStateMachine::States::goToEntityIdAssigned()
     getVariables()->m_idAssigned = false;
 }
 
-void ApcStateMachine::States::doEntityIdAssigned() { goToWaiting(); }
+void ApcStates::doEntityIdAssigned() { goToWaiting(); }
 
-void ApcStateMachine::States::goToSendNop()
+void ApcStates::goToSendNop()
 {
     getActions()->sendNopToAps();
     getVariables()->m_nopTimeout = getVariables()->m_currentTime + 10;
 }
 
-void ApcStateMachine::States::doSendNop() { goToWaiting(); }
+void ApcStates::doSendNop() { goToWaiting(); }
 
-void ApcStateMachine::States::goToFinish()
+void ApcStates::goToFinish()
 {
-    m_current_state = &States::doFinish;
+    m_current_state = &ApcStates::doFinish;
     getActions()->closeTcpConnection();
 }
 
-void ApcStateMachine::States::doFinish() { m_current_state = 0; }
+void ApcStates::doFinish() { m_current_state = 0; }
 }
