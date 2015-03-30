@@ -216,91 +216,91 @@ class TestApcStateMachine : public ApcStateMachine
 class TestApsStateMachine : public ApsStateMachine
 {
   public:
-    class TestStates : public States
+    class TestStates : public ApsStates
     {
       protected:
         virtual void goToInitialize()
         {
             std::cout << "APS: INITIALIZE" << std::endl;
-            States::goToInitialize();
+            ApsStates::goToInitialize();
         }
 
         virtual void goToWaitForConnect()
         {
             std::cout << "APS: WAIT_FOR_CONNECT" << std::endl;
-            States::goToWaitForConnect();
+            ApsStates::goToWaitForConnect();
         }
 
         virtual void goToAccept()
         {
             std::cout << "APS: ACCEPT" << std::endl;
-            States::goToAccept();
+            ApsStates::goToAccept();
         }
 
         virtual void goToReject()
         {
             std::cout << "APS: REJECT" << std::endl;
-            States::goToReject();
+            ApsStates::goToReject();
         }
 
         virtual void goToClosed()
         {
             std::cout << "APS: CLOSED" << std::endl;
-            States::goToClosed();
+            ApsStates::goToClosed();
         }
 
         virtual void goToStartTransfer()
         {
             std::cout << "APS: START_TRANSFER" << std::endl;
-            States::goToStartTransfer();
+            ApsStates::goToStartTransfer();
         }
 
         virtual void goToWaiting()
         {
             std::cout << "APS: WAITING" << std::endl;
-            States::goToWaiting();
+            ApsStates::goToWaiting();
         }
 
         virtual void goToLinkStatus()
         {
             std::cout << "APS: LINK_STATUS" << std::endl;
-            States::goToLinkStatus();
+            ApsStates::goToLinkStatus();
         }
 
         virtual void goToTransferToL2()
         {
             std::cout << "APS: TRANSFER_TO_L2" << std::endl;
-            States::goToTransferToL2();
+            ApsStates::goToTransferToL2();
         }
 
         virtual void goToTransferToApc()
         {
             std::cout << "APS: TRANSFER_TO_APC" << std::endl;
-            States::goToTransferToApc();
+            ApsStates::goToTransferToApc();
         }
 
         virtual void goToAssignEntityId()
         {
             std::cout << "APS: ASSIGN_ENTITY_ID" << std::endl;
-            States::goToAssignEntityId();
+            ApsStates::goToAssignEntityId();
         }
 
         virtual void goToSendNop()
         {
             std::cout << "APS: SEND_NOP" << std::endl;
-            States::goToSendNop();
+            ApsStates::goToSendNop();
         }
 
         virtual void goToCloseAndFinish()
         {
             std::cout << "APS: CLOSE_AND_FINISH" << std::endl;
-            States::goToCloseAndFinish();
+            ApsStates::goToCloseAndFinish();
         }
 
         virtual void goToFinish()
         {
             std::cout << "APS: FINISH" << std::endl;
-            States::goToFinish();
+            ApsStates::goToFinish();
         }
     };
 
@@ -340,10 +340,10 @@ class TestApsStateMachine : public ApsStateMachine
         m_client->onIncomingTcpData( data, len );
     }
 
-    StateVariables m_test_variables;
-    StateActions m_test_actions;
+    ApsStateVariables m_test_variables;
+    ApsStateActions m_test_actions;
     TestStates m_test_states;
-    StateEvents m_test_events;
+    ApsStateEvents m_test_events;
 
     HttpServerParserSimple m_http_server_parser;
     HttpRequest m_http_server_request;

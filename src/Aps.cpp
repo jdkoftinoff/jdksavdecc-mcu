@@ -35,10 +35,10 @@
 namespace JDKSAvdeccMCU
 {
 
-ApsStateMachine::ApsStateMachine( ApsStateMachine::StateVariables *variables,
-                                  ApsStateMachine::StateActions *actions,
-                                  ApsStateMachine::StateEvents *events,
-                                  ApsStateMachine::States *states,
+ApsStateMachine::ApsStateMachine( ApsStateMachine::ApsStateVariables *variables,
+                                  ApsStateMachine::ApsStateActions *actions,
+                                  ApsStateMachine::ApsStateEvents *events,
+                                  ApsStateMachine::ApsStates *states,
                                   uint16_t &active_entity_id_count,
                                   active_connections_type &active_connections )
     : m_variables( variables )
@@ -59,6 +59,8 @@ void ApsStateMachine::setLinkMac( Eui48 mac )
     getVariables()->m_linkMac = mac;
     getVariables()->m_linkStatus = true;
 }
+
+const Eui48 &JDKSAvdeccMCU::ApsStateMachine::getLinkMac() const { return getVariables()->m_linkMac; }
 
 bool ApsStateMachine::run() { return getStates()->run(); }
 
@@ -124,28 +126,28 @@ void ApsStateMachine::clear()
     m_states->clear();
 }
 
-ApsStateMachine::StateEvents::StateEvents( HttpServerParser *http_parser, std::string path )
+ApsStateMachine::ApsStateEvents::ApsStateEvents( HttpServerParser *http_parser, std::string path )
     : m_owner( 0 ), m_http_parser( http_parser ), m_path( path ), m_app_parser( *this )
 {
 }
 
-void ApsStateMachine::StateEvents::clear()
+void ApsStateMachine::ApsStateEvents::clear()
 {
     m_in_http = true;
     m_http_parser->clear();
     m_app_parser.clear();
 }
 
-void ApsStateMachine::StateEvents::sendTcpData( const uint8_t *data, ssize_t len ) { getOwner()->sendTcpData( data, len ); }
+void ApsStateMachine::ApsStateEvents::sendTcpData( const uint8_t *data, ssize_t len ) { getOwner()->sendTcpData( data, len ); }
 
-void ApsStateMachine::StateEvents::onIncomingTcpConnection()
+void ApsStateMachine::ApsStateEvents::onIncomingTcpConnection()
 {
     getVariables()->m_tcpConnected = true;
     m_in_http = true;
     m_http_parser->clear();
 }
 
-ssize_t ApsStateMachine::StateEvents::onIncomingTcpData( const uint8_t *data, ssize_t len )
+ssize_t ApsStateMachine::ApsStateEvents::onIncomingTcpData( const uint8_t *data, ssize_t len )
 {
     ssize_t r = -1;
     if ( len > 0 )
@@ -179,12 +181,12 @@ ssize_t ApsStateMachine::StateEvents::onIncomingTcpData( const uint8_t *data, ss
     return r;
 }
 
-ssize_t ApsStateMachine::StateEvents::onIncomingTcpHttpData( const uint8_t *data, ssize_t len )
+ssize_t ApsStateMachine::ApsStateEvents::onIncomingTcpHttpData( const uint8_t *data, ssize_t len )
 {
     return m_http_parser->onIncomingHttpData( data, len );
 }
 
-bool ApsStateMachine::StateEvents::onIncomingHttpConnectRequest( const HttpRequest &request )
+bool ApsStateMachine::ApsStateEvents::onIncomingHttpConnectRequest( const HttpRequest &request )
 {
     bool r = false;
     if ( request.m_path == m_path )
@@ -196,7 +198,7 @@ bool ApsStateMachine::StateEvents::onIncomingHttpConnectRequest( const HttpReque
     return r;
 }
 
-ssize_t ApsStateMachine::StateEvents::onIncomingTcpAppData( const uint8_t *data, ssize_t len )
+ssize_t ApsStateMachine::ApsStateEvents::onIncomingTcpAppData( const uint8_t *data, ssize_t len )
 {
     ssize_t r = 0;
 
@@ -208,9 +210,9 @@ ssize_t ApsStateMachine::StateEvents::onIncomingTcpAppData( const uint8_t *data,
     return r;
 }
 
-void ApsStateMachine::StateEvents::onTcpConnectionClosed() { getVariables()->m_incomingTcpClosed = true; }
+void ApsStateMachine::ApsStateEvents::onTcpConnectionClosed() { getVariables()->m_incomingTcpClosed = true; }
 
-void ApsStateMachine::StateEvents::onNetLinkStatusUpdated( Eui48 link_mac, bool link_status )
+void ApsStateMachine::ApsStateEvents::onNetLinkStatusUpdated( Eui48 link_mac, bool link_status )
 {
     if ( getVariables()->m_linkStatus != link_status )
     {
@@ -220,20 +222,20 @@ void ApsStateMachine::StateEvents::onNetLinkStatusUpdated( Eui48 link_mac, bool 
     }
 }
 
-void ApsStateMachine::StateEvents::onNetAvdeccMessageReceived( const Frame &frame )
+void ApsStateMachine::ApsStateEvents::onNetAvdeccMessageReceived( const Frame &frame )
 {
     getVariables()->m_in.setAvdeccFromAps( frame );
     getVariables()->m_L2Msg = true;
 }
 
-void ApsStateMachine::StateEvents::onTimeTick( uint32_t time_in_seconds ) { getVariables()->m_currentTime = time_in_seconds; }
+void ApsStateMachine::ApsStateEvents::onTimeTick( uint32_t time_in_seconds ) { getVariables()->m_currentTime = time_in_seconds; }
 
-void ApsStateMachine::StateEvents::onAppNop( const AppMessage &msg )
+void ApsStateMachine::ApsStateEvents::onAppNop( const AppMessage &msg )
 {
     // Do nothing
 }
 
-void ApsStateMachine::StateEvents::onAppEntityIdRequest( const AppMessage &msg )
+void ApsStateMachine::ApsStateEvents::onAppEntityIdRequest( const AppMessage &msg )
 {
     getVariables()->m_entity_id = msg.getEntityIdRequestEntityId();
     getVariables()->m_assignEntityIdRequest = true;
@@ -241,45 +243,45 @@ void ApsStateMachine::StateEvents::onAppEntityIdRequest( const AppMessage &msg )
     // TODO: assign proper entity_id
 }
 
-void ApsStateMachine::StateEvents::onAppEntityIdResponse( const AppMessage &msg )
+void ApsStateMachine::ApsStateEvents::onAppEntityIdResponse( const AppMessage &msg )
 {
     // Do nothing
 }
 
-void ApsStateMachine::StateEvents::onAppLinkUp( const AppMessage &msg )
+void ApsStateMachine::ApsStateEvents::onAppLinkUp( const AppMessage &msg )
 {
     // Do nothing
 }
 
-void ApsStateMachine::StateEvents::onAppLinkDown( const AppMessage &msg )
+void ApsStateMachine::ApsStateEvents::onAppLinkDown( const AppMessage &msg )
 {
     // Do Nothing
 }
 
-void ApsStateMachine::StateEvents::onAppAvdeccFromAps( const AppMessage &msg )
+void ApsStateMachine::ApsStateEvents::onAppAvdeccFromAps( const AppMessage &msg )
 {
     // Do Nothing
 }
 
-void ApsStateMachine::StateEvents::onAppAvdeccFromApc( const AppMessage &msg )
+void ApsStateMachine::ApsStateEvents::onAppAvdeccFromApc( const AppMessage &msg )
 {
     getVariables()->m_out = msg;
     getVariables()->m_apcMsg = true;
 }
 
-void ApsStateMachine::StateEvents::onAppVendor( const AppMessage &msg )
+void ApsStateMachine::ApsStateEvents::onAppVendor( const AppMessage &msg )
 {
     // Do nothing
 }
 
-void ApsStateMachine::StateEvents::onAppUnknown( const AppMessage &msg )
+void ApsStateMachine::ApsStateEvents::onAppUnknown( const AppMessage &msg )
 {
     // Do nothing
 }
 
-void ApsStateMachine::StateActions::initialize()
+void ApsStateMachine::ApsStateActions::initialize()
 {
-    StateVariables *v = getVariables();
+    ApsStateVariables *v = getVariables();
 
     v->m_apcMsg = false;
     v->m_assignEntityIdRequest = false;
@@ -291,7 +293,7 @@ void ApsStateMachine::StateActions::initialize()
     v->m_tcpConnected = false;
 }
 
-void ApsStateMachine::StateActions::sendHttpResponse( int requestValid )
+void ApsStateMachine::ApsStateActions::sendHttpResponse( int requestValid )
 {
     char statusbuf[16];
     HttpResponse response;
@@ -316,7 +318,7 @@ void ApsStateMachine::StateActions::sendHttpResponse( int requestValid )
     getEvents()->sendTcpData( buf.data(), buf.size() );
 }
 
-void ApsStateMachine::StateActions::sendMsgToApc( const AppMessage &apsMsg )
+void ApsStateMachine::ApsStateActions::sendMsgToApc( const AppMessage &apsMsg )
 {
     FixedBufferWithSize<1500> msg_as_octets;
     if ( apsMsg.store( &msg_as_octets ) )
@@ -325,7 +327,7 @@ void ApsStateMachine::StateActions::sendMsgToApc( const AppMessage &apsMsg )
     }
 }
 
-void ApsStateMachine::StateActions::sendLinkStatus( Eui48 link_mac, bool linkStatus )
+void ApsStateMachine::ApsStateActions::sendLinkStatus( Eui48 link_mac, bool linkStatus )
 {
     AppMessage msg;
     if ( linkStatus )
@@ -339,7 +341,7 @@ void ApsStateMachine::StateActions::sendLinkStatus( Eui48 link_mac, bool linkSta
     sendMsgToApc( msg );
 }
 
-void ApsStateMachine::StateActions::sendAvdeccToL2( const AppMessage *msg )
+void ApsStateMachine::ApsStateActions::sendAvdeccToL2( const AppMessage *msg )
 {
     FrameWithMTU frame( 0, msg->getAddress(), getVariables()->m_linkMac, JDKSAVDECC_AVTP_ETHERTYPE );
 
@@ -347,30 +349,30 @@ void ApsStateMachine::StateActions::sendAvdeccToL2( const AppMessage *msg )
     getOwner()->sendAvdeccToL2( frame );
 }
 
-void ApsStateMachine::StateActions::sendAvdeccToApc( const AppMessage *msg ) { sendMsgToApc( *msg ); }
+void ApsStateMachine::ApsStateActions::sendAvdeccToApc( const AppMessage *msg ) { sendMsgToApc( *msg ); }
 
-void ApsStateMachine::StateActions::sendEntityIdAssignment( Eui48 a, Eui64 entity_id )
+void ApsStateMachine::ApsStateActions::sendEntityIdAssignment( Eui48 a, Eui64 entity_id )
 {
     AppMessage msg;
     msg.setEntityIdResponse( a, getOwner()->assignEntityId( getVariables()->m_linkMac, a, entity_id ) );
     sendMsgToApc( msg );
 }
 
-void ApsStateMachine::StateActions::sendNopToApc()
+void ApsStateMachine::ApsStateActions::sendNopToApc()
 {
     AppMessage msg;
     sendMsgToApc( msg );
 }
 
-void ApsStateMachine::StateActions::closeTcpConnection() { getOwner()->closeTcpConnection(); }
+void ApsStateMachine::ApsStateActions::closeTcpConnection() { getOwner()->closeTcpConnection(); }
 
-void ApsStateMachine::StateActions::closeTcpServer() { getOwner()->closeTcpServer(); }
+void ApsStateMachine::ApsStateActions::closeTcpServer() { getOwner()->closeTcpServer(); }
 
-ApsStateMachine::StateVariables::StateVariables() {}
+ApsStateMachine::ApsStateVariables::ApsStateVariables() {}
 
-ApsStateMachine::StateVariables::~StateVariables() {}
+ApsStateMachine::ApsStateVariables::~ApsStateVariables() {}
 
-void ApsStateMachine::StateVariables::clear()
+void ApsStateMachine::ApsStateVariables::clear()
 {
     m_finished = false;
     m_tcpConnected = false;
@@ -387,9 +389,9 @@ void ApsStateMachine::StateVariables::clear()
     m_in.setNOP();
 }
 
-void ApsStateMachine::States::clear()
+void ApsStateMachine::ApsStates::clear()
 {
-    m_current_state = &States::doBegin;
+    m_current_state = &ApsStates::doBegin;
 
     getVariables()->m_tcpConnected = false;
     getVariables()->m_incomingTcpClosed = false;
@@ -399,7 +401,7 @@ void ApsStateMachine::States::clear()
     getVariables()->m_assignEntityIdRequest = false;
 }
 
-bool ApsStateMachine::States::run()
+bool ApsStateMachine::ApsStates::run()
 {
     bool r = false;
 
@@ -425,24 +427,24 @@ bool ApsStateMachine::States::run()
     return r;
 }
 
-void ApsStateMachine::States::doBegin() { goToInitialize(); }
+void ApsStateMachine::ApsStates::doBegin() { goToInitialize(); }
 
-void ApsStateMachine::States::goToInitialize()
+void ApsStateMachine::ApsStates::goToInitialize()
 {
-    m_current_state = &States::doInitialize;
+    m_current_state = &ApsStates::doInitialize;
     getActions()->initialize();
 }
 
-void ApsStateMachine::States::doInitialize() { goToWaitForConnect(); }
+void ApsStateMachine::ApsStates::doInitialize() { goToWaitForConnect(); }
 
-void ApsStateMachine::States::goToWaitForConnect()
+void ApsStateMachine::ApsStates::goToWaitForConnect()
 {
-    m_current_state = &States::doWaitForConnect;
+    m_current_state = &ApsStates::doWaitForConnect;
     getVariables()->m_tcpConnected = false;
     getVariables()->m_incomingTcpClosed = false;
 }
 
-void ApsStateMachine::States::doWaitForConnect()
+void ApsStateMachine::ApsStates::doWaitForConnect()
 {
     if ( getVariables()->m_finished == true )
     {
@@ -454,13 +456,13 @@ void ApsStateMachine::States::doWaitForConnect()
     }
 }
 
-void ApsStateMachine::States::goToAccept()
+void ApsStateMachine::ApsStates::goToAccept()
 {
-    m_current_state = &States::doAccept;
+    m_current_state = &ApsStates::doAccept;
     getVariables()->m_requestValid = -1;
 }
 
-void ApsStateMachine::States::doAccept()
+void ApsStateMachine::ApsStates::doAccept()
 {
     int requestValid = getVariables()->m_requestValid;
 
@@ -474,25 +476,25 @@ void ApsStateMachine::States::doAccept()
     }
 }
 
-void ApsStateMachine::States::goToReject()
+void ApsStateMachine::ApsStates::goToReject()
 {
-    m_current_state = &States::doReject;
+    m_current_state = &ApsStates::doReject;
     getActions()->sendHttpResponse( getVariables()->m_requestValid );
 }
 
-void ApsStateMachine::States::doReject() { goToClosed(); }
+void ApsStateMachine::ApsStates::doReject() { goToClosed(); }
 
-void ApsStateMachine::States::goToClosed() { m_current_state = &States::doClosed; }
+void ApsStateMachine::ApsStates::goToClosed() { m_current_state = &ApsStates::doClosed; }
 
-void ApsStateMachine::States::doClosed()
+void ApsStateMachine::ApsStates::doClosed()
 {
     getActions()->closeTcpConnection();
     goToWaitForConnect();
 }
 
-void ApsStateMachine::States::goToStartTransfer()
+void ApsStateMachine::ApsStates::goToStartTransfer()
 {
-    m_current_state = &States::doStartTransfer;
+    m_current_state = &ApsStates::doStartTransfer;
 
     getActions()->sendHttpResponse( getVariables()->m_requestValid );
 
@@ -501,11 +503,11 @@ void ApsStateMachine::States::goToStartTransfer()
     getVariables()->m_nopTimeout = getVariables()->m_currentTime + 10;
 }
 
-void ApsStateMachine::States::doStartTransfer() { goToWaiting(); }
+void ApsStateMachine::ApsStates::doStartTransfer() { goToWaiting(); }
 
-void ApsStateMachine::States::goToWaiting() { m_current_state = &States::doWaiting; }
+void ApsStateMachine::ApsStates::goToWaiting() { m_current_state = &ApsStates::doWaiting; }
 
-void ApsStateMachine::States::doWaiting()
+void ApsStateMachine::ApsStates::doWaiting()
 {
     if ( getVariables()->m_incomingTcpClosed == true )
     {
@@ -537,9 +539,9 @@ void ApsStateMachine::States::doWaiting()
     }
 }
 
-void ApsStateMachine::States::goToLinkStatus()
+void ApsStateMachine::ApsStates::goToLinkStatus()
 {
-    m_current_state = &States::doLinkStatus;
+    m_current_state = &ApsStates::doLinkStatus;
 
     getActions()->sendLinkStatus( getVariables()->m_linkMac, getVariables()->m_linkStatus );
 
@@ -548,59 +550,62 @@ void ApsStateMachine::States::goToLinkStatus()
     getVariables()->m_linkStatusChanged = false;
 }
 
-void ApsStateMachine::States::doLinkStatus() { goToWaiting(); }
+void ApsStateMachine::ApsStates::doLinkStatus() { goToWaiting(); }
 
-void ApsStateMachine::States::goToTransferToL2()
+void ApsStateMachine::ApsStates::goToTransferToL2()
 {
-    m_current_state = &States::doTransferToL2;
+    m_current_state = &ApsStates::doTransferToL2;
     getActions()->sendAvdeccToL2( &getVariables()->m_out );
     getVariables()->m_apcMsg = false;
 }
 
-void ApsStateMachine::States::doTransferToL2() { goToWaiting(); }
+void ApsStateMachine::ApsStates::doTransferToL2() { goToWaiting(); }
 
-void ApsStateMachine::States::goToTransferToApc()
+void ApsStateMachine::ApsStates::goToTransferToApc()
 {
-    m_current_state = &States::doTransferToApc;
+    m_current_state = &ApsStates::doTransferToApc;
     getActions()->sendAvdeccToApc( &getVariables()->m_in );
     getVariables()->m_nopTimeout = getVariables()->m_currentTime + 10;
     getVariables()->m_L2Msg = false;
 }
 
-void ApsStateMachine::States::doTransferToApc() { goToWaiting(); }
+void ApsStateMachine::ApsStates::doTransferToApc() { goToWaiting(); }
 
-void ApsStateMachine::States::goToAssignEntityId()
+void ApsStateMachine::ApsStates::goToAssignEntityId()
 {
-    m_current_state = &States::doAssignEntityId;
+    m_current_state = &ApsStates::doAssignEntityId;
     getActions()->sendEntityIdAssignment( getVariables()->m_a, getVariables()->m_entity_id );
     getVariables()->m_nopTimeout = getVariables()->m_currentTime + 10;
     getVariables()->m_assignEntityIdRequest = false;
 }
 
-void ApsStateMachine::States::doAssignEntityId() { goToWaiting(); }
+void ApsStateMachine::ApsStates::doAssignEntityId() { goToWaiting(); }
 
-void ApsStateMachine::States::goToSendNop()
+void ApsStateMachine::ApsStates::goToSendNop()
 {
-    m_current_state = &States::doSendNop;
+    m_current_state = &ApsStates::doSendNop;
     getActions()->sendNopToApc();
     getVariables()->m_nopTimeout = getVariables()->m_currentTime + 10;
 }
 
-void ApsStateMachine::States::doSendNop() { goToWaiting(); }
+void ApsStateMachine::ApsStates::doSendNop() { goToWaiting(); }
 
-void ApsStateMachine::States::goToCloseAndFinish()
+void ApsStateMachine::ApsStates::goToCloseAndFinish()
 {
-    m_current_state = &States::doCloseAndFinish;
+    m_current_state = &ApsStates::doCloseAndFinish;
     getActions()->closeTcpConnection();
 }
 
-void ApsStateMachine::States::doCloseAndFinish() { goToFinish(); }
+void ApsStateMachine::ApsStates::doCloseAndFinish() { goToFinish(); }
 
-void ApsStateMachine::States::goToFinish()
+void ApsStateMachine::ApsStates::goToFinish()
 {
-    m_current_state = &States::doFinish;
+    m_current_state = &ApsStates::doFinish;
     getActions()->closeTcpServer();
 }
 
-void ApsStateMachine::States::doFinish() { m_current_state = 0; }
+void ApsStateMachine::ApsStates::doFinish() { m_current_state = 0; }
+
+JDKSAvdeccMCU::ApsStates::ApsStates() : m_owner( 0 ), m_current_stateApsStatesStates::doBegin ) {}
+
 }
