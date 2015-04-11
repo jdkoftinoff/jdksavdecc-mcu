@@ -41,7 +41,7 @@
 #include "JDKSAvdeccMCU/Handler.hpp"
 #include "JDKSAvdeccMCU/HandlerGroup.hpp"
 #include "JDKSAvdeccMCU/Helpers.hpp"
-#include "JDKSAvdeccMCU/Value.hpp"
+#include "JDKSAvdeccMCU/RangedValue.hpp"
 #include "JDKSAvdeccMCU/PcapFile.hpp"
 #include "JDKSAvdeccMCU/PcapFileReader.hpp"
 #include "JDKSAvdeccMCU/PcapFileWriter.hpp"

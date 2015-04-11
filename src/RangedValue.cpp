@@ -30,7 +30,7 @@
 */
 
 #include "JDKSAvdeccMCU/World.hpp"
-#include "JDKSAvdeccMCU/Value.hpp"
+#include "JDKSAvdeccMCU/RangedValue.hpp"
 
 namespace JDKSAvdeccMCU
 {
