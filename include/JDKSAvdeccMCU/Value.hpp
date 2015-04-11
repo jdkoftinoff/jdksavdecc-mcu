@@ -45,13 +45,13 @@ namespace JDKSAvdeccMCU
 extern float powers_of_ten[25];
 
 ///
-/// \brief pow10
+/// \brief integer_pow10
 ///
-/// Template function to get the value of the power of ten
+/// Template function to get the value of an integer power of ten
 /// Works with integer types and floating point types.
 ///
 template <typename T1, typename T2>
-T1 pow10( T2 exponent )
+T1 integer_pow10( T2 exponent )
 {
     T1 r = 0;
     int e = int( exponent ) + 12;
@@ -62,7 +62,7 @@ T1 pow10( T2 exponent )
     return r;
 }
 
-/// \brief the Value class
+/// \brief the RangedValue class
 ///
 /// A holder for a limited range value with options for defaults and inc/dec
 /// step size
@@ -75,7 +75,7 @@ template <uint8_t UnitsValue,
           int64_t StepValue = 1,
           int MultiplierPowerValue = 0,
           typename ValueType = float>
-class Value
+class RangedValue
 {
 #if __cplusplus >= 201103L
     static_assert( MinValue <= DefaultValue, "MinValue is not less than or equal to DefaultValue" );
@@ -96,7 +96,11 @@ class Value
     ///
     /// Initialize to the default value
     ///
-    Value() { setDefault(); }
+    RangedValue()
+    {
+        setDefault();
+        setChanged();
+    }
 
     ///
     /// \brief Value implicit Constructor
@@ -106,7 +110,11 @@ class Value
     ///
     /// \param v value
     ///
-    Value( value_type v ) { setValue( v ); }
+    RangedValue( value_type v )
+    {
+        setValue( v );
+        setChanged();
+    }
 
     ///
     /// \brief Value
@@ -115,7 +123,11 @@ class Value
     ///
     /// \param v Source Value object
     ///
-    Value( Value const &v ) : m_value( v.m_value ) {}
+    RangedValue( RangedValue const &v )
+        : m_value( v.m_value )
+        , m_changed( v.m_changed )
+    {
+    }
 
     ///
     /// \brief operator =
@@ -125,9 +137,10 @@ class Value
     /// \param v Source Value object
     /// \return  *this
     ///
-    Value &operator=( Value const &v )
+    RangedValue &operator=( RangedValue const &v )
     {
         m_value = v.m_value;
+        m_changed = v.m_changed;
         return *this;
     }
 
@@ -171,6 +184,7 @@ class Value
         if ( m_value != v )
         {
             m_value = v;
+            m_changed = true;
             r = true;
         }
         return r;
@@ -201,6 +215,7 @@ class Value
         if ( m_value != v )
         {
             m_value = v;
+            m_changed = true;
             r = true;
         }
         return r;
@@ -225,6 +240,7 @@ class Value
         if ( m_value != new_value )
         {
             m_value = new_value;
+            m_changed = true;
             r = true;
         }
         return r;
@@ -249,6 +265,7 @@ class Value
         if ( m_value != new_value )
         {
             m_value = new_value;
+            m_changed = true;
             r = true;
         }
         return r;
@@ -338,7 +355,7 @@ class Value
         value_type r = 1;
         if ( multiplier_power < 0 )
         {
-            r = pow10<value_type>( -multiplier_power );
+            r = integer_pow10<value_type>( -multiplier_power );
         }
         return r;
     }
@@ -358,7 +375,7 @@ class Value
         value_type r = 1;
         if ( multiplier_power > 0 )
         {
-            r = pow10<value_type>( multiplier_power );
+            r = integer_pow10<value_type>( multiplier_power );
         }
         return r;
     }
@@ -378,7 +395,7 @@ class Value
         value_type r = 1;
         if ( multiplier_power > 0 )
         {
-            r = pow10<value_type>( multiplier_power );
+            r = integer_pow10<value_type>( multiplier_power );
         }
         return r;
     }
@@ -398,19 +415,38 @@ class Value
         value_type r = 1;
         if ( multiplier_power < 0 )
         {
-            r = pow10<value_type>( -multiplier_power );
+            r = integer_pow10<value_type>( -multiplier_power );
         }
         return r;
     }
 
+    ///
+    /// Default template function to help round integer types
+    ///
     template <typename T>
     static T valueRound( T v )
     {
         return v;
     }
 
+    ///
+    /// \brief valueRound
+    ///
+    /// overload to round float types
+    ///
+    /// \param v value to round
+    /// \return the rounded value
+    ///
     static float valueRound( float v ) { return roundf( v ); }
 
+    ///
+    /// \brief valueRound
+    ///
+    /// overload to round double types
+    ///
+    /// \param v the value to round
+    /// \return  the rounded value
+    ///
     static double valueRound( double v ) { return round( v ); }
 
     ///
@@ -500,6 +536,74 @@ class Value
     ///
     uint8_t getUnitsCode() const { return UnitsValue; }
 
+
+    ///
+    /// \brief setChanged
+    ///
+    /// Set the changed flag
+    ///
+    void setChanged()
+    {
+        m_changed=true;
+    }
+
+    ///
+    /// \brief clearChanged
+    ///
+    /// Clear the changed flag
+    ///
+    void clearChanged()
+    {
+        m_changed=false;
+    }
+
+    ///
+    /// \brief getChanged
+    /// \return true if the value had changed since the last time clearChanged() was called
+    ///
+    bool getChanged() const
+    {
+        return m_changed;
+    }
+
+
+
+    ///
+    /// \brief getEncodedMinValue
+    /// \return The encoded minimum value
+    ///
+    int64_t getEncodedMinValue() const
+    {
+        return min_value;
+    }
+
+    ///
+    /// \brief getEncodedMaxValue
+    /// \return The encoded maximum value
+    ///
+    int64_t getEncodedMaxValue() const
+    {
+        return max_value;
+    }
+
+    ///
+    /// \brief getEncodedStepValue
+    /// \return The encoded step value
+    ///
+    int64_t getEncodedStepValue() const
+    {
+        return step_value;
+    }
+
+    ///
+    /// \brief getEncodedDefaultValue
+    /// \return the encoded default value
+    ///
+    int64_t getEncodedDefaultValue() const
+    {
+        return default_value;
+    }
+
   private:
     ///
     /// \brief m_value
@@ -507,5 +611,12 @@ class Value
     /// The actual non-encoded value
     ///
     value_type m_value;
+
+    ///
+    /// \brief m_changed
+    ///
+    /// True if the value has changed since the last time clearChanged() was called
+    ///
+    bool m_changed;
 };
 }
