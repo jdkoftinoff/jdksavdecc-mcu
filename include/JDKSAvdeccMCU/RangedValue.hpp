@@ -44,7 +44,7 @@ namespace JDKSAvdeccMCU
 ///
 extern float powers_of_ten[25];
 
-const char *getUnitsSuffix( uint8_t units_code );
+const char *getAvdeccUnitsSuffix( uint8_t units_code );
 
 ///
 /// \brief integer_pow10
@@ -608,7 +608,7 @@ class RangedValue
 
     const char * getUnitsSuffix() const
     {
-        getUnitsSuffix( getUnitsCode() );
+        getAvdeccUnitsSuffix( getUnitsCode() );
     }
 
   private:
