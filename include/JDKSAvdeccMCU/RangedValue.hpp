@@ -608,7 +608,7 @@ class RangedValue
 
     const char * getUnitsSuffix() const
     {
-        getAvdeccUnitsSuffix( getUnitsCode() );
+        return getAvdeccUnitsSuffix( getUnitsCode() );
     }
 
   private:
