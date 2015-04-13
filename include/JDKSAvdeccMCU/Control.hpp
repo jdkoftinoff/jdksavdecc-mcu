@@ -39,6 +39,7 @@
 #include "JDKSAvdeccMCU/Entity.hpp"
 #include "JDKSAvdeccMCU/ControllerEntity.hpp"
 #include "JDKSAvdeccMCU/ControlValueHolder.hpp"
+#include "JDKSAvdeccMCU/ControlDescription.hpp"
 
 namespace JDKSAvdeccMCU
 {
