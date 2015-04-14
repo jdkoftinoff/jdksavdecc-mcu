@@ -42,8 +42,6 @@ namespace JDKSAvdeccMCU
 ///
 extern float powers_of_ten[25];
 
-const char *getAvdeccUnitsSuffix( uint8_t units_code );
-
 ///
 ///
 /// \brief integer_pow10
@@ -62,6 +60,96 @@ T1 integer_pow10( T2 exponent )
     }
     return r;
 }
+
+
+///
+/// \brief getEncodingMultiplier
+///
+/// Get the multiplier required to convert an unencoded value
+/// to an encoded value.
+///
+/// If the multiplier_power is <=0 this method returns 1
+///
+/// \return The value to multiply with
+///
+template <typename T>
+T getEncodingMultiplier(int8_t multiplier_power)
+{
+    T r = 1;
+    if ( multiplier_power < 0 )
+    {
+        r = integer_pow10<T>( -multiplier_power );
+    }
+    return r;
+}
+
+///
+/// \brief getEncodingDivider
+///
+/// Get the divider required to convert an unencoded value
+/// to an encoded value
+///
+/// If the multiplier_power is >=0 this method returns 1
+///
+/// \return the value to divide with
+///
+template <typename T>
+T getEncodingDivider(int8_t multiplier_power)
+{
+    T r = 1;
+    if ( multiplier_power > 0 )
+    {
+        r = integer_pow10<T>( multiplier_power );
+    }
+    return r;
+}
+
+
+///
+/// \brief getDecodingMultiplier
+///
+/// Get the multiplier required to convert an encoded value
+/// to an unencoded value.
+///
+/// If the multiplier_power is >=0 this method returns 1
+///
+/// \return The value to multiply with
+///
+template <typename T>
+T getDecodingMultiplier(int8_t multiplier_power)
+{
+    T r = 1;
+    if ( multiplier_power > 0 )
+    {
+        r = integer_pow10<T>( multiplier_power );
+    }
+    return r;
+}
+
+///
+/// \brief getDecodingDivider
+///
+/// Get the divider required to convert an encoded value
+/// to an unencoded value
+///
+/// If the multiplier_power is <=0 this method returns 1
+///
+/// \return the value to divide with
+///
+template <typename T>
+T getDecodingDivider(int8_t multiplier_power )
+{
+    T r = 1;
+    if ( multiplier_power < 0 )
+    {
+        r = integer_pow10<T>( -multiplier_power );
+    }
+    return r;
+}
+
+
+const char *getAvdeccUnitsSuffix( uint8_t units_code );
+
 inline bool wasTimeOutHit( jdksavdecc_timestamp_in_milliseconds cur_time,
                            jdksavdecc_timestamp_in_milliseconds last_time_done,
                            jdksavdecc_timestamp_in_milliseconds timeout )
