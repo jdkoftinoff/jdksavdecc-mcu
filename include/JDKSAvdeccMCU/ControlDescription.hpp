@@ -43,7 +43,7 @@ void encodeControlValue( EncodedType *encoded_value, UnencodedType unencoded_val
 template <typename EncodedType, typename UnencodedType>
 void decodeControlValue( UnencodedType *decoded_value, EncodedType encoded_value, int8_t multiplier_code );
 
-template < typename U >
+template < typename T >
 struct EncodedControlItemTraits
 {
 };
@@ -54,6 +54,12 @@ struct EncodedControlItemTraits<int8_t>
     static bool is_signed() { return true; }
     static bool is_floating_point() { return false; }
     static bool is_integral() { return true; }
+    static float convert_network_to_float( const void *encoded_value, int8_t multiplier_code );
+    static int64_t convert_network_to_int64( const void *encoded_value, int8_t multiplier_code );
+    static uint64_t convert_network_to_uint64( const void *encoded_value, int8_t multiplier_code );
+    static void convert_float_to_network( void *encoded_value, float v, int8_t multiplier_code );
+    static void convert_int64_to_network( void *encoded_value, int64_t v, int8_t multiplier_code );
+    static void convert_uint64_to_network( void *encoded_value, uint64_t v, int8_t multiplier_code );
 };
 
 template <>
@@ -192,11 +198,39 @@ public:
     virtual bool isFloatingPoint() const = 0;
 
     ///
+    /// \brief getValueAsBool
+    /// \param value_pointer pointer to network byte order encoded item value
+    /// \return bool representation of the unencoded item value
+    ///
+    virtual bool getValueAsBool( const void *value_pointer ) const = 0;
+
+    ///
+    /// \brief setValueFromBool
+    /// \param value_pointer pointer to buffer to hold the network byte order encoded item value
+    /// \param v bool representation of the unencoded item value
+    /// \return
+    ///
+    virtual void setValueFromBool( void *value_pointer, bool v ) const = 0;
+
+    ///
+    /// \brief getDefaultAsBool
+    /// \return bool representation of the unencoded default value
+    ///
+    virtual bool getDefaultAsBool() const = 0;
+
+    ///
     /// \brief getValueAsFloat
     /// \param value_pointer pointer to network byte order encoded item value
     /// \return floating point representation of the unencoded item value
     ///
     virtual float getValueAsFloat( const void *value_pointer ) = 0;
+
+    ///
+    /// \brief setValueFromFloat
+    /// \param value_pointer pointer to buffer to hold network byee order encoded item value
+    /// \param v floating point representation of the unencoded item value
+    ///
+    virtual void setValueFromFloat( void *value_pointer, float v ) = 0;
 
     ///
     /// \brief getMinAsFloat
@@ -230,6 +264,13 @@ public:
     virtual int64_t getValueAsInt64( const void *value_pointer ) = 0;
 
     ///
+    /// \brief setValueFromInt64
+    /// \param value_pointer pointer to buffer to hold network byte order encoded item value
+    /// \param v int64_t representation of the unencoded item value
+    ///
+    virtual void setValueFromInt64( void *value_pointer, int64_t v ) = 0;
+
+    ///
     /// \brief getMinAsInt64
     /// \return int64_t representation of the unencoded minimum value
     ///
@@ -259,6 +300,13 @@ public:
     /// \return uint64_t representation of the unencoded item value
     ///
     virtual uint64_t getValueAsUInt64( const void *value_pointer ) = 0;
+
+    ///
+    /// \brief setValueFromUInt64
+    /// \param value_pointer pointer to buffer to hold network byte order encoded item value
+    /// \param v uint64_t representation of the unencoded item value
+    ///
+    virtual void setValueFromUInt64( void *value_pointer, uint64_t v ) = 0;
 
     ///
     /// \brief getMinAsUInt64
@@ -320,8 +368,6 @@ private:
 template <typename T>
 class ControlDescriptionItemInfo : ControlDescriptionItemInfoBase
 {
-private:
-
 public:
     ControlDescriptionItemInfo(
             T min_value,
@@ -338,115 +384,184 @@ public:
         , m_step( step_value )
     {}
 
-    virtual uint16_t getItemSize() const override
+    uint16_t getItemSize() const override
     {
         return uint16_t(sizeof(T));
     }
 
-    virtual bool isBool() const override
+    bool isBool() const override
     {
         bool r=false;
-        if( (getItemSize()==1) && !isSigned() && isInteger() && (m_min==0) && (m_max==255) && (m_step==255) )
+        if( (getItemSize()==1)
+                && !isSigned()
+                && isInteger()
+                && (m_min==0)
+                && (m_max==255)
+                && (m_step==255) )
         {
             r=true;
         }
         return r;
     }
 
-    virtual bool isSigned() const override
+    bool isSigned() const override
     {
-        return EncodedControlItemTraits<T>::is_signed() || EncodedControlItemTraits<T>::is_floating_point();
+        return EncodedControlItemTraits<T>::is_signed()
+                || EncodedControlItemTraits<T>::is_floating_point();
     }
 
-    virtual bool isInteger() const override
+    bool isInteger() const override
     {
         return EncodedControlItemTraits<T>::is_integral();
     }
 
-    virtual bool isFloatingPoint() const
+    bool isFloatingPoint() const override
     {
         return EncodedControlItemTraits<T>::is_floating_point();
     }
 
-    virtual float getMinAsFloat() const override
+    bool getValueAsBool( const void *value_pointer ) const override
+    {
+        bool r=false;
+        if( getItemSize()==1 )
+        {
+            const uint8_t *p = reinterpret_cast<const uint8_t *>(value_pointer);
+            if( *p != 0 )
+            {
+                r=true;
+            }
+        }
+        return r;
+    }
+
+    void setValueFromBool( void *value_pointer, bool v ) const override
+    {
+        if( getItemSize()==1 )
+        {
+            uint8_t *p = reinterpret_cast<uint8_t *>(value_pointer);
+            p = (v==false) ? m_min : m_max;
+        }
+    }
+
+    bool getDefaultAsBool() const override
+    {
+        bool r=false;
+        if( m_default!=0 )
+        {
+            r=true;
+        }
+        return r;
+    }
+
+    float getValueAsFloat( const void *value_pointer ) const override
+    {
+        return EncodedControlItemTraits<T>::convert_network_to_float( value_pointer, getMultiplierCode() );
+    }
+
+    void setValueFromFloat( void *value_pointer, float v ) const override
+    {
+        EncodedControlItemTraits<T>::convert_float_to_network( value_pointer, v, getMultiplierCode() );
+    }
+
+    float getMinAsFloat() const override
     {
         float r;
         decodeControlValue(&r,m_min,getMultiplierCode());
         return r;
     }
 
-    virtual float getMaxAsFloat() const override
+    float getMaxAsFloat() const override
     {
         float r;
         decodeControlValue(&r,m_max,getMultiplierCode());
         return r;
     }
 
-    virtual float getDefaultAsFloat() const override
+    float getDefaultAsFloat() const override
     {
         float r;
         decodeControlValue(&r,m_default,getMultiplierCode());
         return r;
     }
 
-    virtual float getStepAsFloat() const override
+    float getStepAsFloat() const override
     {
         float r;
         decodeControlValue(&r,m_step,getMultiplierCode());
         return r;
     }
 
-    virtual int64_t getMinAsInt64() const override
+    int64_t getValueAsInt64( const void *value_pointer ) const override
+    {
+        return EncodedControlItemTraits<T>::convert_network_to_int64( value_pointer, getMultiplierCode() );
+    }
+
+    int64_t setValueFromInt64( void *value_pointer, int64_t v ) const override
+    {
+        EncodedControlItemTraits<T>::convert_int64_to_network( value_pointer, v, getMultiplierCode() );
+    }
+
+    int64_t getMinAsInt64() const override
     {
         int64_t r;
         decodeControlValue(&r,m_min,getMultiplierCode());
         return r;
     }
 
-    virtual int64_t getMaxAsInt64() const override
+    int64_t getMaxAsInt64() const override
     {
         int64_t r;
         decodeControlValue(&r,m_max,getMultiplierCode());
         return r;
     }
 
-    virtual int64_t getDefaultAsInt64() const override
+    int64_t getDefaultAsInt64() const override
     {
         int64_t r;
         decodeControlValue(&r,m_default,getMultiplierCode());
         return r;
     }
 
-    virtual int64_t getStepAsInt64() const override
+    int64_t getStepAsInt64() const override
     {
         int64_t r;
         decodeControlValue(&r,m_step,getMultiplierCode());
         return r;
     }
 
+    uint64_t getValueAsUInt64( const void *value_pointer ) const override
+    {
+        return EncodedControlItemTraits<T>::convert_network_to_uint64( value_pointer, getMultiplierCode() );
+    }
 
-    virtual uint64_t getMinAsUInt64() const override
+    void setValueFromUInt64( void *value_pointer, int64_t v ) const override
+    {
+        EncodedControlItemTraits<T>::convert_uint64_to_network( value_pointer, v, getMultiplierCode() );
+
+    }
+
+    uint64_t getMinAsUInt64() const override
     {
         uint64_t r;
         decodeControlValue(&r,m_min,getMultiplierCode());
         return r;
     }
 
-    virtual uint64_t getMaxAsUInt64() const override
+    uint64_t getMaxAsUInt64() const override
     {
         int64_t r;
         decodeControlValue(&r,m_max,getMultiplierCode());
         return r;
     }
 
-    virtual uint64_t getDefaultAsUInt64() const override
+    uint64_t getDefaultAsUInt64() const override
     {
         int64_t r;
         decodeControlValue(&r,m_default,getMultiplierCode());
         return r;
     }
 
-    virtual uint64_t getStepAsUInt64() const override
+    uint64_t getStepAsUInt64() const override
     {
         int64_t r;
         decodeControlValue(&r,m_step,getMultiplierCode());
