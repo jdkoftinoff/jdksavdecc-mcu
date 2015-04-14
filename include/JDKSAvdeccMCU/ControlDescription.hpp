@@ -43,6 +43,90 @@ void encodeControlValue( EncodedType *encoded_value, UnencodedType unencoded_val
 template <typename EncodedType, typename UnencodedType>
 void decodeControlValue( UnencodedType *decoded_value, EncodedType encoded_value, int8_t multiplier_code );
 
+template < typename U >
+struct EncodedControlItemTraits
+{
+};
+
+template <>
+struct EncodedControlItemTraits<int8_t>
+{
+    static bool is_signed() { return true; }
+    static bool is_floating_point() { return false; }
+    static bool is_integral() { return true; }
+};
+
+template <>
+struct EncodedControlItemTraits<uint8_t>
+{
+    static bool is_signed() { return false; }
+    static bool is_floating_point() { return false; }
+    static bool is_integral() { return true; }
+};
+
+template <>
+struct EncodedControlItemTraits<int16_t>
+{
+    static bool is_signed() { return true; }
+    static bool is_floating_point() { return false; }
+    static bool is_integral() { return true; }
+};
+
+template <>
+struct EncodedControlItemTraits<uint16_t>
+{
+    static bool is_signed() { return false; }
+    static bool is_floating_point() { return false; }
+    static bool is_integral() { return true; }
+};
+
+template <>
+struct EncodedControlItemTraits<int32_t>
+{
+    static bool is_signed() { return true; }
+    static bool is_floating_point() { return false; }
+    static bool is_integral() { return true; }
+};
+
+template <>
+struct EncodedControlItemTraits<uint32_t>
+{
+    static bool is_signed() { return false; }
+    static bool is_floating_point() { return false; }
+    static bool is_integral() { return true; }
+};
+
+template <>
+struct EncodedControlItemTraits<int64_t>
+{
+    static bool is_signed() { return true; }
+    static bool is_floating_point() { return false; }
+    static bool is_integral() { return true; }
+};
+
+template <>
+struct EncodedControlItemTraits<uint64_t>
+{
+    static bool is_signed() { return false; }
+    static bool is_floating_point() { return false; }
+    static bool is_integral() { return true; }
+};
+
+template <>
+struct EncodedControlItemTraits<float>
+{
+    static bool is_signed() { return true; }
+    static bool is_floating_point() { return true; }
+    static bool is_integral() { return false; }
+};
+
+template <>
+struct EncodedControlItemTraits<double>
+{
+    static bool is_signed() { return true; }
+    static bool is_floating_point() { return true; }
+    static bool is_integral() { return false; }
+};
 
 ///
 /// \brief The ControlDescriptionItemInfoBase class
@@ -236,6 +320,8 @@ private:
 template <typename T>
 class ControlDescriptionItemInfo : ControlDescriptionItemInfoBase
 {
+private:
+
 public:
     ControlDescriptionItemInfo(
             T min_value,
@@ -269,17 +355,17 @@ public:
 
     virtual bool isSigned() const override
     {
-        return std::is_signed<T>::value || std::is_floating_point<T>::value;
+        return EncodedControlItemTraits<T>::is_signed() || EncodedControlItemTraits<T>::is_floating_point();
     }
 
     virtual bool isInteger() const override
     {
-        return std::is_integral<T>::value;
+        return EncodedControlItemTraits<T>::is_integral();
     }
 
     virtual bool isFloatingPoint() const
     {
-        return std::is_floating_point<T>::value;
+        return EncodedControlItemTraits<T>::is_floating_point();
     }
 
     virtual float getMinAsFloat() const override
