@@ -32,6 +32,7 @@
 
 #include "JDKSAvdeccMCU/World.hpp"
 #include "JDKSAvdeccMCU/FixedBuffer.hpp"
+#include "JDKSAvdeccMCU/Helpers.hpp"
 
 namespace JDKSAvdeccMCU
 {
@@ -51,87 +52,399 @@ struct EncodedControlItemTraits
 template <>
 struct EncodedControlItemTraits<int8_t>
 {
+    typedef int8_t value_type;
     static bool is_signed() { return true; }
     static bool is_floating_point() { return false; }
     static bool is_integral() { return true; }
-    static float convert_network_to_float( const void *encoded_value, int8_t multiplier_code );
-    static int64_t convert_network_to_int64( const void *encoded_value, int8_t multiplier_code );
-    static uint64_t convert_network_to_uint64( const void *encoded_value, int8_t multiplier_code );
-    static void convert_float_to_network( void *encoded_value, float v, int8_t multiplier_code );
-    static void convert_int64_to_network( void *encoded_value, int64_t v, int8_t multiplier_code );
-    static void convert_uint64_to_network( void *encoded_value, uint64_t v, int8_t multiplier_code );
+
+    static float convert_network_to_float( const void *encoded_value, int8_t multiplier_code )
+    {
+        const value_type *p = reinterpret_cast<const value_type *>(encoded_value);
+        return static_cast<float>(*p)
+                * getDecodingMultiplier<float>( multiplier_code )
+                / getDecodingDivider<float>(multiplier_code);
+    }
+
+    static int64_t convert_network_to_int64( const void *encoded_value, int8_t multiplier_code )
+    {
+        const value_type *p = reinterpret_cast<const value_type *>(encoded_value);
+        return static_cast<float>(*p)
+                * getDecodingMultiplier<int64_t>( multiplier_code )
+                / getDecodingDivider<int64_t>(multiplier_code);
+    }
+
+    static uint64_t convert_network_to_uint64( const void *encoded_value, int8_t multiplier_code )
+    {
+        const value_type *p = reinterpret_cast<const value_type *>(encoded_value);
+        return static_cast<float>(*p)
+                * getDecodingMultiplier<uint64_t>( multiplier_code )
+                / getDecodingDivider<uint64_t>(multiplier_code);
+    }
+
+    static void convert_float_to_network( void *encoded_value, float v, int8_t multiplier_code )
+    {
+
+    }
+
+    static void convert_int64_to_network( void *encoded_value, int64_t v, int8_t multiplier_code )
+    {
+
+    }
+
+    static void convert_uint64_to_network( void *encoded_value, uint64_t v, int8_t multiplier_code )
+    {
+
+    }
 };
 
 template <>
 struct EncodedControlItemTraits<uint8_t>
 {
+    typedef uint8_t value_type;
     static bool is_signed() { return false; }
     static bool is_floating_point() { return false; }
     static bool is_integral() { return true; }
+    static float convert_network_to_float( const void *encoded_value, int8_t multiplier_code )
+    {
+
+    }
+
+    static int64_t convert_network_to_int64( const void *encoded_value, int8_t multiplier_code )
+    {
+
+    }
+
+    static uint64_t convert_network_to_uint64( const void *encoded_value, int8_t multiplier_code )
+    {
+
+    }
+
+    static void convert_float_to_network( void *encoded_value, float v, int8_t multiplier_code )
+    {
+
+    }
+
+    static void convert_int64_to_network( void *encoded_value, int64_t v, int8_t multiplier_code )
+    {
+
+    }
+
+    static void convert_uint64_to_network( void *encoded_value, uint64_t v, int8_t multiplier_code )
+    {
+
+    }
 };
 
 template <>
 struct EncodedControlItemTraits<int16_t>
 {
+    typedef int16_t value_type;
+
     static bool is_signed() { return true; }
     static bool is_floating_point() { return false; }
     static bool is_integral() { return true; }
+    static float convert_network_to_float( const void *encoded_value, int8_t multiplier_code )
+    {
+
+    }
+
+    static int64_t convert_network_to_int64( const void *encoded_value, int8_t multiplier_code )
+    {
+
+    }
+
+    static uint64_t convert_network_to_uint64( const void *encoded_value, int8_t multiplier_code )
+    {
+
+    }
+
+    static void convert_float_to_network( void *encoded_value, float v, int8_t multiplier_code )
+    {
+
+    }
+
+    static void convert_int64_to_network( void *encoded_value, int64_t v, int8_t multiplier_code )
+    {
+
+    }
+
+    static void convert_uint64_to_network( void *encoded_value, uint64_t v, int8_t multiplier_code )
+    {
+
+    }
 };
 
 template <>
 struct EncodedControlItemTraits<uint16_t>
 {
+    typedef uint16_t value_type;
+
     static bool is_signed() { return false; }
     static bool is_floating_point() { return false; }
     static bool is_integral() { return true; }
+    static float convert_network_to_float( const void *encoded_value, int8_t multiplier_code )
+    {
+
+    }
+
+    static int64_t convert_network_to_int64( const void *encoded_value, int8_t multiplier_code )
+    {
+
+    }
+
+    static uint64_t convert_network_to_uint64( const void *encoded_value, int8_t multiplier_code )
+    {
+
+    }
+
+    static void convert_float_to_network( void *encoded_value, float v, int8_t multiplier_code )
+    {
+
+    }
+
+    static void convert_int64_to_network( void *encoded_value, int64_t v, int8_t multiplier_code )
+    {
+
+    }
+
+    static void convert_uint64_to_network( void *encoded_value, uint64_t v, int8_t multiplier_code )
+    {
+
+    }
 };
 
 template <>
 struct EncodedControlItemTraits<int32_t>
 {
+    typedef int32_t value_type;
+
     static bool is_signed() { return true; }
     static bool is_floating_point() { return false; }
     static bool is_integral() { return true; }
+    static float convert_network_to_float( const void *encoded_value, int8_t multiplier_code )
+    {
+
+    }
+
+    static int64_t convert_network_to_int64( const void *encoded_value, int8_t multiplier_code )
+    {
+
+    }
+
+    static uint64_t convert_network_to_uint64( const void *encoded_value, int8_t multiplier_code )
+    {
+
+    }
+
+    static void convert_float_to_network( void *encoded_value, float v, int8_t multiplier_code )
+    {
+
+    }
+
+    static void convert_int64_to_network( void *encoded_value, int64_t v, int8_t multiplier_code )
+    {
+
+    }
+
+    static void convert_uint64_to_network( void *encoded_value, uint64_t v, int8_t multiplier_code )
+    {
+
+    }
 };
 
 template <>
 struct EncodedControlItemTraits<uint32_t>
 {
+    typedef uint32_t value_type;
+
     static bool is_signed() { return false; }
     static bool is_floating_point() { return false; }
     static bool is_integral() { return true; }
+    static float convert_network_to_float( const void *encoded_value, int8_t multiplier_code )
+    {
+
+    }
+
+    static int64_t convert_network_to_int64( const void *encoded_value, int8_t multiplier_code )
+    {
+
+    }
+
+    static uint64_t convert_network_to_uint64( const void *encoded_value, int8_t multiplier_code )
+    {
+
+    }
+
+    static void convert_float_to_network( void *encoded_value, float v, int8_t multiplier_code )
+    {
+
+    }
+
+    static void convert_int64_to_network( void *encoded_value, int64_t v, int8_t multiplier_code )
+    {
+
+    }
+
+    static void convert_uint64_to_network( void *encoded_value, uint64_t v, int8_t multiplier_code )
+    {
+
+    }
 };
 
 template <>
 struct EncodedControlItemTraits<int64_t>
 {
+    typedef int64_t value_type;
+
     static bool is_signed() { return true; }
     static bool is_floating_point() { return false; }
     static bool is_integral() { return true; }
+    static float convert_network_to_float( const void *encoded_value, int8_t multiplier_code )
+    {
+
+    }
+
+    static int64_t convert_network_to_int64( const void *encoded_value, int8_t multiplier_code )
+    {
+
+    }
+
+    static uint64_t convert_network_to_uint64( const void *encoded_value, int8_t multiplier_code )
+    {
+
+    }
+
+    static void convert_float_to_network( void *encoded_value, float v, int8_t multiplier_code )
+    {
+
+    }
+
+    static void convert_int64_to_network( void *encoded_value, int64_t v, int8_t multiplier_code )
+    {
+
+    }
+
+    static void convert_uint64_to_network( void *encoded_value, uint64_t v, int8_t multiplier_code )
+    {
+
+    }
 };
 
 template <>
 struct EncodedControlItemTraits<uint64_t>
 {
+    typedef uint64_t value_type;
+
     static bool is_signed() { return false; }
     static bool is_floating_point() { return false; }
     static bool is_integral() { return true; }
+    static float convert_network_to_float( const void *encoded_value, int8_t multiplier_code )
+    {
+
+    }
+
+    static int64_t convert_network_to_int64( const void *encoded_value, int8_t multiplier_code )
+    {
+
+    }
+
+    static uint64_t convert_network_to_uint64( const void *encoded_value, int8_t multiplier_code )
+    {
+
+    }
+
+    static void convert_float_to_network( void *encoded_value, float v, int8_t multiplier_code )
+    {
+
+    }
+
+    static void convert_int64_to_network( void *encoded_value, int64_t v, int8_t multiplier_code )
+    {
+
+    }
+
+    static void convert_uint64_to_network( void *encoded_value, uint64_t v, int8_t multiplier_code )
+    {
+
+    }
 };
 
 template <>
 struct EncodedControlItemTraits<float>
 {
+    typedef float value_type;
+
     static bool is_signed() { return true; }
     static bool is_floating_point() { return true; }
     static bool is_integral() { return false; }
+    static float convert_network_to_float( const void *encoded_value, int8_t multiplier_code )
+    {
+
+    }
+
+    static int64_t convert_network_to_int64( const void *encoded_value, int8_t multiplier_code )
+    {
+
+    }
+
+    static uint64_t convert_network_to_uint64( const void *encoded_value, int8_t multiplier_code )
+    {
+
+    }
+
+    static void convert_float_to_network( void *encoded_value, float v, int8_t multiplier_code )
+    {
+
+    }
+
+    static void convert_int64_to_network( void *encoded_value, int64_t v, int8_t multiplier_code )
+    {
+
+    }
+
+    static void convert_uint64_to_network( void *encoded_value, uint64_t v, int8_t multiplier_code )
+    {
+
+    }
 };
 
 template <>
 struct EncodedControlItemTraits<double>
 {
+    typedef double value_type;
+
     static bool is_signed() { return true; }
     static bool is_floating_point() { return true; }
     static bool is_integral() { return false; }
+    static float convert_network_to_float( const void *encoded_value, int8_t multiplier_code )
+    {
+
+    }
+
+    static int64_t convert_network_to_int64( const void *encoded_value, int8_t multiplier_code )
+    {
+
+    }
+
+    static uint64_t convert_network_to_uint64( const void *encoded_value, int8_t multiplier_code )
+    {
+
+    }
+
+    static void convert_float_to_network( void *encoded_value, float v, int8_t multiplier_code )
+    {
+
+    }
+
+    static void convert_int64_to_network( void *encoded_value, int64_t v, int8_t multiplier_code )
+    {
+
+    }
+
+    static void convert_uint64_to_network( void *encoded_value, uint64_t v, int8_t multiplier_code )
+    {
+
+    }
 };
 
 ///
