@@ -37,33 +37,6 @@
 namespace JDKSAvdeccMCU
 {
 
-///
-/// \brief powers_of_ten
-///
-/// The powers of ten values as float from 1e-12 to 1e12 inclusive
-///
-extern float powers_of_ten[25];
-
-const char *getAvdeccUnitsSuffix( uint8_t units_code );
-
-///
-/// \brief integer_pow10
-///
-/// Template function to get the value of an integer power of ten
-/// Works with integer types and floating point types.
-///
-template <typename T1, typename T2>
-T1 integer_pow10( T2 exponent )
-{
-    T1 r = 0;
-    int e = int( exponent ) + 12;
-    if ( e >= 0 && e <= 25 )
-    {
-        r = powers_of_ten[e];
-    }
-    return r;
-}
-
 /// \brief the RangedValue class
 ///
 /// A holder for a limited range value with options for defaults and inc/dec
