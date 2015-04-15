@@ -147,6 +147,48 @@ T getDecodingDivider(int8_t multiplier_power )
     return r;
 }
 
+template <typename EncodedType, typename DecodedType>
+void encodeControlValue( EncodedType *encoded_value, DecodedType decoded_value, int8_t multiplier_code )
+{
+    *encoded_value  = static_cast<EncodedType>(decoded_value) * getEncodingMultiplier<EncodedType>(multiplier_code) / getEncodingDivider<EncodedType>(multiplier_code);
+}
+
+template <typename EncodedType, typename DecodedType>
+void decodeControlValue( DecodedType *decoded_value, EncodedType encoded_value, int8_t multiplier_code )
+{
+    *decoded_value  = static_cast<DecodedType>(encoded_value) * getDecodingMultiplier<DecodedType>(multiplier_code) / getDecodingDivider<DecodedType>(multiplier_code);
+}
+
+
+///
+/// \brief convertEncodedValueToDecoded
+///
+/// convert a value from the encoded value to the decoded value, taking
+/// into account the multiplier_power
+///
+template <typename DecodedType,typename EncodedType>
+DecodedType convertEncodedValueToDecoded( EncodedType encoded, int8_t multiplier_power )
+{
+    DecodedType v = static_cast<DecodedType>(encoded);
+    v *= getDecodingMultiplier<DecodedType>(multiplier_power);
+    v /= getDecodingDivider<DecodedType>(multiplier_power);
+    return v;
+}
+
+///
+/// \brief convertDecodedValueToEncoded
+///
+/// convert a value from the decoded value to the encoded value, taking
+/// into account the multiplier_power
+///
+template <typename EncodedType,typename DecodedType>
+EncodedType convertDecodedValueToEncoded( DecodedType decoded, int8_t multiplier_power )
+{
+    EncodedType v = static_cast<EncodedType>(decoded);
+    v *= getEncodingMultiplier<EncodedType>(multiplier_power);
+    v /= getEncodingDivider<EncodedType>(multiplier_power);
+    return v;
+}
 
 const char *getAvdeccUnitsSuffix( uint8_t units_code );
 

@@ -37,13 +37,6 @@
 namespace JDKSAvdeccMCU
 {
 
-
-template <typename EncodedType, typename UnencodedType>
-void encodeControlValue( EncodedType *encoded_value, UnencodedType unencoded_value, int8_t multiplier_code );
-
-template <typename EncodedType, typename UnencodedType>
-void decodeControlValue( UnencodedType *decoded_value, EncodedType encoded_value, int8_t multiplier_code );
-
 template < typename T >
 struct EncodedControlItemTraits
 {
@@ -53,47 +46,31 @@ template <>
 struct EncodedControlItemTraits<int8_t>
 {
     typedef int8_t value_type;
-    static bool is_signed() { return true; }
-    static bool is_floating_point() { return false; }
-    static bool is_integral() { return true; }
+    static bool isSigned() { return true; }
+    static bool isFloatingPoint() { return false; }
+    static bool isIntegral() { return true; }
 
-    static float convert_network_to_float( const void *encoded_value, int8_t multiplier_code )
-    {
-        const value_type *p = reinterpret_cast<const value_type *>(encoded_value);
-        return static_cast<float>(*p)
-                * getDecodingMultiplier<float>( multiplier_code )
-                / getDecodingDivider<float>(multiplier_code);
+    template <typename U>
+    static U decodeNetworkData(
+            const void *encoded_value,
+            ssize_t pos,
+            int8_t multiplier_code )
+    {        
+        value_type v;
+        v = (value_type)jdksavdecc_uint8_get(encoded_value,pos);
+        U r = convertEncodedValueToDecoded<U>( v, multiplier_code );
+        return r;
     }
 
-    static int64_t convert_network_to_int64( const void *encoded_value, int8_t multiplier_code )
+    template <typename U>
+    static void encodeNetworkData(
+            void *encoded_value,
+            ssize_t pos,
+            U v,
+            int8_t multiplier_code )
     {
-        const value_type *p = reinterpret_cast<const value_type *>(encoded_value);
-        return static_cast<float>(*p)
-                * getDecodingMultiplier<int64_t>( multiplier_code )
-                / getDecodingDivider<int64_t>(multiplier_code);
-    }
-
-    static uint64_t convert_network_to_uint64( const void *encoded_value, int8_t multiplier_code )
-    {
-        const value_type *p = reinterpret_cast<const value_type *>(encoded_value);
-        return static_cast<float>(*p)
-                * getDecodingMultiplier<uint64_t>( multiplier_code )
-                / getDecodingDivider<uint64_t>(multiplier_code);
-    }
-
-    static void convert_float_to_network( void *encoded_value, float v, int8_t multiplier_code )
-    {
-
-    }
-
-    static void convert_int64_to_network( void *encoded_value, int64_t v, int8_t multiplier_code )
-    {
-
-    }
-
-    static void convert_uint64_to_network( void *encoded_value, uint64_t v, int8_t multiplier_code )
-    {
-
+        value_type ev = convertDecodedValueToEncoded<value_type>(v,multiplier_code);
+        jdksavdecc_uint8_set( (uint8_t)ev,encoded_value,pos);
     }
 };
 
@@ -101,37 +78,31 @@ template <>
 struct EncodedControlItemTraits<uint8_t>
 {
     typedef uint8_t value_type;
-    static bool is_signed() { return false; }
-    static bool is_floating_point() { return false; }
-    static bool is_integral() { return true; }
-    static float convert_network_to_float( const void *encoded_value, int8_t multiplier_code )
-    {
+    static bool isSigned() { return false; }
+    static bool isFloatingPoint() { return false; }
+    static bool isIntegral() { return true; }
 
+    template <typename U>
+    static U decodeNetworkData(
+            const void *encoded_value,
+            ssize_t pos,
+            int8_t multiplier_code )
+    {
+        value_type v;
+        v = (value_type)jdksavdecc_uint8_get(encoded_value,pos);
+        U r = convertEncodedValueToDecoded<U>( v, multiplier_code );
+        return r;
     }
 
-    static int64_t convert_network_to_int64( const void *encoded_value, int8_t multiplier_code )
+    template <typename U>
+    static void encodeNetworkData(
+            void *encoded_value,
+            ssize_t pos,
+            U v,
+            int8_t multiplier_code )
     {
-
-    }
-
-    static uint64_t convert_network_to_uint64( const void *encoded_value, int8_t multiplier_code )
-    {
-
-    }
-
-    static void convert_float_to_network( void *encoded_value, float v, int8_t multiplier_code )
-    {
-
-    }
-
-    static void convert_int64_to_network( void *encoded_value, int64_t v, int8_t multiplier_code )
-    {
-
-    }
-
-    static void convert_uint64_to_network( void *encoded_value, uint64_t v, int8_t multiplier_code )
-    {
-
+        value_type ev = convertDecodedValueToEncoded<value_type>(v,multiplier_code);
+        jdksavdecc_uint8_set( (uint8_t)ev,encoded_value,pos);
     }
 };
 
@@ -140,37 +111,31 @@ struct EncodedControlItemTraits<int16_t>
 {
     typedef int16_t value_type;
 
-    static bool is_signed() { return true; }
-    static bool is_floating_point() { return false; }
-    static bool is_integral() { return true; }
-    static float convert_network_to_float( const void *encoded_value, int8_t multiplier_code )
-    {
+    static bool isSigned() { return true; }
+    static bool isFloatingPoint() { return false; }
+    static bool isIntegral() { return true; }
 
+    template <typename U>
+    static U decodeNetworkData(
+            const void *encoded_value,
+            ssize_t pos,
+            int8_t multiplier_code )
+    {
+        value_type v;
+        v = (value_type)jdksavdecc_uint16_get(encoded_value,pos);
+        U r = convertEncodedValueToDecoded<U>( v, multiplier_code );
+        return r;
     }
 
-    static int64_t convert_network_to_int64( const void *encoded_value, int8_t multiplier_code )
+    template <typename U>
+    static void encodeNetworkData(
+            void *encoded_value,
+            ssize_t pos,
+            U v,
+            int8_t multiplier_code )
     {
-
-    }
-
-    static uint64_t convert_network_to_uint64( const void *encoded_value, int8_t multiplier_code )
-    {
-
-    }
-
-    static void convert_float_to_network( void *encoded_value, float v, int8_t multiplier_code )
-    {
-
-    }
-
-    static void convert_int64_to_network( void *encoded_value, int64_t v, int8_t multiplier_code )
-    {
-
-    }
-
-    static void convert_uint64_to_network( void *encoded_value, uint64_t v, int8_t multiplier_code )
-    {
-
+        value_type ev = convertDecodedValueToEncoded<value_type>(v,multiplier_code);
+        jdksavdecc_uint16_set( (uint16_t)ev,encoded_value,pos);
     }
 };
 
@@ -179,38 +144,33 @@ struct EncodedControlItemTraits<uint16_t>
 {
     typedef uint16_t value_type;
 
-    static bool is_signed() { return false; }
-    static bool is_floating_point() { return false; }
-    static bool is_integral() { return true; }
-    static float convert_network_to_float( const void *encoded_value, int8_t multiplier_code )
-    {
+    static bool isSigned() { return false; }
+    static bool isFloatingPoint() { return false; }
+    static bool isIntegral() { return true; }
 
+    template <typename U>
+    static U decodeNetworkData(
+            const void *encoded_value,
+            ssize_t pos,
+            int8_t multiplier_code )
+    {
+        value_type v;
+        v = (value_type)jdksavdecc_uint16_get(encoded_value,pos);
+        U r = convertEncodedValueToDecoded<U>( v, multiplier_code );
+        return r;
     }
 
-    static int64_t convert_network_to_int64( const void *encoded_value, int8_t multiplier_code )
+    template <typename U>
+    static void encodeNetworkData(
+            void *encoded_value,
+            ssize_t pos,
+            U v,
+            int8_t multiplier_code )
     {
-
+        value_type ev = convertDecodedValueToEncoded<value_type>(v,multiplier_code);
+        jdksavdecc_uint16_set( (uint16_t)ev,encoded_value,pos);
     }
 
-    static uint64_t convert_network_to_uint64( const void *encoded_value, int8_t multiplier_code )
-    {
-
-    }
-
-    static void convert_float_to_network( void *encoded_value, float v, int8_t multiplier_code )
-    {
-
-    }
-
-    static void convert_int64_to_network( void *encoded_value, int64_t v, int8_t multiplier_code )
-    {
-
-    }
-
-    static void convert_uint64_to_network( void *encoded_value, uint64_t v, int8_t multiplier_code )
-    {
-
-    }
 };
 
 template <>
@@ -218,37 +178,31 @@ struct EncodedControlItemTraits<int32_t>
 {
     typedef int32_t value_type;
 
-    static bool is_signed() { return true; }
-    static bool is_floating_point() { return false; }
-    static bool is_integral() { return true; }
-    static float convert_network_to_float( const void *encoded_value, int8_t multiplier_code )
-    {
+    static bool isSigned() { return true; }
+    static bool isFloatingPoint() { return false; }
+    static bool isIntegral() { return true; }
 
+    template <typename U>
+    static U decodeNetworkData(
+            const void *encoded_value,
+            ssize_t pos,
+            int8_t multiplier_code )
+    {
+        value_type v;
+        v = (value_type)jdksavdecc_uint32_get(encoded_value,pos);
+        U r = convertEncodedValueToDecoded<U>( v, multiplier_code );
+        return r;
     }
 
-    static int64_t convert_network_to_int64( const void *encoded_value, int8_t multiplier_code )
+    template <typename U>
+    static void encodeNetworkData(
+            void *encoded_value,
+            ssize_t pos,
+            U v,
+            int8_t multiplier_code )
     {
-
-    }
-
-    static uint64_t convert_network_to_uint64( const void *encoded_value, int8_t multiplier_code )
-    {
-
-    }
-
-    static void convert_float_to_network( void *encoded_value, float v, int8_t multiplier_code )
-    {
-
-    }
-
-    static void convert_int64_to_network( void *encoded_value, int64_t v, int8_t multiplier_code )
-    {
-
-    }
-
-    static void convert_uint64_to_network( void *encoded_value, uint64_t v, int8_t multiplier_code )
-    {
-
+        value_type ev = convertDecodedValueToEncoded<value_type>(v,multiplier_code);
+        jdksavdecc_uint32_set( (uint32_t)ev,encoded_value,pos);
     }
 };
 
@@ -257,38 +211,33 @@ struct EncodedControlItemTraits<uint32_t>
 {
     typedef uint32_t value_type;
 
-    static bool is_signed() { return false; }
-    static bool is_floating_point() { return false; }
-    static bool is_integral() { return true; }
-    static float convert_network_to_float( const void *encoded_value, int8_t multiplier_code )
-    {
+    static bool isSigned() { return false; }
+    static bool isFloatingPoint() { return false; }
+    static bool isIntegral() { return true; }
 
+    template <typename U>
+    static U decodeNetworkData(
+            const void *encoded_value,
+            ssize_t pos,
+            int8_t multiplier_code )
+    {
+        value_type v;
+        v = (value_type)jdksavdecc_uint32_get(encoded_value,pos);
+        U r = convertEncodedValueToDecoded<U>( v, multiplier_code );
+        return r;
     }
 
-    static int64_t convert_network_to_int64( const void *encoded_value, int8_t multiplier_code )
+    template <typename U>
+    static void encodeNetworkData(
+            void *encoded_value,
+            ssize_t pos,
+            U v,
+            int8_t multiplier_code )
     {
-
+        value_type ev = convertDecodedValueToEncoded<value_type>(v,multiplier_code);
+        jdksavdecc_uint32_set( (uint32_t)ev,encoded_value,pos);
     }
 
-    static uint64_t convert_network_to_uint64( const void *encoded_value, int8_t multiplier_code )
-    {
-
-    }
-
-    static void convert_float_to_network( void *encoded_value, float v, int8_t multiplier_code )
-    {
-
-    }
-
-    static void convert_int64_to_network( void *encoded_value, int64_t v, int8_t multiplier_code )
-    {
-
-    }
-
-    static void convert_uint64_to_network( void *encoded_value, uint64_t v, int8_t multiplier_code )
-    {
-
-    }
 };
 
 template <>
@@ -296,37 +245,31 @@ struct EncodedControlItemTraits<int64_t>
 {
     typedef int64_t value_type;
 
-    static bool is_signed() { return true; }
-    static bool is_floating_point() { return false; }
-    static bool is_integral() { return true; }
-    static float convert_network_to_float( const void *encoded_value, int8_t multiplier_code )
-    {
+    static bool isSigned() { return true; }
+    static bool isFloatingPoint() { return false; }
+    static bool isIntegral() { return true; }
 
+    template <typename U>
+    static U decodeNetworkData(
+            const void *encoded_value,
+            ssize_t pos,
+            int8_t multiplier_code )
+    {
+        value_type v;
+        v = (value_type)jdksavdecc_uint64_get(encoded_value,pos);
+        U r = convertEncodedValueToDecoded<U>( v, multiplier_code );
+        return r;
     }
 
-    static int64_t convert_network_to_int64( const void *encoded_value, int8_t multiplier_code )
+    template <typename U>
+    static void encodeNetworkData(
+            void *encoded_value,
+            ssize_t pos,
+            U v,
+            int8_t multiplier_code )
     {
-
-    }
-
-    static uint64_t convert_network_to_uint64( const void *encoded_value, int8_t multiplier_code )
-    {
-
-    }
-
-    static void convert_float_to_network( void *encoded_value, float v, int8_t multiplier_code )
-    {
-
-    }
-
-    static void convert_int64_to_network( void *encoded_value, int64_t v, int8_t multiplier_code )
-    {
-
-    }
-
-    static void convert_uint64_to_network( void *encoded_value, uint64_t v, int8_t multiplier_code )
-    {
-
+        value_type ev = convertDecodedValueToEncoded<value_type>(v,multiplier_code);
+        jdksavdecc_uint64_set( (uint64_t)ev,encoded_value,pos);
     }
 };
 
@@ -335,38 +278,34 @@ struct EncodedControlItemTraits<uint64_t>
 {
     typedef uint64_t value_type;
 
-    static bool is_signed() { return false; }
-    static bool is_floating_point() { return false; }
-    static bool is_integral() { return true; }
-    static float convert_network_to_float( const void *encoded_value, int8_t multiplier_code )
-    {
+    static bool isSigned() { return false; }
+    static bool isFloatingPoint() { return false; }
+    static bool isIntegral() { return true; }
 
+
+    template <typename U>
+    static U decodeNetworkData(
+            const void *encoded_value,
+            ssize_t pos,
+            int8_t multiplier_code )
+    {
+        value_type v;
+        v = (value_type)jdksavdecc_uint64_get(encoded_value,pos);
+        U r = convertEncodedValueToDecoded<U>( v, multiplier_code );
+        return r;
     }
 
-    static int64_t convert_network_to_int64( const void *encoded_value, int8_t multiplier_code )
+    template <typename U>
+    static void encodeNetworkData(
+            void *encoded_value,
+            ssize_t pos,
+            U v,
+            int8_t multiplier_code )
     {
-
+        value_type ev = convertDecodedValueToEncoded<value_type>(v,multiplier_code);
+        jdksavdecc_uint64_set( (uint64_t)ev,encoded_value,pos);
     }
 
-    static uint64_t convert_network_to_uint64( const void *encoded_value, int8_t multiplier_code )
-    {
-
-    }
-
-    static void convert_float_to_network( void *encoded_value, float v, int8_t multiplier_code )
-    {
-
-    }
-
-    static void convert_int64_to_network( void *encoded_value, int64_t v, int8_t multiplier_code )
-    {
-
-    }
-
-    static void convert_uint64_to_network( void *encoded_value, uint64_t v, int8_t multiplier_code )
-    {
-
-    }
 };
 
 template <>
@@ -374,38 +313,33 @@ struct EncodedControlItemTraits<float>
 {
     typedef float value_type;
 
-    static bool is_signed() { return true; }
-    static bool is_floating_point() { return true; }
-    static bool is_integral() { return false; }
-    static float convert_network_to_float( const void *encoded_value, int8_t multiplier_code )
-    {
+    static bool isSigned() { return true; }
+    static bool isFloatingPoint() { return true; }
+    static bool isIntegral() { return false; }
 
+    template <typename U>
+    static U decodeNetworkData(
+            const void *encoded_value,
+            ssize_t pos,
+            int8_t multiplier_code )
+    {
+        value_type v;
+        v = (value_type)jdksavdecc_float_get(encoded_value,pos);
+        U r = convertEncodedValueToDecoded<U>( v, multiplier_code );
+        return r;
     }
 
-    static int64_t convert_network_to_int64( const void *encoded_value, int8_t multiplier_code )
+    template <typename U>
+    static void encodeNetworkData(
+            void *encoded_value,
+            ssize_t pos,
+            U v,
+            int8_t multiplier_code )
     {
-
+        value_type ev = convertDecodedValueToEncoded<value_type>(v,multiplier_code);
+        jdksavdecc_float_set( (uint64_t)ev,encoded_value,pos);
     }
 
-    static uint64_t convert_network_to_uint64( const void *encoded_value, int8_t multiplier_code )
-    {
-
-    }
-
-    static void convert_float_to_network( void *encoded_value, float v, int8_t multiplier_code )
-    {
-
-    }
-
-    static void convert_int64_to_network( void *encoded_value, int64_t v, int8_t multiplier_code )
-    {
-
-    }
-
-    static void convert_uint64_to_network( void *encoded_value, uint64_t v, int8_t multiplier_code )
-    {
-
-    }
 };
 
 template <>
@@ -413,38 +347,34 @@ struct EncodedControlItemTraits<double>
 {
     typedef double value_type;
 
-    static bool is_signed() { return true; }
-    static bool is_floating_point() { return true; }
-    static bool is_integral() { return false; }
-    static float convert_network_to_float( const void *encoded_value, int8_t multiplier_code )
-    {
+    static bool isSigned() { return true; }
+    static bool isFloatingPoint() { return true; }
+    static bool isIntegral() { return false; }
 
+
+    template <typename U>
+    static U decodeNetworkData(
+            const void *encoded_value,
+            ssize_t pos,
+            int8_t multiplier_code )
+    {
+        value_type v;
+        v = (value_type)jdksavdecc_double_get(encoded_value,pos);
+        U r = convertEncodedValueToDecoded<U>( v, multiplier_code );
+        return r;
     }
 
-    static int64_t convert_network_to_int64( const void *encoded_value, int8_t multiplier_code )
+    template <typename U>
+    static void encodeNetworkData(
+            void *encoded_value,
+            ssize_t pos,
+            U v,
+            int8_t multiplier_code )
     {
-
+        value_type ev = convertDecodedValueToEncoded<value_type>(v,multiplier_code);
+        jdksavdecc_double_set( (uint64_t)ev,encoded_value,pos);
     }
 
-    static uint64_t convert_network_to_uint64( const void *encoded_value, int8_t multiplier_code )
-    {
-
-    }
-
-    static void convert_float_to_network( void *encoded_value, float v, int8_t multiplier_code )
-    {
-
-    }
-
-    static void convert_int64_to_network( void *encoded_value, int64_t v, int8_t multiplier_code )
-    {
-
-    }
-
-    static void convert_uint64_to_network( void *encoded_value, uint64_t v, int8_t multiplier_code )
-    {
-
-    }
 };
 
 ///
@@ -515,7 +445,7 @@ public:
     /// \param value_pointer pointer to network byte order encoded item value
     /// \return bool representation of the unencoded item value
     ///
-    virtual bool getValueAsBool( const void *value_pointer ) const = 0;
+    virtual bool getValueAsBool( const void *value_pointer, ssize_t pos ) const = 0;
 
     ///
     /// \brief setValueFromBool
@@ -523,7 +453,7 @@ public:
     /// \param v bool representation of the unencoded item value
     /// \return
     ///
-    virtual void setValueFromBool( void *value_pointer, bool v ) const = 0;
+    virtual void setValueFromBool( void *value_pointer, ssize_t pos, bool v ) const = 0;
 
     ///
     /// \brief getDefaultAsBool
@@ -536,14 +466,14 @@ public:
     /// \param value_pointer pointer to network byte order encoded item value
     /// \return floating point representation of the unencoded item value
     ///
-    virtual float getValueAsFloat( const void *value_pointer ) = 0;
+    virtual float getValueAsFloat( const void *value_pointer, ssize_t pos ) const = 0;
 
     ///
     /// \brief setValueFromFloat
     /// \param value_pointer pointer to buffer to hold network byee order encoded item value
     /// \param v floating point representation of the unencoded item value
     ///
-    virtual void setValueFromFloat( void *value_pointer, float v ) = 0;
+    virtual void setValueFromFloat( void *value_pointer, ssize_t pos, float v ) const = 0;
 
     ///
     /// \brief getMinAsFloat
@@ -574,14 +504,14 @@ public:
     /// \param value_pointer pointer to network byte order encoded item value
     /// \return int64_t representation of the unencoded item value
     ///
-    virtual int64_t getValueAsInt64( const void *value_pointer ) = 0;
+    virtual int64_t getValueAsInt64( const void *value_pointer, ssize_t pos ) const = 0;
 
     ///
     /// \brief setValueFromInt64
     /// \param value_pointer pointer to buffer to hold network byte order encoded item value
     /// \param v int64_t representation of the unencoded item value
     ///
-    virtual void setValueFromInt64( void *value_pointer, int64_t v ) = 0;
+    virtual void setValueFromInt64( void *value_pointer, ssize_t pos, int64_t v ) const = 0;
 
     ///
     /// \brief getMinAsInt64
@@ -612,14 +542,14 @@ public:
     /// \param value_pointer pointer to network byte order encoded item value
     /// \return uint64_t representation of the unencoded item value
     ///
-    virtual uint64_t getValueAsUInt64( const void *value_pointer ) = 0;
+    virtual uint64_t getValueAsUInt64( const void *value_pointer, ssize_t pos ) const = 0;
 
     ///
     /// \brief setValueFromUInt64
     /// \param value_pointer pointer to buffer to hold network byte order encoded item value
     /// \param v uint64_t representation of the unencoded item value
     ///
-    virtual void setValueFromUInt64( void *value_pointer, uint64_t v ) = 0;
+    virtual void setValueFromUInt64( void *value_pointer, ssize_t pos, uint64_t v ) const = 0;
 
     ///
     /// \brief getMinAsUInt64
@@ -719,26 +649,26 @@ public:
 
     bool isSigned() const override
     {
-        return EncodedControlItemTraits<T>::is_signed()
-                || EncodedControlItemTraits<T>::is_floating_point();
+        return EncodedControlItemTraits<T>::isSigned()
+                || EncodedControlItemTraits<T>::isFloatingPoint();
     }
 
     bool isInteger() const override
     {
-        return EncodedControlItemTraits<T>::is_integral();
+        return EncodedControlItemTraits<T>::isIntegral();
     }
 
     bool isFloatingPoint() const override
     {
-        return EncodedControlItemTraits<T>::is_floating_point();
+        return EncodedControlItemTraits<T>::isFloatingPoint();
     }
 
-    bool getValueAsBool( const void *value_pointer ) const override
+    bool getValueAsBool( const void *value_pointer, ssize_t pos ) const override
     {
         bool r=false;
         if( getItemSize()==1 )
         {
-            const uint8_t *p = reinterpret_cast<const uint8_t *>(value_pointer);
+            const uint8_t *p = reinterpret_cast<const uint8_t *>(value_pointer) + pos;
             if( *p != 0 )
             {
                 r=true;
@@ -747,12 +677,12 @@ public:
         return r;
     }
 
-    void setValueFromBool( void *value_pointer, bool v ) const override
+    void setValueFromBool( void *value_pointer, ssize_t pos, bool v ) const override
     {
         if( getItemSize()==1 )
         {
-            uint8_t *p = reinterpret_cast<uint8_t *>(value_pointer);
-            p = (v==false) ? m_min : m_max;
+            uint8_t *p = reinterpret_cast<uint8_t *>(value_pointer) + pos;
+            *p = (v==false) ? m_min : m_max;
         }
     }
 
@@ -766,119 +696,95 @@ public:
         return r;
     }
 
-    float getValueAsFloat( const void *value_pointer ) const override
+    float getValueAsFloat( const void *value_pointer, ssize_t pos ) const override
     {
-        return EncodedControlItemTraits<T>::convert_network_to_float( value_pointer, getMultiplierCode() );
+        return EncodedControlItemTraits<T>::template decodeNetworkData<float>( value_pointer, pos, getMultiplierCode() );
     }
 
-    void setValueFromFloat( void *value_pointer, float v ) const override
+    void setValueFromFloat( void *value_pointer, ssize_t pos, float v ) const override
     {
-        EncodedControlItemTraits<T>::convert_float_to_network( value_pointer, v, getMultiplierCode() );
+        EncodedControlItemTraits<T>::template encodeNetworkData<float>( value_pointer, pos, v, getMultiplierCode() );
     }
 
     float getMinAsFloat() const override
     {
-        float r;
-        decodeControlValue(&r,m_min,getMultiplierCode());
-        return r;
+        return convertEncodedValueToDecoded<float>(m_min,getMultiplierCode());
     }
 
     float getMaxAsFloat() const override
     {
-        float r;
-        decodeControlValue(&r,m_max,getMultiplierCode());
-        return r;
+        return convertEncodedValueToDecoded<float>(m_max,getMultiplierCode());
     }
 
     float getDefaultAsFloat() const override
     {
-        float r;
-        decodeControlValue(&r,m_default,getMultiplierCode());
-        return r;
+        return convertEncodedValueToDecoded<float>(m_default,getMultiplierCode());
     }
 
     float getStepAsFloat() const override
     {
-        float r;
-        decodeControlValue(&r,m_step,getMultiplierCode());
-        return r;
+        return convertEncodedValueToDecoded<float>(m_step,getMultiplierCode());
     }
 
-    int64_t getValueAsInt64( const void *value_pointer ) const override
+    int64_t getValueAsInt64( const void *value_pointer, ssize_t pos ) const override
     {
-        return EncodedControlItemTraits<T>::convert_network_to_int64( value_pointer, getMultiplierCode() );
+        return EncodedControlItemTraits<T>::template decodeNetworkData<int64_t>( value_pointer, pos, getMultiplierCode() );
     }
 
-    int64_t setValueFromInt64( void *value_pointer, int64_t v ) const override
+    void setValueFromInt64( void *value_pointer, ssize_t pos, int64_t v ) const override
     {
-        EncodedControlItemTraits<T>::convert_int64_to_network( value_pointer, v, getMultiplierCode() );
+        EncodedControlItemTraits<T>::template encodeNetworkData<int64_t>( value_pointer, pos, v, getMultiplierCode() );
     }
 
     int64_t getMinAsInt64() const override
     {
-        int64_t r;
-        decodeControlValue(&r,m_min,getMultiplierCode());
-        return r;
+        return convertEncodedValueToDecoded<int64_t>(m_min,getMultiplierCode());
     }
 
     int64_t getMaxAsInt64() const override
     {
-        int64_t r;
-        decodeControlValue(&r,m_max,getMultiplierCode());
-        return r;
+        return convertEncodedValueToDecoded<int64_t>(m_max,getMultiplierCode());
     }
 
     int64_t getDefaultAsInt64() const override
     {
-        int64_t r;
-        decodeControlValue(&r,m_default,getMultiplierCode());
-        return r;
+        return convertEncodedValueToDecoded<int64_t>(m_default,getMultiplierCode());
     }
 
     int64_t getStepAsInt64() const override
     {
-        int64_t r;
-        decodeControlValue(&r,m_step,getMultiplierCode());
-        return r;
+        return convertEncodedValueToDecoded<int64_t>(m_step,getMultiplierCode());
     }
 
-    uint64_t getValueAsUInt64( const void *value_pointer ) const override
+    uint64_t getValueAsUInt64( const void *value_pointer, ssize_t pos ) const override
     {
-        return EncodedControlItemTraits<T>::convert_network_to_uint64( value_pointer, getMultiplierCode() );
+        return EncodedControlItemTraits<T>::template decodeNetworkData<uint64_t>( value_pointer, pos, getMultiplierCode() );
+
     }
 
-    void setValueFromUInt64( void *value_pointer, int64_t v ) const override
+    void setValueFromUInt64( void *value_pointer, ssize_t pos, uint64_t v ) const override
     {
-        EncodedControlItemTraits<T>::convert_uint64_to_network( value_pointer, v, getMultiplierCode() );
-
+        EncodedControlItemTraits<T>::template encodeNetworkData<uint64_t>( value_pointer, pos, v, getMultiplierCode() );
     }
 
     uint64_t getMinAsUInt64() const override
     {
-        uint64_t r;
-        decodeControlValue(&r,m_min,getMultiplierCode());
-        return r;
+        return convertEncodedValueToDecoded<uint64_t>(m_min,getMultiplierCode());
     }
 
     uint64_t getMaxAsUInt64() const override
     {
-        int64_t r;
-        decodeControlValue(&r,m_max,getMultiplierCode());
-        return r;
+        return convertEncodedValueToDecoded<uint64_t>(m_max,getMultiplierCode());
     }
 
     uint64_t getDefaultAsUInt64() const override
     {
-        int64_t r;
-        decodeControlValue(&r,m_default,getMultiplierCode());
-        return r;
+        return convertEncodedValueToDecoded<uint64_t>(m_default,getMultiplierCode());
     }
 
     uint64_t getStepAsUInt64() const override
     {
-        int64_t r;
-        decodeControlValue(&r,m_step,getMultiplierCode());
-        return r;
+        return convertEncodedValueToDecoded<uint64_t>(m_step,getMultiplierCode());
     }
 
 private:
