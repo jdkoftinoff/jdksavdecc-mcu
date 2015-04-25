@@ -34,6 +34,5 @@
 
 namespace JDKSAvdeccMCU
 {
-ControlDescriptionItemInfo<uint16_t> m(1,300,150,1,JDKSAVDECC_AEM_UNIT_VOLTAGE_VOLTS, -1 );
 
 }

@@ -1,41 +1,555 @@
-/*
-  Copyright (c) 2015, J.D. Koftinoff Software, Ltd.
-  All rights reserved.
-
-  Redistribution and use in source and binary forms, with or without
-  modification, are permitted provided that the following conditions are met:
-
-   1. Redistributions of source code must retain the above copyright notice,
-      this list of conditions and the following disclaimer.
-
-   2. Redistributions in binary form must reproduce the above copyright
-      notice, this list of conditions and the following disclaimer in the
-      documentation and/or other materials provided with the distribution.
-
-   3. Neither the name of J.D. Koftinoff Software, Ltd. nor the names of its
-      contributors may be used to endorse or promote products derived from
-      this software without specific prior written permission.
-
-  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-  AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-  IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
-  ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
-  LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
-  CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
-  SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
-  INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
-  CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
-  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-  POSSIBILITY OF SUCH DAMAGE.
-*/
 #pragma once
 
 #include "JDKSAvdeccMCU/World.hpp"
 #include "JDKSAvdeccMCU/Helpers.hpp"
-#include "JDKSAvdeccMCU/Frame.hpp"
 
 namespace JDKSAvdeccMCU
 {
+/// \brief powers_of_ten
+///
+/// The powers of ten values as float from 1e-12 to 1e12 inclusive
+///
+extern float powers_of_ten[25];
+
+///
+///
+/// \brief integer_pow10
+///
+/// Template function to get the value of an integer power of ten
+/// Works with integer types and floating point types.
+///
+template <typename T1, typename T2>
+T1 integer_pow10( T2 exponent )
+{
+    T1 r = 0;
+    int e = int( exponent ) + 12;
+    if ( e >= 0 && e <= 25 )
+    {
+        r = powers_of_ten[e];
+    }
+    return r;
+}
+
+
+///
+/// \brief getEncodingMultiplier
+///
+/// Get the multiplier required to convert an unencoded value
+/// to an encoded value.
+///
+/// If the multiplier_power is <=0 this method returns 1
+///
+/// \return The value to multiply with
+///
+template <typename T>
+T getEncodingMultiplier(int8_t multiplier_power)
+{
+    T r = 1;
+    if ( multiplier_power < 0 )
+    {
+        r = integer_pow10<T>( -multiplier_power );
+    }
+    return r;
+}
+
+///
+/// \brief getEncodingDivider
+///
+/// Get the divider required to convert an unencoded value
+/// to an encoded value
+///
+/// If the multiplier_power is >=0 this method returns 1
+///
+/// \return the value to divide with
+///
+template <typename T>
+T getEncodingDivider(int8_t multiplier_power)
+{
+    T r = 1;
+    if ( multiplier_power > 0 )
+    {
+        r = integer_pow10<T>( multiplier_power );
+    }
+    return r;
+}
+
+
+///
+/// \brief getDecodingMultiplier
+///
+/// Get the multiplier required to convert an encoded value
+/// to an unencoded value.
+///
+/// If the multiplier_power is >=0 this method returns 1
+///
+/// \return The value to multiply with
+///
+template <typename T>
+T getDecodingMultiplier(int8_t multiplier_power)
+{
+    T r = 1;
+    if ( multiplier_power > 0 )
+    {
+        r = integer_pow10<T>( multiplier_power );
+    }
+    return r;
+}
+
+///
+/// \brief getDecodingDivider
+///
+/// Get the divider required to convert an encoded value
+/// to an unencoded value
+///
+/// If the multiplier_power is <=0 this method returns 1
+///
+/// \return the value to divide with
+///
+template <typename T>
+T getDecodingDivider(int8_t multiplier_power )
+{
+    T r = 1;
+    if ( multiplier_power < 0 )
+    {
+        r = integer_pow10<T>( -multiplier_power );
+    }
+    return r;
+}
+
+///
+/// \brief convertEncodedValueToDecoded
+///
+/// convert a value from the encoded value to the decoded value, taking
+/// into account the multiplier_power
+///
+template <typename DecodedType,typename EncodedType>
+DecodedType convertEncodedValueToDecoded( EncodedType encoded, int8_t multiplier_power )
+{
+    DecodedType v = static_cast<DecodedType>(encoded);
+    v *= getDecodingMultiplier<DecodedType>(multiplier_power);
+    v /= getDecodingDivider<DecodedType>(multiplier_power);
+    return v;
+}
+
+///
+/// \brief convertDecodedValueToEncoded
+///
+/// convert a value from the decoded value to the encoded value, taking
+/// into account the multiplier_power
+///
+template <typename EncodedType,typename DecodedType>
+EncodedType convertDecodedValueToEncoded( DecodedType decoded, int8_t multiplier_power )
+{
+    EncodedType v = static_cast<EncodedType>(decoded);
+    v *= getEncodingMultiplier<EncodedType>(multiplier_power);
+    v /= getEncodingDivider<EncodedType>(multiplier_power);
+    return v;
+}
+
+
+///
+/// \brief The UnitsCode enum
+///
+/// Enumerations matching the Units definitions from IEEE Std 1722.1-2013 Clause 7.3.3
+///
+enum class UnitsCode : uint8_t
+{
+    UNITLESS=0x00,
+    COUNT=0x01,
+    PERCENT=0x02,
+    FSTOP=0x03,
+    TIME_SECONDS=0x08,
+    TIME_MINUTES=0x09,
+    TIME_HOURS=0x0a,
+    TIME_DAYS=0x0b,
+    TIME_MONTHS=0x0c,
+    TIME_YEARS=0x0d,
+    TIME_SAMPLES=0x0e,
+    TIME_FRAMES=0x0f,
+    FREQUENCY_HERTZ=0x10,
+    FREQUENCY_SEMITONES=0x11,
+    FREQUENCY_CENTS=0x12,
+    FREQUENCY_OCTAVES=0x13,
+    FREQUENCY_FPS=0x14,
+    DISTANCE_METRES=0x18,
+    TEMPERATURE_KELVIN=0x20,
+    MASS_GRAMS=0x28,
+    VOLTAGE_VOLTS=0x30,
+    VOLTAGE_DBV=0x31,
+    VOLTAGE_DBU=0x32,
+    CURRENT_AMPS=0x38,
+    POWER_WATTS=0x40,
+    POWER_DBM=0x41,
+    POWER_DBW=0x42,
+    PRESSURE_PASCALS=0x48,
+    MEMORY_BITS=0x50,
+    MEMORY_BYTES=0x51,
+    MEMORY_KIBIBYTES=0x52,
+    MEMORY_MEBIBYTES=0x53,
+    MEMORY_GIBIBYTES=0x54,
+    MEMORY_TEBIBYTES=0x55,
+    MEMORY_BANDWIDTH_BITS_PER_SEC=0x58,
+    MEMORY_BANDWIDTH_BYTES_PER_SEC=0x59,
+    MEMORY_BANDWIDTH_KIBIBYTES_PER_SEC=0x5a,
+    MEMORY_BANDWIDTH_MEBIBYTES_PER_SEC=0x5b,
+    MEMORY_BANDWIDTH_GIGIBYTES_PER_SEC=0x5c,
+    MEMORY_BANDWIDTH_TEBIBYTES_PER_SEC=0x5d,
+    LUMINOSITY_CANDELAS=0x60,
+    ENERGY_JOULES=0x68,
+    ANGLE_RADIANS=0x70,
+    FORCE_NEWTONS=0x78,
+    RESISTANCE_OHMS=0x80,
+    VELOCITY_METRES_PER_SEC=0x88,
+    VELOCITY_RADIANS_PER_SEC=0x89,
+    ACCELERATION_METRES_PER_SEC_SQUARED=0x90,
+    ACCELERATION_RADIANS_PER_SEC_SQUARED=0x91,
+    MAGNETIC_FLUX_TESLAS=0x98,
+    AREA_METERS_SQUARED=0xa0,
+    VOLUME_METERS_CUBED=0xa8,
+    VOLUME_LITRES=0xa9,
+    LEVEL_DB=0xb0,
+    LEVEL_DB_PEAK=0xb1,
+    LEVEL_DB_RMS=0xb2,
+    LEVEL_DBFS=0xb3,
+    LEVEL_DBFS_PEAK=0xb4,
+    LEVEL_DBFS_RMS=0xb5,
+    LEVEL_DBTP=0xb6,
+    LEVEL_DB_A=0xb7,
+    LEVEL_DB_B=0xb8,
+    LEVEL_DB_C=0xb9,
+    LEVEL_DB_SPL=0xba,
+    LEVEL_LU=0xbb,
+    LEVEL_LUFS=0xbc
+};
+
+///
+/// \brief getAvdeccUnitsSuffix
+///
+/// Get description/suffix for a UnitsCode
+///
+/// \param units_code
+/// \return UTF-8 c style string containing a presentable suffix describing the unit
+///
+const char *getAvdeccUnitsSuffix(UnitsCode units_code);
+
+///
+/// \brief The EncodingType enum
+///
+/// Enumeration of possible encoding types to describe transport encoding and
+/// storage encoding
+///
+enum class EncodingType : uint8_t
+{
+    ENCODING_INT8,
+    ENCODING_UINT8,
+    ENCODING_INT16,
+    ENCODING_UINT16,
+    ENCODING_INT32,
+    ENCODING_UINT32,
+    ENCODING_INT64,
+    ENCODING_UINT64,
+    ENCODING_FLOAT,
+    ENCODING_DOUBLE
+};
+
+///
+/// \brief EncodingTypeFor template traits class
+///
+/// Specialized for the C++ types which map to an EncodingType enumeration value
+/// So that code can look up the enumeration value for a static type
+///
+template <typename T>
+struct EncodingTypeFor
+{
+};
+
+template <>
+struct EncodingTypeFor<int8_t>
+{
+    using type = int8_t;
+    static EncodingType getEncodingType() { return EncodingType::ENCODING_INT8; }
+};
+
+template <>
+struct EncodingTypeFor<uint8_t>
+{
+    using type = uint8_t;
+    static EncodingType getEncodingType() { return EncodingType::ENCODING_UINT8; }
+};
+
+template <>
+struct EncodingTypeFor<int16_t>
+{
+    using type = int16_t;
+    static EncodingType getEncodingType() { return EncodingType::ENCODING_INT16; }
+};
+
+template <>
+struct EncodingTypeFor<uint16_t>
+{
+    using type = uint16_t;
+    static EncodingType getEncodingType() { return EncodingType::ENCODING_UINT16; }
+};
+
+template <>
+struct EncodingTypeFor<int32_t>
+{
+    using type = int32_t;
+    static EncodingType getEncodingType() { return EncodingType::ENCODING_INT32; }
+};
+
+template <>
+struct EncodingTypeFor<uint32_t>
+{
+    using type = uint32_t;
+    static EncodingType getEncodingType() { return EncodingType::ENCODING_UINT32; }
+};
+
+template <>
+struct EncodingTypeFor<int64_t>
+{
+    using type = int64_t;
+    static EncodingType getEncodingType() { return EncodingType::ENCODING_INT64; }
+};
+
+template <>
+struct EncodingTypeFor<uint64_t>
+{
+    using type = uint64_t;
+    static EncodingType getEncodingType() { return EncodingType::ENCODING_UINT64; }
+};
+
+template <>
+struct EncodingTypeFor<float>
+{
+    using type = float;
+    static EncodingType getEncodingType() { return EncodingType::ENCODING_FLOAT; }
+};
+
+template <>
+struct EncodingTypeFor<double>
+{
+    using type = uint64_t;
+    static EncodingType getEncodingType() { return EncodingType::ENCODING_DOUBLE; }
+};
+
+
+///
+/// \brief The RangedValueBase class
+///
+/// Base class for the RangedValue
+/// Pure-abstract interfaces to allow querying of meta data and values
+/// and setting of values
+///
+class RangedValueBase
+{
+public:
+    virtual ~RangedValueBase() {}
+
+    ///
+    /// \brief getUnitsCode
+    ///
+    /// \return The UnitsCode for this value
+    ///
+    virtual UnitsCode getUnitsCode() const = 0;
+
+    ///
+    /// \brief getStorageType
+    /// \return The EncodingType used for the storage of this value
+    ///
+    virtual EncodingType getStorageType() const = 0;
+
+    ///
+    /// \brief getEncodingType
+    /// \return The EncodingType used for the encoded transport of this value
+    ///
+    virtual EncodingType getEncodingType() const = 0;
+
+    ///
+    /// \brief setUnencodedValueBool
+    ///
+    /// Set the unencoded value from a bool
+    ///
+    /// \param v value to set
+    /// \return true if the value changed
+    ///
+    virtual bool setUnencodedValueBool( bool v ) =0;
+
+    ///
+    /// \brief setUnencodedValueFloat
+    ///
+    /// Set the unencoded value from a float
+    ///
+    /// \param v value to set
+    /// \return true if the value changed
+    ///
+    virtual bool setUnencodedValueFloat( float v ) = 0;
+
+    ///
+    /// \brief setUnencodedValueDouble
+    ///
+    /// Set the unencoded value from a double
+    ///
+    /// \param v value to set
+    /// \return true if the value changed
+    ///
+    virtual bool setUnencodedValueDouble( double v ) = 0;
+
+    ///
+    /// \brief setUnencodedValueInt64
+    ///
+    /// Set the unencoded value from an int64_t
+    ///
+    /// \param v value to set
+    /// \return true if the value changed
+    ///
+    virtual bool setUnencodedValueInt64( int64_t v ) = 0;
+
+    ///
+    /// \brief setUnencodedValueUInt64
+    ///
+    /// Set the unencoded value from an uint64_t
+    ///
+    /// \param v value to set
+    /// \return true if the value changed
+    ///
+    virtual bool setUnencodedValueUInt64( uint64_t v ) = 0;
+
+    ///
+    /// \brief getUnencodedValueBool
+    /// \return the unencoded value as a bool
+    ///
+    virtual bool getUnencodedValueBool() const =0;
+
+    ///
+    /// \brief getUnencodedValueFloat
+    /// \return the unencoded value as a float
+    ///
+    virtual float getUnencodedValueFloat() const =0;
+
+    ///
+    /// \brief getUnencodedValueDouble
+    /// \return the unencoded value as a double
+    ///
+    virtual double getUnencodedValueDouble() const =0;
+
+    ///
+    /// \brief getUnencodedValueInt64
+    /// \return the unencoded value as an int64_t
+    ///
+    virtual int64_t getUnencodedValueInt64() const =0;
+
+    ///
+    /// \brief getUnencodedValueUInt64
+    /// \return the unencoded value as a uint64_t
+    ///
+    virtual uint64_t getUnencodedValueUInt64() const =0;
+
+    ///
+    /// \brief incValue
+    ///
+    /// Increment the value by the step value
+    ///
+    /// \return true if the value changed
+    ///
+    virtual bool incValue() = 0;
+
+    ///
+    /// \brief decValue
+    ///
+    /// Decrement the value by the step value
+    ///
+    /// \return true if the value changed
+    ///
+    virtual bool decValue() = 0;
+
+    virtual int8_t getEncodedValueInt8() const =0;
+    virtual uint8_t getEncodedValueUInt8() const =0;
+    virtual int16_t getEncodedValueInt16() const =0;
+    virtual uint16_t getEncodedValueUInt16() const =0;
+    virtual int32_t getEncodedValueInt32() const =0;
+    virtual uint32_t getEncodedValueUInt32() const =0;
+    virtual int64_t getEncodedValueInt64() const =0;
+    virtual uint64_t getEncodedValueUInt64() const =0;
+    virtual float getEncodedValueFloat() const =0;
+    virtual double getEncodedValueDouble() const =0;
+
+    virtual bool setFromEncodedValueInt8( int8_t v ) =0;
+    virtual bool setFromEncodedValueUInt8( uint8_t v ) =0;
+    virtual bool setFromEncodedValueInt16( int16_t v ) =0;
+    virtual bool setFromEncodedValueUInt16( uint16_t v ) =0;
+    virtual bool setFromEncodedValueInt32( int32_t v ) =0;
+    virtual bool setFromEncodedValueUInt32( uint32_t v ) =0;
+    virtual bool setFromEncodedValueInt64( int64_t v ) =0;
+    virtual bool setFromEncodedValueUInt64( uint64_t v ) =0;
+    virtual bool setFromEncodedValueFloat( float v ) =0;
+    virtual bool setFromEncodedValueDouble( double v ) =0;
+
+    virtual bool setFromEncodedValueWithClampInt8( int8_t v ) =0;
+    virtual bool setFromEncodedValueWithClampUInt8( uint8_t v ) =0;
+    virtual bool setFromEncodedValueWithClampInt16( int16_t v ) =0;
+    virtual bool setFromEncodedValueWithClampUInt16( uint16_t v ) =0;
+    virtual bool setFromEncodedValueWithClampInt32( int32_t v ) =0;
+    virtual bool setFromEncodedValueWithClampUInt32( uint32_t v ) =0;
+    virtual bool setFromEncodedValueWithClampInt64( int64_t v ) =0;
+    virtual bool setFromEncodedValueWithClampUInt64( uint64_t v ) =0;
+    virtual bool setFromEncodedValueWithClampFloat( float v ) =0;
+    virtual bool setFromEncodedValueWithClampDouble( double v ) =0;
+
+
+    ///
+    /// \brief setChanged
+    ///
+    /// Set the changed flag
+    ///
+    virtual void setChanged() = 0;
+
+    ///
+    /// \brief clearChanged
+    ///
+    /// Clear the changed flag
+    ///
+    virtual void clearChanged() = 0;
+
+    ///
+    /// \brief getChanged
+    /// \return true if the value had changed since the last time clearChanged() was called
+    ///
+    virtual bool getChanged() const = 0;
+
+    ///
+    /// \brief getEncodedMinValue
+    /// \return The encoded minimum value
+    ///
+    virtual int64_t getEncodedMinValue() const = 0;
+
+    ///
+    /// \brief getEncodedMaxValue
+    /// \return The encoded maximum value
+    ///
+    virtual int64_t getEncodedMaxValue() const = 0;
+
+    ///
+    /// \brief getEncodedStepValue
+    /// \return The encoded step value
+    ///
+    virtual int64_t getEncodedStepValue() const = 0;
+
+    ///
+    /// \brief getEncodedDefaultValue
+    /// \return the encoded default value
+    ///
+    virtual int64_t getEncodedDefaultValue() const = 0;
+
+    ///
+    /// \brief getEncodingMultiplierPower
+    /// \return the power of 10 used for encoding
+    ///
+    virtual int8_t getEncodingMultiplierPower() const = 0;
+
+    virtual const char * getUnitsSuffix() const = 0;
+};
+
 
 /// \brief the RangedValue class
 ///
@@ -43,14 +557,15 @@ namespace JDKSAvdeccMCU
 /// step size
 /// and with the capability to encode/decode into a fixed point integer type
 ///
-template <uint8_t UnitsValue,
+template <UnitsCode UnitsValue,
           int64_t MinValue,
           int64_t MaxValue,
           int64_t DefaultValue = 0,
           int64_t StepValue = 1,
           int MultiplierPowerValue = 0,
-          typename ValueType = float>
-class RangedValue
+          typename EncodedT = int32_t,
+          typename ValueT = float>
+class RangedValue : public RangedValueBase
 {
 #if __cplusplus >= 201103L
     static_assert( MinValue <= DefaultValue, "MinValue is not less than or equal to DefaultValue" );
@@ -58,13 +573,16 @@ class RangedValue
 #endif
 
   public:
-    typedef ValueType value_type;
-    static const uint8_t units = UnitsValue;
+    typedef ValueT value_type;
+    typedef EncodedT encoded_type;
+
+    static const UnitsCode units = UnitsValue;
     static const int64_t min_value = MinValue;
     static const int64_t max_value = MaxValue;
     static const int64_t step_value = StepValue;
     static const int64_t default_value = DefaultValue;
     static const int multiplier_power = MultiplierPowerValue;
+
 
     ///
     /// \brief Value Constructor
@@ -196,6 +714,70 @@ class RangedValue
         return r;
     }
 
+    EncodingType getStorageType() const override
+    {
+        return EncodingTypeFor<ValueT>::getEncodingType();
+    }
+
+    EncodingType getEncodingType() const override
+    {
+        return EncodingTypeFor<EncodedT>::getEncodingType();
+    }
+
+    bool setUnencodedValueBool( bool v ) override
+    {
+        uint8_t v8 = v ? 255 : 0;
+
+        return setValue(value_type(v8));
+    }
+
+    bool setUnencodedValueFloat( float v ) override
+    {
+        return setValue(v);
+    }
+
+    bool setUnencodedValueDouble( double v ) override
+    {
+        return setValue(v);
+    }
+
+    bool setUnencodedValueInt64( int64_t v ) override
+    {
+        return setValue(v);
+    }
+
+    bool setUnencodedValueUInt64( uint64_t v ) override
+    {
+        return setValue(v);
+    }
+
+    bool getUnencodedValueBool() const override
+    {
+        return m_value != value_type();
+    }
+
+    float getUnencodedValueFloat() const override
+    {
+        return m_value;
+    }
+
+    double getUnencodedValueDouble() const override
+    {
+        return m_value;
+    }
+
+    int64_t getUnencodedValueInt64() const override
+    {
+        return m_value;
+    }
+
+
+    uint64_t getUnencodedValueUInt64() const override
+    {
+        return m_value;
+    }
+
+
     ///
     /// \brief incValue
     ///
@@ -204,7 +786,7 @@ class RangedValue
     ///
     /// \return true if the value changed
     ///
-    bool incValue()
+    bool incValue() override
     {
         bool r = false;
         value_type new_value = m_value + getStepValue();
@@ -229,7 +811,7 @@ class RangedValue
     ///
     /// \return true if the value changed
     ///
-    bool decValue()
+    bool decValue() override
     {
         bool r = false;
         value_type new_value = m_value - getStepValue();
@@ -467,6 +1049,76 @@ class RangedValue
         *dest = rounded_v;
     }
 
+    int8_t getEncodedValueInt8() const override
+    {
+        int8_t v;
+        getEncodedValue( &v );
+        return v;
+    }
+
+    uint8_t getEncodedValueUInt8() const override
+    {
+        uint8_t v;
+        getEncodedValue( &v );
+        return v;
+    }
+
+    int16_t getEncodedValueInt16() const override
+    {
+        int16_t v;
+        getEncodedValue( &v );
+        return v;
+    }
+
+    uint16_t getEncodedValueUInt16() const override
+    {
+        uint16_t v;
+        getEncodedValue( &v );
+        return v;
+    }
+
+    int32_t getEncodedValueInt32() const override
+    {
+        int32_t v;
+        getEncodedValue( &v );
+        return v;
+    }
+
+    uint32_t getEncodedValueUInt32() const override
+    {
+        uint32_t v;
+        getEncodedValue( &v );
+        return v;
+    }
+
+    int64_t getEncodedValueInt64() const override
+    {
+        int64_t v;
+        getEncodedValue( &v );
+        return v;
+    }
+
+    uint64_t getEncodedValueUInt64() const override
+    {
+        uint64_t v;
+        getEncodedValue( &v );
+        return v;
+    }
+
+    float getEncodedValueFloat() const override
+    {
+        float v;
+        getEncodedValue( &v );
+        return v;
+    }
+
+    double getEncodedValueDouble() const override
+    {
+        double v;
+        getEncodedValue( &v );
+        return v;
+    }
+
     ///
     /// \brief setFromEncodedValue
     ///
@@ -482,6 +1134,56 @@ class RangedValue
         value_type decoding_divider = getDecodingDivider();
         value_type v = value_type( encoded_v ) * decoding_multiplier / decoding_divider;
         return setValue( v );
+    }
+
+    bool setFromEncodedValueInt8( int8_t v ) override
+    {
+        return this->setFromEncodedValue(v);
+    }
+
+    bool setFromEncodedValueUInt8( uint8_t v ) override
+    {
+        return setFromEncodedValue(v);
+    }
+
+    bool setFromEncodedValueInt16( int16_t v ) override
+    {
+        return setFromEncodedValue(v);
+    }
+
+    bool setFromEncodedValueUInt16( uint16_t v ) override
+    {
+        return setFromEncodedValue(v);
+    }
+
+    bool setFromEncodedValueInt32( int32_t v ) override
+    {
+        return setFromEncodedValue(v);
+    }
+
+    bool setFromEncodedValueUInt32( uint32_t v ) override
+    {
+        return setFromEncodedValue(v);
+    }
+
+    bool setFromEncodedValueInt64( int64_t v ) override
+    {
+        return setFromEncodedValue(v);
+    }
+
+    bool setFromEncodedValueUInt64( uint64_t v ) override
+    {
+        return setFromEncodedValue(v);
+    }
+
+    bool setFromEncodedValueFloat( float v ) override
+    {
+        return setFromEncodedValue(v);
+    }
+
+    bool setFromEncodedValueDouble( double v ) override
+    {
+        return setFromEncodedValue(v);
     }
 
     ///
@@ -502,6 +1204,56 @@ class RangedValue
         return setValueWithClamp( v );
     }
 
+    bool setFromEncodedValueWithClampInt8( int8_t v ) override
+    {
+        return this->setFromEncodedValueWithClamp(v);
+    }
+
+    bool setFromEncodedValueWithClampUInt8( uint8_t v ) override
+    {
+        return setFromEncodedValueWithClamp(v);
+    }
+
+    bool setFromEncodedValueWithClampInt16( int16_t v ) override
+    {
+        return setFromEncodedValueWithClamp(v);
+    }
+
+    bool setFromEncodedValueWithClampUInt16( uint16_t v ) override
+    {
+        return setFromEncodedValueWithClamp(v);
+    }
+
+    bool setFromEncodedValueWithClampInt32( int32_t v ) override
+    {
+        return setFromEncodedValueWithClamp(v);
+    }
+
+    bool setFromEncodedValueWithClampUInt32( uint32_t v ) override
+    {
+        return setFromEncodedValueWithClamp(v);
+    }
+
+    bool setFromEncodedValueWithClampInt64( int64_t v ) override
+    {
+        return setFromEncodedValueWithClamp(v);
+    }
+
+    bool setFromEncodedValueWithClampUInt64( uint64_t v ) override
+    {
+        return setFromEncodedValueWithClamp(v);
+    }
+
+    bool setFromEncodedValueWithClampFloat( float v ) override
+    {
+        return setFromEncodedValueWithClamp(v);
+    }
+
+    bool setFromEncodedValueWithClampDouble( double v ) override
+    {
+        return setFromEncodedValueWithClamp(v);
+    }
+
     ///
     /// \brief getUnitsCode
     ///
@@ -509,7 +1261,7 @@ class RangedValue
     ///
     /// \return The Units enumeration value
     ///
-    uint8_t getUnitsCode() const { return UnitsValue; }
+    UnitsCode getUnitsCode() const override { return UnitsValue; }
 
 
     ///
@@ -517,7 +1269,7 @@ class RangedValue
     ///
     /// Set the changed flag
     ///
-    void setChanged()
+    void setChanged() override
     {
         m_changed=true;
     }
@@ -527,7 +1279,7 @@ class RangedValue
     ///
     /// Clear the changed flag
     ///
-    void clearChanged()
+    void clearChanged() override
     {
         m_changed=false;
     }
@@ -536,18 +1288,16 @@ class RangedValue
     /// \brief getChanged
     /// \return true if the value had changed since the last time clearChanged() was called
     ///
-    bool getChanged() const
+    bool getChanged() const override
     {
         return m_changed;
     }
-
-
 
     ///
     /// \brief getEncodedMinValue
     /// \return The encoded minimum value
     ///
-    int64_t getEncodedMinValue() const
+    int64_t getEncodedMinValue() const override
     {
         return min_value;
     }
@@ -556,7 +1306,7 @@ class RangedValue
     /// \brief getEncodedMaxValue
     /// \return The encoded maximum value
     ///
-    int64_t getEncodedMaxValue() const
+    int64_t getEncodedMaxValue() const override
     {
         return max_value;
     }
@@ -565,7 +1315,7 @@ class RangedValue
     /// \brief getEncodedStepValue
     /// \return The encoded step value
     ///
-    int64_t getEncodedStepValue() const
+    int64_t getEncodedStepValue() const override
     {
         return step_value;
     }
@@ -574,12 +1324,22 @@ class RangedValue
     /// \brief getEncodedDefaultValue
     /// \return the encoded default value
     ///
-    int64_t getEncodedDefaultValue() const
+    int64_t getEncodedDefaultValue() const override
     {
         return default_value;
     }
 
-    const char * getUnitsSuffix() const
+    ///
+    /// \brief getEncodingMultiplierPower
+    /// \return the power of 10 used for encoding
+    ///
+    int8_t getEncodingMultiplierPower() const override
+    {
+        return multiplier_power;
+    }
+
+
+    const char * getUnitsSuffix() const override
     {
         return getAvdeccUnitsSuffix( getUnitsCode() );
     }
@@ -599,4 +1359,6 @@ class RangedValue
     ///
     bool m_changed;
 };
+
 }
+
