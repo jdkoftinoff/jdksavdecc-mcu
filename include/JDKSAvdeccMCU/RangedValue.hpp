@@ -9,6 +9,50 @@ namespace JDKSAvdeccMCU
 {
 using std::string;
 
+struct AvdeccControlString
+{
+    AvdeccControlString()
+    {
+        for( int i=0; i<sizeof(m_value); ++i )
+        {
+            m_value[i] = 0;
+        }
+    }
+
+    void clear()
+    {
+        for( int i=0; i<sizeof(m_value); ++i )
+        {
+            m_value[i] = 0;
+        }
+    }
+
+    void set( const string &s )
+    {
+        clear();
+        for( int i=0; i<s.length() && i<sizeof(m_value)-1; ++i )
+        {
+            if( s[i]!=0 )
+            {
+                m_value[i] = uint8_t(s[i]);
+            }
+        }
+    }
+
+    string get() const
+    {
+        string s;
+        for( int i=0; i<sizeof(m_value)-1; ++i )
+        {
+            s.push_back( char(m_value[i]));
+        }
+        return s;
+    }
+
+    /// Null terminated UTF-8 string, 406 octets long max including null termination
+    uint8_t m_value[406];
+};
+
 /// \brief powers_of_ten
 ///
 /// The powers of ten values as float from 1e-12 to 1e12 inclusive
@@ -470,7 +514,7 @@ public:
     ///
     virtual bool decValue() = 0;
 
-    virtual void getEncodedValueAvdeccString( uint8_t storage[64] ) const = 0;
+    virtual void getEncodedValueAvdeccString( AvdeccControlString *storage ) const = 0;
     virtual int8_t getEncodedValueInt8() const =0;
     virtual uint8_t getEncodedValueUInt8() const =0;
     virtual int16_t getEncodedValueInt16() const =0;
@@ -482,7 +526,7 @@ public:
     virtual float getEncodedValueFloat() const =0;
     virtual double getEncodedValueDouble() const =0;
 
-    virtual void setFromEncodedValueAvdeccString( const uint8_t storage[64] ) =0;
+    virtual void setFromEncodedValueAvdeccString( const AvdeccControlString *storage ) =0;
     virtual bool setFromEncodedValueInt8( int8_t v ) =0;
     virtual bool setFromEncodedValueUInt8( uint8_t v ) =0;
     virtual bool setFromEncodedValueInt16( int16_t v ) =0;
@@ -576,10 +620,8 @@ template <UnitsCode UnitsValue,
           typename ValueT = float>
 class RangedValue : public RangedValueBase
 {
-#if __cplusplus >= 201103L
     static_assert( MinValue <= DefaultValue, "MinValue is not less than or equal to DefaultValue" );
     static_assert( DefaultValue <= MaxValue, "DefaultValue is not less than or equal to MaxValue" );
-#endif
 
   public:
     typedef ValueT value_type;
@@ -1055,7 +1097,6 @@ class RangedValue : public RangedValueBase
         value_type encoding_divider = getEncodingDivider();
         value_type v = ( getValue() * encoding_multiplier / encoding_divider );
         value_type rounded_v;
-#if __cplusplus >= 201103L
 
         if ( !std::is_floating_point<T>::value && std::is_floating_point<value_type>::value )
         {
@@ -1073,25 +1114,14 @@ class RangedValue : public RangedValueBase
         {
             throw std::domain_error( "Min Value too small for encoding" );
         }
-#else
-        rounded_v = valueRound( v );
-#endif
         *dest = rounded_v;
     }
 
-    void getEncodedValueAvdeccString( uint8_t storage[64] ) const override
+    void getEncodedValueAvdeccString( AvdeccControlString *storage ) const override
     {
-        for(int i=0; i<64; ++i )
-        {
-            storage[i] = 0;
-        }
-
         string s = getUnencodedValueString(false);
 
-        for(int i=0; i<s.length() && i<64; ++i )
-        {
-            storage[i] = s[i];
-        }
+        storage->set(s);
     }
 
     int8_t getEncodedValueInt8() const override
@@ -1181,27 +1211,16 @@ class RangedValue : public RangedValueBase
         return setValue( v );
     }
 
-    void setFromEncodedValueAvdeccString( const uint8_t storage[64] ) override
+    void setFromEncodedValueAvdeccString( const AvdeccControlString *storage ) override
     {
-        string s;
-        for( int i=0; i<64; ++i )
-        {
-            if( storage[i]=='\0')
-            {
-                break;
-            }
-            else
-            {
-                s.push_back(char(storage[i]));
-            }
-        }
+        string s = storage->get();
         std::istringstream buf(s);
         buf >> m_value;
     }
 
     bool setFromEncodedValueInt8( int8_t v ) override
     {
-        return this->setFromEncodedValue(v);
+        return setFromEncodedValue(v);
     }
 
     bool setFromEncodedValueUInt8( uint8_t v ) override
@@ -1269,7 +1288,754 @@ class RangedValue : public RangedValueBase
 
     bool setFromEncodedValueWithClampInt8( int8_t v ) override
     {
-        return this->setFromEncodedValueWithClamp(v);
+        return setFromEncodedValueWithClamp(v);
+    }
+
+    bool setFromEncodedValueWithClampUInt8( uint8_t v ) override
+    {
+        return setFromEncodedValueWithClamp(v);
+    }
+
+    bool setFromEncodedValueWithClampInt16( int16_t v ) override
+    {
+        return setFromEncodedValueWithClamp(v);
+    }
+
+    bool setFromEncodedValueWithClampUInt16( uint16_t v ) override
+    {
+        return setFromEncodedValueWithClamp(v);
+    }
+
+    bool setFromEncodedValueWithClampInt32( int32_t v ) override
+    {
+        return setFromEncodedValueWithClamp(v);
+    }
+
+    bool setFromEncodedValueWithClampUInt32( uint32_t v ) override
+    {
+        return setFromEncodedValueWithClamp(v);
+    }
+
+    bool setFromEncodedValueWithClampInt64( int64_t v ) override
+    {
+        return setFromEncodedValueWithClamp(v);
+    }
+
+    bool setFromEncodedValueWithClampUInt64( uint64_t v ) override
+    {
+        return setFromEncodedValueWithClamp(v);
+    }
+
+    bool setFromEncodedValueWithClampFloat( float v ) override
+    {
+        return setFromEncodedValueWithClamp(v);
+    }
+
+    bool setFromEncodedValueWithClampDouble( double v ) override
+    {
+        return setFromEncodedValueWithClamp(v);
+    }
+
+    ///
+    /// \brief getUnitsCode
+    ///
+    /// Get the units code for this value
+    ///
+    /// \return The Units enumeration value
+    ///
+    UnitsCode getUnitsCode() const override { return UnitsValue; }
+
+
+    ///
+    /// \brief setChanged
+    ///
+    /// Set the changed flag
+    ///
+    void setChanged() override
+    {
+        m_changed=true;
+    }
+
+    ///
+    /// \brief clearChanged
+    ///
+    /// Clear the changed flag
+    ///
+    void clearChanged() override
+    {
+        m_changed=false;
+    }
+
+    ///
+    /// \brief getChanged
+    /// \return true if the value had changed since the last time clearChanged() was called
+    ///
+    bool getChanged() const override
+    {
+        return m_changed;
+    }
+
+    ///
+    /// \brief getEncodedMinValue
+    /// \return The encoded minimum value
+    ///
+    int64_t getEncodedMinValue() const override
+    {
+        return min_value;
+    }
+
+    ///
+    /// \brief getEncodedMaxValue
+    /// \return The encoded maximum value
+    ///
+    int64_t getEncodedMaxValue() const override
+    {
+        return max_value;
+    }
+
+    ///
+    /// \brief getEncodedStepValue
+    /// \return The encoded step value
+    ///
+    int64_t getEncodedStepValue() const override
+    {
+        return step_value;
+    }
+
+    ///
+    /// \brief getEncodedDefaultValue
+    /// \return the encoded default value
+    ///
+    int64_t getEncodedDefaultValue() const override
+    {
+        return default_value;
+    }
+
+    ///
+    /// \brief getEncodingMultiplierPower
+    /// \return the power of 10 used for encoding
+    ///
+    int8_t getEncodingMultiplierPower() const override
+    {
+        return multiplier_power;
+    }
+
+
+    const char * getUnitsSuffix() const override
+    {
+        return getAvdeccUnitsSuffix( getUnitsCode() );
+    }
+
+  private:
+    ///
+    /// \brief m_value
+    ///
+    /// The actual non-encoded value
+    ///
+    value_type m_value;
+
+    ///
+    /// \brief m_changed
+    ///
+    /// True if the value has changed since the last time clearChanged() was called
+    ///
+    bool m_changed;
+};
+
+
+template <UnitsCode UnitsValue,
+          int64_t MinValue,
+          int64_t MaxValue,
+          int64_t DefaultValue,
+          int64_t StepValue,
+          int MultiplierPowerValue>
+class RangedValue<
+        UnitsValue,MinValue,MaxValue,DefaultValue,StepValue,MultiplierPowerValue,string,string
+        > : public RangedValueBase
+{
+    static_assert( MinValue <= DefaultValue, "MinValue is not less than or equal to DefaultValue" );
+    static_assert( DefaultValue <= MaxValue, "DefaultValue is not less than or equal to MaxValue" );
+
+  public:
+    typedef string value_type;
+    typedef string encoded_type;
+
+    static const UnitsCode units = UnitsValue;
+    static const int64_t min_value = MinValue;
+    static const int64_t max_value = MaxValue;
+    static const int64_t step_value = StepValue;
+    static const int64_t default_value = DefaultValue;
+    static const int multiplier_power = MultiplierPowerValue;
+
+
+    ///
+    /// \brief Value Constructor
+    ///
+    /// Initialize to the default value
+    ///
+    RangedValue()
+    {
+        setDefault();
+        setChanged();
+    }
+
+    ///
+    /// \brief Value implicit Constructor
+    ///
+    /// Initialize based on value. May throw range_error if the value is out of
+    /// range
+    ///
+    /// \param v value
+    ///
+    RangedValue( value_type v )
+    {
+        setValue( v );
+        setChanged();
+    }
+
+    ///
+    /// \brief Value
+    ///
+    /// Copy constructor is faster since the m_value is already validated
+    ///
+    /// \param v Source Value object
+    ///
+    RangedValue( RangedValue const &v )
+        : m_value( v.m_value )
+        , m_changed( v.m_changed )
+    {
+    }
+
+    ///
+    /// \brief operator =
+    ///
+    /// Assignment operator is faster since the m_value is already validated
+    ///
+    /// \param v Source Value object
+    /// \return  *this
+    ///
+    RangedValue &operator=( RangedValue const &v )
+    {
+        m_value = v.m_value;
+        m_changed = v.m_changed;
+        return *this;
+    }
+
+    ///
+    /// \brief operator value_type
+    ///
+    operator value_type() const { return m_value; }
+
+    ///
+    /// \brief setDefault
+    ///
+    /// Sets the value to the default value
+    ///
+    /// \return true if the value changed
+    ///
+    bool setDefault() { return setValue( getDefaultValue() ); }
+
+    ///
+    /// \brief setValue
+    ///
+    /// Set the value to a new value.
+    ///
+    /// throws range_error if the requested value is out of range
+    ///
+    /// \param v the requested value
+    /// \return true if the value changed
+    ///
+    bool setValue( value_type v )
+    {
+        bool r=false;
+        if ( m_value != v )
+        {
+            m_value = v;
+            m_changed = true;
+            r = true;
+        }
+        return r;
+    }
+
+    ///
+    /// \brief setValueWithClamp
+    ///
+    /// Set the value to a new value.
+    ///
+    /// clamps the value to min or max if the requested value is out of range
+    ///
+    /// \param v the requested value
+    /// \return true if the value changed
+    ///
+    bool setValueWithClamp( value_type v )
+    {
+        bool r=false;
+        if ( m_value != v )
+        {
+            m_value = v;
+            m_changed = true;
+            r = true;
+        }
+        return r;
+    }
+
+    EncodingType getStorageType() const override
+    {
+        return EncodingTypeFor<value_type>::getEncodingType();
+    }
+
+    EncodingType getEncodingType() const override
+    {
+        return EncodingTypeFor<encoded_type>::getEncodingType();
+    }
+
+    bool setUnencodedValueString( string const &v ) override
+    {
+        return setValue(v);
+    }
+
+    bool setUnencodedValueBool( bool v ) override
+    {
+        return setValue( v ? "true" : "false" );
+    }
+
+    bool setUnencodedValueFloat( float v ) override
+    {
+        std::ostringstream buf;
+        buf << v;
+        return setValue(buf.str());
+    }
+
+    bool setUnencodedValueDouble( double v ) override
+    {
+        std::ostringstream buf;
+        buf << v;
+        return setValue(buf.str());
+    }
+
+    bool setUnencodedValueInt64( int64_t v ) override
+    {
+        std::ostringstream buf;
+        buf << v;
+        return setValue(buf.str());
+    }
+
+    bool setUnencodedValueUInt64( uint64_t v ) override
+    {
+        std::ostringstream buf;
+        buf << v;
+        return setValue(buf.str());
+    }
+
+    string getUnencodedValueString(bool enable_units) const
+    {
+        std::ostringstream buf;
+        buf << m_value;
+        if( enable_units )
+        {
+            const char *suffix =getAvdeccUnitsSuffix(units);
+            if( suffix && *suffix )
+            {
+                buf << " " << suffix;
+            }
+        }
+        return buf.str();
+    }
+
+    bool getUnencodedValueBool() const override
+    {
+        return m_value == "true" ? true : false;
+    }
+
+    float getUnencodedValueFloat() const override
+    {
+        std::istringstream buf(m_value);
+        float v;
+        buf >> v;
+        return v;
+    }
+
+    double getUnencodedValueDouble() const override
+    {
+        std::istringstream buf(m_value);
+        double v;
+        buf >> v;
+        return v;
+    }
+
+    int64_t getUnencodedValueInt64() const override
+    {
+        std::istringstream buf(m_value);
+        int64_t v;
+        buf >> v;
+        return v;
+    }
+
+
+    uint64_t getUnencodedValueUInt64() const override
+    {
+        std::istringstream buf(m_value);
+        uint64_t v;
+        buf >> v;
+        return v;
+    }
+
+
+    ///
+    /// \brief incValue
+    ///
+    /// Increment the current value by the step size.
+    /// Will not increment past the max value
+    ///
+    /// \return true if the value changed
+    ///
+    bool incValue() override
+    {
+        return false;
+    }
+
+    ///
+    /// \brief decValue
+    ///
+    /// Decrement the current value by the step size.
+    /// Will not decrement past the min value
+    ///
+    /// \return true if the value changed
+    ///
+    bool decValue() override
+    {
+        return false;
+    }
+
+    ///
+    /// \brief getValue
+    ///
+    /// Get the current value
+    ///
+    /// \return the value
+    ///
+    value_type getValue() const { return m_value; }
+
+    ///
+    /// \brief getMinValue
+    ///
+    /// Get the minimum value
+    ///
+    /// \return the minimum value
+    ///
+    value_type getMinValue() const
+    {
+        return "";
+    }
+
+    ///
+    /// \brief getMaxValue
+    ///
+    /// Get the maximum value
+    ///
+    /// \return the maximum value
+    ///
+    value_type getMaxValue() const
+    {
+        return "";
+    }
+
+    ///
+    /// \brief getDefaultValue
+    ///
+    /// Get the default value
+    ///
+    /// \return the default value
+    ///
+    value_type getDefaultValue() const
+    {
+        return "";
+    }
+
+    ///
+    /// \brief getStepValue
+    ///
+    /// Get the step value
+    ///
+    /// \return the step value
+    ///
+    value_type getStepValue() const
+    {
+        return "";
+    }
+
+    ///
+    /// \brief getEncodingMultiplier
+    ///
+    /// Get the multiplier required to convert an unencoded value
+    /// to an encoded value.
+    ///
+    /// If the multiplier_power is <=0 this method returns 1
+    ///
+    /// \return The value to multiply with
+    ///
+    value_type getEncodingMultiplier() const
+    {
+        return "";
+    }
+
+    ///
+    /// \brief getEncodingDivider
+    ///
+    /// Get the divider required to convert an unencoded value
+    /// to an encoded value
+    ///
+    /// If the multiplier_power is >=0 this method returns 1
+    ///
+    /// \return the value to divide with
+    ///
+    value_type getEncodingDivider() const
+    {
+        return "";
+    }
+
+    ///
+    /// \brief getDecodingMultiplier
+    ///
+    /// Get the multiplier required to convert an encoded value
+    /// to an unencoded value.
+    ///
+    /// If the multiplier_power is >=0 this method returns 1
+    ///
+    /// \return The value to multiply with
+    ///
+    value_type getDecodingMultiplier() const
+    {
+        return "";
+    }
+
+    ///
+    /// \brief getDecodingDivider
+    ///
+    /// Get the divider required to convert an encoded value
+    /// to an unencoded value
+    ///
+    /// If the multiplier_power is <=0 this method returns 1
+    ///
+    /// \return the value to divide with
+    ///
+    value_type getDecodingDivider() const
+    {
+        return "";
+    }
+
+    ///
+    /// Default template function to help round integer types
+    ///
+    template <typename T>
+    static T valueRound( T v )
+    {
+        return v;
+    }
+
+    ///
+    /// \brief valueRound
+    ///
+    /// overload to round float types
+    ///
+    /// \param v value to round
+    /// \return the rounded value
+    ///
+    static float valueRound( float v ) { return roundf( v ); }
+
+    ///
+    /// \brief valueRound
+    ///
+    /// overload to round double types
+    ///
+    /// \param v the value to round
+    /// \return  the rounded value
+    ///
+    static double valueRound( double v ) { return round( v ); }
+
+    ///
+    /// \brief getEncodedValue
+    ///
+    /// Convert the current value to an encoded value
+    ///
+    /// If the result type is integer, then the result is rounded first.
+    ///
+    /// If the result type does not have enough bits to hold the full range
+    /// of the encoded value, this function throws domain_error
+    ///
+    /// \param dest Pointer to the result
+    ///
+    template <typename T>
+    void getEncodedValue( T *dest ) const
+    {
+        std::istringstream buf(m_value);
+        buf >> *dest;
+    }
+
+    void getEncodedValueAvdeccString( AvdeccControlString *storage ) const override
+    {
+        storage->set(m_value);
+    }
+
+    int8_t getEncodedValueInt8() const override
+    {
+        int8_t v;
+        getEncodedValue( &v );
+        return v;
+    }
+
+    uint8_t getEncodedValueUInt8() const override
+    {
+        uint8_t v;
+        getEncodedValue( &v );
+        return v;
+    }
+
+    int16_t getEncodedValueInt16() const override
+    {
+        int16_t v;
+        getEncodedValue( &v );
+        return v;
+    }
+
+    uint16_t getEncodedValueUInt16() const override
+    {
+        uint16_t v;
+        getEncodedValue( &v );
+        return v;
+    }
+
+    int32_t getEncodedValueInt32() const override
+    {
+        int32_t v;
+        getEncodedValue( &v );
+        return v;
+    }
+
+    uint32_t getEncodedValueUInt32() const override
+    {
+        uint32_t v;
+        getEncodedValue( &v );
+        return v;
+    }
+
+    int64_t getEncodedValueInt64() const override
+    {
+        int64_t v;
+        getEncodedValue( &v );
+        return v;
+    }
+
+    uint64_t getEncodedValueUInt64() const override
+    {
+        uint64_t v;
+        getEncodedValue( &v );
+        return v;
+    }
+
+    float getEncodedValueFloat() const override
+    {
+        float v;
+        getEncodedValue( &v );
+        return v;
+    }
+
+    double getEncodedValueDouble() const override
+    {
+        double v;
+        getEncodedValue( &v );
+        return v;
+    }
+
+    ///
+    /// \brief setFromEncodedValue
+    ///
+    /// If the encoded_v is out of range, this function will throw range_error
+    ///
+    /// \param encoded_v The encoded value to use to set the value to
+    ///
+    /// \return true if the value changed
+    template <typename T>
+    bool setFromEncodedValue( T encoded_v )
+    {
+        std::ostringstream buf;
+        buf << encoded_v;
+        return setValue(buf.str());
+    }
+
+    void setFromEncodedValueAvdeccString( const AvdeccControlString *storage ) override
+    {
+        m_value = storage->get();
+    }
+
+    bool setFromEncodedValueInt8( int8_t v ) override
+    {
+        return setFromEncodedValue(v);
+    }
+
+    bool setFromEncodedValueUInt8( uint8_t v ) override
+    {
+        return setFromEncodedValue(v);
+    }
+
+    bool setFromEncodedValueInt16( int16_t v ) override
+    {
+        return setFromEncodedValue(v);
+    }
+
+    bool setFromEncodedValueUInt16( uint16_t v ) override
+    {
+        return setFromEncodedValue(v);
+    }
+
+    bool setFromEncodedValueInt32( int32_t v ) override
+    {
+        return setFromEncodedValue(v);
+    }
+
+    bool setFromEncodedValueUInt32( uint32_t v ) override
+    {
+        return setFromEncodedValue(v);
+    }
+
+    bool setFromEncodedValueInt64( int64_t v ) override
+    {
+        return setFromEncodedValue(v);
+    }
+
+    bool setFromEncodedValueUInt64( uint64_t v ) override
+    {
+        return setFromEncodedValue(v);
+    }
+
+    bool setFromEncodedValueFloat( float v ) override
+    {
+        return setFromEncodedValue(v);
+    }
+
+    bool setFromEncodedValueDouble( double v ) override
+    {
+        return setFromEncodedValue(v);
+    }
+
+    ///
+    /// \brief setFromEncodedValueWithClamp
+    ///
+    /// If the encoded_v is out of range, this function will clamp the
+    /// value to the appropriate range
+    ///
+    /// \param encoded_v The encoded value to use to set the value to
+    ///
+    /// \return true if the value changed
+    template <typename T>
+    bool setFromEncodedValueWithClamp( T encoded_v )
+    {
+        return setFromEncodedValue(encoded_v);
+    }
+
+    bool setFromEncodedValueWithClampInt8( int8_t v ) override
+    {
+        return setFromEncodedValueWithClamp(v);
     }
 
     bool setFromEncodedValueWithClampUInt8( uint8_t v ) override
