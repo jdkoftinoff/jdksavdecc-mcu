@@ -2,9 +2,13 @@
 
 #include "JDKSAvdeccMCU/World.hpp"
 #include "JDKSAvdeccMCU/Helpers.hpp"
+#include <string>
+#include <sstream>
 
 namespace JDKSAvdeccMCU
 {
+using std::string;
+
 /// \brief powers_of_ten
 ///
 /// The powers of ten values as float from 1e-12 to 1e12 inclusive
@@ -116,36 +120,6 @@ T getDecodingDivider(int8_t multiplier_power )
     return r;
 }
 
-///
-/// \brief convertEncodedValueToDecoded
-///
-/// convert a value from the encoded value to the decoded value, taking
-/// into account the multiplier_power
-///
-template <typename DecodedType,typename EncodedType>
-DecodedType convertEncodedValueToDecoded( EncodedType encoded, int8_t multiplier_power )
-{
-    DecodedType v = static_cast<DecodedType>(encoded);
-    v *= getDecodingMultiplier<DecodedType>(multiplier_power);
-    v /= getDecodingDivider<DecodedType>(multiplier_power);
-    return v;
-}
-
-///
-/// \brief convertDecodedValueToEncoded
-///
-/// convert a value from the decoded value to the encoded value, taking
-/// into account the multiplier_power
-///
-template <typename EncodedType,typename DecodedType>
-EncodedType convertDecodedValueToEncoded( DecodedType decoded, int8_t multiplier_power )
-{
-    EncodedType v = static_cast<EncodedType>(decoded);
-    v *= getEncodingMultiplier<EncodedType>(multiplier_power);
-    v /= getEncodingDivider<EncodedType>(multiplier_power);
-    return v;
-}
-
 
 ///
 /// \brief The UnitsCode enum
@@ -249,7 +223,8 @@ enum class EncodingType : uint8_t
     ENCODING_INT64,
     ENCODING_UINT64,
     ENCODING_FLOAT,
-    ENCODING_DOUBLE
+    ENCODING_DOUBLE,
+    ENCODING_STRING
 };
 
 ///
@@ -333,6 +308,12 @@ struct EncodingTypeFor<double>
     static EncodingType getEncodingType() { return EncodingType::ENCODING_DOUBLE; }
 };
 
+template <>
+struct EncodingTypeFor<string>
+{
+    using type = string;
+    static EncodingType getEncodingType() { return EncodingType::ENCODING_STRING; }
+};
 
 ///
 /// \brief The RangedValueBase class
@@ -364,6 +345,18 @@ public:
     /// \return The EncodingType used for the encoded transport of this value
     ///
     virtual EncodingType getEncodingType() const = 0;
+
+
+    ///
+    /// \brief setUnencodedValueString
+    ///
+    /// If storage type and encoding type are both string, then set
+    /// the string value
+    ///
+    /// \param v The new string value
+    /// \return true if the value changed
+    ///
+    virtual bool setUnencodedValueString( string const &v ) = 0;
 
     ///
     /// \brief setUnencodedValueBool
@@ -415,6 +408,20 @@ public:
     ///
     virtual bool setUnencodedValueUInt64( uint64_t v ) = 0;
 
+
+    ///
+    /// \brief getUnencodedValueString
+    ///
+    /// Get the unencoded value string. If the
+    /// storage type and encoding type is string, then
+    /// it returns the value. If the storage type is not
+    /// string then it returns the textual representation
+    /// optionally with units
+    ///
+    /// \return the string representation of the unencoded value
+    ///
+    virtual string getUnencodedValueString(bool enable_units=true) const = 0;
+
     ///
     /// \brief getUnencodedValueBool
     /// \return the unencoded value as a bool
@@ -463,6 +470,7 @@ public:
     ///
     virtual bool decValue() = 0;
 
+    virtual void getEncodedValueAvdeccString( uint8_t storage[64] ) const = 0;
     virtual int8_t getEncodedValueInt8() const =0;
     virtual uint8_t getEncodedValueUInt8() const =0;
     virtual int16_t getEncodedValueInt16() const =0;
@@ -474,6 +482,7 @@ public:
     virtual float getEncodedValueFloat() const =0;
     virtual double getEncodedValueDouble() const =0;
 
+    virtual void setFromEncodedValueAvdeccString( const uint8_t storage[64] ) =0;
     virtual bool setFromEncodedValueInt8( int8_t v ) =0;
     virtual bool setFromEncodedValueUInt8( uint8_t v ) =0;
     virtual bool setFromEncodedValueInt16( int16_t v ) =0;
@@ -724,6 +733,12 @@ class RangedValue : public RangedValueBase
         return EncodingTypeFor<EncodedT>::getEncodingType();
     }
 
+    bool setUnencodedValueString( string const &v ) override
+    {
+        return false;
+    }
+
+
     bool setUnencodedValueBool( bool v ) override
     {
         uint8_t v8 = v ? 255 : 0;
@@ -749,6 +764,21 @@ class RangedValue : public RangedValueBase
     bool setUnencodedValueUInt64( uint64_t v ) override
     {
         return setValue(v);
+    }
+
+    string getUnencodedValueString(bool enable_units) const
+    {
+        std::ostringstream buf;
+        buf << m_value;
+        if( enable_units )
+        {
+            const char *suffix =getAvdeccUnitsSuffix(units);
+            if( suffix && *suffix )
+            {
+                buf << " " << suffix;
+            }
+        }
+        return buf.str();
     }
 
     bool getUnencodedValueBool() const override
@@ -1049,6 +1079,21 @@ class RangedValue : public RangedValueBase
         *dest = rounded_v;
     }
 
+    void getEncodedValueAvdeccString( uint8_t storage[64] ) const override
+    {
+        for(int i=0; i<64; ++i )
+        {
+            storage[i] = 0;
+        }
+
+        string s = getUnencodedValueString(false);
+
+        for(int i=0; i<s.length() && i<64; ++i )
+        {
+            storage[i] = s[i];
+        }
+    }
+
     int8_t getEncodedValueInt8() const override
     {
         int8_t v;
@@ -1134,6 +1179,24 @@ class RangedValue : public RangedValueBase
         value_type decoding_divider = getDecodingDivider();
         value_type v = value_type( encoded_v ) * decoding_multiplier / decoding_divider;
         return setValue( v );
+    }
+
+    void setFromEncodedValueAvdeccString( const uint8_t storage[64] ) override
+    {
+        string s;
+        for( int i=0; i<64; ++i )
+        {
+            if( storage[i]=='\0')
+            {
+                break;
+            }
+            else
+            {
+                s.push_back(char(storage[i]));
+            }
+        }
+        std::istringstream buf(s);
+        buf >> m_value;
     }
 
     bool setFromEncodedValueInt8( int8_t v ) override
