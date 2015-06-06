@@ -13,7 +13,7 @@ struct AvdeccControlString
 {
     AvdeccControlString()
     {
-        for( int i=0; i<sizeof(m_value); ++i )
+        for( size_t i=0; i<sizeof(m_value); ++i )
         {
             m_value[i] = 0;
         }
@@ -21,7 +21,7 @@ struct AvdeccControlString
 
     void clear()
     {
-        for( int i=0; i<sizeof(m_value); ++i )
+        for( size_t i=0; i<sizeof(m_value); ++i )
         {
             m_value[i] = 0;
         }
@@ -30,7 +30,7 @@ struct AvdeccControlString
     void set( const string &s )
     {
         clear();
-        for( int i=0; i<s.length() && i<sizeof(m_value)-1; ++i )
+        for( size_t i=0; i<s.length() && i<sizeof(m_value)-1; ++i )
         {
             if( s[i]!=0 )
             {
@@ -42,7 +42,7 @@ struct AvdeccControlString
     string get() const
     {
         string s;
-        for( int i=0; i<sizeof(m_value)-1; ++i )
+        for( size_t i=0; i<sizeof(m_value)-1; ++i )
         {
             s.push_back( char(m_value[i]));
         }
