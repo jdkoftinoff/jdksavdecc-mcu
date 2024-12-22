@@ -4,6 +4,7 @@
 #include "JDKSAvdeccMCU/Helpers.hpp"
 #include <string>
 #include <sstream>
+#include <limits>
 
 namespace JDKSAvdeccMCU
 {

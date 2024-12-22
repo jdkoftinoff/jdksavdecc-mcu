@@ -130,7 +130,7 @@ void Entity::commandTimedOut( Eui64 const &target_entity_id, uint16_t command_ty
     (void)command_type;
     (void)sequence_id;
     //    avr_debug_log("TimeOut:", sequence_id );
-    memset( &m_last_sent_command_target_entity_id, 0, sizeof( m_last_sent_command_target_entity_id ) );
+    m_last_sent_command_target_entity_id.clear();
 }
 
 bool Entity::receivedPDU( RawSocket *incoming_socket, Frame &frame )
